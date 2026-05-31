@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  VIEWER
+}
+
+enum UnitType {
+  MILK_BANK
+  COLLECTION_POINT
+  HOSPITAL
+  PARTNER
+}
+
+enum UnitStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+}
+
+enum InterestStatus {
+  INTERESTED
+  CONTACTED
+  DONATED
+  UNKNOWN
+}
+
+enum ContactPreference {
+  WHATSAPP
+  EMAIL
+  NONE
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  fullName    String    @map("full_name")
+  role        UserRole  @default(VIEWER)
+  isActive    Boolean   @default(true) @map("is_active")
+  lastLoginAt DateTime? @map("last_login_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  unitsResponsible Unit[]               @relation("AdminResponsible")
+  auditLogs        AuditLog[]
+  campaigns        Campaign[]
+  contentsEdited   EducationalContent[]
+
+  @@map("users")
+}
+
+model NutrizProfile {
+  id                String            @id @default(uuid())
+  fullName          String            @map("full_name")
+  phoneWhatsapp     String            @map("phone_whatsapp")
+  email             String?
+  state             String            @db.Char(2)
+  city              String
+  neighborhood      String?
+  interestStatus    InterestStatus    @default(INTERESTED) @map("interest_status")
+  contactPreference ContactPreference @default(WHATSAPP) @map("contact_preference")
+  lgpdConsentAt     DateTime          @map("lgpd_consent_at")
+  marketingConsent  Boolean           @default(false) @map("marketing_consent")
+  sourceUtm         Json?             @map("source_utm")
+  deletedAt         DateTime?         @map("deleted_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  contactIntents ContactIntent[]
+  whatsappClicks WhatsappClick[]
+
+  @@index([state, city, createdAt])
+  @@index([phoneWhatsapp])
+  @@map("nutriz_profiles")
+}
+
+model Unit {
+  id                  String     @id @default(uuid())
+  slug                String     @unique
+  name                String
+  type                UnitType
+  addressStreet       String     @map("address_street")
+  addressNumber       String?    @map("address_number")
+  addressComplement   String?    @map("address_complement")
+  addressNeighborhood String     @map("address_neighborhood")
+  addressCity         String     @map("address_city")
+  addressState        String     @map("address_state") @db.Char(2)
+  addressZip          String?    @map("address_zip")
+  phone               String?
+  whatsapp            String?
+  email               String?
+  openingHours        Json?      @map("opening_hours")
+  instructions        String?    @db.Text
+  whatsappMessage     String?    @map("whatsapp_message") @db.Text
+  status              UnitStatus @default(PENDING)
+  lat                 Float?
+  lng                 Float?
+  adminResponsibleId  String?    @map("admin_responsible_id")
+  adminNotes          String?    @map("admin_notes") @db.Text
+  createdAt           DateTime   @default(now()) @map("created_at")
+  updatedAt           DateTime   @updatedAt @map("updated_at")
+
+  adminResponsible User?           @relation("AdminResponsible", fields: [adminResponsibleId], references: [id])
+  contactIntents   ContactIntent[]
+  whatsappClicks   WhatsappClick[]
+
+  @@index([addressState, addressCity, status])
+  @@index([status])
+  @@map("units")
+}
+
+model ContactIntent {
+  id              String   @id @default(uuid())
+  nutrizProfileId String?  @map("nutriz_profile_id")
+  unitId          String?  @map("unit_id")
+  state           String?  @db.Char(2)
+  city            String?
+  sourceUtm       Json?    @map("source_utm")
+  userAgent       String?  @map("user_agent")
+  ipHash          String?  @map("ip_hash")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  nutrizProfile NutrizProfile? @relation(fields: [nutrizProfileId], references: [id])
+  unit          Unit?          @relation(fields: [unitId], references: [id])
+
+  @@index([createdAt, state])
+  @@map("contact_intents")
+}
+
+model WhatsappClick {
+  id              String   @id @default(uuid())
+  unitId          String   @map("unit_id")
+  nutrizProfileId String?  @map("nutriz_profile_id")
+  sourceUtm       Json?    @map("source_utm")
+  referrer        String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  unit          Unit           @relation(fields: [unitId], references: [id])
+  nutrizProfile NutrizProfile? @relation(fields: [nutrizProfileId], references: [id])
+
+  @@index([createdAt, unitId])
+  @@map("whatsapp_clicks")
+}
+
+model EducationalContent {
+  id              String    @id @default(uuid())
+  slug            String    @unique
+  title           String
+  bodyMarkdown    String    @map("body_markdown") @db.Text
+  category        String?
+  isPublished     Boolean   @default(false) @map("is_published")
+  publishedAt     DateTime? @map("published_at")
+  updatedByUserId String?   @map("updated_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  updatedByUser User? @relation(fields: [updatedByUserId], references: [id])
+
+  @@map("educational_contents")
+}
+
+model Campaign {
+  id              String   @id @default(uuid())
+  name            String
+  utmSource       String   @map("utm_source")
+  utmMedium       String   @map("utm_medium")
+  utmCampaign     String   @map("utm_campaign")
+  landingUrl      String   @map("landing_url")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  createdByUser User @relation(fields: [createdByUserId], references: [id])
+
+  @@map("campaigns")
+}
+
+model AuditLog {
+  id        String      @id @default(uuid())
+  userId    String      @map("user_id")
+  action    AuditAction
+  entity    String
+  entityId  String      @map("entity_id")
+  diff      Json?
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([userId, createdAt])
+  @@map("audit_logs")
+}

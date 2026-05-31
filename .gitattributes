@@ -1,0 +1,5 @@
+# Normaliza finais de linha para LF no repositorio e no checkout.
+# Critico para .sql/.prisma: mantem o checksum das migrations do Prisma estavel.
+* text=auto eol=lf
+*.sql text eol=lf
+*.prisma text eol=lf
