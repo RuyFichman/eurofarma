@@ -21,16 +21,17 @@ NÃO está em uso ainda (não sugira, não configure, não referencie como atual
 - Monitoramento (Sentry, PostHog, Datadog).
 - Supabase Auth (planejado para sprint futuro).
 - Playwright e2e (planejado para sprint futuro).
-- **shadcn/ui** — fundação pronta (`components.json`, util `cn` em `lib/utils/cn.ts`, tokens em `app/globals.css`), mas nenhum componente instalado ainda. Use `pnpm dlx shadcn@latest add <componente>` quando precisar.
-- **Route groups `(public)`/`(admin)`, `lib/i18n/pt-br.ts`, `content/`, `data/`** — ainda não criados; nascem nos sprints de feature.
+- **Route groups `(admin)`, `lib/i18n/pt-br.ts`, `content/`** — ainda não criados; nascem nos sprints de feature. (O grupo `(public)` já existe, com a página `/style-guide`.)
 
 Quando precisar mencionar esses itens, marque-os explicitamente como "previsto para sprints futuros".
 
-O scaffold do Next.js **já existe** e a esteira de qualidade funciona: `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm format`, `pnpm check` e `pnpm check:validators` rodam todos. TS estrito ativo (`strict` + `noUncheckedIndexedAccess`); imports com `@/*` mapeiam para a raiz.
+O scaffold do Next.js **já existe** e a esteira de qualidade funciona: `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm format`, `pnpm check`, `pnpm check:validators` e `pnpm test`/`test:unit`/`test:integration`/`test:coverage` (Vitest) rodam todos. TS estrito ativo (`strict` + `noUncheckedIndexedAccess`); imports com `@/*` mapeiam para a raiz.
+
+**Design system:** tokens visuais em `app/globals.css` (paleta Berry/Sage/Cream em HSL, radius, shadows; Tailwind v4 `@theme inline`, sem dark mode). Fonte **Inter** via `next/font`. **shadcn/ui instalado** — componentes em `components/ui/` (button, card, input, label, select, checkbox, radio-group, badge). Adicione mais com `pnpm dlx shadcn@latest add <componente>`. Referência visual viva em `/style-guide`. Nunca hardcode cor (`bg-[#...]`); use os tokens (`bg-primary`, `text-muted-foreground`, etc.).
 
 **Pendência de segurança aberta:** RLS (Row Level Security) está **desabilitado** em todas as 8 tabelas no Supabase cloud. Como a `publishable key` é pública, isso expõe leitura/escrita de tudo (incluindo `nutriz_profiles`). Habilitar RLS + policies é pré-requisito antes de qualquer exposição pública do app.
 
-**Progresso por sprint:** Sprint 0 (scaffold Next.js 15 + Tailwind 4 + TS estrito + ESLint/Prettier) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅ · 1.5 (seed de unidades — 6 unidades ACTIVE) ✅ · 1.6 (seed do admin inicial via Supabase Auth) ✅. Próximos: 1.7 (Vitest), 1.4 (CSVs reais), Sprint 2 (Landing — pré-condições já satisfeitas).
+**Progresso por sprint:** Sprint 0 (scaffold) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅ · 1.5 (seed de unidades — 6 unidades ACTIVE) ✅ · 1.6 (seed do admin via Supabase Auth) ✅ · 1.7 (Vitest: 66 testes — unit + integração; `findUnitsByLocation` em `lib/db/queries/units.ts`) ✅ · 2.1 (design tokens + shadcn + style guide) ✅. Próximos: 2.2 (header/footer), 2.3 (landing), 1.4 (CSVs reais).
 
 **Admin inicial:** provisionado por `pnpm db:seed-admin` (email em `INITIAL_ADMIN_EMAIL`, hoje `admin@lactare.local`). Existe em `auth.users` (Supabase Auth) e em `public.users` com `role=ADMIN`, mesmo `id` nas duas tabelas. Script idempotente: re-rodar não regenera senha. Reset de senha é manual via painel do Supabase. O fluxo de login do painel admin é Sprint 5 (Supabase Auth só é usado para provisionamento por enquanto).
 
