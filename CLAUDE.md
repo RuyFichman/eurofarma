@@ -21,8 +21,14 @@ NÃO está em uso ainda (não sugira, não configure, não referencie como atual
 - Monitoramento (Sentry, PostHog, Datadog).
 - Supabase Auth (planejado para sprint futuro).
 - Playwright e2e (planejado para sprint futuro).
+- **Scaffold do Next.js** — ainda não foi criado (sem `app/`, `next.config.ts`, Tailwind, shadcn). O repo hoje tem só `prisma/`, `lib/`, `scripts/` e configs de base.
+- **Toolchain de qualidade** — não há `tsconfig.json`, TypeScript instalado, nem ESLint/Prettier. Por isso `pnpm typecheck`, `pnpm lint`, `pnpm format` e `pnpm check` **ainda não funcionam**. Validação atual é via smoke tests com `tsx`.
 
 Quando precisar mencionar esses itens, marque-os explicitamente como "previsto para sprints futuros".
+
+**Pendência de segurança aberta:** RLS (Row Level Security) está **desabilitado** em todas as 8 tabelas no Supabase cloud. Como a `publishable key` é pública, isso expõe leitura/escrita de tudo (incluindo `nutriz_profiles`). Habilitar RLS + policies é pré-requisito antes de qualquer exposição pública do app.
+
+**Progresso por sprint:** 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅. Próximos: Sprint 0 enxuto (scaffold Next.js + toolchain), 1.4 (CSVs reais), 1.5 (seed), 1.6 (admin seed), 1.7 (Vitest).
 
 ## 4. Stack
 
@@ -30,70 +36,61 @@ Quando precisar mencionar esses itens, marque-os explicitamente como "previsto p
 |---|---|---|
 | Framework | Next.js (App Router) | 15 |
 | UI runtime | React | 19 |
-| Linguagem | TypeScript estrito | `strict: true`, `noUncheckedIndexedAccess: true` |
+| Linguagem | TypeScript estrito | `strict: true`, `noUncheckedIndexedAccess: true` (toolchain ainda não montado — ver seção 3) |
 | Estilo | Tailwind CSS | 4 (CSS variables como design tokens) |
 | Componentes | shadcn/ui | última |
-| Banco | PostgreSQL via Supabase | local (Docker) via `supabase start` |
-| ORM | Prisma | schema declarativo + migrations |
+| Banco | PostgreSQL via Supabase | **cloud** — projeto `eurofarma` / org `fiap` (ver seção 13) |
+| ORM | Prisma | **6.x** (fixado; não atualizar para 7 sem migração) |
+| Validação | Zod | **3.x** (fixado; APIs do v4 mudaram) |
 | Auth | Supabase Auth | sprint futuro — não usar ainda |
 | Forms | React Hook Form + Zod | — |
 | Conteúdo | MDX | educativo, políticas, termos |
 | Pacotes | pnpm | obrigatório (não usar npm/yarn) |
-| Node | 22 LTS | fixar em `.nvmrc` |
-| Testes | Vitest | unit + integration |
+| Node | 22 LTS planejado | ambiente atual roda Node 24 |
+| Testes | Vitest | unit + integration (sprint futuro) |
 | Testes e2e | Playwright | sprint futuro |
 
-No início, o banco é **Supabase local em Docker**. `DATABASE_URL` aponta para `localhost`. Não conectar à cloud para desenvolvimento.
+O banco é **Supabase cloud** (sem Docker local). Migrations são geradas com Prisma **offline** (`prisma migrate diff`) e aplicadas via **MCP do Supabase** (`apply_migration`) — o `prisma migrate dev` não roda bem no cloud (shadow DB) nem pelo pooler. `DATABASE_URL` no `.env.local` aponta para o **pooler** (porta 6543, `pgbouncer=true`); o CLI do Prisma lê o `.env.local` via `dotenv-cli`. Pin de Prisma 6 e Zod 3 são intencionais (ver seção 13).
 
 ## 5. Setup local passo a passo
 
-Pré-requisitos: Node 22 LTS, pnpm, Docker (para Supabase local), Supabase CLI.
+Pré-requisitos: Node 22 LTS (ambiente atual usa 24), pnpm. **Não precisa de Docker nem Supabase CLI** — o banco é cloud.
 
 ```bash
 # 1. Clonar e entrar no repo
-git clone <repo> lactare && cd lactare
+git clone https://github.com/RuyFichman/eurofarma.git && cd eurofarma
 
-# 2. Garantir a versão correta do Node
-nvm use            # lê .nvmrc (22 LTS)
+# 2. Variáveis de ambiente
+cp .env.example .env.local   # preencher DATABASE_URL (pooler) e chaves; NUNCA commitar .env.local
 
-# 3. Variáveis de ambiente
-cp .env.example .env.local   # editar valores locais; NUNCA commitar .env.local
-
-# 4. Instalar dependências
+# 3. Instalar dependências
 pnpm install
 
-# 5. Subir o Supabase local (Postgres em Docker)
-supabase start
+# 4. Gerar o Prisma Client
+pnpm db:generate
 
-# 6. Aplicar migrations
-pnpm db:migrate
+# 5. (schema já aplicado no cloud) Validar a camada lib
+pnpm check:validators        # smoke test dos validators/slug, deve dar "Falhou: 0"
 
-# 7. Popular dados de exemplo
-pnpm db:seed
-
-# 8. Rodar o servidor de desenvolvimento
+# 6. Rodar o servidor de desenvolvimento (após o scaffold do Next.js existir)
 pnpm dev
-
-# 9. Acessar
-# http://localhost:3000
 ```
 
-Scripts disponíveis em `package.json`:
+> Migrations **não** se aplicam com `prisma migrate dev` aqui. Gere o SQL offline com
+> `pnpm exec prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script`,
+> salve em `prisma/migrations/<timestamp>_<nome>/migration.sql` e aplique via MCP do Supabase
+> (`apply_migration`). Registre no `_prisma_migrations` com o checksum SHA-256 do arquivo.
 
-| Script | Ação |
-|---|---|
-| `pnpm dev` | Next.js em modo dev |
-| `pnpm build` | build de produção |
-| `pnpm start` | servidor de produção |
-| `pnpm lint` | ESLint |
-| `pnpm format` | Prettier (escreve) |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm check` | lint + typecheck + format check |
-| `pnpm test` | Vitest |
-| `pnpm db:generate` | Prisma generate |
-| `pnpm db:migrate` | Prisma migrate dev |
-| `pnpm db:studio` | Prisma Studio |
-| `pnpm db:seed` | popular banco |
+Scripts disponíveis em `package.json` (estado atual):
+
+| Script | Ação | Funciona? |
+|---|---|---|
+| `pnpm db:generate` | Prisma generate | ✅ |
+| `pnpm db:migrate` | `dotenv -e .env.local -- prisma migrate dev` | ⚠️ não usar no cloud (shadow/pooler) |
+| `pnpm db:studio` | `dotenv -e .env.local -- prisma studio` | ✅ |
+| `pnpm db:seed` | `dotenv -e .env.local -- prisma db seed` | sprint 1.5 |
+| `pnpm check:validators` | smoke test dos validators (`tsx`) | ✅ |
+| `pnpm dev` / `build` / `start` / `lint` / `typecheck` / `format` / `test` | Next.js/qualidade | ❌ ainda não — falta scaffold + toolchain |
 
 ## 6. Estrutura de pastas
 
@@ -246,7 +243,7 @@ Ao receber uma tarefa neste projeto:
 5. **Texto visível** sempre via `lib/i18n/pt-br.ts`. Não hardcode.
 6. **Coloque cada coisa no seu lugar:** rota em `app/`, componente compartilhado em `components/shared/`, lógica pura em `lib/utils/`, acesso a dados via `lib/db/`.
 7. **Não sugira deploy, domínio, produção, CI/CD ou monitoramento** como ação atual. Estamos em local.
-8. **Ao terminar**, rode `pnpm check` (e `pnpm test` quando houver testes) e relate o resultado real.
+8. **Ao terminar**, rode a verificação disponível e relate o resultado real. Hoje é `pnpm check:validators` (smoke test); `pnpm check`/`pnpm test` só quando o toolchain existir.
 9. **Se uma decisão arquitetural nova for tomada**, registre-a na seção 13 deste arquivo.
 10. **Não peça aprovação** para seguir convenções já definidas aqui — apenas siga.
 
@@ -262,7 +259,10 @@ Ao receber uma tarefa neste projeto:
 ## 13. Decisões arquiteturais importantes
 
 - **WhatsApp via `wa.me` direto** (não Business API) → custo zero e tracking suficiente no MVP via rota `api/track`.
-- **Supabase local em Docker** em vez da cloud no início → desenvolvimento isolado, sem custo, sem dependência de rede.
+- **Supabase cloud, não local em Docker** → decisão de 2026-05-31. Sem Docker/Supabase CLI na máquina e foco em velocidade de MVP. Projeto `eurofarma`, org `fiap`, ref `mvixmggxwbrljlovfvac`, região `sa-east-1`. Trade-off aceito: diverge do isolamento local; RLS precisa ser tratado antes de exposição pública.
+- **Migrations geradas offline + aplicadas via MCP do Supabase** → `prisma migrate dev` não funciona no cloud (shadow DB sem permissão) e não temos a senha do banco fora do `.env.local`. Geramos o SQL com `prisma migrate diff` e aplicamos com `apply_migration`; o `_prisma_migrations` é populado manualmente com o checksum SHA-256 do arquivo. `.gitattributes` força `eol=lf` para o checksum não quebrar.
+- **Prisma fixado em 6.x** → o schema usa `datasource.url` e generator `prisma-client-js`, removidos no Prisma 7. Migração para o 7 (driver adapters + `prisma.config.ts`) fica para o sprint de deploy na Vercel, onde o ganho serverless compensa.
+- **Zod fixado em 3.x** → o código usa `z.nativeEnum`, `z.string().email()`, `z.literal(true,{message})`, APIs deprecadas/alteradas no Zod 4.
 - **Prisma como ORM** sobre o Postgres do Supabase → migrations versionadas e queries type-safe; schema é a fonte da verdade.
 - **App Router com route groups** `(public)` e `(admin)` → separação clara de layouts e responsabilidades sem poluir a URL.
 - **Copy centralizada em `lib/i18n/pt-br.ts`** → consistência de tom e facilidade de revisão de linguagem acolhedora.
