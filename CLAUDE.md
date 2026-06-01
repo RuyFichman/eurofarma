@@ -30,7 +30,9 @@ O scaffold do Next.js **já existe** e a esteira de qualidade funciona: `pnpm de
 
 **Pendência de segurança aberta:** RLS (Row Level Security) está **desabilitado** em todas as 8 tabelas no Supabase cloud. Como a `publishable key` é pública, isso expõe leitura/escrita de tudo (incluindo `nutriz_profiles`). Habilitar RLS + policies é pré-requisito antes de qualquer exposição pública do app.
 
-**Progresso por sprint:** Sprint 0 (scaffold Next.js 15 + Tailwind 4 + TS estrito + ESLint/Prettier) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅. Próximos: 1.4 (CSVs reais), 1.5 (seed), 1.6 (admin seed), 1.7 (Vitest).
+**Progresso por sprint:** Sprint 0 (scaffold Next.js 15 + Tailwind 4 + TS estrito + ESLint/Prettier) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅ · 1.5 (seed de unidades — 6 unidades ACTIVE) ✅ · 1.6 (seed do admin inicial via Supabase Auth) ✅. Próximos: 1.7 (Vitest), 1.4 (CSVs reais), Sprint 2 (Landing — pré-condições já satisfeitas).
+
+**Admin inicial:** provisionado por `pnpm db:seed-admin` (email em `INITIAL_ADMIN_EMAIL`, hoje `admin@lactare.local`). Existe em `auth.users` (Supabase Auth) e em `public.users` com `role=ADMIN`, mesmo `id` nas duas tabelas. Script idempotente: re-rodar não regenera senha. Reset de senha é manual via painel do Supabase. O fluxo de login do painel admin é Sprint 5 (Supabase Auth só é usado para provisionamento por enquanto).
 
 ## 4. Stack
 
