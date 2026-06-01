@@ -241,6 +241,13 @@ export type NutrizCreateInput = z.infer<typeof nutrizCreateSchema>;
 
 ## 11. Como interagir com Claude Code
 
+> **ISOLAMENTO — leia antes de qualquer coisa.** Esta máquina tem **outros projetos** do usuário que também usam Supabase, Prisma, Next.js e ferramentas parecidas. NUNCA toque em nada fora do diretório deste projeto (`C:\fiap\eurofarma`). Em concreto:
+> - **Não** edite, mova ou apague arquivos fora desta pasta.
+> - **Não** rode comandos globais que afetem outros projetos: nada de `pnpm -g`, `npm i -g`, `prisma` apontando para outro schema, `supabase link`/`supabase start` de outro projeto, `git` em outro repositório, alterar `~/.npmrc`, variáveis de ambiente do sistema, etc.
+> - **Banco:** opere SOMENTE no projeto Supabase `eurofarma` (ref `mvixmggxwbrljlovfvac`, org `fiap`). Antes de qualquer `apply_migration`/`execute_sql` via MCP, confirme que o `project_id` é esse. Nunca rode DDL/seed contra outro projeto.
+> - **MCP do Supabase:** se `list_organizations` não retornar a org `fiap`, **pare** e avise — pode estar conectado na conta de outro projeto. Não aplique mudanças "no que estiver conectado".
+> - Use sempre caminhos **dentro** deste repo. Na dúvida sobre escopo, pergunte em vez de agir.
+
 Ao receber uma tarefa neste projeto:
 
 1. **Leia este arquivo primeiro.** Ele é a fonte das convenções.
