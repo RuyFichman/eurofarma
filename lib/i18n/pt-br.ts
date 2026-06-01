@@ -135,6 +135,66 @@ export const HOME = {
   },
 } as const
 
+export const ABOUT = {
+  hero: {
+    title: 'Sobre o Lactare',
+    description:
+      'Uma iniciativa que conecta vidas há 6 anos, mobilizando nutrizes e bancos de leite humano por todo o Brasil.',
+  },
+  history: {
+    title: 'Nossa história',
+    paragraphs: [
+      'O Lactare nasceu como um programa institucional da Eurofarma, com o propósito de apoiar os bancos de leite humano e fortalecer a cultura de doação de leite materno no Brasil.',
+      'Em 6 anos de jornada, o programa mobilizou mais de 12.400 doadoras e ajudou a beneficiar mais de 5.000 bebês prematuros com leite humano doado — cada gota representa uma vida amparada em um momento decisivo.',
+      'Com o Lactare Digital, ampliamos esse alcance por meio de canais digitais, aproximando ainda mais as nutrizes dos bancos de leite e tornando a doação simples, acolhedora e ao alcance de todas.',
+    ],
+  },
+  mission: {
+    title: 'Missão',
+    quote:
+      'Garantir que toda nutriz no Brasil tenha acesso fácil, acolhedor e informado aos bancos de leite humano, ampliando o impacto da doação de leite materno e salvando mais vidas.',
+  },
+  timeline: {
+    title: 'Marcos da jornada',
+    milestones: [
+      {
+        year: '2019',
+        description: 'Início do programa Lactare como iniciativa institucional',
+      },
+      {
+        year: '2020',
+        description:
+          'Primeiras parcerias com bancos de leite humano em São Paulo',
+      },
+      {
+        year: '2022',
+        description: 'Expansão para 5 estados brasileiros',
+      },
+      {
+        year: '2024',
+        description: 'Atingimos a marca de 10.000 doadoras mobilizadas',
+      },
+      {
+        year: '2025',
+        description:
+          'Lançamento do Lactare Digital, ampliando o alcance via web e WhatsApp',
+      },
+    ],
+  },
+  partners: {
+    title: 'Parceiros institucionais',
+    description:
+      'Trabalhamos lado a lado com a Rede Brasileira de Bancos de Leite Humano (rBLH), hospitais públicos e privados, maternidades e organizações de saúde em todo o Brasil.',
+    items: ['rBLH/Fiocruz', 'Hospitais parceiros', 'SUS', 'Eurofarma'],
+  },
+  finalCta: {
+    title: 'Faça parte dessa história.',
+    description:
+      'Encontre um banco de leite próximo e inicie sua jornada como doadora.',
+    cta: { label: 'Encontrar banco de leite', href: '/buscar' },
+  },
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
