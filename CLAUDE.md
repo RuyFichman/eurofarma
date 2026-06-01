@@ -21,14 +21,16 @@ NÃO está em uso ainda (não sugira, não configure, não referencie como atual
 - Monitoramento (Sentry, PostHog, Datadog).
 - Supabase Auth (planejado para sprint futuro).
 - Playwright e2e (planejado para sprint futuro).
-- **Scaffold do Next.js** — ainda não foi criado (sem `app/`, `next.config.ts`, Tailwind, shadcn). O repo hoje tem só `prisma/`, `lib/`, `scripts/` e configs de base.
-- **Toolchain de qualidade** — não há `tsconfig.json`, TypeScript instalado, nem ESLint/Prettier. Por isso `pnpm typecheck`, `pnpm lint`, `pnpm format` e `pnpm check` **ainda não funcionam**. Validação atual é via smoke tests com `tsx`.
+- **shadcn/ui** — fundação pronta (`components.json`, util `cn` em `lib/utils/cn.ts`, tokens em `app/globals.css`), mas nenhum componente instalado ainda. Use `pnpm dlx shadcn@latest add <componente>` quando precisar.
+- **Route groups `(public)`/`(admin)`, `lib/i18n/pt-br.ts`, `content/`, `data/`** — ainda não criados; nascem nos sprints de feature.
 
 Quando precisar mencionar esses itens, marque-os explicitamente como "previsto para sprints futuros".
 
+O scaffold do Next.js **já existe** e a esteira de qualidade funciona: `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm format`, `pnpm check` e `pnpm check:validators` rodam todos. TS estrito ativo (`strict` + `noUncheckedIndexedAccess`); imports com `@/*` mapeiam para a raiz.
+
 **Pendência de segurança aberta:** RLS (Row Level Security) está **desabilitado** em todas as 8 tabelas no Supabase cloud. Como a `publishable key` é pública, isso expõe leitura/escrita de tudo (incluindo `nutriz_profiles`). Habilitar RLS + policies é pré-requisito antes de qualquer exposição pública do app.
 
-**Progresso por sprint:** 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅. Próximos: Sprint 0 enxuto (scaffold Next.js + toolchain), 1.4 (CSVs reais), 1.5 (seed), 1.6 (admin seed), 1.7 (Vitest).
+**Progresso por sprint:** Sprint 0 (scaffold Next.js 15 + Tailwind 4 + TS estrito + ESLint/Prettier) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅. Próximos: 1.4 (CSVs reais), 1.5 (seed), 1.6 (admin seed), 1.7 (Vitest).
 
 ## 4. Stack
 
@@ -90,7 +92,12 @@ Scripts disponíveis em `package.json` (estado atual):
 | `pnpm db:studio` | `dotenv -e .env.local -- prisma studio` | ✅ |
 | `pnpm db:seed` | `dotenv -e .env.local -- prisma db seed` | sprint 1.5 |
 | `pnpm check:validators` | smoke test dos validators (`tsx`) | ✅ |
-| `pnpm dev` / `build` / `start` / `lint` / `typecheck` / `format` / `test` | Next.js/qualidade | ❌ ainda não — falta scaffold + toolchain |
+| `pnpm dev` / `build` / `start` | Next.js (dev / build de produção / serve) | ✅ |
+| `pnpm lint` | ESLint (`eslint .`) | ✅ |
+| `pnpm typecheck` | `tsc --noEmit` | ✅ |
+| `pnpm format` / `format:check` | Prettier (escreve / verifica) | ✅ |
+| `pnpm check` | `lint` + `typecheck` + `format:check` | ✅ |
+| `pnpm test` | placeholder — Vitest chega no Sprint 1.7 | — |
 
 ## 6. Estrutura de pastas
 
