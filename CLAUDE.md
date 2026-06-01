@@ -33,7 +33,7 @@ O scaffold do Next.js **já existe** e a esteira de qualidade funciona: `pnpm de
 
 **Pendência de segurança aberta:** RLS (Row Level Security) está **desabilitado** em todas as 8 tabelas no Supabase cloud. Como a `publishable key` é pública, isso expõe leitura/escrita de tudo (incluindo `nutriz_profiles`). Habilitar RLS + policies é pré-requisito antes de qualquer exposição pública do app.
 
-**Progresso por sprint:** Sprint 0 (scaffold) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅ · 1.5 (seed de unidades — 6 unidades ACTIVE) ✅ · 1.6 (seed do admin via Supabase Auth) ✅ · 1.7 (Vitest: 66 testes — unit + integração; `findUnitsByLocation` em `lib/db/queries/units.ts`) ✅ · 2.1 (design tokens + shadcn + style guide) ✅ · 2.2 (header + footer responsivos + i18n `lib/i18n/pt-br.ts`) ✅ · 2.3 (landing pública: hero, stats, "quem faz parte da rede", dicas e CTA final — Server Components em `components/shared/home-*.tsx`, copy em `HOME` no i18n) ✅. Próximos: 2.4 (sobre), 2.5 (educativa/MDX), 1.4 (CSVs reais).
+**Progresso por sprint:** Sprint 0 (scaffold) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅ · 1.5 (seed de unidades — 6 unidades ACTIVE) ✅ · 1.6 (seed do admin via Supabase Auth) ✅ · 1.7 (Vitest: 66 testes — unit + integração; `findUnitsByLocation` em `lib/db/queries/units.ts`) ✅ · 2.1 (design tokens + shadcn + style guide) ✅ · 2.2 (header + footer responsivos + i18n `lib/i18n/pt-br.ts`) ✅ · 2.3 (landing pública: hero, stats, "quem faz parte da rede", dicas e CTA final — Server Components em `components/shared/home-*.tsx`, copy em `HOME` no i18n) ✅ · 2.4 (sobre: hero, história, missão, linha do tempo, parcerias e CTA final — Server Component em `app/(public)/sobre/page.tsx`, copy em `ABOUT` no i18n; datas e logos com `TODO` p/ validação Eurofarma) ✅. Próximos: 2.5 (educativa/MDX), 1.4 (CSVs reais).
 
 **Admin inicial:** provisionado por `pnpm db:seed-admin` (email em `INITIAL_ADMIN_EMAIL`, hoje `admin@lactare.local`). Existe em `auth.users` (Supabase Auth) e em `public.users` com `role=ADMIN`, mesmo `id` nas duas tabelas. Script idempotente: re-rodar não regenera senha. Reset de senha é manual via painel do Supabase. O fluxo de login do painel admin é Sprint 5 (Supabase Auth só é usado para provisionamento por enquanto).
 
@@ -286,6 +286,7 @@ Ao receber uma tarefa neste projeto:
 - **App Router com route groups** `(public)` e `(admin)` → separação clara de layouts e responsabilidades sem poluir a URL.
 - **Copy centralizada em `lib/i18n/pt-br.ts`** → consistência de tom e facilidade de revisão de linguagem acolhedora.
 - **shadcn/ui** em vez de biblioteca de componentes fechada → controle total do código, acessibilidade e theming via CSS variables.
+- **Paleta Azul** (trocada da Berry/Sage/Cream em 2026-06-01, a pedido do time) → tokens HSL em `app/globals.css`. `--primary` usa o **azul profundo `#3A7AB8`** e não o azul claro `#5BA4D4` pedido originalmente para botões, porque `#5BA4D4` com texto branco fica em ~2.7:1 e reprova no WCAG AA (Princípio 5); o azul claro vira acento em `--ring`/charts/sidebar. Não re-litigar sem aceitar abrir mão do AA.
 
 ## 14. Glossário
 
