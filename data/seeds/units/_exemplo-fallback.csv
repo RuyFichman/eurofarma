@@ -1,0 +1,7 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano do Hospital Universitário da USP,MILK_BANK,Avenida Professor Lineu Prestes,2565,Cidade Universitária,São Paulo,SP,05508-000,(11) 3091-9492,,Seg a Sex 7h às 16h,Coleta domiciliar mediante agendamento por telefone.
+Banco de Leite do Hospital das Clínicas FMUSP,MILK_BANK,Avenida Doutor Enéas Carvalho de Aguiar,255,Cerqueira César,São Paulo,SP,05403-000,(11) 2661-6420,,Seg a Sex 8h às 17h,Atendimento mediante triagem prévia da nutriz.
+Banco de Leite Humano da Maternidade Leila Diniz,MILK_BANK,Avenida Ayrton Senna,2000,Barra da Tijuca,Rio de Janeiro,RJ,22775-002,(21) 3325-9595,,Seg a Sex 8h às 16h,Doadoras devem agendar coleta previamente.
+Banco de Leite do Hospital Maternidade Carmela Dutra,MILK_BANK,Rua Conde de Bonfim,150,Tijuca,Rio de Janeiro,RJ,20520-051,(21) 2576-2121,,Seg a Sex 8h às 17h,Aceita doação espontânea e domiciliar.
+Posto de Coleta do Hospital Geral de Pirituba,COLLECTION_POINT,Avenida Doutor Felipe Pinel,12,Pirituba,São Paulo,SP,02950-000,(11) 3996-7300,,Seg a Sex 8h às 16h,Posto vinculado ao Banco de Leite do Hospital Maternidade Mãe Pobre.
+Banco de Leite do Instituto Fernandes Figueira Fiocruz,MILK_BANK,Avenida Rui Barbosa,716,Flamengo,Rio de Janeiro,RJ,22250-020,(21) 2554-1700,,Seg a Sex 8h às 17h,Centro de referência nacional em bancos de leite humano.
