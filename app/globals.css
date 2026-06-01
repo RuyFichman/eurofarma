@@ -6,60 +6,61 @@
 
 @layer base {
   :root {
-    /* Backgrounds */
-    --background: hsl(30 25% 99%);
-    --foreground: hsl(340 20% 8%);
+    /* Backgrounds — #F4F9FF azul gelado / #1A2B3C navy */
+    --background: hsl(214 100% 98%);
+    --foreground: hsl(210 39% 17%);
 
-    /* Cards e popovers */
+    /* Cards e popovers — card branco, texto navy */
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(340 20% 8%);
+    --card-foreground: hsl(210 39% 17%);
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(340 20% 8%);
+    --popover-foreground: hsl(210 39% 17%);
 
-    /* Primary (Berry) */
-    --primary: hsl(340 41% 30%);
+    /* Primary (Azul) — usa o azul profundo #3A7AB8 p/ passar WCAG AA com texto branco
+       (o azul claro #5BA4D4 fica em ~2.7:1 com branco; vive como acento em --ring/charts/sidebar) */
+    --primary: hsl(210 52% 47%);
     --primary-foreground: hsl(0 0% 98%);
 
-    /* Secondary (Sage) */
-    --secondary: hsl(155 22% 92%);
-    --secondary-foreground: hsl(155 30% 15%);
+    /* Secondary (Azul suave #D6EAFF) */
+    --secondary: hsl(211 100% 92%);
+    --secondary-foreground: hsl(210 45% 24%);
 
     /* Muted */
-    --muted: hsl(30 15% 95%);
-    --muted-foreground: hsl(340 8% 42%);
+    --muted: hsl(210 40% 96%);
+    --muted-foreground: hsl(210 14% 40%);
 
-    /* Accent (Cream) */
-    --accent: hsl(35 42% 93%);
-    --accent-foreground: hsl(35 30% 15%);
+    /* Accent (Azul suave +saturado — dá tom ao gradiente do hero e aos chips de dica) */
+    --accent: hsl(208 75% 86%);
+    --accent-foreground: hsl(210 45% 22%);
 
     /* Destructive — ajustado de 51% para 44% (L) para passar WCAG AA com texto branco */
     --destructive: hsl(0 72% 44%);
     --destructive-foreground: hsl(0 0% 98%);
 
-    /* Bordas e inputs */
-    --border: hsl(30 15% 90%);
-    --input: hsl(30 15% 85%);
-    --ring: hsl(340 41% 30%);
+    /* Bordas e inputs — azul suave */
+    --border: hsl(208 60% 88%);
+    --input: hsl(208 45% 80%);
+    --ring: hsl(210 52% 47%);
 
     /* Border radius global */
     --radius: 0.625rem;
 
     /* Chart (dashboard) */
-    --chart-1: hsl(340 41% 30%);
-    --chart-2: hsl(155 22% 61%);
-    --chart-3: hsl(35 42% 70%);
-    --chart-4: hsl(210 50% 55%);
-    --chart-5: hsl(25 80% 55%);
+    --chart-1: hsl(210 52% 47%); /* azul profundo #3A7AB8 */
+    --chart-2: hsl(153 38% 42%); /* verde de sucesso */
+    --chart-3: hsl(204 58% 59%); /* azul claro #5BA4D4 */
+    --chart-4: hsl(35 80% 58%); /* âmbar */
+    --chart-5: hsl(190 55% 45%); /* teal */
 
-    /* Sidebar admin */
-    --sidebar: hsl(340 20% 6%);
-    --sidebar-foreground: hsl(30 15% 90%);
-    --sidebar-primary: hsl(340 41% 45%);
+    /* Sidebar admin / footer — navy #1A2B3C, acento azul claro #5BA4D4 */
+    --sidebar: hsl(210 39% 17%);
+    --sidebar-foreground: hsl(210 30% 90%);
+    --sidebar-primary: hsl(204 58% 59%);
     --sidebar-primary-foreground: hsl(0 0% 98%);
-    --sidebar-accent: hsl(340 15% 15%);
-    --sidebar-accent-foreground: hsl(30 15% 90%);
-    --sidebar-border: hsl(340 15% 15%);
-    --sidebar-ring: hsl(340 41% 45%);
+    --sidebar-accent: hsl(210 35% 24%);
+    --sidebar-accent-foreground: hsl(210 30% 90%);
+    --sidebar-border: hsl(210 30% 26%);
+    --sidebar-ring: hsl(204 58% 59%);
 
     /* Shadows suaves */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
