@@ -104,7 +104,7 @@ function Swatch({ token }: { token: ColorToken }): ReactNode {
 
 export default function StyleGuidePage(): ReactNode {
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
+    <div className="mx-auto max-w-5xl px-6 py-12">
       <header className="space-y-2 pb-6">
         <Badge variant="secondary">Referência interna</Badge>
         <h1>Style Guide — Lactare Digital</h1>
@@ -293,6 +293,6 @@ export default function StyleGuidePage(): ReactNode {
           </div>
         </div>
       </Section>
-    </main>
+    </div>
   )
 }
