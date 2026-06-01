@@ -1,12 +1,25 @@
+import type { Metadata } from 'next'
+
+import { HomeHero } from '@/components/shared/home-hero'
+import { HomeStats } from '@/components/shared/home-stats'
+import { HomeNetwork } from '@/components/shared/home-network'
+import { HomeTips } from '@/components/shared/home-tips'
+import { HomeCta } from '@/components/shared/home-cta'
+import { SITE } from '@/lib/i18n/pt-br'
+
+export const metadata: Metadata = {
+  title: `${SITE.name} — ${SITE.tagline}`,
+  description: SITE.description,
+}
+
 export default function HomePage() {
   return (
-    <section className="mx-auto flex max-w-2xl flex-col justify-center gap-4 px-6 py-20">
-      <span className="text-primary text-sm font-medium">Lactare Digital</span>
-      <h1>Toda gota de leite materno pode salvar uma vida.</h1>
-      <p className="text-muted-foreground">
-        Estamos construindo a plataforma que conecta você ao banco de leite
-        humano mais perto. Em breve, mais por aqui.
-      </p>
-    </section>
+    <>
+      <HomeHero />
+      <HomeStats />
+      <HomeNetwork />
+      <HomeTips />
+      <HomeCta />
+    </>
   )
 }
