@@ -13,9 +13,22 @@ const eslintConfig = [
     ignores: [
       'node_modules/**',
       '.next/**',
+      'coverage/**',
       'prisma/migrations/**',
       'next-env.d.ts',
     ],
+  },
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
   },
 ]
 
