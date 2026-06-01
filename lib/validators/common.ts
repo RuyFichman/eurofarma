@@ -2,14 +2,40 @@ import { z } from 'zod'
 
 /** As 27 unidades federativas oficiais do Brasil. */
 export const UFS = [
-  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
-  'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
-  'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO',
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
 ] as const
 
 /** Valida que o valor e uma sigla de UF brasileira valida. */
 export const ufSchema = z.enum(UFS, {
-  errorMap: () => ({ message: 'UF invalida. Use a sigla do estado (ex.: SP).' }),
+  errorMap: () => ({
+    message: 'UF invalida. Use a sigla do estado (ex.: SP).',
+  }),
 })
 
 /**
@@ -65,4 +91,7 @@ export const emailSchema = z
   .trim()
 
 /** String obrigatoria: aplica trim e exige ao menos 1 caractere. */
-export const stringNotEmptySchema = z.string().trim().min(1, 'Campo obrigatorio.')
+export const stringNotEmptySchema = z
+  .string()
+  .trim()
+  .min(1, 'Campo obrigatorio.')

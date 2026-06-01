@@ -25,7 +25,10 @@ export const nutrizSignupSchema = z.object({
  * Atualizacao pelo admin. Todos os campos opcionais (atualiza apenas o que mudou).
  */
 export const nutrizAdminUpdateSchema = z.object({
-  fullName: stringNotEmptySchema.min(3, 'Nome muito curto.').max(120).optional(),
+  fullName: stringNotEmptySchema
+    .min(3, 'Nome muito curto.')
+    .max(120)
+    .optional(),
   email: emailSchema.optional(),
   neighborhood: z.string().trim().max(120).optional(),
   interestStatus: z.nativeEnum(InterestStatus).optional(),
