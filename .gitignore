@@ -14,8 +14,9 @@
 *.tsbuildinfo
 next-env.d.ts
 
-# testing
+# testing / vitest
 /coverage
+coverage/
 
 # logs
 *.log

@@ -18,7 +18,11 @@
     "db:seed": "dotenv -e .env.local -- prisma db seed",
     "db:seed-admin": "dotenv -e .env.local -- tsx prisma/seed-admin.ts",
     "check:validators": "tsx scripts/check-validators.ts",
-    "test": "echo \"Tests via Vitest chegam no Sprint 1.7\""
+    "test": "dotenv -e .env.local -- vitest run",
+    "test:watch": "dotenv -e .env.local -- vitest",
+    "test:unit": "dotenv -e .env.local -- vitest run tests/unit",
+    "test:integration": "dotenv -e .env.local -- vitest run tests/integration",
+    "test:coverage": "dotenv -e .env.local -- vitest run --coverage"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -33,6 +37,7 @@
     "@types/node": "^25.9.1",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.7",
     "csv-parse": "^6.2.1",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.4",
@@ -43,7 +48,8 @@
     "prisma": "^6.19.3",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
