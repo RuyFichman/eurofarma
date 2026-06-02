@@ -1,9 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
-import {
-  PRISMA_TO_PUBLIC_UNIT_TYPE,
-  type PublicUnitType,
-} from '../constants/unit-types'
+import { PRISMA_TO_PUBLIC_UNIT_TYPE } from '../constants/unit-types-prisma'
+import type { PublicUnitType } from '../constants/unit-types'
 
 /**
  * Subconjunto de colunas de `Unit` seguras para exposição pública. NÃO inclui

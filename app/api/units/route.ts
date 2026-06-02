@@ -3,7 +3,7 @@ import { Prisma, UnitStatus } from '@prisma/client'
 
 import { prisma } from '@/lib/db/prisma'
 import { parseUnitSearchParams } from '@/lib/validators/unit-search'
-import { PUBLIC_TO_PRISMA_UNIT_TYPE } from '@/lib/constants/unit-types'
+import { PUBLIC_TO_PRISMA_UNIT_TYPE } from '@/lib/constants/unit-types-prisma'
 import { mapUnitToPublicUnit } from '@/lib/mappers/unit-mapper'
 
 /**

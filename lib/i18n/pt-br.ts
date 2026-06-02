@@ -426,6 +426,55 @@ export const CONTENT = {
   },
 } as const
 
+export const SEARCH = {
+  filters: {
+    title: 'Encontre um banco de leite',
+    description:
+      'Use os filtros abaixo para localizar bancos de leite humano e pontos de coleta próximos de você.',
+    fields: {
+      state: {
+        label: 'Estado',
+        placeholder: 'Selecione o estado',
+        error: 'Selecione um estado válido.',
+      },
+      city: {
+        label: 'Cidade',
+        placeholder: 'Selecione a cidade',
+        placeholderWithoutState: 'Selecione um estado primeiro',
+        loading: 'Carregando cidades...',
+        empty: 'Nenhuma cidade encontrada',
+        errorLoading: 'Não foi possível carregar as cidades agora.',
+      },
+      neighborhood: {
+        label: 'Bairro',
+        placeholder: 'Digite um bairro, se quiser',
+        helper: 'Opcional. Funciona melhor quando uma cidade está selecionada.',
+      },
+      type: {
+        label: 'Tipo de unidade',
+        placeholder: 'Todos os tipos',
+        options: {
+          all: 'Todos os tipos',
+          milkBank: 'Banco de leite',
+          collectionPoint: 'Ponto de coleta',
+          hospital: 'Hospital',
+          partner: 'Parceiro',
+        },
+      },
+      hasWhatsapp: {
+        label: 'Apenas unidades com WhatsApp',
+      },
+    },
+    actions: {
+      submit: 'Buscar',
+      clear: 'Limpar filtros',
+    },
+    loading: {
+      cities: 'Carregando cidades...',
+    },
+  },
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
