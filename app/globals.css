@@ -52,6 +52,11 @@
     --chart-4: hsl(35 80% 58%); /* âmbar */
     --chart-5: hsl(190 55% 45%); /* teal */
 
+    /* WhatsApp — verde de marca para o CTA de contato. Aprofundado p/ passar WCAG AA
+       com texto branco (o #25D366 puro fica ~2:1 com branco). Única exceção à paleta azul. */
+    --whatsapp: hsl(142 71% 30%);
+    --whatsapp-foreground: hsl(0 0% 100%);
+
     /* Sidebar admin / footer — navy #1A2B3C, acento azul claro #5BA4D4 */
     --sidebar: hsl(210 39% 17%);
     --sidebar-foreground: hsl(210 30% 90%);
@@ -88,6 +93,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

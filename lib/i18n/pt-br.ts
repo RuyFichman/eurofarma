@@ -195,6 +195,237 @@ export const ABOUT = {
   },
 } as const
 
+export const CONTENT = {
+  meta: {
+    title: 'Conteúdos',
+    description:
+      'Espaço educativo do Lactare: guias, vídeos e dúvidas frequentes para acompanhar cada etapa da sua jornada como nutriz, da primeira dúvida à primeira doação.',
+  },
+  hero: {
+    badge: 'Espaço Educativo Lactare',
+    titleLead: 'Tudo que você precisa saber',
+    titleHighlight: 'para cuidar e compartilhar',
+    description:
+      'Um espaço pensado com carinho para acompanhar cada etapa da sua jornada como nutriz — da primeira dúvida à primeira doação.',
+    searchLabel: 'Buscar conteúdos',
+    searchPlaceholder: 'Buscar artigos, vídeos ou dúvidas frequentes...',
+    filters: ['Todos', 'Extração', 'Armazenamento', 'Amamentação', 'Doação'],
+  },
+  startHere: {
+    eyebrow: 'Seção 1',
+    title: 'Comece por Aqui',
+    description:
+      'Respostas rápidas para as dúvidas mais comuns de quem está chegando agora.',
+    cards: [
+      {
+        tag: 'Elegibilidade',
+        title: 'Quem pode doar?',
+        description:
+          'Qualquer mãe em fase de amamentação com excesso de produção de leite e boa saúde pode ser doadora. O processo de triagem é simples e gratuito.',
+        cta: { label: 'Verificar elegibilidade', href: '#duvidas-frequentes' },
+      },
+      {
+        tag: 'Mitos & Verdades',
+        title: 'Meu leite serve?',
+        description:
+          'Sim! Todo leite materno é único e valioso. Mesmo que você ache que produz pouco, sua contribuição pode salvar um bebê prematuro.',
+        cta: { label: 'Entender mais', href: '#amamentacao-na-pratica' },
+      },
+      {
+        tag: 'Segurança',
+        title: 'É seguro?',
+        description:
+          'Totalmente. O leite é pasteurizado, testado e rastreado em todas as etapas. A rBLH é reconhecida pela OMS como referência mundial.',
+        cta: { label: 'Ver processo', href: '#caminho-da-doacao' },
+      },
+    ],
+  },
+  donationPath: {
+    eyebrow: 'Seção 2',
+    title: 'O Caminho da Doação',
+    description:
+      'Do primeiro contato até a coleta — um passo a passo visual e claro.',
+    steps: [
+      {
+        title: 'Primeiro contato pelo WhatsApp',
+        description:
+          'Encontre o banco de leite mais perto de você e fale direto com a equipe pelo WhatsApp, em poucos cliques.',
+      },
+      {
+        title: 'Triagem de elegibilidade',
+        description:
+          'A equipe do banco de leite confirma sua aptidão como doadora com base em critérios clínicos simples.',
+      },
+      {
+        title: 'Agendamento da coleta',
+        description:
+          'Combine a data, o horário e o banco de leite mais conveniente para você. Em muitos casos há coleta domiciliar assistida.',
+      },
+      {
+        title: 'Extração e preparação em casa',
+        description:
+          'Siga o guia de higiene e extração, armazene em frasco esterilizado e etiquete com data e hora. Simples assim.',
+      },
+      {
+        title: 'Entrega no banco de leite',
+        description:
+          'Leve ao banco na data combinada. O leite passa por pasteurização, análise e distribuição para os bebês que precisam.',
+      },
+    ],
+  },
+  videos: {
+    title: 'Vídeos Explicativos',
+    items: [
+      { title: 'Como funciona o primeiro contato', duration: '2:34' },
+      { title: 'Como agendar sua visita', duration: '3:18' },
+    ],
+  },
+  checklist: {
+    title: 'O que esperar da sua primeira visita',
+    subtitle: 'Marque cada item conforme você se preparar',
+    readyLabel: 'prontos',
+    items: [
+      'Lavar as mãos com água e sabão por 20 segundos',
+      'Ter o frasco de vidro esterilizado disponível',
+      'Levar documento de identidade com foto',
+      'Caderneta de Saúde do bebê (primeira visita)',
+      'Chegar com 10 min de antecedência',
+      'Usar roupa confortável para amamentação',
+      'Levar o leite em bolsa térmica (se coletado em casa)',
+    ],
+  },
+  practice: {
+    eyebrow: 'Seção 3',
+    title: 'Amamentação na Prática',
+    action: { label: 'Ver todos os guias', href: '#' },
+    cards: [
+      {
+        tag: 'Extração',
+        title: 'Técnica de Extração Manual',
+        description:
+          'Posicione o polegar e o indicador formando um C. Pressione para dentro e depois comprima suavemente, em ritmo constante.',
+        readTime: '4 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Armazenamento',
+        title: 'Armazenamento Seguro',
+        description:
+          'Freezer: até 15 dias. Congelador: até 3 meses. Geladeira: até 12 horas. Nunca reaqueça no micro-ondas.',
+        readTime: '3 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Pega',
+        title: 'Pega Correta do Bebê',
+        description:
+          'A boca do bebê deve abocanhar boa parte da aréola, não apenas o mamilo. Lábios virados para fora é o sinal certo.',
+        readTime: '5 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Posicionamento',
+        title: 'Posições para Amamentar',
+        description:
+          'Tradicional, cavaleiro, invertida, deitada — cada posição tem vantagens. A certa é a que funciona para você e seu bebê.',
+        readTime: '6 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Dicas',
+        title: 'Aumentando a Produção',
+        description:
+          'Ofereça o peito com frequência, mantenha-se hidratada, durma quando o bebê dormir e evite estresse desnecessário.',
+        readTime: '4 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Higiene',
+        title: 'Higiene na Extração',
+        description:
+          'Lave as mãos, limpe as mamas com compressa estéril, esterilize frascos e bombas a cada uso. Prevenção é essencial.',
+        readTime: '3 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+    ],
+  },
+  stories: {
+    eyebrow: 'Seção 4',
+    title: 'Histórias Reais',
+    description:
+      'Relatos de mães e famílias que fazem parte desta rede de amor.',
+    items: [
+      {
+        role: 'Doadora',
+        quote:
+          'Quando descobri que meu leite poderia salvar a vida de um bebê prematuro, chorei de emoção. O processo foi muito mais simples do que imaginava. Hoje é parte da minha rotina e me sinto parte de algo enorme.',
+        name: 'Maria Silva',
+        detail: 'Doadora há 8 meses — São Paulo, SP',
+      },
+      {
+        role: 'Família Beneficiada',
+        quote:
+          'Nosso filho nasceu com 28 semanas. Durante 4 meses, o leite humano doado foi o único alimento que ele recebeu. Hoje ele tem 2 anos e é cheio de vida. Não temos palavras para agradecer.',
+        name: 'Família Pereira',
+        detail: 'Beneficiada pelo BLH — Rio de Janeiro, RJ',
+      },
+      {
+        role: 'Doadora',
+        quote:
+          'Tinha muito leite sobrando e não sabia o que fazer. Uma amiga me indicou o Lactare. Em menos de uma semana já estava cadastrada e fazendo minha primeira coleta. É gratificante demais.',
+        name: 'Fernanda Costa',
+        detail: 'Doadora voluntária — Campinas, SP',
+      },
+    ],
+    cta: {
+      lead: 'Você também faz parte dessa história.',
+      label: 'Quero ser doadora',
+      href: '/buscar',
+    },
+  },
+  faq: {
+    eyebrow: 'Seção 5',
+    title: 'Dúvidas Frequentes',
+    items: [
+      {
+        question: 'Posso doar se estou tomando medicamentos?',
+        answer:
+          'Depende do medicamento. A maioria dos remédios comuns (vitaminas, suplementos, antialérgicos leves) não impede a doação. A equipe do banco de leite avalia caso a caso durante a triagem. Sempre informe todos os medicamentos que usa.',
+      },
+      {
+        question: 'O leite que sobra depois que o bebê mamou pode ser doado?',
+        answer:
+          'Sim! O leite que sobra após a mamada pode ser coletado, desde que respeitadas as normas de higiene. Coloque imediatamente no frasco esterilizado, etiquete com data e hora e armazene conforme as orientações do banco de leite.',
+      },
+      {
+        question: 'Quantas vezes por semana posso fazer a coleta?',
+        answer:
+          'Não há um limite fixo — vai depender da sua produção. Algumas doadoras levam leite semanalmente, outras quinzenalmente. O importante é não comprometer a alimentação do seu próprio bebê.',
+      },
+      {
+        question: 'Meu bebê vai ter menos leite se eu doar?',
+        answer:
+          'Não! A produção de leite funciona pela lógica de oferta e demanda. Quanto mais você extrai, mais seu corpo produz. Desde que o bebê continue mamando normalmente, a produção se mantém ou até aumenta.',
+      },
+      {
+        question: 'Posso parar de ser doadora quando quiser?',
+        answer:
+          'Absolutamente. A doação é sempre voluntária e você pode encerrar a qualquer momento, sem nenhuma obrigação. Basta comunicar o banco de leite responsável.',
+      },
+      {
+        question: 'Para quais bebês o leite doado é destinado?',
+        answer:
+          'Prioritariamente para recém-nascidos prematuros e de baixo peso internados em UTIs Neonatais. Esses bebês não podem receber fórmulas artificiais e o leite humano é o único alimento adequado para seu desenvolvimento.',
+      },
+    ],
+    help: {
+      title: 'Não encontrou sua resposta?',
+      whatsapp: { label: 'Perguntar no WhatsApp', href: '/buscar' },
+      articles: { label: 'Ver todos os artigos', href: '#' },
+    },
+  },
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
