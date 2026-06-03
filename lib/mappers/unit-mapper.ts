@@ -19,6 +19,7 @@ export const PUBLIC_UNIT_SELECT = {
   addressState: true,
   phone: true,
   whatsapp: true,
+  whatsappMessage: true,
   openingHours: true,
 } satisfies Prisma.UnitSelect
 
@@ -39,9 +40,15 @@ export type PublicUnit = {
   contact: {
     phone: string | null
     whatsapp: string | null
+    hasPhone: boolean
     hasWhatsapp: boolean
   }
   openingHours: Prisma.JsonValue
+  /**
+   * Mensagem de saudação pré-preenchida no link `wa.me` (campo público
+   * `whatsappMessage` da unidade). É voltada à nutriz — não é dado admin/PII.
+   */
+  whatsappMessage: string | null
 }
 
 /** Converte uma unidade (formato Prisma) para o formato público da API. */
@@ -59,8 +66,10 @@ export function mapUnitToPublicUnit(unit: UnitSearchResult): PublicUnit {
     contact: {
       phone: unit.phone,
       whatsapp: unit.whatsapp,
+      hasPhone: Boolean(unit.phone?.trim()),
       hasWhatsapp: Boolean(unit.whatsapp?.trim()),
     },
     openingHours: unit.openingHours,
+    whatsappMessage: unit.whatsappMessage,
   }
 }

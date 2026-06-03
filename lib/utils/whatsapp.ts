@@ -1,23 +1,42 @@
 const WA_BASE_URL = 'https://wa.me'
 
 /**
- * Monta um link `wa.me` a partir de um número de WhatsApp armazenado.
+ * Normaliza um número de WhatsApp brasileiro para o formato aceito pelo `wa.me`
+ * (apenas dígitos, com DDI 55). Funções puras, sem `window` — seguras em RSC.
  *
- * Remove qualquer formatação, garante o código de país `55` e, opcionalmente,
- * pré-preenche a mensagem via `?text=`. Retorna `null` quando não há dígitos
- * suficientes para um número válido (DDD + número = mínimo 10 dígitos), para a
- * UI poder cair em outro canal de contato.
+ * Regras:
+ * - vazio/nulo → `null`;
+ * - remove tudo que não for dígito;
+ * - 10 ou 11 dígitos (DDD + número, sem DDI) → prefixa `55`;
+ * - já começa com `55` e tem ≥ 12 dígitos → preserva;
+ * - menos de 10 dígitos após a limpeza → `null`.
  */
-export function buildWhatsappUrl(
-  whatsapp: string,
-  message?: string,
+export function normalizeBrazilianWhatsappNumber(
+  value: string | null | undefined,
 ): string | null {
-  const digits = whatsapp.replace(/\D/g, '')
+  if (!value) return null
+
+  const digits = value.replace(/\D/g, '')
   if (digits.length < 10) return null
 
-  const withCountry = digits.startsWith('55') ? digits : `55${digits}`
-  const url = `${WA_BASE_URL}/${withCountry}`
+  if (digits.length === 10 || digits.length === 11) {
+    return `55${digits}`
+  }
 
-  const text = message?.trim()
-  return text ? `${url}?text=${encodeURIComponent(text)}` : url
+  // ≥ 12 dígitos: assume que já carrega o DDI (55 ou outro) e preserva.
+  return digits
+}
+
+/**
+ * Monta a URL `wa.me` com a mensagem pré-preenchida. Retorna `null` quando o
+ * número não normaliza para um WhatsApp válido (a UI cai em outro canal).
+ */
+export function buildWhatsappUrl(params: {
+  phone: string | null | undefined
+  message: string
+}): string | null {
+  const number = normalizeBrazilianWhatsappNumber(params.phone)
+  if (!number) return null
+
+  return `${WA_BASE_URL}/${number}?text=${encodeURIComponent(params.message)}`
 }

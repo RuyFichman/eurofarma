@@ -1,106 +1,97 @@
-import { Building2, Clock, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { Clock, MapPin } from 'lucide-react'
 
+import { UnitCardActions } from '@/components/shared/unit-card-actions'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import type { PublicUnitType } from '@/lib/constants/unit-types'
+import { Card } from '@/components/ui/card'
 import type { PublicUnit } from '@/lib/mappers/unit-mapper'
 import { SEARCH } from '@/lib/i18n/pt-br'
-import { buildTelHref, formatPhone } from '@/lib/utils/format-phone'
-import { buildWhatsappUrl } from '@/lib/utils/whatsapp'
 
-const COPY = SEARCH.card
+const COPY = SEARCH.page.unitCard
 
-// Reusa os rótulos do filtro de tipo (fonte única de copy dos tipos públicos).
-const TYPE_LABEL: Record<PublicUnitType, string> = {
-  milk_bank: SEARCH.filters.fields.type.options.milkBank,
-  collection_point: SEARCH.filters.fields.type.options.collectionPoint,
-  hospital: SEARCH.filters.fields.type.options.hospital,
-  partner: SEARCH.filters.fields.type.options.partner,
+type UnitCardProps = {
+  unit: PublicUnit
 }
 
-export function UnitCard({ unit }: { unit: PublicUnit }) {
-  // `openingHours` é JSON livre; nos dados atuais vem como string ("Seg a Sex 8h às 17h").
-  const hours =
-    typeof unit.openingHours === 'string' ? unit.openingHours.trim() : ''
+/**
+ * Extrai um horário legível de `openingHours` (JSON livre). Nos dados atuais vem
+ * como string ("Seg a Sex 8h às 17h"); aceita também objetos com um campo textual
+ * simples. Nunca renderiza JSON cru — retorna `null` para o card cair no fallback.
+ */
+function readableOpeningHours(
+  value: PublicUnit['openingHours'],
+): string | null {
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed : null
+  }
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    for (const key of ['text', 'label', 'description', 'summary'] as const) {
+      const field = (value as Record<string, unknown>)[key]
+      if (typeof field === 'string' && field.trim().length > 0) {
+        return field.trim()
+      }
+    }
+  }
+  return null
+}
 
-  const whatsappUrl = unit.contact.whatsapp
-    ? buildWhatsappUrl(unit.contact.whatsapp, COPY.whatsappMessage)
-    : null
+export function UnitCard({ unit }: UnitCardProps) {
+  const hours = readableOpeningHours(unit.openingHours)
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader>
-        <div className="flex items-start gap-3">
-          <span className="bg-accent text-accent-foreground flex size-11 shrink-0 items-center justify-center rounded-xl">
-            <Building2 className="size-5" aria-hidden="true" />
-          </span>
-          <div className="min-w-0 flex-1 space-y-1.5">
-            <h3 className="text-base leading-snug font-semibold">
-              {unit.name}
-            </h3>
-            <Badge variant="secondary" className="w-fit">
-              {TYPE_LABEL[unit.type]}
-            </Badge>
-          </div>
+    <Card className="border-border/80 hover:border-primary/40 flex h-full flex-col gap-4 p-5 shadow-sm transition-colors">
+      <div className="flex flex-1 flex-col gap-4">
+        <div className="space-y-2">
+          <h3 className="text-base leading-snug font-semibold">{unit.name}</h3>
+          <Badge variant="secondary" className="w-fit">
+            {COPY.typeLabels[unit.type]}
+          </Badge>
         </div>
-      </CardHeader>
 
-      <CardContent className="flex-1 space-y-2 text-sm">
-        <p className="text-muted-foreground flex items-start gap-2">
-          <MapPin
-            className="text-primary mt-0.5 size-4 shrink-0"
-            aria-hidden="true"
-          />
-          <span>
-            {unit.address.neighborhood} — {unit.address.city},{' '}
-            {unit.address.state}
-          </span>
-        </p>
-        {hours ? (
-          <p className="text-muted-foreground flex items-start gap-2">
+        <div className="text-muted-foreground space-y-2 text-sm">
+          <p className="flex items-start gap-2">
+            <MapPin
+              className="text-primary mt-0.5 size-4 shrink-0"
+              aria-hidden="true"
+            />
+            <span>
+              <span className="sr-only">{COPY.addressLabel}: </span>
+              {unit.address.neighborhood}, {unit.address.city} -{' '}
+              {unit.address.state}
+            </span>
+          </p>
+          <p className="flex items-start gap-2">
             <Clock
               className="text-primary mt-0.5 size-4 shrink-0"
               aria-hidden="true"
             />
             <span>
-              <span className="sr-only">{COPY.hoursLabel}: </span>
-              {hours}
+              <span className="sr-only">{COPY.openingHoursLabel}: </span>
+              {hours ?? COPY.openingHoursFallback}
             </span>
           </p>
-        ) : null}
-      </CardContent>
+        </div>
 
-      <CardFooter>
-        {whatsappUrl ? (
-          <Button
-            asChild
-            className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full"
-          >
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={COPY.whatsappAria.replace('{name}', unit.name)}
-            >
-              <MessageCircle aria-hidden="true" />
-              {COPY.whatsapp}
-            </a>
-          </Button>
-        ) : unit.contact.phone ? (
-          <Button asChild variant="outline" className="w-full">
-            <a
-              href={buildTelHref(unit.contact.phone)}
-              aria-label={COPY.callAria.replace('{name}', unit.name)}
-            >
-              <Phone aria-hidden="true" />
-              {formatPhone(unit.contact.phone)}
-            </a>
-          </Button>
-        ) : (
-          <p className="text-muted-foreground text-sm">{COPY.noContact}</p>
-        )}
-      </CardFooter>
+        {unit.contact.hasWhatsapp || unit.contact.hasPhone ? (
+          <div className="flex flex-wrap gap-2">
+            {unit.contact.hasWhatsapp ? (
+              <Badge variant="outline">{COPY.whatsappAvailable}</Badge>
+            ) : null}
+            {unit.contact.hasPhone ? (
+              <Badge variant="outline">{COPY.phoneAvailable}</Badge>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+
+      <UnitCardActions
+        unitId={unit.id}
+        slug={unit.slug}
+        unitName={unit.name}
+        phone={unit.contact.phone}
+        whatsapp={unit.contact.whatsapp}
+        whatsappMessage={unit.whatsappMessage}
+      />
     </Card>
   )
 }
