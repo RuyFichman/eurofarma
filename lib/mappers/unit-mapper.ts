@@ -4,23 +4,26 @@ import { PRISMA_TO_PUBLIC_UNIT_TYPE } from '../constants/unit-types-prisma'
 import type { PublicUnitType } from '../constants/unit-types'
 
 /**
- * Subconjunto de colunas de `Unit` seguras para exposição pública. NÃO inclui
- * campos administrativos (`adminNotes`, `adminResponsibleId`), e-mail, instruções,
+ * Subconjunto de colunas de `Unit` seguras para exposição pública e fonte única
+ * do `select` usado no route handler e nas queries. NÃO inclui campos
+ * administrativos (`adminNotes`, `adminResponsibleId`), e-mail, instruções,
  * coordenadas, timestamps nem relações.
  */
+export const PUBLIC_UNIT_SELECT = {
+  id: true,
+  slug: true,
+  name: true,
+  type: true,
+  addressNeighborhood: true,
+  addressCity: true,
+  addressState: true,
+  phone: true,
+  whatsapp: true,
+  openingHours: true,
+} satisfies Prisma.UnitSelect
+
 export type UnitSearchResult = Prisma.UnitGetPayload<{
-  select: {
-    id: true
-    slug: true
-    name: true
-    type: true
-    addressNeighborhood: true
-    addressCity: true
-    addressState: true
-    phone: true
-    whatsapp: true
-    openingHours: true
-  }
+  select: typeof PUBLIC_UNIT_SELECT
 }>
 
 export type PublicUnit = {

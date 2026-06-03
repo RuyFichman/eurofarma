@@ -427,6 +427,52 @@ export const CONTENT = {
 } as const
 
 export const SEARCH = {
+  page: {
+    title: 'Buscar bancos de leite',
+    description:
+      'Filtre por estado e cidade para encontrar bancos de leite humano e pontos de coleta perto de você — e fale com a equipe pelo WhatsApp em poucos cliques.',
+  },
+  results: {
+    countOne: 'unidade encontrada',
+    countOther: 'unidades encontradas',
+    initial: {
+      title: 'Comece escolhendo um estado',
+      description:
+        'Selecione um estado (e, se quiser, uma cidade ou bairro) acima para ver os bancos de leite e pontos de coleta disponíveis.',
+    },
+    empty: {
+      title: 'Nenhuma unidade encontrada',
+      description:
+        'Não encontramos unidades com esses filtros. Tente ampliar a busca: remova o bairro, troque a cidade ou limpe os filtros.',
+    },
+    invalid: {
+      title: 'Não entendemos esses filtros',
+      description:
+        'Ajuste os campos acima e busque novamente para ver as unidades disponíveis.',
+    },
+    error: {
+      title: 'Não foi possível carregar as unidades',
+      description:
+        'Algo deu errado ao buscar as unidades. Tente novamente em alguns instantes.',
+    },
+  },
+  pagination: {
+    label: 'Paginação dos resultados',
+    previous: 'Anterior',
+    next: 'Próxima',
+    // {page} e {total} são substituídos no componente.
+    status: 'Página {page} de {total}',
+  },
+  card: {
+    whatsapp: 'Falar no WhatsApp',
+    // {name} é substituído no componente.
+    whatsappAria: 'Falar com {name} no WhatsApp',
+    callAria: 'Ligar para {name}',
+    hoursLabel: 'Horário de atendimento',
+    noContact: 'Contato não informado',
+    whatsappMessage:
+      'Olá! Encontrei vocês pelo Lactare e gostaria de saber como doar leite materno.',
+  },
   filters: {
     title: 'Encontre um banco de leite',
     description:

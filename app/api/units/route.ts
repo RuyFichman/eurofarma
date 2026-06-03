@@ -1,10 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { Prisma, UnitStatus } from '@prisma/client'
 
-import { prisma } from '@/lib/db/prisma'
+import { searchPublicUnits } from '@/lib/db/queries/units'
 import { parseUnitSearchParams } from '@/lib/validators/unit-search'
-import { PUBLIC_TO_PRISMA_UNIT_TYPE } from '@/lib/constants/unit-types-prisma'
-import { mapUnitToPublicUnit } from '@/lib/mappers/unit-mapper'
 
 /**
  * `GET /api/units?state=SP&city=...&neighborhood=...&type=...&has_whatsapp=...&page=1&limit=10`
@@ -36,77 +33,16 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const { state, city, neighborhood, type, hasWhatsapp, page, limit } =
-    parsed.data
+  const { state, city, neighborhood, type, hasWhatsapp } = parsed.data
 
   try {
-    const where: Prisma.UnitWhereInput = {
-      status: UnitStatus.ACTIVE,
-      addressState: state,
-    }
-
-    if (city) {
-      // Cidade vem de select no frontend → igualdade case-insensitive.
-      where.addressCity = { equals: city, mode: 'insensitive' }
-    }
-
-    if (neighborhood) {
-      // Bairro é texto livre → busca parcial case-insensitive.
-      where.addressNeighborhood = {
-        contains: neighborhood,
-        mode: 'insensitive',
-      }
-    }
-
-    if (type) {
-      where.type = PUBLIC_TO_PRISMA_UNIT_TYPE[type]
-    }
-
-    if (hasWhatsapp === true) {
-      // Preserva qualquer AND pré-existente ao exigir whatsapp preenchido.
-      where.AND = [
-        ...(Array.isArray(where.AND) ? where.AND : []),
-        { whatsapp: { not: null } },
-        { whatsapp: { not: '' } },
-      ]
-    }
-
-    const [total, units] = await prisma.$transaction([
-      prisma.unit.count({ where }),
-      prisma.unit.findMany({
-        where,
-        select: {
-          id: true,
-          slug: true,
-          name: true,
-          type: true,
-          addressNeighborhood: true,
-          addressCity: true,
-          addressState: true,
-          phone: true,
-          whatsapp: true,
-          openingHours: true,
-        },
-        orderBy: { name: 'asc' },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-    ])
-
-    const totalPages = total === 0 ? 0 : Math.ceil(total / limit)
+    const { units, meta } = await searchPublicUnits(parsed.data)
 
     return NextResponse.json(
       {
         filters: { state, city, neighborhood, type, hasWhatsapp },
-        units: units.map(mapUnitToPublicUnit),
-        meta: {
-          page,
-          limit,
-          total,
-          totalPages,
-          hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1,
-        },
+        units,
+        meta,
       },
       { status: 200, headers: SUCCESS_HEADERS },
     )
