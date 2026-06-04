@@ -690,6 +690,27 @@ export const SIGNUP = {
   },
 } as const
 
+export const THANKS = {
+  meta: {
+    title: 'Cadastro concluído',
+    description:
+      'Recebemos seu cadastro no Lactare. Em breve um banco de leite humano falará com você pelo WhatsApp para combinar os próximos passos da doação.',
+  },
+  badge: 'Cadastro recebido',
+  title: 'Obrigada por fazer parte dessa rede de amor 💙',
+  body: 'Seu cadastro foi recebido com todo o cuidado. Em breve, um banco de leite humano vai falar com você pelo WhatsApp para combinar os próximos passos da sua doação.',
+  nextSteps: {
+    title: 'O que acontece agora?',
+    items: [
+      'Um banco de leite entra em contato com você pelo WhatsApp',
+      'A equipe confirma sua elegibilidade com perguntas simples',
+      'Vocês combinam a coleta no melhor dia e horário para você',
+    ],
+  },
+  primaryCta: 'Encontrar banco próximo',
+  secondaryCta: 'Ver como funciona a doação',
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
