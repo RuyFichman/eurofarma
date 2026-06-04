@@ -710,6 +710,63 @@ export const THANKS = {
   secondaryCta: 'Ver como funciona a doação',
 } as const
 
+export const ADMIN_LOGIN = {
+  seo: {
+    title: 'Entrar no painel admin',
+    description:
+      'Acesse o painel administrativo do Lactare para gerenciar unidades, conteúdos e indicadores.',
+  },
+  brand: {
+    name: 'Lactare Admin',
+    eyebrow: 'Área administrativa',
+  },
+  hero: {
+    title: 'Entrar no painel',
+    description:
+      'Acesse com seu email e senha para gerenciar unidades, conteúdos e indicadores do Lactare.',
+    restrictedNotice: 'Acesso restrito à equipe autorizada.',
+  },
+  form: {
+    fields: {
+      email: {
+        label: 'Email',
+        placeholder: 'admin@eurofarma.com.br',
+      },
+      password: {
+        label: 'Senha',
+        placeholder: 'Digite sua senha',
+      },
+    },
+    actions: {
+      submit: 'Entrar',
+      submitting: 'Entrando...',
+      forgotPassword: 'Esqueci minha senha',
+      sendingReset: 'Enviando instruções...',
+      showPassword: 'Mostrar senha',
+      hidePassword: 'Ocultar senha',
+    },
+    validation: {
+      emailRequired: 'Informe seu email.',
+      emailInvalid: 'Informe um email válido.',
+      passwordRequired: 'Informe sua senha.',
+      passwordMin: 'A senha deve ter pelo menos 8 caracteres.',
+      passwordMax: 'A senha deve ter no máximo 128 caracteres.',
+    },
+    feedback: {
+      invalidCredentials: 'Email ou senha inválidos.',
+      genericError:
+        'Não foi possível entrar agora. Tente novamente em alguns minutos.',
+      rateLimited:
+        'Muitas tentativas de login. Tente novamente em alguns minutos.',
+      resetSuccess:
+        'Se este email estiver cadastrado, enviaremos instruções para redefinir a senha.',
+      resetError:
+        'Não foi possível enviar as instruções agora. Tente novamente em alguns minutos.',
+      resetNeedsEmail: 'Informe um email válido para redefinir a senha.',
+    },
+  },
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
