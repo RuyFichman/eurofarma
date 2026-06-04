@@ -613,6 +613,83 @@ export const UNIT_DETAIL = {
   },
 } as const
 
+export const SIGNUP = {
+  meta: {
+    title: 'Criar cadastro',
+    description:
+      'Cadastre-se no Lactare para começar sua jornada de doação de leite humano. Coleta mínima de dados, em conformidade com a LGPD.',
+  },
+  hero: {
+    quote: 'Cada gota de leite humano doado é um ato de amor que salva vidas.',
+    quoteSource: 'Ministério da Saúde — rBLH',
+    bullets: [
+      'Acompanhe sua jornada de doação',
+      'Encontre o banco de leite mais próximo de você',
+      'Fale direto com a equipe pelo WhatsApp',
+    ],
+  },
+  backToHome: 'Voltar ao início',
+  tabs: {
+    login: 'Entrar',
+    signup: 'Criar conta',
+    // Login (Supabase Auth) é sprint futuro — a aba fica visível, porém inativa.
+    loginUnavailable: 'O acesso à conta chega em breve',
+  },
+  heading: 'Crie seu cadastro',
+  subtitle:
+    'Cadastre-se para começar sua jornada de doação de leite humano. Leva menos de um minuto.',
+  fields: {
+    fullName: {
+      label: 'Nome completo',
+      placeholder: 'Seu nome completo',
+    },
+    whatsapp: {
+      label: 'WhatsApp',
+      placeholder: '(11) 90000-0000',
+      helper: 'É por aqui que um banco de leite vai falar com você.',
+    },
+    state: {
+      label: 'Estado',
+      placeholder: 'Selecione o estado',
+    },
+    city: {
+      label: 'Cidade',
+      placeholder: 'Sua cidade',
+    },
+    consent: {
+      lead: 'Li e aceito a',
+      privacy: 'Política de Privacidade',
+      middle: 'e os',
+      terms: 'Termos de Uso',
+      tail: 'e autorizo o contato sobre doação de leite humano.',
+    },
+  },
+  actions: {
+    submit: 'Criar meu cadastro',
+    submitting: 'Enviando...',
+    orContinue: 'ou continue com',
+    whatsappCta: 'Falar com um banco pelo WhatsApp',
+  },
+  legal: {
+    lead: 'Ao se cadastrar, você concorda com os',
+    terms: 'Termos de Uso',
+    middle: 'e a',
+    privacy: 'Política de Privacidade',
+    tail: 'do Lactare, em conformidade com a LGPD.',
+  },
+  success: {
+    title: 'Cadastro recebido! 💙',
+    // {name} é substituído no componente.
+    body: 'Obrigada por se juntar à rede, {name}. Em breve um banco de leite vai falar com você pelo WhatsApp. Enquanto isso, você já pode encontrar a unidade mais próxima.',
+    cta: 'Encontrar banco de leite',
+    again: 'Fazer outro cadastro',
+  },
+  ariaLabels: {
+    form: 'Formulário de cadastro da nutriz',
+    backToHome: 'Voltar para a página inicial',
+  },
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
