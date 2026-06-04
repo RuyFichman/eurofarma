@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CircleCheck, MapPin, MessageCircle, User } from 'lucide-react'
+import { MapPin, MessageCircle, User } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -80,7 +81,8 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 }
 
 export function SignupForm() {
-  const [submittedName, setSubmittedName] = useState<string | null>(null)
+  const router = useRouter()
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const form = useForm<SignupFormInput, unknown, SignupFormValues>({
@@ -111,7 +113,14 @@ export function SignupForm() {
       })
 
       if (response.ok) {
-        setSubmittedName(values.fullName.split(' ')[0] ?? values.fullName)
+        // Sucesso → página de agradecimento (mantém o botão travado durante a navegação).
+        setIsRedirecting(true)
+        router.push('/obrigada')
+        return
+      }
+
+      if (response.status === 429) {
+        setSubmitError(COPY.api.rateLimited)
         return
       }
 
@@ -131,37 +140,8 @@ export function SignupForm() {
     }
   }
 
-  if (submittedName) {
-    return (
-      <div className="flex flex-col items-center gap-4 py-6 text-center">
-        <span className="bg-secondary text-primary flex size-14 items-center justify-center rounded-2xl">
-          <CircleCheck className="size-7" aria-hidden="true" />
-        </span>
-        <h2 className="text-2xl font-semibold">{COPY.success.title}</h2>
-        <p className="text-muted-foreground max-w-sm text-sm">
-          {COPY.success.body.replace('{name}', submittedName)}
-        </p>
-        <div className="mt-2 flex w-full flex-col gap-3">
-          <Button asChild className="w-full">
-            <Link href="/buscar">{COPY.success.cta}</Link>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={() => {
-              form.reset()
-              setSubmittedName(null)
-            }}
-          >
-            {COPY.success.again}
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   const errors = form.formState.errors
+  const isBusy = form.formState.isSubmitting || isRedirecting
 
   return (
     <div>
@@ -342,15 +322,8 @@ export function SignupForm() {
           </p>
         ) : null}
 
-        <Button
-          type="submit"
-          size="lg"
-          className="w-full"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting
-            ? COPY.actions.submitting
-            : COPY.actions.submit}
+        <Button type="submit" size="lg" className="w-full" disabled={isBusy}>
+          {isBusy ? COPY.actions.submitting : COPY.actions.submit}
         </Button>
       </form>
 

@@ -5,14 +5,27 @@ import { prisma } from '@/lib/db/prisma'
 import { nutrizSignupApiSchema } from '@/lib/validators/nutriz'
 import { sanitizeSourceUtm } from '@/lib/utils/utm'
 import { jsonError } from '@/lib/utils/api-errors'
+import { rateLimit } from '@/lib/security/rate-limit'
 
 // Prisma roda melhor no Node runtime (não Edge).
 export const runtime = 'nodejs'
 
-// TODO(LCT-4.4): adicionar rate limiting antes de exposição pública.
+// Rate limiting: in-memory, por IP (LCT-4.4). É por processo — antes de um deploy
+// multi-instância, trocar por store distribuído (ver lib/security/rate-limit.ts).
 // Dispensado a pedido do time (MVP): anti-spam Turnstile (LCT-4.2). Antes de
 // qualquer exposição pública, habilitar o RLS em `nutriz_profiles` (pendência
 // de segurança do CLAUDE.md — hoje a tabela é legível pela publishable key).
+const RATE_LIMIT = { limit: 5, windowMs: 60_000 } as const
+
+/** IP do cliente a partir dos headers de proxy (fallback `unknown` em local). */
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for')
+  if (forwarded) {
+    const first = forwarded.split(',')[0]?.trim()
+    if (first) return first
+  }
+  return request.headers.get('x-real-ip')?.trim() || 'unknown'
+}
 
 /**
  * `POST /api/nutriz` — cadastro **opcional** de interesse da nutriz. A usuária
@@ -23,6 +36,28 @@ export const runtime = 'nodejs'
  * Nunca retorna dados pessoais e nunca expõe erro interno do Prisma.
  */
 export async function POST(request: NextRequest) {
+  // 0. Rate limiting por IP (anti-abuso básico).
+  const ip = getClientIp(request)
+  const limited = rateLimit(`nutriz:${ip}`, RATE_LIMIT)
+  if (!limited.success) {
+    return NextResponse.json(
+      {
+        error: {
+          code: 'RATE_LIMITED',
+          message:
+            'Muitas tentativas em pouco tempo. Aguarde um instante e tente novamente.',
+        },
+      },
+      {
+        status: 429,
+        headers: {
+          'Cache-Control': 'no-store',
+          'Retry-After': String(limited.retryAfterSeconds),
+        },
+      },
+    )
+  }
+
   // 1. Ler JSON do corpo.
   let payload: unknown
   try {

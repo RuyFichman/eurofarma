@@ -677,16 +677,11 @@ export const SIGNUP = {
     privacy: 'Política de Privacidade',
     tail: 'do Lactare, em conformidade com a LGPD.',
   },
-  success: {
-    title: 'Cadastro recebido! 💙',
-    // {name} é substituído no componente.
-    body: 'Obrigada por se juntar à rede, {name}. Em breve um banco de leite vai falar com você pelo WhatsApp. Enquanto isso, você já pode encontrar a unidade mais próxima.',
-    cta: 'Encontrar banco de leite',
-    again: 'Fazer outro cadastro',
-  },
   api: {
     errorTitle: 'Não foi possível concluir o cadastro.',
     errorDescription: 'Revise os dados e tente novamente em alguns instantes.',
+    rateLimited:
+      'Muitas tentativas em pouco tempo. Aguarde um instante e tente novamente.',
   },
   ariaLabels: {
     form: 'Formulário de cadastro da nutriz',
