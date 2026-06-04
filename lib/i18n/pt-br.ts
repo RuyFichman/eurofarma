@@ -684,6 +684,10 @@ export const SIGNUP = {
     cta: 'Encontrar banco de leite',
     again: 'Fazer outro cadastro',
   },
+  api: {
+    errorTitle: 'Não foi possível concluir o cadastro.',
+    errorDescription: 'Revise os dados e tente novamente em alguns instantes.',
+  },
   ariaLabels: {
     form: 'Formulário de cadastro da nutriz',
     backToHome: 'Voltar para a página inicial',

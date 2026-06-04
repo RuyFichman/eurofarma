@@ -27,6 +27,49 @@ import { SIGNUP } from '@/lib/i18n/pt-br'
 
 const COPY = SIGNUP
 
+/** Campos do form para os quais aceitamos erro vindo da API (`error.fields`). */
+const FORM_FIELD_KEYS = [
+  'fullName',
+  'phoneWhatsapp',
+  'state',
+  'city',
+] as const satisfies ReadonlyArray<keyof SignupFormInput>
+
+/** Lê os UTMs da URL atual (sem dado pessoal). Chaves vazias são omitidas. */
+function getCurrentUtmParams(): Record<string, string> {
+  const params = new URLSearchParams(window.location.search)
+  const utm: Record<string, string> = {}
+  for (const key of [
+    'utm_source',
+    'utm_medium',
+    'utm_campaign',
+    'utm_content',
+    'utm_term',
+  ]) {
+    const value = params.get(key)?.trim()
+    if (value) utm[key] = value
+  }
+  return utm
+}
+
+/** Extrai `error.fields` (mensagens por campo) de uma resposta de erro da API. */
+function getErrorFields(data: unknown): Record<string, string> | null {
+  if (!data || typeof data !== 'object' || !('error' in data)) return null
+  const error = (data as { error?: unknown }).error
+  if (!error || typeof error !== 'object' || !('fields' in error)) return null
+  const fields = (error as { fields?: unknown }).fields
+  if (!fields || typeof fields !== 'object' || Array.isArray(fields))
+    return null
+
+  const result: Record<string, string> = {}
+  for (const [key, value] of Object.entries(
+    fields as Record<string, unknown>,
+  )) {
+    if (typeof value === 'string') result[key] = value
+  }
+  return Object.keys(result).length > 0 ? result : null
+}
+
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null
   return (
@@ -38,6 +81,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
 
 export function SignupForm() {
   const [submittedName, setSubmittedName] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const form = useForm<SignupFormInput, unknown, SignupFormValues>({
     resolver: zodResolver(signupFormSchema),
@@ -50,12 +94,41 @@ export function SignupForm() {
     },
   })
 
-  function onSubmit(values: SignupFormValues) {
-    // TODO(Sprint 4.2): enviar para `POST /api/nutriz` (revalidando com
-    // `nutrizSignupSchema`) e redirecionar para `/obrigada`. A persistência
-    // depende de habilitar o RLS antes (pendência de segurança no CLAUDE.md);
-    // por isso a 4.1 só valida no cliente e mostra o estado de sucesso.
-    setSubmittedName(values.fullName.split(' ')[0] ?? values.fullName)
+  async function onSubmit(values: SignupFormValues) {
+    setSubmitError(null)
+    try {
+      const response = await fetch('/api/nutriz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: values.fullName,
+          phoneWhatsapp: values.phoneWhatsapp,
+          state: values.state,
+          city: values.city,
+          lgpdConsent: values.lgpdConsent,
+          sourceUtm: getCurrentUtmParams(),
+        }),
+      })
+
+      if (response.ok) {
+        setSubmittedName(values.fullName.split(' ')[0] ?? values.fullName)
+        return
+      }
+
+      // Mapeia mensagens seguras por campo (se vierem) para o estado do form.
+      const data: unknown = await response.json().catch(() => null)
+      const fields = getErrorFields(data)
+      if (fields) {
+        for (const key of FORM_FIELD_KEYS) {
+          const message = fields[key]
+          if (message) form.setError(key, { message })
+        }
+      }
+      setSubmitError(COPY.api.errorDescription)
+    } catch {
+      // Falha de rede — nunca loga o payload/PII no console.
+      setSubmitError(COPY.api.errorDescription)
+    }
   }
 
   if (submittedName) {
@@ -260,7 +333,21 @@ export function SignupForm() {
           />
         </div>
 
-        <Button type="submit" size="lg" className="w-full">
+        {submitError ? (
+          <p
+            role="alert"
+            className="border-destructive/30 bg-destructive/5 text-destructive rounded-md border px-3 py-2 text-sm"
+          >
+            {submitError}
+          </p>
+        ) : null}
+
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={form.formState.isSubmitting}
+        >
           {form.formState.isSubmitting
             ? COPY.actions.submitting
             : COPY.actions.submit}
