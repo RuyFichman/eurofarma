@@ -535,6 +535,84 @@ export const SEARCH = {
   },
 } as const
 
+export const UNIT_DETAIL = {
+  seo: {
+    titleSuffix: 'Lactare',
+    descriptionTemplate:
+      'Veja endereço, telefone, WhatsApp e orientações para contato com {unitName}, banco de leite ou ponto de coleta no Lactare.',
+    notFoundTitle: 'Unidade não encontrada',
+    notFoundDescription:
+      'A unidade que você tentou acessar não foi encontrada ou não está disponível no Lactare.',
+  },
+  breadcrumb: {
+    home: 'Início',
+    search: 'Buscar',
+  },
+  typeLabels: {
+    milk_bank: 'Banco de leite',
+    collection_point: 'Ponto de coleta',
+    hospital: 'Hospital',
+    partner: 'Parceiro',
+  },
+  badges: {
+    whatsappAvailable: 'WhatsApp disponível',
+    phoneAvailable: 'Telefone disponível',
+    openingHoursAvailable: 'Horário informado',
+  },
+  actions: {
+    phone: 'Ligar',
+    whatsapp: 'Falar pelo WhatsApp',
+    backToSearch: 'Voltar para busca',
+    reportProblem: 'Reportar informação incorreta',
+  },
+  // {unitName} é substituído no componente.
+  ariaLabels: {
+    phone: 'Ligar para {unitName}',
+    whatsapp: 'Falar pelo WhatsApp com {unitName}',
+    backToSearch: 'Voltar para a busca de bancos de leite',
+    reportProblem: 'Reportar informação incorreta sobre {unitName}',
+  },
+  contact: {
+    title: 'Informações de contato',
+    phone: 'Telefone',
+    whatsapp: 'WhatsApp',
+    email: 'E-mail',
+    address: 'Endereço',
+    zip: 'CEP',
+    empty: 'Informações de contato não disponíveis no momento.',
+  },
+  openingHours: {
+    title: 'Horário de atendimento',
+    fallback:
+      'Horário não informado. Confirme diretamente com a unidade antes de se deslocar.',
+  },
+  instructions: {
+    title: 'Instruções específicas para doação',
+    fallback:
+      'Esta unidade ainda não possui instruções específicas cadastradas. Entre em contato por telefone ou WhatsApp para receber orientação segura.',
+  },
+  map: {
+    title: 'Localização',
+    unavailable:
+      'Mapa indisponível no momento. Use o endereço abaixo para confirmar a localização com a unidade.',
+    // {unitName} é substituído no componente.
+    imageAlt: 'Mapa estático da localização de {unitName}',
+  },
+  safety: {
+    title: 'Antes de iniciar a doação',
+    text: 'Cada banco de leite pode ter orientações próprias para coleta, armazenamento e entrega. Entre em contato com a unidade antes de iniciar o processo para receber instruções seguras.',
+  },
+  whatsapp: {
+    defaultMessage:
+      'Olá! Vim pelo site do Lactare e gostaria de saber mais sobre doação de leite humano.',
+  },
+  report: {
+    email: 'contato@lactare.local',
+    // {unitName} é substituído no componente.
+    subjectTemplate: 'Informação incorreta - {unitName}',
+  },
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
