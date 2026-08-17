@@ -3,9 +3,9 @@ import {
   type User as AuthUser,
   type SupabaseClient,
 } from '@supabase/supabase-js'
-import { randomBytes } from 'node:crypto'
 
 import { prisma } from '../lib/db/prisma'
+import { generateStrongPassword } from './support/generate-password'
 
 // ---- Validação de variáveis de ambiente ----
 const SUPABASE_URL = process.env.SUPABASE_URL
@@ -36,19 +36,6 @@ function createSupabaseAdminClient(): SupabaseClient {
       persistSession: false,
     },
   })
-}
-
-/**
- * Gera senha forte alfanumérica de `length` caracteres. Usa bytes aleatórios em
- * base64 e remove `+`, `/`, `=` (regerando até completar o tamanho), garantindo
- * exatamente `length` caracteres sem símbolos que atrapalham copy/paste.
- */
-function generateStrongPassword(length = 20): string {
-  let result = ''
-  while (result.length < length) {
-    result += randomBytes(length).toString('base64').replace(/[+/=]/g, '')
-  }
-  return result.slice(0, length)
 }
 
 /** Procura usuário no auth.users pelo email (case-insensitive). Primeira página basta em dev. */
@@ -135,7 +122,7 @@ async function main(): Promise<void> {
     await upsertPublicUser(existing.id, adminEmail)
     console.log('[seed-admin] Perfil em public.users garantido com role ADMIN.')
     console.log(
-      '[seed-admin] Esqueceu a senha? Resete no painel do Supabase: Authentication > Users > (usuário) > Reset password.',
+      '[seed-admin] Esqueceu a senha? Rode `pnpm db:set-admin-password` para definir uma nova.',
     )
   } else {
     const password = generateStrongPassword(20)

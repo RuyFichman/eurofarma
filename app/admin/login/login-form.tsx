@@ -23,7 +23,12 @@ import { ADMIN_LOGIN } from '@/lib/i18n/pt-br'
 
 const FORM = ADMIN_LOGIN.form
 
-export function LoginForm() {
+type LoginFormProps = {
+  /** Destino pós-login, já sanitizado na page (`sanitizeAdminNextPath`). */
+  nextPath: string
+}
+
+export function LoginForm({ nextPath }: LoginFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [isResetPending, startResetTransition] = useTransition()
@@ -45,7 +50,7 @@ export function LoginForm() {
     startTransition(async () => {
       const result = await loginAdminAction(values)
       if (result.ok) {
-        router.push('/admin/dashboard')
+        router.push(nextPath)
         router.refresh()
         return
       }

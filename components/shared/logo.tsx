@@ -20,6 +20,29 @@ const ICON_SIZE: Record<NonNullable<LogoProps['size']>, number> = {
   lg: 28,
 }
 
+/** Gota estilizada (placeholder até o logo oficial da Eurofarma). */
+export function LogoMark({
+  size = 'md',
+  className,
+}: {
+  size?: NonNullable<LogoProps['size']>
+  className?: string
+}) {
+  return (
+    <svg
+      width={ICON_SIZE[size]}
+      height={ICON_SIZE[size]}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+      className={className}
+    >
+      <path d="M12 2.5c3.4 4 6.5 7.4 6.5 11.3a6.5 6.5 0 0 1-13 0C5.5 9.9 8.6 6.5 12 2.5Z" />
+    </svg>
+  )
+}
+
 export function Logo({ variant = 'default', size = 'md' }: LogoProps) {
   const colorClass = variant === 'light' ? 'text-white' : 'text-primary'
 
@@ -34,17 +57,7 @@ export function Logo({ variant = 'default', size = 'md' }: LogoProps) {
         TEXT_SIZE[size],
       )}
     >
-      {/* Gota estilizada (placeholder até o logo oficial da Eurofarma). */}
-      <svg
-        width={ICON_SIZE[size]}
-        height={ICON_SIZE[size]}
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path d="M12 2.5c3.4 4 6.5 7.4 6.5 11.3a6.5 6.5 0 0 1-13 0C5.5 9.9 8.6 6.5 12 2.5Z" />
-      </svg>
+      <LogoMark size={size} />
       <span>{SITE.name}</span>
     </Link>
   )

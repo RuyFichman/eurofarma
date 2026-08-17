@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { LoginForm } from '@/app/admin/login/login-form'
 import { Card, CardContent } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-current-user'
+import { sanitizeAdminNextPath } from '@/lib/auth/safe-next-path'
 import { ADMIN_LOGIN } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
@@ -11,12 +12,20 @@ export const metadata: Metadata = {
   description: ADMIN_LOGIN.seo.description,
 }
 
-export default async function AdminLoginPage() {
-  // Já autenticado → vai direto ao painel (o dashboard chega na Sprint 5.3;
-  // até lá esse destino pode dar 404, o que é aceitável neste sprint).
+export default async function AdminLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>
+}) {
+  // O middleware manda para cá com `?next=` quando a pessoa tentou uma rota do
+  // painel sem sessão. `sanitizeAdminNextPath` barra open redirect.
+  const params = await searchParams
+  const rawNext = Array.isArray(params.next) ? params.next[0] : params.next
+  const nextPath = sanitizeAdminNextPath(rawNext)
+
   const user = await getCurrentUser()
   if (user) {
-    redirect('/admin/dashboard')
+    redirect(nextPath)
   }
 
   return (
@@ -41,7 +50,7 @@ export default async function AdminLoginPage() {
                 </p>
               </div>
 
-              <LoginForm />
+              <LoginForm nextPath={nextPath} />
             </CardContent>
           </Card>
 

@@ -767,6 +767,60 @@ export const ADMIN_LOGIN = {
   },
 } as const
 
+export const ADMIN = {
+  brand: {
+    name: 'Lactare Admin',
+    eyebrow: 'Área administrativa',
+  },
+  a11y: {
+    skipToContent: 'Ir para o conteúdo do painel',
+    nav: 'Navegação do painel',
+    openMenu: 'Abrir menu do painel',
+    closeMenu: 'Fechar menu do painel',
+  },
+  nav: {
+    soon: 'Em breve',
+    items: [
+      { href: '/admin/dashboard', label: 'Dashboard', available: true },
+      { href: '/admin/unidades', label: 'Unidades', available: false },
+      { href: '/admin/nutrizes', label: 'Nutrizes', available: false },
+      { href: '/admin/conteudos', label: 'Conteúdos', available: false },
+      { href: '/admin/campanhas', label: 'Campanhas', available: false },
+    ],
+  },
+  account: {
+    sessionLabel: 'Sessão de',
+    roleLabel: {
+      ADMIN: 'Administração',
+      VIEWER: 'Leitura',
+    },
+    logout: 'Sair',
+    backToSite: 'Ver o site público',
+  },
+  dashboard: {
+    seo: {
+      title: 'Dashboard | Lactare Admin',
+      description: 'Painel administrativo do Lactare Digital.',
+    },
+    title: 'Dashboard',
+    description: 'Visão geral da rede e das doações do Lactare.',
+    placeholder: {
+      title: 'Indicadores em construção',
+      description:
+        'Esta tela já está protegida e pronta para receber os números da rede. Os indicadores de unidades, cadastros e cliques no WhatsApp entram na próxima etapa.',
+    },
+  },
+  noAccess: {
+    seo: {
+      title: 'Acesso restrito | Lactare Admin',
+      description: 'Esta conta não tem permissão para acessar o painel.',
+    },
+    title: 'Esta conta não tem acesso ao painel',
+    description:
+      'O acesso ao painel administrativo é liberado apenas para contas com permissão de administração. Se você acredita que isso é um engano, fale com a pessoa responsável pelo projeto.',
+  },
+} as const
+
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
