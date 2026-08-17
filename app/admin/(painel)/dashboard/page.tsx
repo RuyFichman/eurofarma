@@ -21,14 +21,16 @@ export const metadata: Metadata = {
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
-      <header className="space-y-1">
+      {/* `div`, não `header`: dentro de `<main>` um segundo `<header>` compete
+          com o banner do shell na árvore de acessibilidade. */}
+      <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">
           {ADMIN.dashboard.title}
         </h1>
         <p className="text-muted-foreground text-sm">
           {ADMIN.dashboard.description}
         </p>
-      </header>
+      </div>
 
       <Card>
         <CardHeader>

@@ -767,29 +767,33 @@ export const ADMIN_LOGIN = {
   },
 } as const
 
-export const ADMIN = {
+/** Copy do shell administrativo (sidebar, header, navegação, conta). */
+export const ADMIN_LAYOUT = {
   brand: {
-    name: 'Lactare Admin',
-    eyebrow: 'Área administrativa',
+    name: 'Lactare',
+    area: 'Admin',
+    fullName: 'Lactare Admin',
   },
-  a11y: {
-    skipToContent: 'Ir para o conteúdo do painel',
-    nav: 'Navegação do painel',
-    openMenu: 'Abrir menu do painel',
-    closeMenu: 'Fechar menu do painel',
+  navigation: {
+    label: 'Navegação administrativa',
+    items: {
+      dashboard: 'Dashboard',
+      units: 'Unidades',
+      nutrizes: 'Nutrizes',
+      contents: 'Conteúdos',
+      campaigns: 'Campanhas',
+    },
   },
-  nav: {
-    soon: 'Em breve',
-    items: [
-      { href: '/admin/dashboard', label: 'Dashboard', available: true },
-      { href: '/admin/unidades', label: 'Unidades', available: false },
-      { href: '/admin/nutrizes', label: 'Nutrizes', available: false },
-      { href: '/admin/conteudos', label: 'Conteúdos', available: false },
-      { href: '/admin/campanhas', label: 'Campanhas', available: false },
-    ],
+  header: {
+    areaLabel: 'Área administrativa',
+    openMenu: 'Abrir menu',
+    closeMenu: 'Fechar menu',
   },
   account: {
-    sessionLabel: 'Sessão de',
+    label: 'Conta',
+    // Forma neutra em vez de "Conectado como": o painel não sabe o gênero de
+    // quem acessa e o rótulo aparece ao lado do nome real.
+    signedInAs: 'Sessão de',
     roleLabel: {
       ADMIN: 'Administração',
       VIEWER: 'Leitura',
@@ -797,6 +801,13 @@ export const ADMIN = {
     logout: 'Sair',
     backToSite: 'Ver o site público',
   },
+  accessibility: {
+    skipToContent: 'Pular para o conteúdo',
+  },
+} as const
+
+/** Copy das telas administrativas (não do shell — este fica em ADMIN_LAYOUT). */
+export const ADMIN = {
   dashboard: {
     seo: {
       title: 'Dashboard | Lactare Admin',

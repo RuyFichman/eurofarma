@@ -7,7 +7,7 @@ import { logoutAdminAction } from '@/app/admin/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { getAdminAccess } from '@/lib/auth/get-admin-user'
-import { ADMIN } from '@/lib/i18n/pt-br'
+import { ADMIN, ADMIN_LAYOUT } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
   title: ADMIN.noAccess.seo.title,
@@ -49,11 +49,11 @@ export default async function AdminNoAccessPage() {
               <div className="space-y-2">
                 <form action={logoutAdminAction}>
                   <Button type="submit" className="w-full">
-                    {ADMIN.account.logout}
+                    {ADMIN_LAYOUT.account.logout}
                   </Button>
                 </form>
                 <Button asChild variant="outline" className="w-full">
-                  <Link href="/">{ADMIN.account.backToSite}</Link>
+                  <Link href="/">{ADMIN_LAYOUT.account.backToSite}</Link>
                 </Button>
               </div>
             </CardContent>

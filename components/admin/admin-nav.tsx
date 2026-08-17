@@ -11,77 +11,63 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
+import { ADMIN_NAV_ITEMS, type AdminNavKey } from '@/lib/admin/navigation'
+import { ADMIN_LAYOUT } from '@/lib/i18n/pt-br'
 import { cn } from '@/lib/utils/cn'
-import { ADMIN } from '@/lib/i18n/pt-br'
 
 type AdminNavProps = {
-  /** Chamado ao navegar — usado pelo menu mobile para fechar o Sheet. */
+  /** Chamado ao navegar — o menu mobile usa para fechar o Sheet. */
   onNavigate?: () => void
 }
 
-const ICONS: Record<string, LucideIcon> = {
-  '/admin/dashboard': LayoutDashboard,
-  '/admin/unidades': Building2,
-  '/admin/nutrizes': Users,
-  '/admin/conteudos': FileText,
-  '/admin/campanhas': Megaphone,
+const ICONS: Record<AdminNavKey, LucideIcon> = {
+  dashboard: LayoutDashboard,
+  units: Building2,
+  nutrizes: Users,
+  contents: FileText,
+  campaigns: Megaphone,
 }
 
+/**
+ * Marca a rota ativa. `startsWith` cobre subrotas (ex.: `/admin/unidades/nova`)
+ * sem que um href curto capture os demais itens — nenhum href aqui é prefixo de
+ * outro, e `/admin` sozinho não está na lista justamente por isso.
+ */
 function isActive(pathname: string, href: string): boolean {
   const current = pathname.replace(/\/$/, '') || '/'
   return current === href || current.startsWith(`${href}/`)
 }
 
-const BASE_ITEM =
-  'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors'
-
 export function AdminNav({ onNavigate }: AdminNavProps) {
   const pathname = usePathname()
 
   return (
-    <nav aria-label={ADMIN.a11y.nav} className="flex flex-col gap-1">
-      {ADMIN.nav.items.map((item) => {
-        const Icon = ICONS[item.href]
-
-        // Seções ainda não construídas aparecem para dar noção do painel, mas
-        // não são links (evita levar a equipe para um 404).
-        if (!item.available) {
-          return (
-            <span
-              key={item.href}
-              aria-disabled="true"
-              className={cn(BASE_ITEM, 'text-sidebar-foreground/55')}
-            >
-              {Icon ? (
-                <Icon className="size-4 shrink-0" aria-hidden="true" />
-              ) : null}
-              <span className="flex-1">{item.label}</span>
-              <span className="border-sidebar-border rounded-full border px-2 py-0.5 text-[0.625rem] tracking-wide uppercase">
-                {ADMIN.nav.soon}
-              </span>
-            </span>
-          )
-        }
-
+    <nav
+      aria-label={ADMIN_LAYOUT.navigation.label}
+      className="flex flex-col gap-1"
+    >
+      {ADMIN_NAV_ITEMS.map((item) => {
+        const Icon = ICONS[item.key]
         const active = isActive(pathname, item.href)
+
         return (
           <Link
-            key={item.href}
+            key={item.key}
             href={item.href}
             onClick={onNavigate}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              BASE_ITEM,
-              'focus-visible:ring-sidebar-ring focus-visible:ring-2 focus-visible:outline-none',
+              'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors',
+              'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
+              // O peso da fonte acompanha a cor para o estado ativo não depender
+              // só de cor (WCAG 1.4.1).
               active
-                ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
-                : 'text-sidebar-foreground/85 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
+                ? 'bg-primary/10 text-primary font-medium'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
             )}
           >
-            {Icon ? (
-              <Icon className="size-4 shrink-0" aria-hidden="true" />
-            ) : null}
-            <span>{item.label}</span>
+            <Icon className="size-4 shrink-0" aria-hidden="true" />
+            <span>{ADMIN_LAYOUT.navigation.items[item.key]}</span>
           </Link>
         )
       })}
