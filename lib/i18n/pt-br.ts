@@ -814,11 +814,89 @@ export const ADMIN = {
       description: 'Painel administrativo do Lactare Digital.',
     },
     title: 'Dashboard',
-    description: 'Visão geral da rede e das doações do Lactare.',
-    placeholder: {
-      title: 'Indicadores em construção',
+    description:
+      'Acompanhe o alcance da rede, os cadastros de nutrizes e os contatos por WhatsApp.',
+
+    /** Rótulo de janela temporal. `{days}` é substituído em tempo de render. */
+    period: 'Últimos {days} dias',
+
+    metrics: {
+      /** Heading do bloco de cartões — visualmente oculto, lido por leitor de tela. */
+      title: 'Indicadores principais',
+      activeUnits: {
+        label: 'Unidades ativas',
+        description: 'Aparecem na busca pública',
+        empty: 'Nenhuma unidade publicada até agora',
+      },
+      statesCovered: {
+        label: 'Estados atendidos',
+        description: 'UFs com ao menos uma unidade ativa',
+        empty: 'Nenhuma UF coberta até agora',
+      },
+      nutriz: {
+        label: 'Nutrizes cadastradas',
+        /** `{count}` = cadastros no período, `{days}` = tamanho da janela. */
+        description: '{count} nos últimos {days} dias',
+        empty: 'Nenhuma nutriz se cadastrou até agora',
+      },
+      whatsappClicks: {
+        label: 'Cliques no WhatsApp',
+        /** `{total}` = acumulado desde o início da coleta. */
+        description: '{total} desde o início da medição',
+        empty: 'Nenhum contato registrado até agora',
+      },
+    },
+
+    unitsByStatus: {
+      title: 'Unidades por situação',
+      /** `{total}` = todas as unidades cadastradas, publicadas ou não. */
+      description: '{total} unidades cadastradas no total',
+      empty:
+        'Ainda não há unidades cadastradas. Elas chegam pela importação da base da rBLH.',
+      labels: {
+        ACTIVE: 'Ativas',
+        PENDING: 'Aguardando revisão',
+        INACTIVE: 'Inativas',
+      },
+    },
+
+    unitsByType: {
+      title: 'Unidades por tipo',
+      description: 'Composição da rede cadastrada',
+      labels: {
+        MILK_BANK: 'Bancos de leite',
+        COLLECTION_POINT: 'Postos de coleta',
+        HOSPITAL: 'Hospitais',
+        PARTNER: 'Parceiros',
+      },
+    },
+
+    unitsByState: {
+      title: 'Cobertura por estado',
+      description: 'Unidades ativas em cada UF',
+      empty:
+        'Nenhuma unidade ativa ainda — por isso não há cobertura geográfica para mostrar.',
+    },
+
+    nutrizByState: {
+      title: 'Nutrizes por estado',
       description:
-        'Esta tela já está protegida e pronta para receber os números da rede. Os indicadores de unidades, cadastros e cliques no WhatsApp entram na próxima etapa.',
+        'Agregado por UF, nunca por cidade, para não identificar cadastros individuais.',
+      empty:
+        'Nenhuma nutriz se cadastrou ainda. O cadastro é opcional: a nutriz pode buscar unidades e falar pelo WhatsApp sem deixar dados.',
+    },
+
+    topUnits: {
+      title: 'Unidades mais contatadas',
+      /** `{days}` = tamanho da janela. */
+      description: 'Cliques no WhatsApp nos últimos {days} dias',
+      empty:
+        'Nenhum clique no WhatsApp foi registrado nesta janela, então ainda não há ranking.',
+      columns: {
+        unit: 'Unidade',
+        location: 'Localização',
+        clicks: 'Cliques',
+      },
     },
   },
   noAccess: {

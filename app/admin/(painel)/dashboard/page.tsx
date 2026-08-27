@@ -1,11 +1,7 @@
 import type { Metadata } from 'next'
 
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { DashboardOverview } from '@/components/admin/dashboard/dashboard-overview'
+import { getAdminDashboardMetrics } from '@/lib/db/queries/dashboard-metrics'
 import { ADMIN } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
@@ -14,11 +10,20 @@ export const metadata: Metadata = {
 }
 
 /**
- * Destino padrão do painel. Nesta sprint (5.3) a tela existe para fechar o fluxo
- * de acesso — protegida por middleware + role. Os indicadores reais entram na
- * Sprint 5.4.
+ * Destino padrão do painel, com os indicadores reais da Sprint 5.5.
+ *
+ * Server Component: consulta o Prisma direto, **sem self-fetch** de rota
+ * interna (mesma decisão da 3.4 — evita hop HTTP e URL absoluta em RSC). Não
+ * repete o chrome do painel: sidebar, header e `<main>` vêm do layout do grupo
+ * `(painel)`, que também aplica o gate de role.
+ *
+ * A rota já é dinâmica por construção — o layout chama `requireAdminUser()`,
+ * que lê cookies de sessão —, então não precisa de `force-dynamic` para os
+ * números não congelarem em build.
  */
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const metrics = await getAdminDashboardMetrics()
+
   return (
     <div className="space-y-6">
       {/* `div`, não `header`: dentro de `<main>` um segundo `<header>` compete
@@ -27,19 +32,12 @@ export default function AdminDashboardPage() {
         <h1 className="text-2xl font-semibold tracking-tight">
           {ADMIN.dashboard.title}
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-sm text-pretty">
           {ADMIN.dashboard.description}
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{ADMIN.dashboard.placeholder.title}</CardTitle>
-          <CardDescription>
-            {ADMIN.dashboard.placeholder.description}
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <DashboardOverview metrics={metrics} />
     </div>
   )
 }
