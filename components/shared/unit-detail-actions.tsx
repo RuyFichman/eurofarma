@@ -49,8 +49,8 @@ export function UnitDetailActions({
 
   /**
    * Dispara o tracking do clique sem bloquear a navegação para o WhatsApp.
-   * Preparado para a Sprint 3.8 (rota `/api/track` ainda não existe); qualquer
-   * falha — inclusive 404 — é ignorada silenciosamente. Payload sem PII da nutriz.
+   * A rota `/api/track` existe desde a Sprint 3.8 e grava um `WhatsappClick`;
+   * qualquer falha continua ignorada silenciosamente. Payload sem PII da nutriz.
    */
   function trackWhatsappClick() {
     const payload = {

@@ -48,8 +48,9 @@ export function UnitCardActions({
 
   /**
    * Dispara o tracking do clique sem bloquear a navegação para o WhatsApp.
-   * Preparado para a Sprint 3.8 (rota `/api/track` ainda não existe); qualquer
-   * falha — inclusive 404 — é ignorada silenciosamente.
+   * A rota `/api/track` existe desde a Sprint 3.8 e grava um `WhatsappClick`;
+   * qualquer falha continua ignorada silenciosamente — tracking nunca pode
+   * atrapalhar o contato com a unidade.
    */
   function trackWhatsappClick() {
     const payload = {
