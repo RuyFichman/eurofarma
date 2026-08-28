@@ -899,6 +899,115 @@ export const ADMIN = {
       },
     },
   },
+  units: {
+    seo: {
+      title: 'Unidades | Lactare Admin',
+      description:
+        'Gerencie os bancos de leite, pontos de coleta e demais unidades do Lactare.',
+    },
+    title: 'Unidades',
+    description:
+      'Gerencie bancos de leite, pontos de coleta e demais unidades disponíveis no Lactare.',
+    createAction: 'Nova unidade',
+
+    filters: {
+      /** Nome acessível do formulário (vira landmark de busca). */
+      label: 'Filtros da lista de unidades',
+      search: {
+        label: 'Buscar unidade',
+        placeholder: 'Digite o nome da unidade',
+      },
+      status: {
+        label: 'Situação',
+        all: 'Todas as situações',
+      },
+      type: {
+        label: 'Tipo',
+        all: 'Todos os tipos',
+      },
+      state: {
+        label: 'Estado',
+        all: 'Todos os estados',
+      },
+      city: {
+        label: 'Cidade',
+        placeholder: 'Digite a cidade',
+      },
+      actions: {
+        apply: 'Filtrar',
+        clear: 'Limpar filtros',
+      },
+    },
+
+    results: {
+      countOne: 'unidade encontrada',
+      countOther: 'unidades encontradas',
+    },
+
+    table: {
+      caption: 'Unidades cadastradas no Lactare',
+      columns: {
+        unit: 'Unidade',
+        type: 'Tipo',
+        location: 'Localização',
+        contact: 'Contato',
+        status: 'Situação',
+        actions: 'Ações',
+      },
+      edit: 'Editar',
+      /** `{unitName}` é substituído no componente. */
+      editAria: 'Editar {unitName}',
+      publicPage: 'Ver página pública',
+      publicPageAria: 'Ver a página pública de {unitName} (abre em nova aba)',
+    },
+
+    /**
+     * Rótulos no singular, para uma linha da lista. O painel (5.5) usa plural
+     * ("Ativas", "Aguardando revisão") porque lá o rótulo nomeia uma contagem —
+     * são formas gramaticais diferentes, não duplicação.
+     */
+    status: {
+      ACTIVE: 'Ativa',
+      PENDING: 'Pendente',
+      INACTIVE: 'Inativa',
+    },
+
+    types: {
+      MILK_BANK: 'Banco de leite',
+      COLLECTION_POINT: 'Ponto de coleta',
+      HOSPITAL: 'Hospital',
+      PARTNER: 'Parceiro',
+    },
+
+    contact: {
+      whatsapp: 'WhatsApp',
+      phone: 'Telefone',
+      none: 'Não informado',
+    },
+
+    pagination: {
+      label: 'Paginação das unidades',
+      previous: 'Anterior',
+      next: 'Próxima',
+      /** `{page}` e `{total}` são substituídos no componente. */
+      status: 'Página {page} de {total}',
+    },
+
+    empty: {
+      database: {
+        title: 'Nenhuma unidade cadastrada',
+        description:
+          'Cadastre o primeiro banco de leite ou ponto de coleta para disponibilizá-lo no Lactare.',
+        action: 'Cadastrar primeira unidade',
+      },
+      filtered: {
+        title: 'Nenhuma unidade encontrada',
+        description:
+          'Nenhuma unidade corresponde a esses filtros. Tente ajustar a busca ou limpar os filtros.',
+        action: 'Limpar filtros',
+      },
+    },
+  },
   noAccess: {
     seo: {
       title: 'Acesso restrito | Lactare Admin',
