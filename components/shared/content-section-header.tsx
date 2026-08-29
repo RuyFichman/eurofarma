@@ -6,6 +6,12 @@ type ContentSectionHeaderProps = {
   eyebrow: string
   title: string
   description?: string
+  /**
+   * `below` (padrão) empilha a descrição sob o título. `beside` a coloca numa
+   * coluna ao lado, como no mockup do "Comece por Aqui" — em telas estreitas
+   * ela volta a empilhar de qualquer forma.
+   */
+  descriptionPlacement?: 'below' | 'beside'
   action?: ReactNode
 }
 
@@ -14,24 +20,42 @@ export function ContentSectionHeader({
   eyebrow,
   title,
   description,
+  descriptionPlacement = 'below',
   action,
 }: ContentSectionHeaderProps) {
+  const beside = descriptionPlacement === 'beside'
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex items-start gap-4">
-        <span className="bg-secondary text-primary flex size-12 shrink-0 items-center justify-center rounded-2xl">
-          <Icon className="size-6" aria-hidden="true" />
-        </span>
-        <div className="space-y-1">
-          <p className="text-primary text-xs font-semibold tracking-wider uppercase">
-            {eyebrow}
-          </p>
-          <h2>{title}</h2>
-          {description ? (
-            <p className="text-muted-foreground max-w-xl">{description}</p>
-          ) : null}
+      <div
+        className={
+          beside
+            ? 'flex flex-col gap-4 md:flex-row md:items-center md:gap-8'
+            : 'flex items-start gap-4'
+        }
+      >
+        <div className="flex items-start gap-4">
+          <span className="bg-secondary text-primary flex size-12 shrink-0 items-center justify-center rounded-2xl">
+            <Icon className="size-6" aria-hidden="true" />
+          </span>
+          <div className="space-y-1">
+            <p className="text-primary text-xs font-semibold tracking-wider uppercase">
+              {eyebrow}
+            </p>
+            <h2>{title}</h2>
+            {description && !beside ? (
+              <p className="text-muted-foreground max-w-xl">{description}</p>
+            ) : null}
+          </div>
         </div>
+
+        {description && beside ? (
+          <p className="text-muted-foreground max-w-sm text-sm text-pretty">
+            {description}
+          </p>
+        ) : null}
       </div>
+
       {action ? <div className="sm:pt-2">{action}</div> : null}
     </div>
   )

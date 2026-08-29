@@ -59,16 +59,22 @@ export const HOME = {
       'Seus dados protegidos pela LGPD',
       'Contato direto e gratuito pelo WhatsApp',
     ],
-    highlight: { value: '+48 mil', label: 'doadoras ativas na rede' },
     imageAlt: 'Bebê recém-nascido aconchegado em um cobertor macio',
   },
   stats: {
-    items: [
-      { value: '220+', label: 'Bancos e postos de coleta' },
-      { value: '48 mil', label: 'Doadoras ativas' },
-      { value: '2,3 mi', label: 'Bebês beneficiados' },
-      { value: '27', label: 'Estados atendidos' },
-    ],
+    /** Heading do bloco — visualmente oculto, lido por leitor de tela. */
+    title: 'A rede em números',
+    /**
+     * Os dois primeiros vêm do banco (é o que a nutriz realmente encontra na
+     * busca); `fallback` cobre a falha da consulta. Os dois últimos são da
+     * rBLH e não derivam da nossa base — daí a nota de fonte.
+     */
+    units: { label: 'Unidades cadastradas', fallback: '220+' },
+    states: { label: 'Estados atendidos', fallback: '27' },
+    donors: { value: '48 mil', label: 'Doadoras ativas na rede' },
+    babies: { value: '2,3 mi', label: 'Bebês beneficiados' },
+    sourceNote:
+      'Unidades e estados vêm da nossa base; doadoras e bebês são dados da rBLH/Fiocruz.',
   },
   network: {
     eyebrow: 'Conheça a rede',
@@ -94,7 +100,10 @@ export const HOME = {
         items: [
           'Maior rede do mundo em BLH',
           'Coordenada pela Fiocruz',
-          '220+ unidades em 27 estados',
+          // Sem número aqui: a faixa de indicadores logo acima já mostra a
+          // contagem real da base, e dois totais diferentes na mesma tela
+          // se contradiriam.
+          'Unidades em todas as regiões do país',
         ],
         cta: { label: 'Saiba mais', href: '/como-funciona' },
       },

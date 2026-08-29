@@ -57,6 +57,18 @@
     --whatsapp: hsl(142 71% 30%);
     --whatsapp-foreground: hsl(0 0% 100%);
 
+    /* Famílias de cor dos cartões de tema do "Comece por Aqui"
+       (/como-funciona) — pedido do time a partir do mockup original, que usa
+       um tom por assunto. Uso restrito a essa seção; o resto do site segue a
+       paleta azul. Cada `-foreground` foi escolhido para passar WCAG AA (>=4.5:1)
+       sobre a superfície da própria família. */
+    --topic-blue: hsl(210 100% 96%);
+    --topic-blue-foreground: hsl(210 52% 38%);
+    --topic-green: hsl(150 55% 95%);
+    --topic-green-foreground: hsl(153 45% 30%);
+    --topic-lilac: hsl(268 60% 96%);
+    --topic-lilac-foreground: hsl(268 40% 45%);
+
     /* Sidebar admin / footer — navy #1A2B3C, acento azul claro #5BA4D4 */
     --sidebar: hsl(210 39% 17%);
     --sidebar-foreground: hsl(210 30% 90%);
@@ -103,6 +115,13 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-topic-blue: var(--topic-blue);
+  --color-topic-blue-foreground: var(--topic-blue-foreground);
+  --color-topic-green: var(--topic-green);
+  --color-topic-green-foreground: var(--topic-green-foreground);
+  --color-topic-lilac: var(--topic-lilac);
+  --color-topic-lilac-foreground: var(--topic-lilac-foreground);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);

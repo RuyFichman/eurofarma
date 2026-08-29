@@ -49,8 +49,13 @@ export function ContentDonationPath() {
               <span className="bg-primary text-primary-foreground relative z-10 flex size-10 items-center justify-center rounded-full text-sm font-bold">
                 {index + 1}
               </span>
-              <Card className="mt-6 w-full gap-3 py-5">
-                <CardHeader className="items-center px-5">
+              {/* `flex-1`: o `li` já estica com o grid, mas o cartão parava na
+                  altura do próprio texto — daí as bases desalinhadas. */}
+              <Card className="mt-6 flex w-full flex-1 flex-col gap-3 py-5">
+                {/* `justify-items-center`, não `items-center`: o CardHeader é um
+                    grid, e ali `items-*` alinha na vertical — era por isso que o
+                    ícone ficava à esquerda com o título centralizado. */}
+                <CardHeader className="justify-items-center px-5">
                   <span className="bg-secondary text-primary flex size-11 items-center justify-center rounded-xl">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
