@@ -118,7 +118,7 @@ Scripts disponíveis em `package.json` (estado atual):
 | `pnpm typecheck` | `tsc --noEmit` | ✅ |
 | `pnpm format` / `format:check` | Prettier (escreve / verifica) | ✅ |
 | `pnpm check` | `lint` + `typecheck` + `format:check` | ✅ |
-| `pnpm test` | placeholder — Vitest chega no Sprint 1.7 | — |
+| `pnpm test` | Vitest (`vitest run`); variantes `test:watch` / `test:unit` / `test:integration` / `test:coverage` | ✅ |
 
 ## 6. Estrutura de pastas
 
@@ -284,7 +284,7 @@ Ao receber uma tarefa neste projeto:
 5. **Texto visível** sempre via `lib/i18n/pt-br.ts`. Não hardcode.
 6. **Coloque cada coisa no seu lugar:** rota em `app/`, componente compartilhado em `components/shared/`, lógica pura em `lib/utils/`, acesso a dados via `lib/db/`.
 7. **Não sugira deploy, domínio, produção, CI/CD ou monitoramento** como ação atual. Estamos em local.
-8. **Ao terminar**, rode a verificação disponível e relate o resultado real. Hoje é `pnpm check:validators` (smoke test); `pnpm check`/`pnpm test` só quando o toolchain existir.
+8. **Ao terminar**, rode `pnpm check` e `pnpm test` e relate o resultado real, inclusive falhas. O `pnpm check:validators` continua disponível como smoke test rápido dos validators.
 9. **Se uma decisão arquitetural nova for tomada**, registre-a na seção 13 deste arquivo.
 10. **Não peça aprovação** para seguir convenções já definidas aqui — apenas siga.
 
