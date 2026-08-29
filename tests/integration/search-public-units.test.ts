@@ -6,13 +6,20 @@ import {
   type PublicUnitSearchResult,
 } from '../../lib/db/queries/units'
 import type { UnitSearchParams } from '../../lib/validators/unit-search'
-import { createTestUnit, createTestUnits } from '../helpers/factories'
+import {
+  createTestUnit,
+  createTestUnits,
+  TEST_CITY,
+} from '../helpers/factories'
 
-// Isolamento: UFs que o seed real NÃO usa (seed = SP/RJ), contagens exatas.
+/**
+ * Isolamento por **cidade**, não por UF: depois da carga real da rBLH (1.4)
+ * toda UF tem unidades, então só `TEST_CITY` garante contagem exata.
+ */
 function params(overrides: Partial<UnitSearchParams> = {}): UnitSearchParams {
   return {
     state: 'TO',
-    city: null,
+    city: TEST_CITY,
     neighborhood: null,
     type: null,
     hasWhatsapp: null,
@@ -62,7 +69,7 @@ describe('searchPublicUnits', () => {
     expect(unit?.type).toBe('collection_point')
     expect(unit?.address).toEqual({
       neighborhood: 'Bairro Teste',
-      city: 'Cidade Teste',
+      city: TEST_CITY,
       state: 'TO',
     })
     // Garante que nenhum campo admin/PII vazou no objeto público.
@@ -111,9 +118,9 @@ describe('searchPublicUnits', () => {
     expect(result.units.every((u) => u.contact.hasWhatsapp)).toBe(true)
   })
 
-  it('UF válida sem unidades retorna lista vazia (nunca erro)', async () => {
+  it('busca válida sem unidades retorna lista vazia (nunca erro)', async () => {
     const result: PublicUnitSearchResult = await searchPublicUnits(
-      params({ state: 'AC' }),
+      params({ state: 'AC', city: 'Cidade Que Não Existe' }),
     )
 
     expect(result.units).toEqual([])

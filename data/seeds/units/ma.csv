@@ -1,0 +1,6 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano do Hospital Regional Materno Infantil de Imperatriz,MILK_BANK,Rua Coriolano Milhomem,42,Centro,Imperatriz,MA,65900-330,99-3525-4518,,,
+Banco de Leite Humano do HUUFMA,MILK_BANK,Rua Barão de Itapary,227,Centro,São Luís,MA,65020-070,98-2109-1178,,,
+Banco de Leite Humano Dr. Fernando Vieira Chaves,MILK_BANK,Av. Dr. Walter Brito,,Campo de Belém,Caxias,MA,65600-000,99-3521-1297,,,
+Banco de Leite Humano da Maternidade de Alta Complexidade do Maranhão,MILK_BANK,Avenida Jerônimo de Albuquerque,S/N,Cohab - Anil III,São Luís,MA,65051-210,98-99213-6886,,,
+Posto do Hospital Juvêncio Matos,COLLECTION_POINT,Rua do Norte,S/N,Centro,São Luís,MA,65000-000,98-3231-8974,,,

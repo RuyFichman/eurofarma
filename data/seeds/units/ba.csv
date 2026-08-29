@@ -1,0 +1,13 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite do Hospital Geral Roberto Santos,MILK_BANK,Estrada do Saboeiro,,Cabula,Salvador,BA,41180-780,71-3117-7532,,,
+Banco de Leite Humano da Maternidade Climério de Oliveira,MILK_BANK,Rua do Limoeiro,137,Nazaré,Salvador,BA,40055-150,71-3206-5407,,,
+Banco de Leite Humano da Maternidade Professor José Maria de Magalhães Neto,MILK_BANK,Rua Marques de Maricá,,Pau Miúdo,Salvador,BA,40310-740,71-3111-9350,,,
+Banco de Leite Humano de Guanambi,MILK_BANK,Rua José Humberto Nunes,1750,Paraíso,Guanambi,BA,46430-000,77-3451-8696,,,
+Banco de Leite Humano do Hospital da Mulher - Inácia Pinto dos Santos,MILK_BANK,Rua da Barra,705,Jardim Cruzeiro,Feira de Santana,BA,44024-366,75-3602-7156,,,
+Banco de Leite Humano do Hospital Manoel Novaes,MILK_BANK,Rua Santa Cruz,S/N,Bairro de Fátima,Itabuna,BA,45603-305,73-3214-4346,,,
+Banco de Leite Humano do Hospital Municipal Esaú Matos,MILK_BANK,Av. Macaúbas,100,Kadija,Vitória da Conquista,BA,45065-540,77-3420-6237,,,
+Banco de Leite Humano do IPERBA,MILK_BANK,Rua Teixeira de Barros,72,Brotas,Salvador,BA,40276-150,71-3116-5118,,,
+Banco de Leite Humano Hospital do Oeste,MILK_BANK,Rua do Antigo Aeroporto,1264,São Pedro,Barreiras,BA,47810-894,77-3612-9408,,,
+Banco de Leite Humano Santa Casa de Misericórdia São Judas Tadeu,MILK_BANK,Av. Carlos Aguiar Ribeiro,,Lot. São Judas Tadeu,Jequié,BA,45204-040,73-3528-8100,,,
+Banco de Leite do Hospital Estadual da Criança,MILK_BANK,Av. Eduardo Fróes da Mota,S/N,35 BI,Feira de Santana,BA,44094-000,75-3602-0630,,,
+PCLH da Maternidade Tsylla Balbino,COLLECTION_POINT,Ladeira de Quintas dos Lázaros,S/N,Baixa de Quintas,Salvador,BA,40300-450,71-3234-7469,,,

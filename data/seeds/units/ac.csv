@@ -1,0 +1,6 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite do Hospital da Mulher e da Criança do Juruá (HMCJ),MILK_BANK,Av. Lauro Muller,350,Centro,Cruzeiro do Sul,AC,69980-000,68-3322-3165,,,
+Banco de Leite Humano da Maternidade e Clínica de Mulheres Bárbara Heliodora,MILK_BANK,Av. Getúlio Vargas,811,Centro,Rio Branco,AC,69908-650,68-3224-1290,,,Centro de referência em banco de leite humano.
+Hospital Santa Juliana,COLLECTION_POINT,Rua Alvorada,808,Bosque,Rio Branco,AC,69908-380,68-3212-4746,,,
+Unidade de Referência da Atenção Primária Augusto Hidalgo de Lima,COLLECTION_POINT,Rua Tião Natureza,271,Palheiral,Rio Branco,AC,69911-204,68-3225-2651,,,
+Unidade de Saúde da Família Dr Cerqueira,COLLECTION_POINT,Av. Japiim,S/N,Guarani,Mâncio Lima,AC,69900-000,,,,

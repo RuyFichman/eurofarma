@@ -1,0 +1,8 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano da Santa Casa de Misericórdia de São Miguel dos Campos,MILK_BANK,Praça Dr. José Inácio,43,Centro,São Miguel dos Campos,AL,57240-000,82-3271-9401,,,
+Banco de Leite Humano do Hospital Universitário Prof. Alberto Antunes - UFAL,MILK_BANK,Rua Lourival de Melo Mota,S/N,Tabuleiro dos Martins,Maceió,AL,57072-970,82-3202-3945,,,
+Banco de Leite Humano Dra. Kátia Born,MILK_BANK,Avenida Deputado Medeiros Neto,76,São Cristóvão,Palmeira dos Índios,AL,57601-370,82-3421-9000,,,
+Banco de Leite Humano Ivete França Lima,MILK_BANK,Rua Padre Cícero,S/N,Centro,Arapiraca,AL,57300-040,82-8121-1058,,,
+Banco de Leite Humano Dr. Carlos Roberto C. Perdigão,MILK_BANK,Av. Comendador Leão,S/N,Poço,Maceió,AL,57025-000,82-3315-4434,,,
+Posto de Coleta do Hospital Nossa Senhora da Guia,COLLECTION_POINT,Rua Comendador Calaça,1244,Poço,Maceió,AL,57025-640,82-3202-5531,,,
+URS Dr. Hamilton Falcão,COLLECTION_POINT,Av. Norma Pimentel da Costa,S/N,Benedito Bentes,Maceió,AL,57084-615,82-3312-5422,,,

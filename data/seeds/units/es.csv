@@ -1,0 +1,9 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano do Hospital Infantil e Maternidade Dr. Alzir Bernardino Alves,MILK_BANK,Rua Ministro Salgado Filho,918,Soteco,Vila Velha,ES,29106-010,27-3636-3151,,,
+Banco de Leite Humano do Hospital da Polícia Militar do Espírito Santo,MILK_BANK,Avenida Joubert de Barros,555,Bento Ferreira,Vitória,ES,29050-720,27-3636-6568,,,
+Banco de Leite Humano Jurema Abranches,MILK_BANK,Rua Coronel Guardia,83,Centro,Cachoeiro de Itapemirim,ES,29300-070,28-99955-3549,,,
+Banco de Leite Humano Madre Gertrudes de São José,MILK_BANK,Ladeira Cristo Rei,514,Centro,Colatina,ES,29701-400,27-2102-2144,,,
+Banco de Leite Humano Maternidade Unidade Pró Matre Santa Casa de Vitória,MILK_BANK,Avenida Vitória,1114,Forte São João,Vitória,ES,29017-022,27-3025-0230,,,
+Banco de Leite Humano Prof. Dr. Severino Dantas Filho,MILK_BANK,Rua Adaucto Morais da Silva,200,Civitt II,Serra,ES,29168-088,27-3400-1444,,,
+Banco de Leite Humano do Hospital Universitário Cassiano Antônio de Moraes,MILK_BANK,Avenida Marechal Campos,1355,Maruípe/Santos Dumont,Vitória,ES,29040-091,27-3335-7515,,,
+Posto de Coleta da UTI Neonatal do HIMABA,COLLECTION_POINT,Av. Ministro Salgado Filho,918,Soteco,Vila Velha,ES,29101-010,27-3636-3195,,,

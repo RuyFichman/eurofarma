@@ -1,0 +1,9 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano da Maternidade Nascer Cidadão,MILK_BANK,Avenida Oriente,S/N,Jardim Curitiba III,Goiânia,GO,74431-340,62-3298-1214,,,
+Banco de Leite Humano Dona Edna Cupertino,MILK_BANK,Rua Visconde de Taunay,134,Jundiaí,Anápolis,GO,75110-730,62-3311-9933,,,
+Banco de Leite Humano Elaine Miriam de Oliveira,MILK_BANK,Avenida Cachoeira Dourada - Praça Martins,,São Joaquim,Anápolis,GO,75145-040,62-2604-0484,,,
+Banco de Leite Humano do Hospital Estadual da Mulher (HEMU),MILK_BANK,Av. R-7,S/N,Setor Oeste/Coimbra,Goiânia,GO,74125-090,62-3956-2921,,,
+PCLH de Planaltina,COLLECTION_POINT,QC 1 MC,01,Setor Oeste,Planaltina,GO,73750-210,61-2017-1369,,,
+PCLH do Hospital das Clínicas / EBSERH / Universidade Federal de Goiás (PCLHHCUFG),COLLECTION_POINT,Rua 235 - Qd. 68,285,Setor Leste Universitário,Goiânia,GO,74605-050,62-3644-8129,,,
+PCLH do Hospital e Maternidade Municipal Célia Câmara,COLLECTION_POINT,Av. Senador Canedo c/ Av. Gercina Borges Teixeira - Qd. Área Especial,Lt. 412,Conjunto Vera Cruz,Goiânia,GO,74493-160,62-3121-6200,,,
+Posto de Coleta de LHOC do Hospital e Maternidade Dona Íris,COLLECTION_POINT,Alameda Emílio Póvoa,151,Vila Redenção,Goiânia,GO,74845-250,62-3956-8887,,,
