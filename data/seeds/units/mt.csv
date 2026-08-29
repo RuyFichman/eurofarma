@@ -1,0 +1,6 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano de Rondonópolis,MILK_BANK,Rua Acyr Rezende de Souza e Silva,2107,Vila Birigui,Rondonópolis,MT,78705-025,66-3410-2785,,,
+Banco de Leite Humano do Hospital São Lucas,MILK_BANK,Avenida Brasil,120 E,Rio Verde,Lucas do Rio Verde,MT,78455-000,65-3548-4001,,,
+Banco de Leite Humano do Hospital Universitário Júlio Muller,MILK_BANK,Rua Luis Philippe Pereira Leite,S/N,Alvorada,Cuiabá,MT,78048-902,65-3615-7203,,,
+Banco de Leite Humano Dr. José de Faria Vinagre,MILK_BANK,Rua Treze de Julho,2101,Centro,Cuiabá,MT,78025-000,65-3363-7035,,,
+PCLH - Hospital e Maternidade Clínica Femina,COLLECTION_POINT,Rua Corumbá,538,Baú,Cuiabá,MT,78008-400,65-2128-9183,,,

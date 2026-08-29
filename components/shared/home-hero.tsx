@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Droplet, Heart, MapPin } from 'lucide-react'
 
@@ -56,14 +57,21 @@ export function HomeHero() {
           </ul>
         </div>
 
-        {/* Coluna visual — placeholder até foto licenciada (mesma convenção do logo) */}
+        {/* Coluna visual. Foto fornecida pelo time (TODO: confirmar licença de uso
+            com a Eurofarma antes de qualquer exposição pública).
+            Proporção 4/5: a original é 800x1200 (retrato), e um recorte
+            paisagem cortaria o rosto do bebê. */}
         <div className="relative">
-          <div
-            role="img"
-            aria-label={hero.imageAlt}
-            className="from-accent to-secondary flex aspect-[4/3] items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg"
-          >
-            <Heart className="text-primary/25 size-24" aria-hidden="true" />
+          <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-lg">
+            <Image
+              src="/images/hero-bebe.jpg"
+              alt={hero.imageAlt}
+              fill
+              // Imagem de LCP da landing: carrega sem lazy.
+              priority
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover"
+            />
           </div>
           <div className="bg-card absolute -bottom-5 left-4 flex items-center gap-3 rounded-xl border p-4 shadow-md">
             <span className="bg-secondary text-secondary-foreground flex size-10 shrink-0 items-center justify-center rounded-full">

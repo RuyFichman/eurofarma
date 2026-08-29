@@ -1,0 +1,11 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano de Caicó,MILK_BANK,Praça Dr. José Medeiros,1167,Centro,Caicó,RN,59300-000,84-3421-2018,,,
+Banco de Leite Humano do Hospital Central Coronel Pedro Germano,MILK_BANK,Avenida Prudente de Morais,887,Tirol,Natal,RN,59020-505,84-3232-3664,,,
+Banco de Leite Humano do Hospital Dr. José Pedro Bezerra,MILK_BANK,Rua Araquari - Conj. Sta. Catarina,S/N,Potengi,Natal,RN,59110-390,84-3232-7728,,,
+Banco de Leite Humano de Mossoró - Hospital Regional Parteira Maria Coreia,MILK_BANK,Rua Professor Antônio Campos,S/N,Presidente Costa e Silva,Mossoró,RN,59625-620,84-3317-3050,,,
+Banco de Leite Humano Maternidade do Divino Amor,MILK_BANK,Av. Tenente Medeiros,145,Centro,Parnamirim,RN,59140-020,84-3272-4367,,,
+Banco de Leite Humano da Maternidade Escola Januário Cicco,MILK_BANK,Av. Nilo Peçanha,259,Petrópolis,Natal,RN,59012-300,84-3342-5800,,,
+Posto de Coleta da Maternidade Dr. Araken Irerê Pinto,COLLECTION_POINT,Rua Cel. Juventino Cabral,1735,Tirol,Natal,RN,59015-530,84-3232-8430,,,
+Posto de Coleta Hospital Maternidade Almeida Castro,COLLECTION_POINT,Rua Juvenal Lamartine,334,Santo Antônio,Mossoró,RN,59600-000,84-8723-3818,,,
+Posto de Coleta Hospital Universitário Ana Bezerra,COLLECTION_POINT,Praça Tequinha Farias,,Centro,Santa Cruz,RN,59200-000,84-3291-2324,,,
+Posto de Coleta Maternidade Dr. Leide Morais,COLLECTION_POINT,Avenida das Fronteiras,,Nossa Senhora da Apresentação,Natal,RN,59114-275,84-3232-4678,,,

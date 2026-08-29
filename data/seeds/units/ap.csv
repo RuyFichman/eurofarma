@@ -1,0 +1,5 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano do Hospital da Mulher Mãe Luzia,MILK_BANK,Av. FAB,81,Centro,Macapá,AP,68900-073,96-9121-8860,,,
+Posto de Coleta de Leite Humano da Maternidade Bem Nascer Euclélia Américo,COLLECTION_POINT,Rua Liberdade,S/N,São Lázaro,Macapá,AP,68908-350,96-98148-8811,,,
+Posto de Coleta de Leite Humano do Hospital de Santana,COLLECTION_POINT,Rua Salvador Diniz,187,Remédios I,Santana,AP,69925-000,96-3281-6200,,,
+Posto de Coleta do Hospital São Camilo São Luís,COLLECTION_POINT,Rua Marcelo Candia,742,Santa Rita,Macapá,AP,68901-901,96-3312-2400,,,

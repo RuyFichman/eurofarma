@@ -1,0 +1,8 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano de Barcarena,MILK_BANK,Av. José Pinheiro Rodrigues,258,Centro,Barcarena,PA,68445-000,91-3754-3329,,,
+Banco de Leite Humano Dra. Cynara Melo Souza,MILK_BANK,Rua 05 de Abril,,Velha Marabá,Marabá,PA,68500-040,94-3322-5751,,,
+Banco de Leite Humano Dra. Lúcia Margarida Costa Campos,MILK_BANK,Rua A - Quadra Especial,S/N,Cidade Nova,Parauapebas,PA,68515-000,94-9144-5814,,,
+Banco de Leite Humano Mãe da Divina Providência,MILK_BANK,Av. João Paulo II,71,Dom Aristides,Marituba,PA,67200-000,91-4005-6100,,,
+Banco de Leite Humano Maria Eunice Begot da Silva Dantas,MILK_BANK,Avenida Nazeazeno Ferreira,,Padre Luiz,Bragança,PA,68600-000,91-3425-2177,,,
+Banco de Leite Humano João Aprígio Guerra de Almeida,MILK_BANK,Rua Oliveira Belo,395,Umarizal,Belém,PA,66050-380,91-4009-2318,,,
+Posto de Coleta de Leite Humano Dra. Cristina Andrade & Dra. Cleidiane Moura,COLLECTION_POINT,Rua Senador Antônio Lemos,349,Centro,Castanhal,PA,68745-000,91-99337-9418,,,

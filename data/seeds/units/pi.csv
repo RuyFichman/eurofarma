@@ -1,0 +1,7 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano da Maternidade Dona Evangelina Rosa,MILK_BANK,Av. Presidente Kennedy,1160,Piçarreira,Teresina,PI,64056-375,86-9947-0515,,,
+Posto de Coleta Dirceu Arcoverde,COLLECTION_POINT,Rua Ricardo Coimbra Rodrigues,1650,Rodoviária,Parnaíba,PI,64216-470,86-3323-7188,,,
+Posto de Coleta do Satélite,COLLECTION_POINT,Rua Rotary Clube,4265,Satélite,Teresina,PI,64059-490,86-3235-2074,,,
+Posto de Coleta Hospital Regional Tibério Nunes,COLLECTION_POINT,Rua Gabriel Ferreira,S/N,Maguinha,Floriano,PI,64800-000,89-9992-1873,,,
+Posto de Coleta Maternidade Ursulino Veloso de Sousa Martins,COLLECTION_POINT,Rua Castelo do Piauí,3292,Buenos Aires,Teresina,PI,64008-540,86-3225-7267,,,
+Posto de Coleta Maternidade Wall Ferraz,COLLECTION_POINT,Praça dos Correios,S/N,Dirceu Arcoverde II,Teresina,PI,64002-530,86-3215-9210,,,

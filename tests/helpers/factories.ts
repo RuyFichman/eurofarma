@@ -12,9 +12,17 @@ function uniqueSuffix(): string {
 }
 
 /**
+ * Cidade fictícia usada por toda unidade de teste. **É por ela que os testes se
+ * isolam** dos dados reais: desde a carga da base da rBLH (Sprint 1.4) as 27 UFs
+ * têm unidades, então filtrar só por estado não isola mais nada — mas nenhum
+ * município do Brasil se chama "Cidade Teste".
+ */
+export const TEST_CITY = 'Cidade Teste'
+
+/**
  * Cria uma unidade de teste com defaults sensatos. Todo slug começa com
- * `__test__` para o cleanup do setup conseguir remover. UF default `TO`
- * (estado que o seed não usa) evita colisão com as unidades reais.
+ * `__test__` para o cleanup do setup conseguir remover, e a cidade é
+ * `TEST_CITY` — quem consultar por outra cidade nunca enxerga estes registros.
  */
 export async function createTestUnit(
   overrides: Partial<Prisma.UnitCreateInput> = {},
@@ -26,7 +34,7 @@ export async function createTestUnit(
     type: 'MILK_BANK',
     addressStreet: 'Rua Teste',
     addressNeighborhood: 'Bairro Teste',
-    addressCity: 'Cidade Teste',
+    addressCity: TEST_CITY,
     addressState: 'TO',
     status: 'ACTIVE',
     ...overrides,

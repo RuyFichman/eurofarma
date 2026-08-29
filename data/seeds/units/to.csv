@@ -1,0 +1,6 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano do Hospital Dom Orione,MILK_BANK,Rua Dom Orione,100,Centro,Araguaína,TO,77803-010,63-3411-8787,,,
+Banco de Leite Humano do Hospital Regional de Gurupi,MILK_BANK,Av. Juscelino Kubitschek,1641,Centro,Gurupi,TO,77405-110,63-3027-5179,,,
+Banco de Leite Humano do Hospital e Maternidade Pública Dona Regina,MILK_BANK,Rua NE 104 - Norte Lote 31 a 41,S/N,Centro,Palmas,TO,77006-020,63-3027-5083,,,
+Posto de Coleta de Leite Humano Dona Marly,COLLECTION_POINT,Rua Raquel de Carvalho,420,Centro,Porto Nacional,TO,77500-000,63-3363-8303,,,
+Posto de Coleta de Leite Humano Leila Pereira Santos,COLLECTION_POINT,Rua 03 - Quadra 02 - Lotes 01 a 19,,Setor Aeroporto,Paraíso do Tocantins,TO,77600-000,63-3904-1215,,,

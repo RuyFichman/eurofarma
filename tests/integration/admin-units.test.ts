@@ -1,14 +1,22 @@
 import { describe, it, expect } from 'vitest'
 
-import { parseAdminUnitFilters } from '../../lib/admin/units/filters'
+import {
+  parseAdminUnitFilters,
+  type AdminUnitsSearchParams,
+} from '../../lib/admin/units/filters'
 import { getAdminUnits } from '../../lib/db/queries/admin-units'
 import { createTestUnit } from '../helpers/factories'
 
 /**
- * As unidades de teste nascem em `TO` (UF que o seed não usa), então filtrar
- * por estado isola completamente estes casos das unidades reais do banco.
+ * Isolamento pelo prefixo `__test__` do nome, que só as fixtures usam: desde a
+ * carga real da rBLH (1.4) toda UF tem unidades, então filtrar por estado não
+ * isola mais nada. `q` faz busca parcial em `name`, o que basta.
  */
-const IN_TO = parseAdminUnitFilters({ state: 'TO' })
+const TEST_MARKER = '__test__'
+
+function filters(overrides: AdminUnitsSearchParams = {}) {
+  return parseAdminUnitFilters({ q: TEST_MARKER, ...overrides })
+}
 
 describe('getAdminUnits', () => {
   it('lista unidades de todas as situações, não só as ativas', async () => {
@@ -16,7 +24,7 @@ describe('getAdminUnits', () => {
     await createTestUnit({ status: 'PENDING' })
     await createTestUnit({ status: 'INACTIVE' })
 
-    const { units, pagination } = await getAdminUnits(IN_TO)
+    const { units, pagination } = await getAdminUnits(filters())
 
     expect(pagination.total).toBe(3)
     expect(new Set(units.map((unit) => unit.status))).toEqual(
@@ -28,9 +36,7 @@ describe('getAdminUnits', () => {
     await createTestUnit({ status: 'ACTIVE' })
     await createTestUnit({ status: 'PENDING' })
 
-    const { units } = await getAdminUnits(
-      parseAdminUnitFilters({ state: 'TO', status: 'PENDING' }),
-    )
+    const { units } = await getAdminUnits(filters({ status: 'PENDING' }))
 
     expect(units).toHaveLength(1)
     expect(units[0]?.status).toBe('PENDING')
@@ -40,9 +46,7 @@ describe('getAdminUnits', () => {
     await createTestUnit({ type: 'MILK_BANK' })
     await createTestUnit({ type: 'COLLECTION_POINT' })
 
-    const { units } = await getAdminUnits(
-      parseAdminUnitFilters({ state: 'TO', type: 'COLLECTION_POINT' }),
-    )
+    const { units } = await getAdminUnits(filters({ type: 'COLLECTION_POINT' }))
 
     expect(units).toHaveLength(1)
     expect(units[0]?.type).toBe('COLLECTION_POINT')
@@ -53,7 +57,7 @@ describe('getAdminUnits', () => {
     await createTestUnit({ name: '__test__ Posto Omega' })
 
     const { units, pagination } = await getAdminUnits(
-      parseAdminUnitFilters({ state: 'TO', q: 'zetalfa' }),
+      parseAdminUnitFilters({ q: 'zetalfa' }),
     )
 
     expect(pagination.total).toBe(1)
@@ -62,25 +66,28 @@ describe('getAdminUnits', () => {
 
   it('filtra por cidade parcial e combina filtros com E', async () => {
     await createTestUnit({
-      addressCity: 'Palmas',
+      addressCity: 'Cidade Teste Alfa',
       status: 'ACTIVE',
-      name: '__test__ Alfa Palmas',
+      name: '__test__ Alfa Ativa',
     })
-    await createTestUnit({ addressCity: 'Palmas', status: 'INACTIVE' })
-    await createTestUnit({ addressCity: 'Gurupi', status: 'ACTIVE' })
+    await createTestUnit({
+      addressCity: 'Cidade Teste Alfa',
+      status: 'INACTIVE',
+    })
+    await createTestUnit({ addressCity: 'Cidade Teste Beta', status: 'ACTIVE' })
 
     const { units } = await getAdminUnits(
-      parseAdminUnitFilters({ state: 'TO', city: 'palm', status: 'ACTIVE' }),
+      filters({ city: 'teste alfa', status: 'ACTIVE' }),
     )
 
     expect(units).toHaveLength(1)
-    expect(units[0]?.name).toBe('__test__ Alfa Palmas')
+    expect(units[0]?.name).toBe('__test__ Alfa Ativa')
   })
 
   it('expõe contato como indicador, sem o número, e trata vazio como ausente', async () => {
     await createTestUnit({ phone: '6332181000', whatsapp: '' })
 
-    const { units } = await getAdminUnits(IN_TO)
+    const { units } = await getAdminUnits(filters())
 
     expect(units[0]?.hasPhone).toBe(true)
     expect(units[0]?.hasWhatsapp).toBe(false)
@@ -92,7 +99,7 @@ describe('getAdminUnits', () => {
     await createTestUnit({ status: 'ACTIVE', name: '__test__ AAA Ativa' })
     await createTestUnit({ status: 'PENDING', name: '__test__ ZZZ Pendente' })
 
-    const { units } = await getAdminUnits(IN_TO)
+    const { units } = await getAdminUnits(filters())
 
     // A ordem do enum no schema (PENDING, ACTIVE, INACTIVE) coloca o que
     // aguarda revisão no topo, mesmo com nome maior.
@@ -102,9 +109,7 @@ describe('getAdminUnits', () => {
   it('página além da última devolve lista vazia com o total correto', async () => {
     await createTestUnit()
 
-    const { units, pagination } = await getAdminUnits(
-      parseAdminUnitFilters({ state: 'TO', page: '999' }),
-    )
+    const { units, pagination } = await getAdminUnits(filters({ page: '999' }))
 
     expect(units).toHaveLength(0)
     expect(pagination.total).toBe(1)
@@ -113,10 +118,8 @@ describe('getAdminUnits', () => {
     expect(pagination.hasNextPage).toBe(false)
   })
 
-  it('UF sem unidade devolve lista vazia, nunca erro', async () => {
-    const { units, pagination } = await getAdminUnits(
-      parseAdminUnitFilters({ state: 'AC' }),
-    )
+  it('filtro sem correspondência devolve lista vazia, nunca erro', async () => {
+    const { units, pagination } = await getAdminUnits(filters({ state: 'AC' }))
 
     expect(units).toEqual([])
     expect(pagination.total).toBe(0)

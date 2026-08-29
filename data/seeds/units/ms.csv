@@ -1,0 +1,6 @@
+name,type,address_street,address_number,address_neighborhood,address_city,address_state,address_zip,phone,whatsapp,opening_hours,instructions
+Banco de Leite Humano do Hospital Regional de Mato Grosso do Sul,MILK_BANK,Av. Engenheiro Luthero Lopes,36,Aero Rancho,Campo Grande,MS,79084-180,67-3378-2715,,,
+Banco de Leite Humano Dr. João Aprígio,MILK_BANK,Rua Cândido Mariano,2644,Centro,Campo Grande,MS,79002-201,67-3042-9994,,,
+Banco de Leite Humano Hilda Bergo Duarte,MILK_BANK,Ivo Alves da Rocha,558,Altos do Indaiá,Dourados,MS,79823-501,67-3410-3002,,,
+Banco de Leite Humano Irmã Maria José Machado - Santa Casa Campo Grande,MILK_BANK,Rua Eduardo Santos Pereira,88,Centro,Campo Grande,MS,79002-251,67-3322-4174,,,
+Banco de Leite Humano do Hospital Universitário Maria Aparecida Pedrossian,MILK_BANK,Av. Senador Filinto Muller - Campus Universitário,355,Vila Ipiranga,Campo Grande,MS,79080-190,67-3345-3027,,,

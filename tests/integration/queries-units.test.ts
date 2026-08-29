@@ -2,10 +2,17 @@ import { describe, it, expect, beforeAll } from 'vitest'
 
 import { prisma } from '../../lib/db/prisma'
 import { findUnitsByLocation } from '../../lib/db/queries/units'
-import { createTestUnit, createTestUnits } from '../helpers/factories'
+import {
+  createTestUnit,
+  createTestUnits,
+  TEST_CITY,
+} from '../helpers/factories'
 
-// Isolamento: usamos UFs que o seed real NÃO usa (seed = SP/RJ), então as
-// contagens são exatas mesmo o banco cloud tendo as 6 unidades reais.
+/**
+ * Isolamento por **cidade**, não por UF: depois da carga real da rBLH (1.4) as
+ * 27 UFs têm unidades, então `state: 'TO'` sozinho já não garante contagem
+ * exata. Toda consulta aqui filtra por `TEST_CITY`, que só as fixtures usam.
+ */
 describe('findUnitsByLocation', () => {
   beforeAll(async () => {
     // Garante início limpo caso uma execução anterior tenha deixado resíduo.
@@ -18,7 +25,7 @@ describe('findUnitsByLocation', () => {
     await createTestUnits(3, () => ({ addressState: 'TO' }))
     await createTestUnits(2, () => ({ addressState: 'AC' }))
 
-    const result = await findUnitsByLocation({ state: 'TO' })
+    const result = await findUnitsByLocation({ state: 'TO', city: TEST_CITY })
 
     expect(result.total).toBe(3)
     expect(result.units).toHaveLength(3)
@@ -27,23 +34,20 @@ describe('findUnitsByLocation', () => {
   it('filtra por estado case-insensitive', async () => {
     await createTestUnits(3, () => ({ addressState: 'TO' }))
 
-    const upper = await findUnitsByLocation({ state: 'TO' })
-    const lower = await findUnitsByLocation({ state: 'to' })
+    const upper = await findUnitsByLocation({ state: 'TO', city: TEST_CITY })
+    const lower = await findUnitsByLocation({ state: 'to', city: TEST_CITY })
 
     expect(lower.total).toBe(upper.total)
     expect(lower.total).toBe(3)
   })
 
   it('filtra por cidade', async () => {
-    await createTestUnits(2, () => ({
-      addressState: 'TO',
-      addressCity: 'Cidade Teste',
-    }))
+    await createTestUnits(2, () => ({ addressState: 'TO' }))
     await createTestUnit({ addressState: 'TO', addressCity: 'Outra Cidade' })
 
     const result = await findUnitsByLocation({
       state: 'TO',
-      city: 'Cidade Teste',
+      city: TEST_CITY,
     })
 
     expect(result.total).toBe(2)
@@ -56,7 +60,11 @@ describe('findUnitsByLocation', () => {
     }))
     await createTestUnit({ addressState: 'TO', whatsapp: null })
 
-    const result = await findUnitsByLocation({ state: 'TO', hasWhatsapp: true })
+    const result = await findUnitsByLocation({
+      state: 'TO',
+      city: TEST_CITY,
+      hasWhatsapp: true,
+    })
 
     expect(result.total).toBe(2)
   })
@@ -67,6 +75,7 @@ describe('findUnitsByLocation', () => {
 
     const result = await findUnitsByLocation({
       state: 'TO',
+      city: TEST_CITY,
       type: 'MILK_BANK',
     })
 
@@ -77,7 +86,7 @@ describe('findUnitsByLocation', () => {
     await createTestUnit({ addressState: 'TO', status: 'ACTIVE' })
     await createTestUnit({ addressState: 'TO', status: 'INACTIVE' })
 
-    const result = await findUnitsByLocation({ state: 'TO' })
+    const result = await findUnitsByLocation({ state: 'TO', city: TEST_CITY })
 
     expect(result.total).toBe(1)
   })
@@ -87,6 +96,7 @@ describe('findUnitsByLocation', () => {
 
     const result = await findUnitsByLocation({
       state: 'TO',
+      city: TEST_CITY,
       limit: 10,
       offset: 0,
     })
@@ -100,7 +110,7 @@ describe('findUnitsByLocation', () => {
     await createTestUnit({ addressState: 'TO', name: 'Alpha' })
     await createTestUnit({ addressState: 'TO', name: 'Mu' })
 
-    const result = await findUnitsByLocation({ state: 'TO' })
+    const result = await findUnitsByLocation({ state: 'TO', city: TEST_CITY })
 
     expect(result.units.map((u) => u.name)).toEqual(['Alpha', 'Mu', 'Zeta'])
   })
@@ -113,6 +123,7 @@ describe('findUnitsByLocation', () => {
 
     const result = await findUnitsByLocation({
       state: 'TO',
+      city: TEST_CITY,
       neighborhood: 'madalena',
     })
 
