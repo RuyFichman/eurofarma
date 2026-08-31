@@ -67,6 +67,84 @@ export type AdminUnitsResult = {
   pagination: AdminUnitsPagination
 }
 
+/**
+ * `select` da tela de edição (Sprint 5.7). Mais largo que o da listagem porque
+ * o formulário edita o registro inteiro — mas ainda restrito: `adminNotes`,
+ * `adminResponsibleId` e os timestamps ficam de fora por não serem editáveis, e
+ * nenhuma relação (cliques, intenções de contato, nutrizes) é carregada.
+ */
+const ADMIN_UNIT_FORM_SELECT = {
+  id: true,
+  slug: true,
+  name: true,
+  type: true,
+  status: true,
+  addressStreet: true,
+  addressNumber: true,
+  addressComplement: true,
+  addressNeighborhood: true,
+  addressCity: true,
+  addressState: true,
+  addressZip: true,
+  phone: true,
+  whatsapp: true,
+  email: true,
+  openingHours: true,
+  instructions: true,
+  whatsappMessage: true,
+  lat: true,
+  lng: true,
+} as const satisfies Prisma.UnitSelect
+
+/**
+ * Unidade como o formulário administrativo precisa dela. Enums em união de
+ * literais (mesma razão do `AdminUnitListItem`): o registro atravessa até o
+ * mapper e o Client Component, e amarrá-lo ao enum do Prisma levaria o cliente
+ * junto.
+ */
+export type AdminUnitFormRecord = {
+  id: string
+  slug: string
+  name: string
+  type: AdminUnitTypeValue
+  status: AdminUnitStatusValue
+  addressStreet: string
+  addressNumber: string | null
+  addressComplement: string | null
+  addressNeighborhood: string
+  addressCity: string
+  addressState: string
+  addressZip: string | null
+  phone: string | null
+  whatsapp: string | null
+  email: string | null
+  /** `Json?` no schema; nos dados atuais é sempre nulo ou texto simples. */
+  openingHours: Prisma.JsonValue
+  instructions: string | null
+  whatsappMessage: string | null
+  lat: number | null
+  lng: number | null
+}
+
+/**
+ * Busca uma unidade por `id` para a tela de edição (Sprint 5.7).
+ *
+ * `id` é coluna `text` no Postgres, então identificador malformado simplesmente
+ * não casa e volta `null` — quem chama transforma isso em `notFound()`, sem
+ * erro de Prisma vazando para a tela. Leitura pura: esta função nunca escreve.
+ */
+export async function getAdminUnitById(
+  id: string,
+): Promise<AdminUnitFormRecord | null> {
+  const trimmed = id.trim()
+  if (trimmed === '') return null
+
+  return prisma.unit.findUnique({
+    where: { id: trimmed },
+    select: ADMIN_UNIT_FORM_SELECT,
+  })
+}
+
 /** Canal preenchido de verdade — `''` no banco conta como ausente (mesma regra da busca pública). */
 function hasValue(value: string | null): boolean {
   return typeof value === 'string' && value.trim() !== ''
