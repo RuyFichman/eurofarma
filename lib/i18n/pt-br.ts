@@ -439,7 +439,7 @@ export const SEARCH = {
   page: {
     title: 'Buscar bancos de leite',
     description:
-      'Filtre por estado e cidade para encontrar bancos de leite humano e pontos de coleta perto de você — e fale com a equipe pelo WhatsApp em poucos cliques.',
+      'Filtre por estado e cidade para encontrar bancos de leite humano e pontos de coleta perto de você e fale com a equipe pelo WhatsApp em poucos cliques.',
     unitCard: {
       typeLabels: {
         milk_bank: 'Banco de leite',

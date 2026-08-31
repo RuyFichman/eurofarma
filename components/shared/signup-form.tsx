@@ -145,12 +145,18 @@ export function SignupForm() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold md:text-3xl">{COPY.heading}</h1>
-      <p className="text-muted-foreground mt-2 text-sm">{COPY.subtitle}</p>
+      <div className="border-b pb-6">
+        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+          {COPY.heading}
+        </h1>
+        <p className="text-muted-foreground mt-2 max-w-md text-sm leading-6">
+          {COPY.subtitle}
+        </p>
+      </div>
 
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="mt-8 space-y-5"
+        className="mt-6 space-y-5"
         noValidate
         aria-label={COPY.ariaLabels.form}
       >
@@ -159,12 +165,12 @@ export function SignupForm() {
           <Label htmlFor="signup-name">{COPY.fields.fullName.label}</Label>
           <div className="relative">
             <User
-              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2"
               aria-hidden="true"
             />
             <Input
               id="signup-name"
-              className="pl-9"
+              className="bg-background h-11 rounded-xl pr-4 pl-11"
               autoComplete="name"
               placeholder={COPY.fields.fullName.placeholder}
               aria-invalid={Boolean(errors.fullName)}
@@ -185,7 +191,7 @@ export function SignupForm() {
           <Label htmlFor="signup-whatsapp">{COPY.fields.whatsapp.label}</Label>
           <div className="relative">
             <MessageCircle
-              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2"
               aria-hidden="true"
             />
             <Input
@@ -193,7 +199,7 @@ export function SignupForm() {
               type="tel"
               inputMode="tel"
               autoComplete="tel"
-              className="pl-9"
+              className="bg-background h-11 rounded-xl pr-4 pl-11"
               placeholder={COPY.fields.whatsapp.placeholder}
               aria-invalid={Boolean(errors.phoneWhatsapp)}
               aria-describedby="signup-whatsapp-helper signup-whatsapp-error"
@@ -226,7 +232,7 @@ export function SignupForm() {
                 >
                   <SelectTrigger
                     id="signup-state"
-                    className="w-full"
+                    className="bg-background w-full rounded-xl data-[size=default]:h-11"
                     aria-invalid={Boolean(errors.state)}
                     aria-describedby={
                       errors.state ? 'signup-state-error' : undefined
@@ -254,12 +260,12 @@ export function SignupForm() {
             <Label htmlFor="signup-city">{COPY.fields.city.label}</Label>
             <div className="relative">
               <MapPin
-                className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                className="text-muted-foreground pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2"
                 aria-hidden="true"
               />
               <Input
                 id="signup-city"
-                className="pl-9"
+                className="bg-background h-11 rounded-xl pr-4 pl-11"
                 autoComplete="address-level2"
                 placeholder={COPY.fields.city.placeholder}
                 aria-invalid={Boolean(errors.city)}
@@ -272,15 +278,15 @@ export function SignupForm() {
         </div>
 
         {/* Consentimento LGPD (não pré-marcado) */}
-        <div className="space-y-2">
-          <div className="flex items-start gap-3">
+        <div className="bg-muted/40 space-y-2 rounded-xl border p-4">
+          <div className="flex items-start gap-3.5">
             <Controller
               control={form.control}
               name="lgpdConsent"
               render={({ field }) => (
                 <Checkbox
                   id="signup-consent"
-                  className="mt-0.5"
+                  className="mt-0.5 size-5 rounded-md"
                   checked={field.value}
                   onCheckedChange={(checked) =>
                     field.onChange(checked === true)
@@ -294,7 +300,7 @@ export function SignupForm() {
             />
             <Label
               htmlFor="signup-consent"
-              className="text-muted-foreground text-sm leading-snug font-normal"
+              className="text-muted-foreground text-sm leading-relaxed font-normal"
             >
               {COPY.fields.consent.lead}{' '}
               <Link href="/privacidade" className="text-primary underline">
@@ -316,18 +322,23 @@ export function SignupForm() {
         {submitError ? (
           <p
             role="alert"
-            className="border-destructive/30 bg-destructive/5 text-destructive rounded-md border px-3 py-2 text-sm"
+            className="border-destructive/30 bg-destructive/5 text-destructive rounded-xl border px-4 py-3 text-sm"
           >
             {submitError}
           </p>
         ) : null}
 
-        <Button type="submit" size="lg" className="w-full" disabled={isBusy}>
+        <Button
+          type="submit"
+          size="lg"
+          className="h-12 w-full rounded-xl px-6 shadow-sm"
+          disabled={isBusy}
+        >
           {isBusy ? COPY.actions.submitting : COPY.actions.submit}
         </Button>
       </form>
 
-      <div className="my-6 flex items-center gap-3">
+      <div className="my-6 flex items-center gap-4">
         <span className="bg-border h-px flex-1" />
         <span className="text-muted-foreground text-xs">
           {COPY.actions.orContinue}
@@ -339,7 +350,7 @@ export function SignupForm() {
         asChild
         variant="outline"
         size="lg"
-        className="border-whatsapp/30 text-whatsapp hover:bg-whatsapp/5 hover:text-whatsapp w-full"
+        className="border-whatsapp/30 text-whatsapp hover:bg-whatsapp/5 hover:text-whatsapp h-12 w-full rounded-xl px-6"
       >
         <Link href="/buscar">
           <MessageCircle aria-hidden="true" />
@@ -347,7 +358,7 @@ export function SignupForm() {
         </Link>
       </Button>
 
-      <p className="text-muted-foreground mt-6 text-center text-xs leading-relaxed">
+      <p className="text-muted-foreground mx-auto mt-6 max-w-md text-center text-xs leading-relaxed">
         {COPY.legal.lead}{' '}
         <Link href="/termos" className="text-primary underline">
           {COPY.legal.terms}

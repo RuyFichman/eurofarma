@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { MessageCircle, Phone } from 'lucide-react'
+import { ArrowRight, MessageCircle, Phone } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { SEARCH } from '@/lib/i18n/pt-br'
@@ -45,6 +45,7 @@ export function UnitCardActions({
       ? whatsappMessage
       : COPY.defaultWhatsappMessage
   const whatsappUrl = buildWhatsappUrl({ phone: whatsapp, message })
+  const hasContactAction = Boolean(phoneHref || whatsappUrl)
 
   /**
    * Dispara o tracking do clique sem bloquear a navegação para o WhatsApp.
@@ -85,44 +86,51 @@ export function UnitCardActions({
   }
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-      {phoneHref ? (
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="w-full sm:w-auto"
-        >
-          <a
-            href={phoneHref}
-            aria-label={COPY.ariaLabels.phone.replace('{unitName}', unitName)}
-          >
-            <Phone aria-hidden="true" />
-            {COPY.phoneButton}
-          </a>
-        </Button>
-      ) : null}
+    <div className="space-y-2">
+      {hasContactAction ? (
+        <div className="grid [grid-template-columns:repeat(auto-fit,minmax(7rem,1fr))] gap-2">
+          {phoneHref ? (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="bg-card w-full rounded-lg"
+            >
+              <a
+                href={phoneHref}
+                aria-label={COPY.ariaLabels.phone.replace(
+                  '{unitName}',
+                  unitName,
+                )}
+              >
+                <Phone aria-hidden="true" />
+                {COPY.phoneButton}
+              </a>
+            </Button>
+          ) : null}
 
-      {whatsappUrl ? (
-        <Button
-          asChild
-          size="sm"
-          className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full sm:w-auto"
-        >
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={trackWhatsappClick}
-            aria-label={COPY.ariaLabels.whatsapp.replace(
-              '{unitName}',
-              unitName,
-            )}
-          >
-            <MessageCircle aria-hidden="true" />
-            {COPY.whatsappButton}
-          </a>
-        </Button>
+          {whatsappUrl ? (
+            <Button
+              asChild
+              size="sm"
+              className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full rounded-lg"
+            >
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={trackWhatsappClick}
+                aria-label={COPY.ariaLabels.whatsapp.replace(
+                  '{unitName}',
+                  unitName,
+                )}
+              >
+                <MessageCircle aria-hidden="true" />
+                {COPY.whatsappButton}
+              </a>
+            </Button>
+          ) : null}
+        </div>
       ) : null}
 
       {slug ? (
@@ -130,13 +138,14 @@ export function UnitCardActions({
           asChild
           variant="secondary"
           size="sm"
-          className="w-full sm:w-auto"
+          className="w-full justify-between rounded-lg px-4"
         >
           <Link
             href={`/banco-de-leite/${slug}`}
             aria-label={COPY.ariaLabels.details.replace('{unitName}', unitName)}
           >
             {COPY.detailsButton}
+            <ArrowRight aria-hidden="true" />
           </Link>
         </Button>
       ) : null}

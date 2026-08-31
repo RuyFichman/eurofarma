@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Lactare Digital - Arquitetura de Tecnologia (TOGAF Fase D)" id="id-model-lactare-tech" version="5.0.0">
+  <folder name="Strategy" id="id-folder-strategy" type="strategy"/>
+  <folder name="Business" id="id-folder-business" type="business"/>
+  <folder name="Application" id="id-folder-application" type="application"/>
+  <folder name="Technology &amp; Physical" id="id-folder-technology" type="technology">
+    <element xsi:type="archimate:Device" name="Smartphone da nutriz&#xA;(acesso publico, mobile-first)" id="el-dev-nutriz"/>
+    <element xsi:type="archimate:SystemSoftware" name="Navegador movel&#xA;(Chrome / Safari)" id="el-sw-browser-mobile"/>
+    <element xsi:type="archimate:Device" name="PC/Notebook do administrador&#xA;(acesso ao painel admin)" id="el-dev-admin"/>
+    <element xsi:type="archimate:SystemSoftware" name="Navegador WEB Chrome" id="el-sw-browser-chrome"/>
+    <element xsi:type="archimate:CommunicationNetwork" name="Internet publica&#xA;HTTPS/TLS (TCP/IP)" id="el-net-internet"/>
+    <element xsi:type="archimate:Node" name="Servico de infraestrutura sob demanda em datacenter de nuvem (sa-east-1)" id="el-node-cloud"/>
+    <element xsi:type="archimate:Node" name="WEB Server / CDN&#xA;(Vercel Edge)" id="el-node-web"/>
+    <element xsi:type="archimate:SystemSoftware" name="Vercel Edge Network / CDN&#xA;(assets estaticos + SSR)" id="el-sw-vercel-edge"/>
+    <element xsi:type="archimate:Node" name="Application Server&#xA;(Vercel Functions / Fluid Compute)" id="el-node-app"/>
+    <element xsi:type="archimate:SystemSoftware" name="Node.js 22 + Next.js 15&#xA;(RSC, Route Handlers, Prisma Client)" id="el-sw-node-next"/>
+    <element xsi:type="archimate:Artifact" name="App Lactare (bundle deployado)&#xA;route groups (public) e (admin)" id="el-art-bundle"/>
+    <element xsi:type="archimate:Node" name="Database Server&#xA;(Supabase)" id="el-node-db"/>
+    <element xsi:type="archimate:SystemSoftware" name="PostgreSQL + PgBouncer (pooler :6543)&#xA;+ Supabase Auth" id="el-sw-postgres"/>
+    <element xsi:type="archimate:Node" name="WhatsApp&#xA;(servico externo de mensageria - wa.me)" id="el-node-whatsapp"/>
+    <element xsi:type="archimate:Node" name="Google Maps API&#xA;(servico externo de mapas / geocoding)" id="el-node-gmaps"/>
+  </folder>
+  <folder name="Motivation" id="id-folder-motivation" type="motivation"/>
+  <folder name="Implementation &amp; Migration" id="id-folder-implementation" type="implementation_migration"/>
+  <folder name="Other" id="id-folder-other" type="other"/>
+  <folder name="Relations" id="id-folder-relations" type="relations">
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-nutriz-browser" source="el-dev-nutriz" target="el-sw-browser-mobile"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-admin-browser" source="el-dev-admin" target="el-sw-browser-chrome"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-cloud-web" source="el-node-cloud" target="el-node-web"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-cloud-app" source="el-node-cloud" target="el-node-app"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-cloud-db" source="el-node-cloud" target="el-node-db"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-web-sw" source="el-node-web" target="el-sw-vercel-edge"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-app-sw" source="el-node-app" target="el-sw-node-next"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="rel-assign-app-art" source="el-node-app" target="el-art-bundle"/>
+    <element xsi:type="archimate:CompositionRelationship" id="rel-comp-db-sw" source="el-node-db" target="el-sw-postgres"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-assoc-nutriz-net" source="el-dev-nutriz" target="el-net-internet"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-assoc-admin-net" source="el-dev-admin" target="el-net-internet"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-assoc-net-cloud" source="el-net-internet" target="el-node-cloud"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-serv-db-app" name="dados" source="el-node-db" target="el-node-app"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-serv-app-web" name="conteudo renderizado" source="el-node-app" target="el-node-web"/>
+    <element xsi:type="archimate:AssociationRelationship" id="rel-assoc-app-wa" name="link wa.me (conversao)" source="el-node-app" target="el-node-whatsapp"/>
+    <element xsi:type="archimate:ServingRelationship" id="rel-serv-gmaps-app" name="API de mapas / geocoding" source="el-node-gmaps" target="el-node-app"/>
+  </folder>
+  <folder name="Views" id="id-folder-views" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Camada de Tecnologia - Lactare Digital" id="id-view-tech">
+      <child xsi:type="archimate:DiagramObject" id="obj-dev-nutriz" archimateElement="el-dev-nutriz">
+        <bounds x="80" y="24" width="220" height="130"/>
+        <sourceConnection xsi:type="archimate:Connection" id="conn-net1" source="obj-dev-nutriz" target="obj-net-internet" archimateRelationship="rel-assoc-nutriz-net"/>
+        <child xsi:type="archimate:DiagramObject" id="obj-sw-browser-mobile" archimateElement="el-sw-browser-mobile">
+          <bounds x="20" y="60" width="180" height="56"/>
+        </child>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="obj-dev-admin" archimateElement="el-dev-admin">
+        <bounds x="540" y="24" width="220" height="130"/>
+        <sourceConnection xsi:type="archimate:Connection" id="conn-net2" source="obj-dev-admin" target="obj-net-internet" archimateRelationship="rel-assoc-admin-net"/>
+        <child xsi:type="archimate:DiagramObject" id="obj-sw-browser-chrome" archimateElement="el-sw-browser-chrome">
+          <bounds x="20" y="60" width="180" height="56"/>
+        </child>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="obj-net-internet" targetConnections="conn-net1 conn-net2" archimateElement="el-net-internet">
+        <bounds x="360" y="44" width="140" height="86"/>
+        <sourceConnection xsi:type="archimate:Connection" id="conn-net3" source="obj-net-internet" target="obj-node-cloud" archimateRelationship="rel-assoc-net-cloud"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="obj-node-cloud" targetConnections="conn-net3" archimateElement="el-node-cloud">
+        <bounds x="40" y="220" width="960" height="320"/>
+        <child xsi:type="archimate:DiagramObject" id="obj-node-web" targetConnections="conn-serv2" archimateElement="el-node-web">
+          <bounds x="120" y="80" width="220" height="200"/>
+          <child xsi:type="archimate:DiagramObject" id="obj-sw-vercel-edge" archimateElement="el-sw-vercel-edge">
+            <bounds x="20" y="80" width="180" height="100"/>
+          </child>
+        </child>
+        <child xsi:type="archimate:DiagramObject" id="obj-node-app" targetConnections="conn-serv1 conn-gmaps" archimateElement="el-node-app">
+          <bounds x="380" y="80" width="240" height="200"/>
+          <sourceConnection xsi:type="archimate:Connection" id="conn-serv2" source="obj-node-app" target="obj-node-web" archimateRelationship="rel-serv-app-web"/>
+          <sourceConnection xsi:type="archimate:Connection" id="conn-wa" source="obj-node-app" target="obj-node-whatsapp" archimateRelationship="rel-assoc-app-wa"/>
+          <child xsi:type="archimate:DiagramObject" id="obj-sw-node-next" archimateElement="el-sw-node-next">
+            <bounds x="20" y="56" width="200" height="74"/>
+          </child>
+          <child xsi:type="archimate:DiagramObject" id="obj-art-bundle" archimateElement="el-art-bundle">
+            <bounds x="20" y="140" width="200" height="48"/>
+          </child>
+        </child>
+        <child xsi:type="archimate:DiagramObject" id="obj-node-db" archimateElement="el-node-db">
+          <bounds x="660" y="80" width="220" height="200"/>
+          <sourceConnection xsi:type="archimate:Connection" id="conn-serv1" source="obj-node-db" target="obj-node-app" archimateRelationship="rel-serv-db-app"/>
+          <child xsi:type="archimate:DiagramObject" id="obj-sw-postgres" archimateElement="el-sw-postgres">
+            <bounds x="20" y="80" width="180" height="100"/>
+          </child>
+        </child>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="obj-node-whatsapp" targetConnections="conn-wa" archimateElement="el-node-whatsapp">
+        <bounds x="380" y="580" width="240" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="obj-node-gmaps" archimateElement="el-node-gmaps">
+        <bounds x="700" y="580" width="240" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="conn-gmaps" source="obj-node-gmaps" target="obj-node-app" archimateRelationship="rel-serv-gmaps-app"/>
+      </child>
+    </element>
+  </folder>
+</archimate:model>

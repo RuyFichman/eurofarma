@@ -44,26 +44,38 @@ export function ContentFaq() {
         ))}
       </ul>
 
-      <div className="bg-secondary/40 mt-8 rounded-2xl p-8 text-center">
-        <p className="text-muted-foreground">{faq.help.title}</p>
-        <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
+      <aside
+        aria-labelledby="faq-help-title"
+        className="bg-card mt-10 rounded-2xl border p-6 text-center shadow-sm sm:p-8"
+      >
+        <h3 id="faq-help-title" className="text-base sm:text-lg">
+          {faq.help.title}
+        </h3>
+
+        <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
           <Button
             asChild
-            className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90"
+            size="lg"
+            className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 h-11 rounded-full px-7 has-[>svg]:px-6"
           >
             <Link href={faq.help.whatsapp.href}>
               <MessageCircle aria-hidden="true" />
               {faq.help.whatsapp.label}
             </Link>
           </Button>
-          <Button asChild variant="outline" className="bg-card">
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="h-11 rounded-full bg-transparent px-7 has-[>svg]:px-6"
+          >
             <Link href={faq.help.articles.href}>
               <FileText aria-hidden="true" />
               {faq.help.articles.label}
             </Link>
           </Button>
         </div>
-      </div>
+      </aside>
     </section>
   )
 }
