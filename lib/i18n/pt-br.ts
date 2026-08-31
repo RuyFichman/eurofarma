@@ -1195,6 +1195,103 @@ export const ADMIN = {
       },
     },
   },
+  nutrizes: {
+    seo: {
+      title: 'Nutrizes | Lactare Admin',
+      description: 'Acompanhe as nutrizes cadastradas no Lactare.',
+    },
+    title: 'Nutrizes',
+    description:
+      'Acompanhe quem se cadastrou para doar e em que ponto da conversa cada pessoa está.',
+
+    /**
+     * Aviso permanente de LGPD. Fica visível na tela, não escondido em
+     * documentação: esta é a única tela do painel que lista dados pessoais.
+     */
+    privacyNotice:
+      'Esta tela mostra dados pessoais de pessoas reais. Use apenas para atender quem se cadastrou e evite exibi-la em apresentações ou compartilhamento de tela.',
+
+    filters: {
+      label: 'Filtros da lista de nutrizes',
+      search: {
+        label: 'Buscar por nome',
+        placeholder: 'Digite o nome da nutriz',
+      },
+      status: { label: 'Situação', all: 'Todas as situações' },
+      state: { label: 'Estado', all: 'Todos os estados' },
+      actions: { apply: 'Filtrar', clear: 'Limpar filtros' },
+    },
+
+    results: {
+      countOne: 'nutriz cadastrada',
+      countOther: 'nutrizes cadastradas',
+    },
+
+    table: {
+      caption: 'Nutrizes cadastradas no Lactare',
+      columns: {
+        nutriz: 'Nutriz',
+        location: 'Localização',
+        contact: 'Contato',
+        status: 'Situação',
+        consent: 'Consentimento',
+        signedUpAt: 'Cadastro',
+      },
+    },
+
+    contact: {
+      /** `{name}` é substituído no componente. */
+      revealAria: 'Mostrar o WhatsApp de {name}',
+      hideAria: 'Ocultar o WhatsApp de {name}',
+      reveal: 'Mostrar',
+      hide: 'Ocultar',
+      whatsappLabel: 'WhatsApp',
+      emailLabel: 'E-mail',
+      noEmail: 'Sem e-mail',
+      /** Canal que a nutriz escolheu para ser contatada. */
+      preference: {
+        WHATSAPP: 'Prefere WhatsApp',
+        EMAIL: 'Prefere e-mail',
+        NONE: 'Não quer contato',
+      },
+    },
+
+    consent: {
+      /** `{date}` é substituído no componente. */
+      lgpd: 'LGPD em {date}',
+      marketingYes: 'Aceita campanhas',
+      marketingNo: 'Só contato essencial',
+    },
+
+    status: {
+      INTERESTED: 'Interessada',
+      CONTACTED: 'Contatada',
+      DONATED: 'Doou',
+      UNKNOWN: 'Sem retorno',
+    },
+
+    pagination: {
+      label: 'Paginação das nutrizes',
+      previous: 'Anterior',
+      next: 'Próxima',
+      /** `{page}` e `{total}` são substituídos no componente. */
+      status: 'Página {page} de {total}',
+    },
+
+    empty: {
+      database: {
+        title: 'Nenhuma nutriz cadastrada',
+        description:
+          'O cadastro é opcional: a nutriz pode encontrar uma unidade e falar pelo WhatsApp sem deixar dados. Quem escolher se cadastrar aparece aqui.',
+      },
+      filtered: {
+        title: 'Nenhuma nutriz encontrada',
+        description:
+          'Nenhum cadastro corresponde a esses filtros. Tente ajustar a busca ou limpar os filtros.',
+        action: 'Limpar filtros',
+      },
+    },
+  },
   noAccess: {
     seo: {
       title: 'Acesso restrito | Lactare Admin',
