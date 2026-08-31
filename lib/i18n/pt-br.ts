@@ -1077,13 +1077,23 @@ export const ADMIN = {
       },
 
       /**
-       * Feedback temporário da 5.7: o formulário valida, mas ainda não grava.
-       * Diz exatamente isso — nunca "unidade cadastrada". Sai na 5.8.
+       * Retorno das Server Actions (Sprint 5.8). Toda mensagem aqui é segura
+       * para exibir: nenhuma carrega código do Prisma, SQL ou stack.
        */
-      validationOnly: {
-        title: 'Formulário validado',
-        description:
-          'Os dados estão consistentes, mas ainda não foram gravados: a persistência entra na próxima etapa.',
+      mutations: {
+        submittingCreate: 'Cadastrando unidade...',
+        submittingUpdate: 'Salvando alterações...',
+        createError:
+          'Não foi possível cadastrar a unidade agora. Tente novamente em alguns instantes.',
+        updateError:
+          'Não foi possível salvar as alterações agora. Tente novamente em alguns instantes.',
+        validationGeneric: 'Revise os campos destacados e envie novamente.',
+        slugConflict:
+          'Já existe uma unidade com esse nome nesta cidade. Ajuste o nome para diferenciá-la.',
+        notFound:
+          'Esta unidade não existe mais. Ela pode ter sido removida em outra aba.',
+        /** Título do alerta de erro — o texto acompanha, nunca só a cor. */
+        errorTitle: 'Não foi possível salvar',
       },
     },
 

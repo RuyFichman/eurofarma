@@ -1,9 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+
+import {
+  createAdminUnitAction,
+  updateAdminUnitAction,
+} from '@/app/admin/(painel)/unidades/actions'
 
 import { AdminUnitFormSection } from '@/components/admin/units/admin-unit-form-section'
 import {
@@ -35,6 +40,32 @@ const STATE_OPTIONS = BRAZILIAN_STATES.map((state) => ({
 }))
 
 /**
+ * Campos que aceitam mensagem de erro vinda do servidor. A lista existe para o
+ * `setError` receber só chaves que o formulário conhece — o servidor não dita
+ * nomes de campo.
+ */
+const FORM_FIELD_KEYS = [
+  'name',
+  'type',
+  'addressStreet',
+  'addressNumber',
+  'addressComplement',
+  'addressNeighborhood',
+  'addressCity',
+  'addressState',
+  'addressZip',
+  'phone',
+  'whatsapp',
+  'email',
+  'openingHours',
+  'instructions',
+  'whatsappMessage',
+  'latitude',
+  'longitude',
+  'status',
+] as const satisfies ReadonlyArray<keyof AdminUnitFormInput>
+
+/**
  * Formulário administrativo de unidade (Sprint 5.7) — um só componente para
  * cadastro e edição.
  *
@@ -60,7 +91,7 @@ export function AdminUnitForm(props: AdminUnitFormProps) {
   const { mode, initialValues } = props
   const modeCopy = mode === 'create' ? COPY.create : COPY.edit
 
-  const [showValidatedNotice, setShowValidatedNotice] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const form = useForm<AdminUnitFormInput, unknown, AdminUnitFormValues>({
     resolver: zodResolver(adminUnitFormSchema),
@@ -69,20 +100,32 @@ export function AdminUnitForm(props: AdminUnitFormProps) {
 
   const { errors, isSubmitting } = form.formState
 
-  // O aviso de "validado" descreve um retrato do formulário; qualquer edição
-  // posterior o torna obsoleto, então ele some assim que algo muda.
-  useEffect(() => {
-    const subscription = form.watch(() => setShowValidatedNotice(false))
-    return () => subscription.unsubscribe()
-  }, [form])
+  /**
+   * Envia para a Server Action correspondente ao modo.
+   *
+   * Em caso de sucesso a action redireciona para a listagem, então nada depois
+   * do `await` roda — por isso não há mensagem de "salvo com sucesso" aqui: a
+   * confirmação é a unidade aparecendo na lista. Só o caminho de erro retorna.
+   *
+   * A validação do cliente não substitui a do servidor: a action revalida o
+   * payload inteiro com o mesmo schema antes de encostar no banco.
+   */
+  async function handleValidSubmit(values: AdminUnitFormValues) {
+    setSubmitError(null)
 
-  // TODO(LCT-5.8): trocar este submit de validação por Server Actions
-  // autenticadas (`createAdminUnitAction`/`updateAdminUnitAction`), com
-  // `requireAdminUser()`, normalização, slug e `revalidatePath`.
-  // Os valores validados não são lidos aqui de propósito: enquanto não há
-  // persistência, nada justifica trafegar ou registrar dados da unidade.
-  function handleValidSubmit() {
-    setShowValidatedNotice(true)
+    const result =
+      props.mode === 'create'
+        ? await createAdminUnitAction(values)
+        : await updateAdminUnitAction(props.unitId, values)
+
+    if (result.fields) {
+      for (const key of FORM_FIELD_KEYS) {
+        const message = result.fields[key]
+        if (message) form.setError(key, { message })
+      }
+    }
+
+    setSubmitError(result.message)
   }
 
   return (
@@ -319,10 +362,12 @@ export function AdminUnitForm(props: AdminUnitFormProps) {
         ) : null}
       </AdminUnitFormSection>
 
-      {showValidatedNotice ? (
-        <Alert role="status">
-          <AlertTitle>{COPY.validationOnly.title}</AlertTitle>
-          <AlertDescription>{COPY.validationOnly.description}</AlertDescription>
+      {/* `role="alert"` anuncia a falha; o título carrega o significado, não a
+          cor do alerta (Princípio 5). */}
+      {submitError ? (
+        <Alert variant="destructive" role="alert">
+          <AlertTitle>{COPY.mutations.errorTitle}</AlertTitle>
+          <AlertDescription>{submitError}</AlertDescription>
         </Alert>
       ) : null}
 
@@ -330,8 +375,15 @@ export function AdminUnitForm(props: AdminUnitFormProps) {
         <Button variant="outline" asChild className="sm:w-auto">
           <Link href={ADMIN_UNITS_PATH}>{COPY.actions.cancel}</Link>
         </Button>
+        {/* Desabilitar durante o envio evita cadastro duplicado por clique
+            duplo. É conforto, não segurança: quem garante unicidade é o
+            `@unique` do slug no banco. */}
         <Button type="submit" disabled={isSubmitting} className="sm:w-auto">
-          {modeCopy.submit}
+          {isSubmitting
+            ? mode === 'create'
+              ? COPY.mutations.submittingCreate
+              : COPY.mutations.submittingUpdate
+            : modeCopy.submit}
         </Button>
       </div>
     </form>
