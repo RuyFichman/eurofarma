@@ -71,6 +71,27 @@ export async function findUnitsByLocation(
   return { units, total, limit, offset }
 }
 
+export type PublicNetworkStats = {
+  activeUnits: number
+  statesCovered: number
+}
+
+/**
+ * Contagens da rede para a home. Só unidades **ACTIVE**: é o que a nutriz
+ * encontra de fato na busca, mesma regra da cobertura geográfica do painel
+ * (5.5). Duas agregações num `$transaction` — nenhuma linha sai do banco.
+ */
+export async function getPublicNetworkStats(): Promise<PublicNetworkStats> {
+  const where = { status: UnitStatus.ACTIVE }
+
+  const [activeUnits, states] = await prisma.$transaction([
+    prisma.unit.count({ where }),
+    prisma.unit.groupBy({ by: ['addressState'], where }),
+  ])
+
+  return { activeUnits, statesCovered: states.length }
+}
+
 export type PublicUnitSearchMeta = {
   page: number
   limit: number

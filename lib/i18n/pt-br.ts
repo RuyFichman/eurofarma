@@ -59,16 +59,22 @@ export const HOME = {
       'Seus dados protegidos pela LGPD',
       'Contato direto e gratuito pelo WhatsApp',
     ],
-    highlight: { value: '+48 mil', label: 'doadoras ativas na rede' },
     imageAlt: 'Bebê recém-nascido aconchegado em um cobertor macio',
   },
   stats: {
-    items: [
-      { value: '220+', label: 'Bancos e postos de coleta' },
-      { value: '48 mil', label: 'Doadoras ativas' },
-      { value: '2,3 mi', label: 'Bebês beneficiados' },
-      { value: '27', label: 'Estados atendidos' },
-    ],
+    /** Heading do bloco — visualmente oculto, lido por leitor de tela. */
+    title: 'A rede em números',
+    /**
+     * Os dois primeiros vêm do banco (é o que a nutriz realmente encontra na
+     * busca); `fallback` cobre a falha da consulta. Os dois últimos são da
+     * rBLH e não derivam da nossa base — daí a nota de fonte.
+     */
+    units: { label: 'Unidades cadastradas', fallback: '220+' },
+    states: { label: 'Estados atendidos', fallback: '27' },
+    donors: { value: '48 mil', label: 'Doadoras ativas na rede' },
+    babies: { value: '2,3 mi', label: 'Bebês beneficiados' },
+    sourceNote:
+      'Unidades e estados vêm da nossa base; doadoras e bebês são dados da rBLH/Fiocruz.',
   },
   network: {
     eyebrow: 'Conheça a rede',
@@ -94,7 +100,10 @@ export const HOME = {
         items: [
           'Maior rede do mundo em BLH',
           'Coordenada pela Fiocruz',
-          '220+ unidades em 27 estados',
+          // Sem número aqui: a faixa de indicadores logo acima já mostra a
+          // contagem real da base, e dois totais diferentes na mesma tela
+          // se contradiriam.
+          'Unidades em todas as regiões do país',
         ],
         cta: { label: 'Saiba mais', href: '/como-funciona' },
       },
@@ -910,6 +919,184 @@ export const ADMIN = {
       'Gerencie bancos de leite, pontos de coleta e demais unidades disponíveis no Lactare.',
     createAction: 'Nova unidade',
 
+    /** Formulário de cadastro/edição de unidade (Sprint 5.7). */
+    form: {
+      create: {
+        seo: {
+          title: 'Nova unidade | Lactare Admin',
+          description: 'Cadastre uma nova unidade na rede do Lactare.',
+        },
+        title: 'Nova unidade',
+        description:
+          'Cadastre as informações institucionais e de contato da unidade.',
+        submit: 'Cadastrar unidade',
+      },
+
+      edit: {
+        seo: {
+          title: 'Editar unidade | Lactare Admin',
+          description: 'Atualize os dados de uma unidade da rede do Lactare.',
+        },
+        title: 'Editar unidade',
+        description:
+          'Atualize as informações institucionais e de contato da unidade.',
+        submit: 'Salvar alterações',
+      },
+
+      actions: {
+        back: 'Voltar para unidades',
+        cancel: 'Cancelar',
+        publicPage: 'Ver página pública',
+        publicPageAria: 'Ver a página pública desta unidade (abre em nova aba)',
+      },
+
+      /** Endereço público da unidade — exibido, nunca editável (ver §13). */
+      slug: {
+        label: 'Endereço público',
+        helper:
+          'Gerado a partir do nome e da localização. Não é editável para não quebrar links já divulgados.',
+      },
+
+      sections: {
+        basic: {
+          title: 'Informações básicas',
+          description: 'Identifique a unidade e seu tipo de atendimento.',
+        },
+        location: {
+          title: 'Localização',
+          description: 'Informe o endereço usado para localizar a unidade.',
+        },
+        contact: {
+          title: 'Contato',
+          description:
+            'Informe os canais públicos que a unidade usa para atender quem quer doar.',
+        },
+        service: {
+          title: 'Atendimento e orientação',
+          description:
+            'Horários e orientações que ajudam a nutriz a se preparar antes de procurar a unidade.',
+        },
+        coordinates: {
+          title: 'Coordenadas',
+          description:
+            'Opcional. Preencha as duas juntas — usamos para posicionar o mapa da página da unidade.',
+        },
+        publication: {
+          title: 'Publicação',
+          description: 'Defina a situação da unidade dentro do Lactare.',
+        },
+      },
+
+      fields: {
+        name: {
+          label: 'Nome da unidade',
+          placeholder: 'Ex.: Banco de Leite Humano Cachoeirinha',
+        },
+        type: { label: 'Tipo de unidade', placeholder: 'Selecione o tipo' },
+        street: {
+          label: 'Rua / logradouro',
+          placeholder: 'Ex.: Avenida Deputado Emílio Carlos',
+        },
+        number: { label: 'Número', placeholder: 'Ex.: 3100 ou S/N' },
+        complement: {
+          label: 'Complemento',
+          placeholder: 'Bloco, andar ou referência',
+        },
+        neighborhood: { label: 'Bairro', placeholder: 'Digite o bairro' },
+        city: { label: 'Cidade', placeholder: 'Digite a cidade' },
+        state: { label: 'Estado', placeholder: 'Selecione o estado' },
+        zip: { label: 'CEP', placeholder: '00000-000' },
+        phone: {
+          label: 'Telefone',
+          placeholder: '(11) 0000-0000',
+          helper: 'Com DDD. Deixe vazio se a unidade não divulga telefone.',
+        },
+        whatsapp: {
+          label: 'WhatsApp',
+          placeholder: '(11) 90000-0000',
+          helper:
+            'Só preencha um número que realmente atende no WhatsApp — é o botão principal de contato da nutriz.',
+        },
+        email: { label: 'E-mail', placeholder: 'contato@unidade.org.br' },
+        openingHours: {
+          label: 'Horário de atendimento',
+          placeholder: 'Segunda a sexta, das 8h às 17h',
+        },
+        instructions: {
+          label: 'Orientações para doação',
+          placeholder:
+            'Ex.: procurar a recepção do 2º andar; levar documento com foto.',
+        },
+        whatsappMessage: {
+          label: 'Mensagem inicial do WhatsApp',
+          placeholder:
+            'Olá! Gostaria de saber mais sobre doação de leite humano.',
+          helper:
+            'Vem preenchida na conversa quando a nutriz toca em "WhatsApp". Deixe vazio para usar a mensagem padrão.',
+        },
+        latitude: { label: 'Latitude', placeholder: '-23.550520' },
+        longitude: { label: 'Longitude', placeholder: '-46.633308' },
+        status: { label: 'Situação', placeholder: 'Selecione a situação' },
+      },
+
+      /**
+       * Marca campos não obrigatórios. Com 18 campos, dizer o que é opcional
+       * poupa mais tempo do que marcar o que é obrigatório com asterisco.
+       */
+      optionalLabel: 'opcional',
+
+      /** Explica o efeito público de cada situação, sem depender só da cor. */
+      statusHelper:
+        'Somente unidades ativas aparecem na busca pública e têm página própria.',
+
+      validation: {
+        nameRequired: 'Informe o nome da unidade.',
+        nameMax: 'O nome da unidade é muito longo.',
+        typeRequired: 'Selecione um tipo de unidade.',
+        streetRequired: 'Informe o logradouro.',
+        streetMax: 'O logradouro é muito longo.',
+        numberMax: 'O número é muito longo.',
+        complementMax: 'O complemento é muito longo.',
+        neighborhoodRequired: 'Informe o bairro.',
+        neighborhoodMax: 'O bairro é muito longo.',
+        cityRequired: 'Informe a cidade.',
+        cityMax: 'O nome da cidade é muito longo.',
+        stateInvalid: 'Selecione uma UF brasileira válida.',
+        zipInvalid: 'CEP inválido. Use 8 dígitos (00000-000).',
+        phoneInvalid: 'Telefone inválido. Use DDD + número.',
+        whatsappInvalid: 'WhatsApp inválido. Use DDD + número.',
+        emailInvalid: 'Informe um e-mail válido.',
+        openingHoursMax: 'O horário de atendimento é muito longo.',
+        instructionsMax: 'As orientações estão muito longas.',
+        whatsappMessageMax: 'A mensagem inicial é muito longa.',
+        latitudeInvalid: 'Informe uma latitude entre -90 e 90.',
+        longitudeInvalid: 'Informe uma longitude entre -180 e 180.',
+        coordinatesPair:
+          'Informe latitude e longitude juntas ou deixe as duas vazias.',
+        statusRequired: 'Selecione uma situação válida.',
+      },
+
+      /**
+       * Retorno das Server Actions (Sprint 5.8). Toda mensagem aqui é segura
+       * para exibir: nenhuma carrega código do Prisma, SQL ou stack.
+       */
+      mutations: {
+        submittingCreate: 'Cadastrando unidade...',
+        submittingUpdate: 'Salvando alterações...',
+        createError:
+          'Não foi possível cadastrar a unidade agora. Tente novamente em alguns instantes.',
+        updateError:
+          'Não foi possível salvar as alterações agora. Tente novamente em alguns instantes.',
+        validationGeneric: 'Revise os campos destacados e envie novamente.',
+        slugConflict:
+          'Já existe uma unidade com esse nome nesta cidade. Ajuste o nome para diferenciá-la.',
+        notFound:
+          'Esta unidade não existe mais. Ela pode ter sido removida em outra aba.',
+        /** Título do alerta de erro — o texto acompanha, nunca só a cor. */
+        errorTitle: 'Não foi possível salvar',
+      },
+    },
+
     filters: {
       /** Nome acessível do formulário (vira landmark de busca). */
       label: 'Filtros da lista de unidades',
@@ -1004,6 +1191,103 @@ export const ADMIN = {
         title: 'Nenhuma unidade encontrada',
         description:
           'Nenhuma unidade corresponde a esses filtros. Tente ajustar a busca ou limpar os filtros.',
+        action: 'Limpar filtros',
+      },
+    },
+  },
+  nutrizes: {
+    seo: {
+      title: 'Nutrizes | Lactare Admin',
+      description: 'Acompanhe as nutrizes cadastradas no Lactare.',
+    },
+    title: 'Nutrizes',
+    description:
+      'Acompanhe quem se cadastrou para doar e em que ponto da conversa cada pessoa está.',
+
+    /**
+     * Aviso permanente de LGPD. Fica visível na tela, não escondido em
+     * documentação: esta é a única tela do painel que lista dados pessoais.
+     */
+    privacyNotice:
+      'Esta tela mostra dados pessoais de pessoas reais. Use apenas para atender quem se cadastrou e evite exibi-la em apresentações ou compartilhamento de tela.',
+
+    filters: {
+      label: 'Filtros da lista de nutrizes',
+      search: {
+        label: 'Buscar por nome',
+        placeholder: 'Digite o nome da nutriz',
+      },
+      status: { label: 'Situação', all: 'Todas as situações' },
+      state: { label: 'Estado', all: 'Todos os estados' },
+      actions: { apply: 'Filtrar', clear: 'Limpar filtros' },
+    },
+
+    results: {
+      countOne: 'nutriz cadastrada',
+      countOther: 'nutrizes cadastradas',
+    },
+
+    table: {
+      caption: 'Nutrizes cadastradas no Lactare',
+      columns: {
+        nutriz: 'Nutriz',
+        location: 'Localização',
+        contact: 'Contato',
+        status: 'Situação',
+        consent: 'Consentimento',
+        signedUpAt: 'Cadastro',
+      },
+    },
+
+    contact: {
+      /** `{name}` é substituído no componente. */
+      revealAria: 'Mostrar o WhatsApp de {name}',
+      hideAria: 'Ocultar o WhatsApp de {name}',
+      reveal: 'Mostrar',
+      hide: 'Ocultar',
+      whatsappLabel: 'WhatsApp',
+      emailLabel: 'E-mail',
+      noEmail: 'Sem e-mail',
+      /** Canal que a nutriz escolheu para ser contatada. */
+      preference: {
+        WHATSAPP: 'Prefere WhatsApp',
+        EMAIL: 'Prefere e-mail',
+        NONE: 'Não quer contato',
+      },
+    },
+
+    consent: {
+      /** `{date}` é substituído no componente. */
+      lgpd: 'LGPD em {date}',
+      marketingYes: 'Aceita campanhas',
+      marketingNo: 'Só contato essencial',
+    },
+
+    status: {
+      INTERESTED: 'Interessada',
+      CONTACTED: 'Contatada',
+      DONATED: 'Doou',
+      UNKNOWN: 'Sem retorno',
+    },
+
+    pagination: {
+      label: 'Paginação das nutrizes',
+      previous: 'Anterior',
+      next: 'Próxima',
+      /** `{page}` e `{total}` são substituídos no componente. */
+      status: 'Página {page} de {total}',
+    },
+
+    empty: {
+      database: {
+        title: 'Nenhuma nutriz cadastrada',
+        description:
+          'O cadastro é opcional: a nutriz pode encontrar uma unidade e falar pelo WhatsApp sem deixar dados. Quem escolher se cadastrar aparece aqui.',
+      },
+      filtered: {
+        title: 'Nenhuma nutriz encontrada',
+        description:
+          'Nenhum cadastro corresponde a esses filtros. Tente ajustar a busca ou limpar os filtros.',
         action: 'Limpar filtros',
       },
     },
