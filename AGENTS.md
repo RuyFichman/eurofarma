@@ -104,10 +104,25 @@ pnpm dev
 > salve em `prisma/migrations/<timestamp>_<nome>/migration.sql` e aplique via MCP do Supabase
 > (`apply_migration`). Registre no `_prisma_migrations` com o checksum SHA-256 do arquivo.
 
-> **Se o seu ambiente não tem o MCP do Supabase** (caso normal do Codex): faça os dois primeiros
-> passos — gerar o SQL offline e salvar o arquivo — e **pare aí**, avisando o usuário para aplicar.
-> Não tente aplicar a migration por outro caminho. `pnpm db:migrate` continua não funcionando para
-> ninguém: o banco é cloud e a `DATABASE_URL` aponta para o pooler.
+> **Se o seu ambiente não tem o MCP do Supabase:** faça os dois primeiros passos — gerar o SQL
+> offline e salvar o arquivo — e **pare aí**, avisando o usuário para aplicar. Não tente aplicar a
+> migration por outro caminho. `pnpm db:migrate` continua não funcionando para ninguém: o banco é
+> cloud e a `DATABASE_URL` aponta para o pooler.
+
+> **Mais de um agente com acesso ao mesmo banco.** Claude Code e Codex podem ter o MCP do Supabase
+> ao mesmo tempo, e os dois escrevem no **mesmo** projeto cloud — não há banco local nem staging para
+> amortecer erro. Duas consequências práticas: (1) antes de qualquer `apply_migration`/`execute_sql`,
+> confirme que o `project_id` é `mvixmggxwbrljlovfvac`; (2) o `_prisma_migrations` é preenchido **à
+> mão** com o checksum SHA-256, então antes de aplicar uma migration verifique se o outro agente já
+> não a aplicou — `list_migrations` primeiro, sempre. Migration aplicada duas vezes ou registrada
+> pela metade deixa o histórico inconsistente, e não há rollback automático.
+
+> **O que é recuperável, para calibrar o cuidado.** As 487 unidades **não** são insubstituíveis: elas
+> vêm dos CSVs versionados em `data/seeds/units/` e o `prisma/seed.ts` faz upsert por slug, então
+> `pnpm db:seed` reconstrói a tabela `units`. O admin sai de `pnpm db:seed-admin`. O que **não** tem
+> como recriar é `whatsapp_clicks` (analytics acumulada) e `nutriz_profiles` (PII que a pessoa
+> confiou à plataforma — e que, uma vez perdida, não dá para pedir de volta). Trate essas duas
+> tabelas com mais cuidado que as demais; não é motivo para paralisar trabalho nas outras.
 
 Scripts disponíveis em `package.json` (estado atual):
 
@@ -281,6 +296,15 @@ export type NutrizCreateInput = z.infer<typeof nutrizCreateSchema>;
 > - **Não** rode comandos globais que afetem outros projetos: nada de `pnpm -g`, `npm i -g`, `prisma` apontando para outro schema, `supabase link`/`supabase start` de outro projeto, `git` em outro repositório, alterar `~/.npmrc`, variáveis de ambiente do sistema, etc.
 > - **Banco:** opere SOMENTE no projeto Supabase `eurofarma` (ref `mvixmggxwbrljlovfvac`, org `fiap`). Antes de qualquer `apply_migration`/`execute_sql` via MCP, confirme que o `project_id` é esse. Nunca rode DDL/seed contra outro projeto.
 > - **MCP do Supabase:** se `list_organizations` não retornar a org `fiap`, **pare** e avise — pode estar conectado na conta de outro projeto. Não aplique mudanças "no que estiver conectado".
+> - **Configuração recomendada do MCP quando mais de um agente trabalha no repo.** Só **um** agente
+>   deve ter escrita no banco (hoje o Claude Code, que executa o fluxo de migration com o registro
+>   manual no `_prisma_migrations`). Os demais recebem o MCP escopado e somente-leitura:
+>   `https://mcp.supabase.com/mcp?project_ref=mvixmggxwbrljlovfvac&read_only=true`.
+>   `read_only=true` roda toda query como usuário Postgres de leitura — `SELECT`, `list_tables`,
+>   `list_migrations` e `get_advisors` continuam funcionando, `apply_migration` e escrita não.
+>   `project_ref` trava no projeto e **desabilita as ferramentas de conta**, então a regra do bullet
+>   acima deixa de depender de o agente reparar no erro: `list_organizations` nem existe. Isso
+>   transforma a regra de isolamento em garantia do servidor em vez de instrução neste arquivo.
 > - Use sempre caminhos **dentro** deste repo. Na dúvida sobre escopo, pergunte em vez de agir.
 
 Ao receber uma tarefa neste projeto:
