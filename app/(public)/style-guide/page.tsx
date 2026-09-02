@@ -21,9 +21,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { SITE } from '@/lib/i18n/pt-br'
 
 export const metadata = {
-  title: 'Style Guide — Lactare Digital',
+  title: `Style Guide — ${SITE.name} Digital`,
 }
 
 type ColorToken = { name: string; className: string; value: string }
@@ -107,7 +108,7 @@ export default function StyleGuidePage(): ReactNode {
     <div className="mx-auto max-w-5xl px-6 py-12">
       <header className="space-y-2 pb-6">
         <Badge variant="secondary">Referência interna</Badge>
-        <h1>Style Guide — Lactare Digital</h1>
+        <h1>Style Guide — {SITE.name} Digital</h1>
         <p className="text-muted-foreground">
           Tokens visuais, tipografia e componentes base. Use esta página para
           validar a identidade ao longo do desenvolvimento.

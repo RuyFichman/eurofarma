@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Search, SlidersHorizontal } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -150,15 +151,22 @@ export function SearchFilters() {
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="bg-card rounded-2xl border p-4 shadow-sm md:p-6"
+      className="bg-card rounded-3xl border p-5 shadow-sm md:p-7"
       noValidate
     >
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">{COPY.title}</h2>
-        <p className="text-muted-foreground text-sm">{COPY.description}</p>
+      <div className="flex items-start gap-3 border-b pb-5">
+        <span className="bg-secondary text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
+          <SlidersHorizontal className="size-4.5" aria-hidden="true" />
+        </span>
+        <div>
+          <h2 className="text-lg font-semibold">{COPY.title}</h2>
+          <p className="text-muted-foreground mt-1 max-w-2xl text-sm text-pretty">
+            {COPY.description}
+          </p>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         {/* Estado */}
         <div className="space-y-2 md:col-span-1">
           <Label htmlFor="filters-state">{COPY.fields.state.label}</Label>
@@ -177,7 +185,7 @@ export function SearchFilters() {
               >
                 <SelectTrigger
                   id="filters-state"
-                  className="w-full"
+                  className="bg-background w-full rounded-xl data-[size=default]:h-11"
                   aria-invalid={Boolean(stateError)}
                   aria-describedby={
                     stateError ? 'filters-state-error' : undefined
@@ -223,7 +231,7 @@ export function SearchFilters() {
               >
                 <SelectTrigger
                   id="filters-city"
-                  className="w-full"
+                  className="bg-background w-full rounded-xl data-[size=default]:h-11"
                   aria-describedby={
                     citiesError ? 'filters-city-status' : undefined
                   }
@@ -251,7 +259,7 @@ export function SearchFilters() {
         </div>
 
         {/* Bairro */}
-        <div className="space-y-2 md:col-span-2 lg:col-span-1">
+        <div className="space-y-2">
           <Label htmlFor="filters-neighborhood">
             {COPY.fields.neighborhood.label}
           </Label>
@@ -259,6 +267,7 @@ export function SearchFilters() {
             id="filters-neighborhood"
             placeholder={COPY.fields.neighborhood.placeholder}
             aria-describedby="filters-neighborhood-helper"
+            className="bg-background h-11 rounded-xl"
             {...form.register('neighborhood')}
           />
           <p
@@ -282,7 +291,10 @@ export function SearchFilters() {
                   field.onChange(value === TYPE_ALL ? '' : value)
                 }
               >
-                <SelectTrigger id="filters-type" className="w-full">
+                <SelectTrigger
+                  id="filters-type"
+                  className="bg-background w-full rounded-xl data-[size=default]:h-11"
+                >
                   <SelectValue placeholder={COPY.fields.type.placeholder} />
                 </SelectTrigger>
                 <SelectContent>
@@ -299,9 +311,11 @@ export function SearchFilters() {
             )}
           />
         </div>
+      </div>
 
+      <div className="mt-6 flex flex-col gap-4 border-t pt-5 lg:flex-row lg:items-center lg:justify-between">
         {/* WhatsApp */}
-        <div className="flex items-center md:col-span-2 lg:col-span-1">
+        <div className="bg-muted/50 flex min-h-11 items-center rounded-xl border px-4 py-3">
           <Controller
             control={form.control}
             name="hasWhatsapp"
@@ -324,20 +338,24 @@ export function SearchFilters() {
             )}
           />
         </div>
-      </div>
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleClearFilters}
-          className="w-full sm:w-auto"
-        >
-          {COPY.actions.clear}
-        </Button>
-        <Button type="submit" className="w-full sm:w-auto">
-          {COPY.actions.submit}
-        </Button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClearFilters}
+            className="h-11 w-full rounded-xl px-5 sm:w-auto"
+          >
+            {COPY.actions.clear}
+          </Button>
+          <Button
+            type="submit"
+            className="h-11 w-full rounded-xl px-6 sm:w-auto"
+          >
+            <Search aria-hidden="true" />
+            {COPY.actions.submit}
+          </Button>
+        </div>
       </div>
     </form>
   )

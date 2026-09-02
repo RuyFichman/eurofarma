@@ -24,7 +24,7 @@ export function ContentDonationPath() {
   const lastIndex = donationPath.steps.length - 1
 
   return (
-    <section className="mx-auto max-w-6xl px-6 pt-16 md:pt-20">
+    <section className="mx-auto max-w-7xl px-6 pt-16 md:pt-20">
       <ContentSectionHeader
         icon={ArrowRight}
         eyebrow={donationPath.eyebrow}

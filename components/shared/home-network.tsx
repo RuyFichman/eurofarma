@@ -13,7 +13,7 @@ import { HOME } from '@/lib/i18n/pt-br'
 const ICONS = [HeartHandshake, Building2]
 
 /**
- * "Quem faz parte do Lactare" — Server Component.
+ * "Quem faz parte do NutriLink" — Server Component.
  *
  * Um único painel apresenta as duas pontas da rede e explicita visualmente a
  * conexão entre elas. A composição evita cards soltos e dá mais hierarquia ao
@@ -57,7 +57,7 @@ export function HomeNetwork() {
           <div className="grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
             {network.cards.map((card, index) => {
               const Icon = ICONS[index] ?? HeartHandshake
-              const isLactare = index === 0
+              const isNutriLink = index === 0
 
               return (
                 <div key={card.title} className="contents">
@@ -74,13 +74,13 @@ export function HomeNetwork() {
 
                   <article
                     className={`flex min-h-full flex-col p-6 sm:p-8 lg:p-10 ${
-                      isLactare ? '' : 'bg-secondary/15'
+                      isNutriLink ? '' : 'bg-secondary/15'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-6">
                       <span
                         className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${
-                          isLactare
+                          isNutriLink
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-secondary text-secondary-foreground'
                         }`}

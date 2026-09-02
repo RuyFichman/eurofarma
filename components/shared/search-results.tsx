@@ -43,12 +43,12 @@ function StatePanel({
   description: string
 }) {
   return (
-    <div className="bg-card flex flex-col items-center rounded-2xl border px-6 py-16 text-center">
-      <span className="bg-secondary text-secondary-foreground mb-4 flex size-14 items-center justify-center rounded-2xl">
-        <Icon className="size-7" aria-hidden={true} />
+    <div className="bg-card/80 flex min-h-72 flex-col items-center justify-center rounded-3xl border border-dashed px-6 py-14 text-center shadow-sm">
+      <span className="bg-secondary text-primary mb-5 flex size-12 items-center justify-center rounded-full">
+        <Icon className="size-5" aria-hidden={true} />
       </span>
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="text-muted-foreground mt-2 max-w-md text-sm">
+      <h2 className="text-xl font-semibold text-balance">{title}</h2>
+      <p className="text-muted-foreground mt-2 max-w-md text-sm leading-6 text-pretty">
         {description}
       </p>
     </div>
@@ -80,34 +80,56 @@ function Pagination({
 
   return (
     <nav
-      className="mt-8 flex items-center justify-center gap-4"
+      className="mt-10 flex flex-wrap items-center justify-center gap-3"
       aria-label={PAGINATION.label}
     >
       {hasPreviousPage ? (
-        <Button asChild variant="outline" size="sm">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="bg-card h-10 rounded-xl px-4"
+        >
           <Link href={buildPageHref(base, page - 1)} rel="prev">
             <ChevronLeft aria-hidden="true" />
             {PAGINATION.previous}
           </Link>
         </Button>
       ) : (
-        <Button variant="outline" size="sm" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-10 rounded-xl px-4"
+          disabled
+        >
           <ChevronLeft aria-hidden="true" />
           {PAGINATION.previous}
         </Button>
       )}
 
-      <span className="text-muted-foreground text-sm">{status}</span>
+      <span className="bg-card text-muted-foreground rounded-full border px-4 py-2 text-sm shadow-xs">
+        {status}
+      </span>
 
       {hasNextPage ? (
-        <Button asChild variant="outline" size="sm">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="bg-card h-10 rounded-xl px-4"
+        >
           <Link href={buildPageHref(base, page + 1)} rel="next">
             {PAGINATION.next}
             <ChevronRight aria-hidden="true" />
           </Link>
         </Button>
       ) : (
-        <Button variant="outline" size="sm" disabled>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-10 rounded-xl px-4"
+          disabled
+        >
           {PAGINATION.next}
           <ChevronRight aria-hidden="true" />
         </Button>
@@ -172,11 +194,15 @@ export async function SearchResults({
 
   return (
     <section aria-live="polite">
-      <h2 className="text-muted-foreground text-sm font-medium">
-        {meta.total} {countLabel}
-      </h2>
+      <div className="flex items-center gap-3 border-b pb-4">
+        <span className="bg-primary size-2 rounded-full" aria-hidden="true" />
+        <h2 className="text-base font-semibold">
+          <span className="text-primary tabular-nums">{meta.total}</span>{' '}
+          {countLabel}
+        </h2>
+      </div>
 
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {units.map((unit) => (
           <li key={unit.id}>
             <UnitCard unit={unit} />
@@ -201,22 +227,23 @@ export async function SearchResults({
 export function SearchResultsSkeleton() {
   return (
     <section aria-hidden="true">
-      <div className="bg-muted h-4 w-40 animate-pulse rounded" />
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="flex items-center gap-3 border-b pb-4">
+        <div className="bg-muted size-2 animate-pulse rounded-full" />
+        <div className="bg-muted h-5 w-40 animate-pulse rounded" />
+      </div>
+      <ul className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <li
             key={index}
-            className="bg-card flex h-52 flex-col gap-4 rounded-xl border p-6"
+            className="bg-card flex h-72 flex-col gap-4 overflow-hidden rounded-2xl border p-5"
           >
-            <div className="flex items-start gap-3">
-              <div className="bg-muted size-11 shrink-0 animate-pulse rounded-xl" />
-              <div className="flex-1 space-y-2">
-                <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
-                <div className="bg-muted h-4 w-20 animate-pulse rounded-full" />
-              </div>
+            <div className="bg-muted h-5 w-28 animate-pulse rounded-full" />
+            <div className="bg-muted h-5 w-3/4 animate-pulse rounded" />
+            <div className="bg-muted/70 mt-1 h-20 w-full animate-pulse rounded-xl" />
+            <div className="mt-auto space-y-2 border-t pt-4">
+              <div className="bg-muted h-9 w-full animate-pulse rounded-lg" />
+              <div className="bg-muted h-9 w-full animate-pulse rounded-lg" />
             </div>
-            <div className="bg-muted h-3 w-full animate-pulse rounded" />
-            <div className="bg-muted mt-auto h-9 w-full animate-pulse rounded-md" />
           </li>
         ))}
       </ul>

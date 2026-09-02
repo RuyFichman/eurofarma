@@ -39,16 +39,18 @@ export function UnitCard({ unit }: UnitCardProps) {
   const hours = readableOpeningHours(unit.openingHours)
 
   return (
-    <Card className="border-border/80 hover:border-primary/40 flex h-full flex-col gap-4 p-5 shadow-sm transition-colors">
-      <div className="flex flex-1 flex-col gap-4">
-        <div className="space-y-2">
-          <h3 className="text-base leading-snug font-semibold">{unit.name}</h3>
+    <Card className="border-border/80 hover:border-primary/30 flex h-full flex-col gap-0 overflow-hidden rounded-2xl py-0 shadow-sm transition-[border-color,box-shadow] hover:shadow-md">
+      <div className="flex flex-1 flex-col p-5 md:p-6">
+        <div>
           <Badge variant="secondary" className="w-fit">
             {COPY.typeLabels[unit.type]}
           </Badge>
+          <h3 className="mt-3 text-lg leading-snug font-semibold text-balance">
+            {unit.name}
+          </h3>
         </div>
 
-        <div className="text-muted-foreground space-y-2 text-sm">
+        <div className="bg-muted/45 border-border/60 text-muted-foreground mt-5 space-y-3 rounded-xl border p-4 text-sm">
           <p className="flex items-start gap-2">
             <MapPin
               className="text-primary mt-0.5 size-4 shrink-0"
@@ -71,27 +73,18 @@ export function UnitCard({ unit }: UnitCardProps) {
             </span>
           </p>
         </div>
-
-        {unit.contact.hasWhatsapp || unit.contact.hasPhone ? (
-          <div className="flex flex-wrap gap-2">
-            {unit.contact.hasWhatsapp ? (
-              <Badge variant="outline">{COPY.whatsappAvailable}</Badge>
-            ) : null}
-            {unit.contact.hasPhone ? (
-              <Badge variant="outline">{COPY.phoneAvailable}</Badge>
-            ) : null}
-          </div>
-        ) : null}
       </div>
 
-      <UnitCardActions
-        unitId={unit.id}
-        slug={unit.slug}
-        unitName={unit.name}
-        phone={unit.contact.phone}
-        whatsapp={unit.contact.whatsapp}
-        whatsappMessage={unit.whatsappMessage}
-      />
+      <div className="bg-muted/20 border-t p-4">
+        <UnitCardActions
+          unitId={unit.id}
+          slug={unit.slug}
+          unitName={unit.name}
+          phone={unit.contact.phone}
+          whatsapp={unit.contact.whatsapp}
+          whatsappMessage={unit.whatsappMessage}
+        />
+      </div>
     </Card>
   )
 }

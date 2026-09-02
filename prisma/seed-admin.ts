@@ -87,7 +87,7 @@ async function upsertPublicUser(
     create: {
       id: authUserId,
       email,
-      fullName: 'Admin Lactare (inicial)',
+      fullName: 'Admin NutriLink (inicial)',
       role: 'ADMIN',
       isActive: true,
     },
