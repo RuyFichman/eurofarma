@@ -145,12 +145,25 @@ export const HOME = {
 } as const
 
 export const ABOUT = {
-  hero: {
+  meta: {
     title: 'Sobre o Lactare',
     description:
+      'Conheça a história do Lactare, programa de doação de leite humano que já mobilizou mais de 12 mil doadoras no Brasil.',
+  },
+  hero: {
+    eyebrow: 'Sobre o Lactare',
+    title: 'Uma ponte digital entre quem quer doar e quem precisa.',
+    description:
       'Uma iniciativa que conecta vidas há 6 anos, mobilizando nutrizes e bancos de leite humano por todo o Brasil.',
+    impactLabel: 'Impacto construído em rede',
+    impact: [
+      { value: '6 anos', label: 'de jornada' },
+      { value: '+12,4 mil', label: 'doadoras mobilizadas' },
+      { value: '+5 mil', label: 'bebês beneficiados' },
+    ],
   },
   history: {
+    eyebrow: 'Nossa essência',
     title: 'Nossa história',
     paragraphs: [
       'O Lactare nasceu como um programa institucional da Eurofarma, com o propósito de apoiar os bancos de leite humano e fortalecer a cultura de doação de leite materno no Brasil.',
@@ -159,12 +172,16 @@ export const ABOUT = {
     ],
   },
   mission: {
-    title: 'Missão',
+    eyebrow: 'O que nos move',
+    title: 'Nossa missão',
     quote:
       'Garantir que toda nutriz no Brasil tenha acesso fácil, acolhedor e informado aos bancos de leite humano, ampliando o impacto da doação de leite materno e salvando mais vidas.',
   },
   timeline: {
+    eyebrow: 'Nossa trajetória',
     title: 'Marcos da jornada',
+    description:
+      'Um programa que cresceu com propósito e agora ganha novas possibilidades no ambiente digital.',
     milestones: [
       {
         year: '2019',
@@ -191,6 +208,7 @@ export const ABOUT = {
     ],
   },
   partners: {
+    eyebrow: 'Construído em conjunto',
     title: 'Parceiros institucionais',
     description:
       'Trabalhamos lado a lado com a Rede Brasileira de Bancos de Leite Humano (rBLH), hospitais públicos e privados, maternidades e organizações de saúde em todo o Brasil.',
