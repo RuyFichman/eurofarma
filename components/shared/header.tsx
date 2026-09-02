@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Logo } from '@/components/shared/logo'
+import { HeaderAccount } from '@/components/shared/header-account'
 import { A11Y, NAV } from '@/lib/i18n/pt-br'
 
 function isActive(pathname: string, href: string): boolean {
@@ -66,7 +67,10 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {/* Atalho de conta — Client, para as páginas públicas seguirem estáticas */}
+          <HeaderAccount />
+
           {/* CTA sempre visível */}
           <Button asChild size="sm">
             <Link href={NAV.cta.href}>

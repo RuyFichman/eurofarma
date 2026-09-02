@@ -754,6 +754,115 @@ export const SIGNUP = {
   },
 } as const
 
+/**
+ * Copy das telas de sessão da nutriz (Sprint 6.3): entrar, redefinir senha e a
+ * área protegida. Separada de `ADMIN_LOGIN` de propósito — o tom aqui é o do
+ * público (Princípio 9), não o do painel.
+ */
+export const NUTRIZ_AUTH = {
+  login: {
+    meta: {
+      title: 'Entrar',
+      description:
+        'Acesse sua conta do NutriLink para acompanhar seu agendamento de doação de leite humano.',
+    },
+    backToHome: 'Voltar ao início',
+    heading: 'Que bom te ver de novo',
+    subtitle: 'Entre para acompanhar seu agendamento e sua jornada de doação.',
+    fields: {
+      email: { label: 'E-mail', placeholder: 'voce@email.com' },
+      password: { label: 'Senha', placeholder: 'Sua senha' },
+    },
+    actions: {
+      submit: 'Entrar',
+      submitting: 'Entrando...',
+      forgotPassword: 'Esqueci minha senha',
+      sendingReset: 'Enviando...',
+      showPassword: 'Mostrar senha',
+      hidePassword: 'Ocultar senha',
+      signupLead: 'Ainda não tem conta?',
+      signupLink: 'Criar cadastro',
+    },
+    feedback: {
+      // Genérica por segurança: nunca diz se o problema foi o e-mail ou a senha.
+      invalidCredentials: 'E-mail ou senha inválidos.',
+      genericError:
+        'Não foi possível entrar agora. Tente novamente em alguns minutos.',
+      rateLimited:
+        'Muitas tentativas de acesso. Tente novamente em alguns minutos.',
+      // Igual exista ou não a conta (anti-enumeração).
+      resetSuccess:
+        'Se este e-mail estiver cadastrado, enviaremos instruções para redefinir a senha.',
+      resetError:
+        'Não foi possível enviar as instruções agora. Tente novamente em alguns minutos.',
+      resetNeedsEmail: 'Informe um e-mail válido para redefinir a senha.',
+    },
+    validation: {
+      emailRequired: 'Informe seu e-mail.',
+      emailInvalid: 'E-mail inválido.',
+      passwordRequired: 'Informe sua senha.',
+      passwordMin: 'A senha deve ter pelo menos 8 caracteres.',
+      passwordMax: 'A senha deve ter no máximo 128 caracteres.',
+    },
+    ariaLabels: { form: 'Formulário de acesso da nutriz' },
+  },
+  newPassword: {
+    meta: {
+      title: 'Redefinir senha',
+      description: 'Defina uma nova senha para sua conta do NutriLink.',
+    },
+    heading: 'Criar uma nova senha',
+    subtitle: 'Escolha uma senha nova para voltar a acessar sua conta.',
+    fields: {
+      password: { label: 'Nova senha', placeholder: 'Pelo menos 8 caracteres' },
+      passwordConfirm: {
+        label: 'Confirmar nova senha',
+        placeholder: 'Repita a senha',
+      },
+    },
+    actions: {
+      submit: 'Salvar nova senha',
+      submitting: 'Salvando...',
+      backToLogin: 'Voltar para entrar',
+    },
+    feedback: {
+      // O link do e-mail é o que autentica esta tela; sem ele não há o que fazer.
+      invalidLink:
+        'Este link de redefinição expirou ou já foi usado. Peça um novo na tela de acesso.',
+      genericError:
+        'Não foi possível salvar a nova senha agora. Tente novamente em alguns minutos.',
+      success: 'Senha atualizada. Você já pode entrar com ela.',
+    },
+    validation: {
+      passwordMin: 'A senha deve ter pelo menos 8 caracteres.',
+      passwordMax: 'A senha deve ter no máximo 128 caracteres.',
+      passwordMismatch: 'As senhas não conferem.',
+    },
+    ariaLabels: { form: 'Formulário de nova senha' },
+  },
+  area: {
+    meta: {
+      title: 'Meu agendamento',
+      description: 'Acompanhe seu agendamento de doação de leite humano.',
+    },
+    // {firstName} é substituído no componente.
+    greetingTemplate: 'Olá, {firstName}!',
+    subtitle: 'Sua saúde e a do seu bebê importam 💙',
+    badge: 'Área da nutriz',
+    empty: {
+      title: 'Você ainda não tem agendamento por aqui',
+      body: 'Quando você combinar uma visita com um banco de leite e nos contar pelo WhatsApp, os detalhes aparecem nesta página.',
+      searchCta: 'Encontrar banco de leite',
+      howCta: 'Ver como funciona a doação',
+    },
+    logout: 'Sair',
+  },
+  header: {
+    login: 'Entrar',
+    account: 'Meu agendamento',
+  },
+} as const
+
 export const THANKS = {
   meta: {
     title: 'Cadastro concluído',
