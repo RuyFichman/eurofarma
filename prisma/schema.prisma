@@ -44,6 +44,37 @@ enum AuditAction {
   DELETE
 }
 
+/// Situação de um agendamento **autodeclarado** pela nutriz no chatbot. A
+/// plataforma não confirma nada: quem marcou foi a unidade, por fora. Por isso
+/// não existe `CONFIRMED` — a interface diz "informado por você", nunca
+/// "confirmado pelo banco de leite" (ver seção 13 do AGENTS.md).
+enum AppointmentStatus {
+  DECLARED
+  NOT_SCHEDULED
+  CANCELLED
+  COMPLETED
+}
+
+/// Motivo de a nutriz não ter conseguido agendar. Lista fechada porque é
+/// respondida por botões no WhatsApp, não por texto livre.
+enum AppointmentFailureReason {
+  NO_ANSWER
+  NO_SLOT
+  TOO_FAR
+  GAVE_UP
+  OTHER
+}
+
+/// Passo da conversa do chatbot. O webhook é sem estado próprio: o passo atual
+/// mora no banco, indexado pelo número de WhatsApp.
+enum WhatsappConversationStep {
+  ASKED_SCHEDULED
+  AWAITING_DATE
+  AWAITING_DATE_CONFIRMATION
+  AWAITING_FAILURE_REASON
+  FINISHED
+}
+
 model User {
   id          String    @id @default(uuid())
   email       String    @unique
@@ -64,8 +95,14 @@ model User {
 
 model NutrizProfile {
   id                String            @id @default(uuid())
+  /// `id` do usuário em `auth.users` (Supabase Auth), quando a nutriz tem conta.
+  /// Nulo para quem se cadastrou só como lead. **Não** usa a tabela `users`, que
+  /// é do staff (ADMIN/VIEWER) e é o que o `requireAdminUser()` consulta.
+  authUserId        String?           @unique @map("auth_user_id")
   fullName          String            @map("full_name")
-  phoneWhatsapp     String            @map("phone_whatsapp")
+  /// Único porque é o identificador da nutriz no chatbot: o webhook resolve o
+  /// perfil a partir do número que enviou a mensagem.
+  phoneWhatsapp     String            @unique @map("phone_whatsapp")
   email             String?
   state             String            @db.Char(2)
   city              String
@@ -81,9 +118,10 @@ model NutrizProfile {
 
   contactIntents ContactIntent[]
   whatsappClicks WhatsappClick[]
+  appointments   Appointment[]
+  conversations  WhatsappConversation[]
 
   @@index([state, city, createdAt])
-  @@index([phoneWhatsapp])
   @@map("nutriz_profiles")
 }
 
@@ -116,6 +154,7 @@ model Unit {
   adminResponsible User?           @relation("AdminResponsible", fields: [adminResponsibleId], references: [id])
   contactIntents   ContactIntent[]
   whatsappClicks   WhatsappClick[]
+  appointments     Appointment[]
 
   @@index([addressState, addressCity, status])
   @@index([status])
@@ -153,6 +192,50 @@ model WhatsappClick {
 
   @@index([createdAt, unitId])
   @@map("whatsapp_clicks")
+}
+
+/// Agendamento que a nutriz marcou **diretamente com a unidade** e depois
+/// informou ao chatbot. `unitId` é opcional porque ela pode não dizer com qual
+/// banco falou; `scheduledAt` é nulo quando a resposta foi "não consegui", caso
+/// em que `failureReason` explica o quê.
+model Appointment {
+  id              String                    @id @default(uuid())
+  reference       String                    @unique
+  nutrizProfileId String                    @map("nutriz_profile_id")
+  unitId          String?                   @map("unit_id")
+  status          AppointmentStatus         @default(DECLARED)
+  scheduledAt     DateTime?                 @map("scheduled_at")
+  failureReason   AppointmentFailureReason? @map("failure_reason")
+  declaredAt      DateTime                  @default(now()) @map("declared_at")
+  cancelledAt     DateTime?                 @map("cancelled_at")
+  createdAt       DateTime                  @default(now()) @map("created_at")
+  updatedAt       DateTime                  @updatedAt @map("updated_at")
+
+  nutrizProfile NutrizProfile @relation(fields: [nutrizProfileId], references: [id])
+  unit          Unit?         @relation(fields: [unitId], references: [id])
+
+  @@index([nutrizProfileId, scheduledAt])
+  @@index([status, scheduledAt])
+  @@map("appointments")
+}
+
+/// Estado da conversa do chatbot, chaveado pelo número. Fica separado de
+/// `NutrizProfile` porque o bot também recebe mensagem de quem nunca se
+/// cadastrou — nesse caso `nutrizProfileId` é nulo.
+model WhatsappConversation {
+  id               String                   @id @default(uuid())
+  phoneWhatsapp    String                   @unique @map("phone_whatsapp")
+  nutrizProfileId  String?                  @map("nutriz_profile_id")
+  step             WhatsappConversationStep @default(ASKED_SCHEDULED)
+  /// Data que a nutriz digitou e ainda não confirmou no passo seguinte.
+  draftScheduledAt DateTime?                @map("draft_scheduled_at")
+  lastMessageAt    DateTime                 @default(now()) @map("last_message_at")
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
+
+  nutrizProfile NutrizProfile? @relation(fields: [nutrizProfileId], references: [id])
+
+  @@map("whatsapp_conversations")
 }
 
 model EducationalContent {
