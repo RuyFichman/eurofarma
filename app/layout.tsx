@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { Inter } from 'next/font/google'
+
+import { SITE } from '@/lib/i18n/pt-br'
+
 import './globals.css'
 
 const inter = Inter({
@@ -10,9 +13,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Lactare Digital',
-  description:
-    'Conectamos nutrizes a bancos de leite humano e pontos de coleta no Brasil.',
+  title: `${SITE.name} Digital`,
+  description: SITE.description,
 }
 
 export default function RootLayout({

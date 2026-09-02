@@ -1,9 +1,9 @@
 export const SITE = {
-  name: 'Lactare',
+  name: 'NutriLink',
   tagline: 'Conectando vidas através do leite humano.',
   description:
     'Plataforma digital que conecta nutrizes a bancos de leite humano e pontos de coleta no Brasil.',
-  credits: 'Uma iniciativa Lactare · Eurofarma',
+  credits: 'Uma iniciativa NutriLink · Eurofarma',
   partnerCredit: 'Desenvolvido em parceria com FIAP',
 } as const
 
@@ -34,15 +34,15 @@ export const FOOTER = {
   links: {
     privacy: { label: 'Política de Privacidade', href: '/privacidade' },
     terms: { label: 'Termos de Uso', href: '/termos' },
-    about: { label: 'Sobre o Lactare', href: '/sobre' },
+    about: { label: 'Sobre o NutriLink', href: '/sobre' },
     howItWorks: { label: 'Como funciona', href: '/como-funciona' },
     findBank: { label: 'Encontrar banco de leite', href: '/buscar' },
   },
   contact: {
     title: 'Contato institucional',
-    placeholder: 'contato@lactare.com.br',
+    placeholder: 'contato@nutrilink.com.br',
   },
-  copyright: `© ${new Date().getFullYear()} Lactare. Todos os direitos reservados.`,
+  copyright: `© ${new Date().getFullYear()} NutriLink. Todos os direitos reservados.`,
 } as const
 
 export const HOME = {
@@ -52,7 +52,7 @@ export const HOME = {
     titleHighlight: 'presente de vida',
     titleTail: 'para quem mais precisa',
     description:
-      'O Lactare conecta nutrizes aos bancos de leite humano da rBLH e torna a doação de leite materno mais simples, segura e acolhedora.',
+      'O NutriLink conecta nutrizes aos bancos de leite humano da rBLH e torna a doação de leite materno mais simples, segura e acolhedora.',
     primaryCta: { label: 'Encontrar banco de leite', href: '/buscar' },
     secondaryCta: { label: 'Como funciona', href: '/como-funciona' },
     trust: [
@@ -78,12 +78,12 @@ export const HOME = {
   },
   network: {
     eyebrow: 'Conheça a rede',
-    title: 'Quem faz parte do Lactare?',
+    title: 'Quem faz parte do NutriLink?',
     subtitle:
-      'O Lactare é o elo digital entre a nutriz e a maior rede de bancos de leite humano do Brasil.',
+      'O NutriLink é o elo digital entre a nutriz e a maior rede de bancos de leite humano do Brasil.',
     cards: [
       {
-        title: 'O que é o Lactare?',
+        title: 'O que é o NutriLink?',
         description:
           'É a plataforma que aproxima você do banco de leite mais perto. Em poucos cliques, você encontra a unidade certa e fala com ela pelo WhatsApp.',
         items: [
@@ -146,12 +146,12 @@ export const HOME = {
 
 export const ABOUT = {
   meta: {
-    title: 'Sobre o Lactare',
+    title: 'Sobre o NutriLink',
     description:
-      'Conheça a história do Lactare, programa de doação de leite humano que já mobilizou mais de 12 mil doadoras no Brasil.',
+      'Conheça a história do NutriLink, programa de doação de leite humano que já mobilizou mais de 12 mil doadoras no Brasil.',
   },
   hero: {
-    eyebrow: 'Sobre o Lactare',
+    eyebrow: 'Sobre o NutriLink',
     title: 'Uma ponte digital entre quem quer doar e quem precisa.',
     description:
       'Uma iniciativa que conecta vidas há 6 anos, mobilizando nutrizes e bancos de leite humano por todo o Brasil.',
@@ -166,9 +166,9 @@ export const ABOUT = {
     eyebrow: 'Nossa essência',
     title: 'Nossa história',
     paragraphs: [
-      'O Lactare nasceu como um programa institucional da Eurofarma, com o propósito de apoiar os bancos de leite humano e fortalecer a cultura de doação de leite materno no Brasil.',
+      'O NutriLink nasceu como um programa institucional da Eurofarma, com o propósito de apoiar os bancos de leite humano e fortalecer a cultura de doação de leite materno no Brasil.',
       'Em 6 anos de jornada, o programa mobilizou mais de 12.400 doadoras e ajudou a beneficiar mais de 5.000 bebês prematuros com leite humano doado — cada gota representa uma vida amparada em um momento decisivo.',
-      'Com o Lactare Digital, ampliamos esse alcance por meio de canais digitais, aproximando ainda mais as nutrizes dos bancos de leite e tornando a doação simples, acolhedora e ao alcance de todas.',
+      'Com o NutriLink Digital, ampliamos esse alcance por meio de canais digitais, aproximando ainda mais as nutrizes dos bancos de leite e tornando a doação simples, acolhedora e ao alcance de todas.',
     ],
   },
   mission: {
@@ -185,7 +185,8 @@ export const ABOUT = {
     milestones: [
       {
         year: '2019',
-        description: 'Início do programa Lactare como iniciativa institucional',
+        description:
+          'Início do programa NutriLink como iniciativa institucional',
       },
       {
         year: '2020',
@@ -203,7 +204,7 @@ export const ABOUT = {
       {
         year: '2025',
         description:
-          'Lançamento do Lactare Digital, ampliando o alcance via web e WhatsApp',
+          'Lançamento do NutriLink Digital, ampliando o alcance via web e WhatsApp',
       },
     ],
   },
@@ -226,10 +227,10 @@ export const CONTENT = {
   meta: {
     title: 'Conteúdos',
     description:
-      'Espaço educativo do Lactare: guias, vídeos e dúvidas frequentes para acompanhar cada etapa da sua jornada como nutriz, da primeira dúvida à primeira doação.',
+      'Espaço educativo do NutriLink: guias, vídeos e dúvidas frequentes para acompanhar cada etapa da sua jornada como nutriz, da primeira dúvida à primeira doação.',
   },
   hero: {
-    badge: 'Espaço Educativo Lactare',
+    badge: 'Espaço Educativo NutriLink',
     titleLead: 'Tudo que você precisa saber',
     titleHighlight: 'para cuidar e compartilhar',
     description:
@@ -399,7 +400,7 @@ export const CONTENT = {
       {
         role: 'Doadora',
         quote:
-          'Tinha muito leite sobrando e não sabia o que fazer. Uma amiga me indicou o Lactare. Em menos de uma semana já estava cadastrada e fazendo minha primeira coleta. É gratificante demais.',
+          'Tinha muito leite sobrando e não sabia o que fazer. Uma amiga me indicou o NutriLink. Em menos de uma semana já estava cadastrada e fazendo minha primeira coleta. É gratificante demais.',
         name: 'Fernanda Costa',
         detail: 'Doadora voluntária — Campinas, SP',
       },
@@ -474,7 +475,7 @@ export const SEARCH = {
       whatsappButton: 'WhatsApp',
       detailsButton: 'Ver detalhes',
       defaultWhatsappMessage:
-        'Olá! Vim pelo site do Lactare e gostaria de saber mais sobre doação de leite humano.',
+        'Olá! Vim pelo site do NutriLink e gostaria de saber mais sobre doação de leite humano.',
       // {unitName} é substituído no componente.
       ariaLabels: {
         phone: 'Ligar para {unitName}',
@@ -564,12 +565,12 @@ export const SEARCH = {
 
 export const UNIT_DETAIL = {
   seo: {
-    titleSuffix: 'Lactare',
+    titleSuffix: 'NutriLink',
     descriptionTemplate:
-      'Veja endereço, telefone, WhatsApp e orientações para contato com {unitName}, banco de leite ou ponto de coleta no Lactare.',
+      'Veja endereço, telefone, WhatsApp e orientações para contato com {unitName}, banco de leite ou ponto de coleta no NutriLink.',
     notFoundTitle: 'Unidade não encontrada',
     notFoundDescription:
-      'A unidade que você tentou acessar não foi encontrada ou não está disponível no Lactare.',
+      'A unidade que você tentou acessar não foi encontrada ou não está disponível no NutriLink.',
   },
   breadcrumb: {
     home: 'Início',
@@ -631,10 +632,10 @@ export const UNIT_DETAIL = {
   },
   whatsapp: {
     defaultMessage:
-      'Olá! Vim pelo site do Lactare e gostaria de saber mais sobre doação de leite humano.',
+      'Olá! Vim pelo site do NutriLink e gostaria de saber mais sobre doação de leite humano.',
   },
   report: {
-    email: 'contato@lactare.local',
+    email: 'contato@nutrilink.local',
     // {unitName} é substituído no componente.
     subjectTemplate: 'Informação incorreta - {unitName}',
   },
@@ -644,7 +645,7 @@ export const SIGNUP = {
   meta: {
     title: 'Criar cadastro',
     description:
-      'Cadastre-se no Lactare para começar sua jornada de doação de leite humano. Coleta mínima de dados, em conformidade com a LGPD.',
+      'Cadastre-se no NutriLink para começar sua jornada de doação de leite humano. Coleta mínima de dados, em conformidade com a LGPD.',
   },
   hero: {
     quote: 'Cada gota de leite humano doado é um ato de amor que salva vidas.',
@@ -702,7 +703,7 @@ export const SIGNUP = {
     terms: 'Termos de Uso',
     middle: 'e a',
     privacy: 'Política de Privacidade',
-    tail: 'do Lactare, em conformidade com a LGPD.',
+    tail: 'do NutriLink, em conformidade com a LGPD.',
   },
   api: {
     errorTitle: 'Não foi possível concluir o cadastro.',
@@ -720,7 +721,7 @@ export const THANKS = {
   meta: {
     title: 'Cadastro concluído',
     description:
-      'Recebemos seu cadastro no Lactare. Em breve um banco de leite humano falará com você pelo WhatsApp para combinar os próximos passos da doação.',
+      'Recebemos seu cadastro no NutriLink. Em breve um banco de leite humano falará com você pelo WhatsApp para combinar os próximos passos da doação.',
   },
   badge: 'Cadastro recebido',
   title: 'Obrigada por fazer parte dessa rede de amor 💙',
@@ -741,16 +742,16 @@ export const ADMIN_LOGIN = {
   seo: {
     title: 'Entrar no painel admin',
     description:
-      'Acesse o painel administrativo do Lactare para gerenciar unidades, conteúdos e indicadores.',
+      'Acesse o painel administrativo do NutriLink para gerenciar unidades, conteúdos e indicadores.',
   },
   brand: {
-    name: 'Lactare Admin',
+    name: 'NutriLink Admin',
     eyebrow: 'Área administrativa',
   },
   hero: {
     title: 'Entrar no painel',
     description:
-      'Acesse com seu email e senha para gerenciar unidades, conteúdos e indicadores do Lactare.',
+      'Acesse com seu email e senha para gerenciar unidades, conteúdos e indicadores do NutriLink.',
     restrictedNotice: 'Acesso restrito à equipe autorizada.',
   },
   form: {
@@ -797,9 +798,9 @@ export const ADMIN_LOGIN = {
 /** Copy do shell administrativo (sidebar, header, navegação, conta). */
 export const ADMIN_LAYOUT = {
   brand: {
-    name: 'Lactare',
+    name: 'NutriLink',
     area: 'Admin',
-    fullName: 'Lactare Admin',
+    fullName: 'NutriLink Admin',
   },
   navigation: {
     label: 'Navegação administrativa',
@@ -837,8 +838,8 @@ export const ADMIN_LAYOUT = {
 export const ADMIN = {
   dashboard: {
     seo: {
-      title: 'Dashboard | Lactare Admin',
-      description: 'Painel administrativo do Lactare Digital.',
+      title: 'Dashboard | NutriLink Admin',
+      description: 'Painel administrativo do NutriLink Digital.',
     },
     title: 'Dashboard',
     description:
@@ -928,21 +929,21 @@ export const ADMIN = {
   },
   units: {
     seo: {
-      title: 'Unidades | Lactare Admin',
+      title: 'Unidades | NutriLink Admin',
       description:
-        'Gerencie os bancos de leite, pontos de coleta e demais unidades do Lactare.',
+        'Gerencie os bancos de leite, pontos de coleta e demais unidades do NutriLink.',
     },
     title: 'Unidades',
     description:
-      'Gerencie bancos de leite, pontos de coleta e demais unidades disponíveis no Lactare.',
+      'Gerencie bancos de leite, pontos de coleta e demais unidades disponíveis no NutriLink.',
     createAction: 'Nova unidade',
 
     /** Formulário de cadastro/edição de unidade (Sprint 5.7). */
     form: {
       create: {
         seo: {
-          title: 'Nova unidade | Lactare Admin',
-          description: 'Cadastre uma nova unidade na rede do Lactare.',
+          title: 'Nova unidade | NutriLink Admin',
+          description: 'Cadastre uma nova unidade na rede do NutriLink.',
         },
         title: 'Nova unidade',
         description:
@@ -952,8 +953,8 @@ export const ADMIN = {
 
       edit: {
         seo: {
-          title: 'Editar unidade | Lactare Admin',
-          description: 'Atualize os dados de uma unidade da rede do Lactare.',
+          title: 'Editar unidade | NutriLink Admin',
+          description: 'Atualize os dados de uma unidade da rede do NutriLink.',
         },
         title: 'Editar unidade',
         description:
@@ -1001,7 +1002,7 @@ export const ADMIN = {
         },
         publication: {
           title: 'Publicação',
-          description: 'Defina a situação da unidade dentro do Lactare.',
+          description: 'Defina a situação da unidade dentro do NutriLink.',
         },
       },
 
@@ -1150,7 +1151,7 @@ export const ADMIN = {
     },
 
     table: {
-      caption: 'Unidades cadastradas no Lactare',
+      caption: 'Unidades cadastradas no NutriLink',
       columns: {
         unit: 'Unidade',
         type: 'Tipo',
@@ -1202,7 +1203,7 @@ export const ADMIN = {
       database: {
         title: 'Nenhuma unidade cadastrada',
         description:
-          'Cadastre o primeiro banco de leite ou ponto de coleta para disponibilizá-lo no Lactare.',
+          'Cadastre o primeiro banco de leite ou ponto de coleta para disponibilizá-lo no NutriLink.',
         action: 'Cadastrar primeira unidade',
       },
       filtered: {
@@ -1215,8 +1216,8 @@ export const ADMIN = {
   },
   nutrizes: {
     seo: {
-      title: 'Nutrizes | Lactare Admin',
-      description: 'Acompanhe as nutrizes cadastradas no Lactare.',
+      title: 'Nutrizes | NutriLink Admin',
+      description: 'Acompanhe as nutrizes cadastradas no NutriLink.',
     },
     title: 'Nutrizes',
     description:
@@ -1246,7 +1247,7 @@ export const ADMIN = {
     },
 
     table: {
-      caption: 'Nutrizes cadastradas no Lactare',
+      caption: 'Nutrizes cadastradas no NutriLink',
       columns: {
         nutriz: 'Nutriz',
         location: 'Localização',
@@ -1312,7 +1313,7 @@ export const ADMIN = {
   },
   noAccess: {
     seo: {
-      title: 'Acesso restrito | Lactare Admin',
+      title: 'Acesso restrito | NutriLink Admin',
       description: 'Esta conta não tem permissão para acessar o painel.',
     },
     title: 'Esta conta não tem acesso ao painel',
@@ -1324,7 +1325,7 @@ export const ADMIN = {
 export const A11Y = {
   skipToContent: 'Ir para o conteúdo principal',
   navMenu: 'Menu de navegação',
-  logoHome: 'Lactare - Ir para página inicial',
+  logoHome: 'NutriLink - Ir para página inicial',
 } as const
 
 export type NavItem = (typeof NAV.items)[number]

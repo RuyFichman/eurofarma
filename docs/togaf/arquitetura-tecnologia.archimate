@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Lactare Digital - Arquitetura de Tecnologia (TOGAF Fase D)" id="id-model-lactare-tech" version="5.0.0">
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="NutriLink Digital - Arquitetura de Tecnologia (TOGAF Fase D)" id="id-model-nutrilink-tech" version="5.0.0">
   <folder name="Strategy" id="id-folder-strategy" type="strategy"/>
   <folder name="Business" id="id-folder-business" type="business"/>
   <folder name="Application" id="id-folder-application" type="application"/>
@@ -14,7 +14,7 @@
     <element xsi:type="archimate:SystemSoftware" name="Vercel Edge Network / CDN&#xA;(assets estaticos + SSR)" id="el-sw-vercel-edge"/>
     <element xsi:type="archimate:Node" name="Application Server&#xA;(Vercel Functions / Fluid Compute)" id="el-node-app"/>
     <element xsi:type="archimate:SystemSoftware" name="Node.js 22 + Next.js 15&#xA;(RSC, Route Handlers, Prisma Client)" id="el-sw-node-next"/>
-    <element xsi:type="archimate:Artifact" name="App Lactare (bundle deployado)&#xA;route groups (public) e (admin)" id="el-art-bundle"/>
+    <element xsi:type="archimate:Artifact" name="App NutriLink (bundle deployado)&#xA;route groups (public) e (admin)" id="el-art-bundle"/>
     <element xsi:type="archimate:Node" name="Database Server&#xA;(Supabase)" id="el-node-db"/>
     <element xsi:type="archimate:SystemSoftware" name="PostgreSQL + PgBouncer (pooler :6543)&#xA;+ Supabase Auth" id="el-sw-postgres"/>
     <element xsi:type="archimate:Node" name="WhatsApp&#xA;(servico externo de mensageria - wa.me)" id="el-node-whatsapp"/>
@@ -42,7 +42,7 @@
     <element xsi:type="archimate:ServingRelationship" id="rel-serv-gmaps-app" name="API de mapas / geocoding" source="el-node-gmaps" target="el-node-app"/>
   </folder>
   <folder name="Views" id="id-folder-views" type="diagrams">
-    <element xsi:type="archimate:ArchimateDiagramModel" name="Camada de Tecnologia - Lactare Digital" id="id-view-tech">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Camada de Tecnologia - NutriLink Digital" id="id-view-tech">
       <child xsi:type="archimate:DiagramObject" id="obj-dev-nutriz" archimateElement="el-dev-nutriz">
         <bounds x="80" y="24" width="220" height="130"/>
         <sourceConnection xsi:type="archimate:Connection" id="conn-net1" source="obj-dev-nutriz" target="obj-net-internet" archimateRelationship="rel-assoc-nutriz-net"/>

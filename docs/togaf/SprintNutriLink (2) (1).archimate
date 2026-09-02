@@ -5,7 +5,7 @@
     <element xsi:type="archimate:BusinessObject" name="Recepcionar e cadastrar a Nutriz" id="id-13331466eaf948d8ad240b03966dcd8c"/>
     <element xsi:type="archimate:BusinessEvent" name="Nutriz cadastrada e pronta para engajamento" id="id-766b6906afcc479fb430e92a004e7e7f"/>
     <element xsi:type="archimate:BusinessProcess" name="Chegada da Nutriz interessada" id="id-0264c080184b48eaaae64dcc30422c40"/>
-    <element xsi:type="archimate:BusinessProcess" name="Introdução ao projeto Lactare" id="id-7d638255b0854211ba14ee3ff8dbb8d2"/>
+    <element xsi:type="archimate:BusinessProcess" name="Introdução ao projeto NutriLink" id="id-7d638255b0854211ba14ee3ff8dbb8d2"/>
     <element xsi:type="archimate:BusinessProcess" name="Checar se a nutriz tem cadastro" id="id-2918d3b49a604ab58c355a5322e28190"/>
     <element xsi:type="archimate:BusinessCollaboration" name="Existência de cadastro validada" id="id-1a2b26387a8d4a08baf3488491ebb3df"/>
     <element xsi:type="archimate:BusinessProcess" name="Retomar fluxo da conversa" id="id-0934e13831c24f69ae4a5b5287a9aea5"/>
@@ -16,8 +16,8 @@
     <element xsi:type="archimate:BusinessObject" name="Encaminhar nutriz" id="id-6d6acba26f304014be54d88684b81605"/>
     <element xsi:type="archimate:BusinessProcess" name="Orientar sobre triagem e elegibilidade" id="id-b2efb21daee4402eb1db101c8f15735c"/>
     <element xsi:type="archimate:BusinessProcess" name="Verificar Região da Nutriz" id="id-a6c45ca2b0864fe8bc17346a5cea6336"/>
-    <element xsi:type="archimate:BusinessCollaboration" name="Existência de banco do Lactare na região informada" id="id-364b3971178847bc8b9133e4c79a2b83"/>
-    <element xsi:type="archimate:BusinessProcess" name="Encaminhar ao banco do Lactare" id="id-1bd52405f4d94c389a877cba5f574fec"/>
+    <element xsi:type="archimate:BusinessCollaboration" name="Existência de banco do NutriLink na região informada" id="id-364b3971178847bc8b9133e4c79a2b83"/>
+    <element xsi:type="archimate:BusinessProcess" name="Encaminhar ao banco do NutriLink" id="id-1bd52405f4d94c389a877cba5f574fec"/>
     <element xsi:type="archimate:BusinessProcess" name="Encaminhar à rede rBLH mais próxima" id="id-20ffe70ebdee43c6a66630378ccd26ab"/>
     <element xsi:type="archimate:BusinessProcess" name="Enviar orientações sobre o processo" id="id-70144cb481044f66b7bdcbdfcc173e3d"/>
     <element xsi:type="archimate:Contract" name="Registrar Histórico (copy)" id="id-e5bcf867af8841359a21197f159da605"/>
@@ -28,7 +28,7 @@
     <element xsi:type="archimate:BusinessObject" name="Acompanhar Jornada" id="id-a72c0f4d15f842cbafaf603c41aa53e3"/>
     <element xsi:type="archimate:BusinessProcess" name="Identificar tipo de encaminhamento" id="id-e0417230fa744fc98b91e7a05286c088"/>
     <element xsi:type="archimate:BusinessProcess" name="Verificar se houve agendamento de Coleta" id="id-a32870e267b34f3b8f6241135b8bc6c4"/>
-    <element xsi:type="archimate:BusinessCollaboration" name="Checagem de coleta no Sistema Lactare pelo CPF da Nutriz" id="id-1f6afbc79fa741fea601d9b942ed8924"/>
+    <element xsi:type="archimate:BusinessCollaboration" name="Checagem de coleta no Sistema NutriLink pelo CPF da Nutriz" id="id-1f6afbc79fa741fea601d9b942ed8924"/>
     <element xsi:type="archimate:BusinessProcess" name="Informar dados e oferecer lembretes opcionais" id="id-9a163284258e4141a8e928df9abfcc9e"/>
     <element xsi:type="archimate:BusinessProcess" name="Oferecer ajuda para destravar o processo" id="id-9805db9bccf04dcc922501c9bf9debf7"/>
     <element xsi:type="archimate:BusinessProcess" name="Enviar orientações sobre o processo (copy)" id="id-11bf784c3d334f8e9922285199768671"/>
@@ -52,7 +52,7 @@
     <element xsi:type="archimate:BusinessProcess" name="Chatbot resgata jornada com mensagem leve após 2 horas" id="id-b4d3e5989818472ab1e1149ff632569b"/>
     <element xsi:type="archimate:BusinessObject" name="Administrar e monitorar operação" id="id-b3d1957e48154a659767c674ae4904f3"/>
     <element xsi:type="archimate:BusinessProcess" name="Gerenciar base de pontos de coleta" id="id-cbc4274960994d7fb7ed2be342fed1b5"/>
-    <element xsi:type="archimate:BusinessCollaboration" name="Checagem de coleta no Sistema Lactare pelo CPF da Nutriz (copy)" id="id-9973ad0603d74b5b9305e5a28721060c"/>
+    <element xsi:type="archimate:BusinessCollaboration" name="Checagem de coleta no Sistema NutriLink pelo CPF da Nutriz (copy)" id="id-9973ad0603d74b5b9305e5a28721060c"/>
     <element xsi:type="archimate:BusinessProcess" name="Informar dados e oferecer lembretes opcionais (copy)" id="id-d3d98d6fee904dd9a6e9197e6af6ce29"/>
     <element xsi:type="archimate:BusinessProcess" name="Oferecer ajuda para destravar o processo (copy)" id="id-8fbbab86cd724db39b899dd6d61dcf8f"/>
     <element xsi:type="archimate:BusinessProcess" name="Registrar Status da jornada da Nutriz (copy)" id="id-e75ed42ca43d4e6abf406597d91c6804"/>
@@ -60,8 +60,8 @@
     <element xsi:type="archimate:BusinessEvent" name="Ações de melhoria definidas" id="id-2c9d98beb5114074a4caf5a015cbb0ae"/>
     <element xsi:type="archimate:BusinessEvent" name="Ações de melhoria definidas" id="id-80b4ac4a8c1f402487c918e6ca84cd02"/>
     <element xsi:type="archimate:BusinessEvent" name="Equipe acessa o painel administartivo" id="id-4e2e4dabdc8e46b6bb1536a60f200e36"/>
-    <element xsi:type="archimate:BusinessActor" name="Equipe Operacional Lactare" id="id-3407824fcaa347aa9d94a53730515d5b"/>
-    <element xsi:type="archimate:BusinessActor" name="Coordenador Lactare" id="id-4d81830e7cbc4bf9bc9d675d676cafa0"/>
+    <element xsi:type="archimate:BusinessActor" name="Equipe Operacional NutriLink" id="id-3407824fcaa347aa9d94a53730515d5b"/>
+    <element xsi:type="archimate:BusinessActor" name="Coordenador NutriLink" id="id-4d81830e7cbc4bf9bc9d675d676cafa0"/>
     <element xsi:type="archimate:BusinessProcess" name="Consultar indicadores de alcance, engajamento e conversão" id="id-e53d88543a1a46f89aa6e9a598ea693f"/>
     <element xsi:type="archimate:BusinessProcess" name="Resgistrar confirmação de doações efetivas" id="id-b5b14dd685f74c8784a130a062663c8f"/>
     <element xsi:type="archimate:BusinessProcess" name="Identificar pontos de abandono na jornada" id="id-c665f0bddd95422b9c369b80fe8d6531"/>
@@ -70,7 +70,7 @@
     <element xsi:type="archimate:BusinessFunction" name="Recepcionar e cadastrar a Nutriz" id="id-74e70377dc1b46c5a25bf1d3584ac4b8"/>
     <element xsi:type="archimate:BusinessCollaboration" name="Existência de cadastro validada" id="id-7fdf8fe61f114b87950b1c0921296575"/>
     <element xsi:type="archimate:Contract" name="Registrar Histórico" id="id-e403073707934db88a91d8e2f0272328"/>
-    <element xsi:type="archimate:BusinessProcess" name="Introdução ao projeto Lactare" id="id-6264a04ec0bf4e6b94f9695a9ce20b12"/>
+    <element xsi:type="archimate:BusinessProcess" name="Introdução ao projeto NutriLink" id="id-6264a04ec0bf4e6b94f9695a9ce20b12"/>
     <element xsi:type="archimate:BusinessProcess" name="Retomar fluxo da conversa" id="id-f6ed8d95e4844800b90a13537624f9f7"/>
     <element xsi:type="archimate:BusinessProcess" name="Coletar dados para cadastro" id="id-2ac9c1b3920141f88e97bf3ec5f5c032"/>
     <element xsi:type="archimate:BusinessProcess" name="Checar se a nutriz tem cadastro" id="id-9fc13519fa1a441fa6d25a10d289614d"/>
@@ -82,34 +82,34 @@
     <element xsi:type="archimate:BusinessCollaboration" name="Identificar se a nutriz prosseguiu para a etapa de encaminhamento" id="id-687e542bf2d94a35959b1202c62123da"/>
     <element xsi:type="archimate:BusinessCollaboration" name="Sugerir plataforma web para aprofundamento (autônoma)" id="id-0097aab3e2354d648d63963d221cb76f"/>
     <element xsi:type="archimate:BusinessFunction" name="Encaminhar nutriz" id="id-546292e1ea2a4e54bac1c2c7252ba54e"/>
-    <element xsi:type="archimate:BusinessCollaboration" name="Existência de banco do Lactare na região informada" id="id-fd89ec7a0ae04a6ea8812aa9e7401d32"/>
+    <element xsi:type="archimate:BusinessCollaboration" name="Existência de banco do NutriLink na região informada" id="id-fd89ec7a0ae04a6ea8812aa9e7401d32"/>
     <element xsi:type="archimate:BusinessProcess" name="Orientar sobre triagem e elegibilidade" id="id-b6890ba80cde4db389a18083961ec76d"/>
     <element xsi:type="archimate:BusinessProcess" name="Apresentar dados do ponto de coleta" id="id-1041ffb110f349fc966b15e7af87ce5f"/>
     <element xsi:type="archimate:BusinessProcess" name="Encaminhar à rede rBLH mais próxima" id="id-017a8953251a414baea2a0bfe88ae9fc"/>
     <element xsi:type="archimate:BusinessProcess" name="Enviar orientações sobre o processo" id="id-e4e38e8ec53d41a28feea072dcdc4a37"/>
     <element xsi:type="archimate:BusinessProcess" name="Verificar Região da Nutriz" id="id-9461050672bc464abeffc3f06953526b"/>
-    <element xsi:type="archimate:BusinessProcess" name="Encaminhar ao banco do Lactare" id="id-b18c775fdbbd4dda9bbfe14f75183483"/>
+    <element xsi:type="archimate:BusinessProcess" name="Encaminhar ao banco do NutriLink" id="id-b18c775fdbbd4dda9bbfe14f75183483"/>
     <element xsi:type="archimate:BusinessFunction" name="Acompanhar jornada" id="id-3825f793ef3d4e1884171f7b29d7b27e"/>
     <element xsi:type="archimate:BusinessProcess" name="Identificar tipo de encaminhamento" id="id-5527a3a399a045449c3aea2d3dcaacc4"/>
     <element xsi:type="archimate:BusinessProcess" name="Oferecer ajuda para destravar o processo" id="id-a4383fea8b4c4501bcb726a34ae917ef"/>
     <element xsi:type="archimate:BusinessProcess" name="Registrar Status da jornada da Nutriz" id="id-7b1bf6c15dec4b71bd05ba0e9177829c"/>
-    <element xsi:type="archimate:BusinessCollaboration" name="Checagem de coleta no Sistema Lactare pelo CPF da Nutriz" id="id-748e3296dfc643c0a1b5cd3be4f0793e"/>
+    <element xsi:type="archimate:BusinessCollaboration" name="Checagem de coleta no Sistema NutriLink pelo CPF da Nutriz" id="id-748e3296dfc643c0a1b5cd3be4f0793e"/>
     <element xsi:type="archimate:BusinessProcess" name="Informar dados e oferecer lembretes opcionais" id="id-2e1a27900b514324b6798d044f2ec581"/>
     <element xsi:type="archimate:BusinessProcess" name="Verificar se houve agendamento de Coleta" id="id-0b9a79f71e4143d288568f362f2aec8b"/>
     <element xsi:type="archimate:BusinessEvent" name="Registrar Agendamento" id="id-e7fd890d57b844499f6866e23e6e9b6f"/>
     <element xsi:type="archimate:BusinessEvent" name="Jornada acompanhada sem retorno" id="id-b3f68b0d92594ec4a583800024c175bf"/>
     <element xsi:type="archimate:BusinessEvent" name="Chegada da Nutriz interessada" id="id-38b3fe1e197c4720b1fb98f26c69fd2a"/>
     <element xsi:type="archimate:BusinessEvent" name="Nutriz cadastrada e pronta para engajamento" id="id-12c699eb1e854c9f9b319248201e08c4"/>
-    <element xsi:type="archimate:BusinessActor" name="Chatbot Lactare" id="id-5b203d85c8bf450ab6a607142335e794"/>
+    <element xsi:type="archimate:BusinessActor" name="Chatbot NutriLink" id="id-5b203d85c8bf450ab6a607142335e794"/>
     <element xsi:type="archimate:BusinessRole" name="Assistente de Cadastro" id="id-5e841534fa96494d9e66ba2a44b226c3"/>
     <element xsi:type="archimate:BusinessRole" name="Agente de Engajamento" id="id-9a087e1ef6cd409eb1675c9dec6a23a5"/>
     <element xsi:type="archimate:BusinessRole" name="Agente de Triagem e Encaminhamento" id="id-295dedbd75f14d238cdb6ca531c4c002"/>
     <element xsi:type="archimate:BusinessRole" name="Assistente de Acompanhamento" id="id-81a11af1df2e4f64bd12bf7f558225d0"/>
     <element xsi:type="archimate:BusinessFunction" name="Administrar e monitorar operação" id="id-696aea9b692e47e4a871144c66bd3f8c"/>
     <element xsi:type="archimate:BusinessActor" name="Web" id="id-8d9bdfd19f8246eeb7acf02da1579903"/>
-    <element xsi:type="archimate:BusinessActor" name="Chatbot Lactare " id="id-0c7cd41214b04f3e9e291f9b3464bc74"/>
-    <element xsi:type="archimate:BusinessActor" name="Chatbot Lactare " id="id-1f98146f5bd144d281431bf18e3152b9"/>
-    <element xsi:type="archimate:BusinessActor" name="Chatbot Lactare " id="id-eb585a678f3f43ea8e166f1295c3123b"/>
+    <element xsi:type="archimate:BusinessActor" name="Chatbot NutriLink " id="id-0c7cd41214b04f3e9e291f9b3464bc74"/>
+    <element xsi:type="archimate:BusinessActor" name="Chatbot NutriLink " id="id-1f98146f5bd144d281431bf18e3152b9"/>
+    <element xsi:type="archimate:BusinessActor" name="Chatbot NutriLink " id="id-eb585a678f3f43ea8e166f1295c3123b"/>
     <element xsi:type="archimate:BusinessActor" name="Web " id="id-725bc33a8e5644dda92a0e5ccfeaa373"/>
     <element xsi:type="archimate:BusinessActor" name="Web " id="id-7386000f51ab4413b5b097d4b9a8a369"/>
   </folder>
@@ -123,7 +123,7 @@
     <element xsi:type="archimate:ApplicationService" name="Gerenciamento da jornada da nutriz" id="id-31f253047e7b4ba79e3e5fc9695ef9e5"/>
     <element xsi:type="archimate:ApplicationInteraction" name="Checagem de local" id="id-15a48ee0daf24001988fc01a681a7bd5"/>
     <element xsi:type="archimate:ApplicationInteraction" name="Agendamento" id="id-8a1327471cbb42289e84aa2942111c86"/>
-    <element xsi:type="archimate:ApplicationInteraction" name="Informações da lactare" id="id-546aea07db7c48a1aeb1462d4a0cc8d4"/>
+    <element xsi:type="archimate:ApplicationInteraction" name="Informações da nutrilink" id="id-546aea07db7c48a1aeb1462d4a0cc8d4"/>
     <element xsi:type="archimate:ApplicationComponent" name="Página Web" id="id-e228eeaa48ca45e593fd778173d27aa3"/>
     <element xsi:type="archimate:ApplicationInterface" name="Chatbot (WhatsApp)" id="id-bbd49054df0d449f9c03fd0edf238d97"/>
     <element xsi:type="archimate:ApplicationService" name="Serviço de acesso dos administradores" id="id-85f7daa1ab104b3bade1011c93fd41dd"/>
@@ -133,7 +133,7 @@
     <element xsi:type="archimate:DataObject" name="Registro de dados cadastrais" id="id-74f896d8f2d142949e9606707798e6fb"/>
     <element xsi:type="archimate:DataObject" name="Registro de agendamento" id="id-dabeef7e0a654cb7b7c351643e4019d3"/>
     <element xsi:type="archimate:DataObject" name="Registro de conversão das notificações" id="id-33eaa5655763436994eb6c7a698cf622"/>
-    <element xsi:type="archimate:ApplicationService" name="Contato da administração da equipe lactare" id="id-dcc6387ccdfb42cea3fc002adf8b042a"/>
+    <element xsi:type="archimate:ApplicationService" name="Contato da administração da equipe nutrilink" id="id-dcc6387ccdfb42cea3fc002adf8b042a"/>
     <element xsi:type="archimate:ApplicationComponent" name="Dashboard da web" id="id-6e31518ee53b489ba447ad0ee50c9f21"/>
     <element xsi:type="archimate:ApplicationInterface" name="Web Interface (ADM)" id="id-39c9f2c0736e487e8b660075d8afcd18"/>
     <element xsi:type="archimate:ApplicationInterface" name="Plataforma web" id="id-fdf068a2cdde477cb9b1377b17758db9"/>
@@ -174,11 +174,11 @@
     <element xsi:type="archimate:SystemSoftware" name="Vercel Edge Network / CDN&#xA;(assets estaticos + SSR)" id="id-d444057b4bda408babfb48d3a5b24864"/>
     <element xsi:type="archimate:Node" name="Application Server&#xA;(Vercel Functions / Fluid Compute)" id="id-2dd666352b38402eb3aa3959a8737502"/>
     <element xsi:type="archimate:SystemSoftware" name="Node.js 22 + Next.js 15&#xA;(RSC, Route Handlers, Prisma Client)" id="id-aa24b612f1854c05aaf68414bf192026"/>
-    <element xsi:type="archimate:Artifact" name="App Lactare (bundle deployado)&#xA;route groups (public) e (admin)" id="id-9ce6f9b06fa64654bd9d35538990280d"/>
+    <element xsi:type="archimate:Artifact" name="App NutriLink (bundle deployado)&#xA;route groups (public) e (admin)" id="id-9ce6f9b06fa64654bd9d35538990280d"/>
   </folder>
   <folder name="Motivation" id="id-f57faf4ca8204356bc96cb9abdb54ba1" type="motivation">
-    <element xsi:type="archimate:Stakeholder" name="Eurofarma(Projeto Lactare)" id="id-8d3c5cb28a644f93a122865fd54b446d"/>
-    <element xsi:type="archimate:Driver" name="Baixo alcance e captação de nutrizes doadoras para o projeto Lactare" id="id-bb6cadc8194b48d9bdf7b547bc0f655c"/>
+    <element xsi:type="archimate:Stakeholder" name="Eurofarma(Projeto NutriLink)" id="id-8d3c5cb28a644f93a122865fd54b446d"/>
+    <element xsi:type="archimate:Driver" name="Baixo alcance e captação de nutrizes doadoras para o projeto NutriLink" id="id-bb6cadc8194b48d9bdf7b547bc0f655c"/>
     <element xsi:type="archimate:Goal" name="Ampliar o alcance e a conscientização sobre doação de leite humano" id="id-49607694a2094428898a4ef8f8b3fffe"/>
     <element xsi:type="archimate:Goal" name="Viabilizar o processo da nutriz à doação de leite humano" id="id-42c541030db745f698d8c578291ba41d"/>
     <element xsi:type="archimate:Goal" name=" Gerar dashboards e relatórios para acompanhamento da captação e engajamento das nutrizes" id="id-2ff9699002be42c38e09d917ba272994"/>
@@ -189,8 +189,8 @@
     <element xsi:type="archimate:Requirement" name="Disponibilizar na plataforma web biblioteca de conteúdos educativos e painel de impacto do projeto" id="id-dd28eee4bde34c9ab0034798b2104297"/>
     <element xsi:type="archimate:Requirement" name="A solução deve estar disponível 24/7 nos canais de entrada" id="id-d2277a7c49c241689865130a92eebe39"/>
     <element xsi:type="archimate:Constraint" name="O cadastro deve solicitar apenas informações essenciais como nome, CPF e localização. O sistema deve verificar pelo CPF se a nutriz já possui cadastro; caso exista, a jornada é retomada do ponto onde parou. O cadastro pode ser realizado via chatbot ou plataforma web, mantendo continuidade entre os canais." id="id-8f91131c91334aa6877d15daecf35841"/>
-    <element xsi:type="archimate:Constraint" name="O painel deve permitir filtrar nutrizes cadastradas por região ou CEP. O disparo ocorre exclusivamente via WhatsApp Business API. O conteúdo é definido pela equipe do Lactare antes do envio e o resultado é registrado automaticamente no dashboard." id="id-84b91a517197412e931ccf736e0bbfe5"/>
-    <element xsi:type="archimate:Constraint" name="A biblioteca deve conter artigos e vídeos organizados por tema. O painel de impacto deve exibir indicadores como total de doações realizadas e regiões atendidas. Ambos são gerenciados via painel administrativo, com dados aprovados pela equipe do Lactare antes da publicação." id="id-1aee72584f7e4381bec93c7bfc445c07"/>
+    <element xsi:type="archimate:Constraint" name="O painel deve permitir filtrar nutrizes cadastradas por região ou CEP. O disparo ocorre exclusivamente via WhatsApp Business API. O conteúdo é definido pela equipe do NutriLink antes do envio e o resultado é registrado automaticamente no dashboard." id="id-84b91a517197412e931ccf736e0bbfe5"/>
+    <element xsi:type="archimate:Constraint" name="A biblioteca deve conter artigos e vídeos organizados por tema. O painel de impacto deve exibir indicadores como total de doações realizadas e regiões atendidas. Ambos são gerenciados via painel administrativo, com dados aprovados pela equipe do NutriLink antes da publicação." id="id-1aee72584f7e4381bec93c7bfc445c07"/>
     <element xsi:type="archimate:Principle" name="Solução digital que permita alcançar e engajar por meio de canais digitais" id="id-f4d821c62062414199a019a4da83bbb8"/>
     <element xsi:type="archimate:Principle" name=" Facilitar o acesso à informação priorizando uma jornada mais simples" id="id-ecec64184c9a42798aaaa44e87d75d4b"/>
     <element xsi:type="archimate:Principle" name="Monitorar jornada através de dashboards e indicadores estratégicos" id="id-fe421cf18f604a0d9729dfcdeb2fe32b"/>
@@ -199,12 +199,12 @@
     <element xsi:type="archimate:Requirement" name="Orientar a nutriz sobre o processo de triagem e critérios de elegibilidade para doação" id="id-6913b4e027634aadb78bc94b45f63d0d"/>
     <element xsi:type="archimate:Requirement" name="Localizar e encaminhar a nutriz ao ponto de coleta ou banco de leite mais próximo com base na região informada" id="id-7fe8152982aa456a850bda2ed58caa42"/>
     <element xsi:type="archimate:Requirement" name="Acompanhar a jornada da nutriz após o encaminhamento de forma personalizada" id="id-cf16e06fb16c45a590c5e55fca6056ee"/>
-    <element xsi:type="archimate:Constraint" name="O sistema deve orientar a nutriz sobre as etapas do processo de triagem do Lactare, informando o que será avaliado, quais documentos ou informações deve levar e o que esperar durante o processo. Caso a nutriz relate alguma condição que possivelmente a impeça de doar, o sistema deve orientá-la a confirmar sua elegibilidade diretamente com a equipe do ponto de coleta." id="id-f906e36c7a044ac298940e918b1c13b4"/>
-    <element xsi:type="archimate:Constraint" name="O encaminhamento deve ser baseado no CEP ou cidade informados no cadastro. O sistema deve retornar nome, endereço, horário de funcionamento e contato do ponto de coleta mais próximo. Caso não haja ponto de coleta na região atendida pelo Lactare, o sistema deve encaminhar a nutriz ao banco de leite mais próximo via rede da rBLH. Após o encaminhamento, o chatbot deve enviar orientações sobre o que esperar no processo." id="id-10c3f142674642a3a62e317f10506c99"/>
-    <element xsi:type="archimate:Constraint" name="Para nutrizes encaminhadas a bancos da Lactare, o sistema verifica pelo CPF se há agendamento e atua como facilitador, informando data, horário e local da consulta e oferecendo lembretes opcionais, sempre com a nutriz no controle de recebê-los ou não.Para nutrizes encaminhadas a bancos terceiros via rBLH, em que não há acesso ao status do agendamento, o acompanhamento é não intrusivo. Após um intervalo de dois dias, o sistema envia uma única mensagem acolhedora perguntando como está indo e se precisa de ajuda, sem exigir resposta. Se a nutriz avançou, registra a conversão; se ainda não, oferece ajuda; se não responde, nenhum novo lembrete é disparado." id="id-d83e337671c94705a98c14f3398db644"/>
+    <element xsi:type="archimate:Constraint" name="O sistema deve orientar a nutriz sobre as etapas do processo de triagem do NutriLink, informando o que será avaliado, quais documentos ou informações deve levar e o que esperar durante o processo. Caso a nutriz relate alguma condição que possivelmente a impeça de doar, o sistema deve orientá-la a confirmar sua elegibilidade diretamente com a equipe do ponto de coleta." id="id-f906e36c7a044ac298940e918b1c13b4"/>
+    <element xsi:type="archimate:Constraint" name="O encaminhamento deve ser baseado no CEP ou cidade informados no cadastro. O sistema deve retornar nome, endereço, horário de funcionamento e contato do ponto de coleta mais próximo. Caso não haja ponto de coleta na região atendida pelo NutriLink, o sistema deve encaminhar a nutriz ao banco de leite mais próximo via rede da rBLH. Após o encaminhamento, o chatbot deve enviar orientações sobre o que esperar no processo." id="id-10c3f142674642a3a62e317f10506c99"/>
+    <element xsi:type="archimate:Constraint" name="Para nutrizes encaminhadas a bancos do NutriLink, o sistema verifica pelo CPF se há agendamento e atua como facilitador, informando data, horário e local da consulta e oferecendo lembretes opcionais, sempre com a nutriz no controle de recebê-los ou não.Para nutrizes encaminhadas a bancos terceiros via rBLH, em que não há acesso ao status do agendamento, o acompanhamento é não intrusivo. Após um intervalo de dois dias, o sistema envia uma única mensagem acolhedora perguntando como está indo e se precisa de ajuda, sem exigir resposta. Se a nutriz avançou, registra a conversão; se ainda não, oferece ajuda; se não responde, nenhum novo lembrete é disparado." id="id-d83e337671c94705a98c14f3398db644"/>
     <element xsi:type="archimate:Requirement" name="Consolidar e exibir indicadores de alcance, engajamento e conversão das nutrizes" id="id-539edfabae55407094f5fe728028d3ee"/>
     <element xsi:type="archimate:Outcome" name="Identificar as etapas com maior abandono nas primeiras semanas" id="id-2bf374130a09407784bddd65a28409f5"/>
-    <element xsi:type="archimate:Assessment" name="Dashboard via plataforma web para gestores Lactare" id="id-efa65e28508b446d9c610bd204ecf591"/>
+    <element xsi:type="archimate:Assessment" name="Dashboard via plataforma web para gestores NutriLink" id="id-efa65e28508b446d9c610bd204ecf591"/>
     <element xsi:type="archimate:Constraint" name="O dashboard deve exibir alcance das comunicações, engajamento das nutrizes e conversão, como interesse ou início de contato para doação. Os dados devem ser filtráveis por período e região." id="id-459432946ad84364b5b6599c9508c78c"/>
     <element xsi:type="archimate:Assessment" name="Interação da nutriz via WhatsApp e Instagram sem necessidade de App externo" id="id-392c1056e38e447eb9e9d74fc61d0ac3"/>
     <element xsi:type="archimate:Requirement" name="Identificar o ponto de abandono da nutriz ao longo da jornada" id="id-e126f40ea8454431bb6bb85e82eac1aa"/>
