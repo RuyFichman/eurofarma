@@ -663,18 +663,32 @@ export const SIGNUP = {
     // Login (Supabase Auth) é sprint futuro — a aba fica visível, porém inativa.
     loginUnavailable: 'O acesso à conta chega em breve',
   },
-  heading: 'Crie seu cadastro',
+  heading: 'Crie sua conta',
   subtitle:
-    'Cadastre-se para começar sua jornada de doação de leite humano. Leva menos de um minuto.',
+    'Crie sua conta para começar sua jornada de doação de leite humano e acompanhar seu agendamento. Leva menos de um minuto.',
   fields: {
     fullName: {
       label: 'Nome completo',
       placeholder: 'Seu nome completo',
     },
+    email: {
+      label: 'E-mail',
+      placeholder: 'voce@email.com',
+      helper: 'É com ele que você entra na sua área depois.',
+    },
     whatsapp: {
       label: 'WhatsApp',
       placeholder: '(11) 90000-0000',
-      helper: 'É por aqui que um banco de leite vai falar com você.',
+      helper:
+        'É por aqui que um banco de leite fala com você — e é como reconhecemos você no nosso WhatsApp.',
+    },
+    password: {
+      label: 'Senha',
+      placeholder: 'Pelo menos 8 caracteres',
+    },
+    passwordConfirm: {
+      label: 'Confirmar senha',
+      placeholder: 'Repita a senha',
     },
     state: {
       label: 'Estado',
@@ -693,10 +707,31 @@ export const SIGNUP = {
     },
   },
   actions: {
-    submit: 'Criar meu cadastro',
+    submit: 'Criar minha conta',
     submitting: 'Enviando...',
     orContinue: 'ou continue com',
     whatsappCta: 'Falar com um banco pelo WhatsApp',
+    showPassword: 'Mostrar senha',
+    hidePassword: 'Ocultar senha',
+  },
+  /**
+   * Mensagens de validação do formulário (Princípio 7 — nada de string visível
+   * hardcoded no schema). Reusadas pelo `signupFormSchema` no cliente.
+   */
+  validation: {
+    fullNameMin: 'Informe seu nome completo.',
+    fullNameMax: 'Nome muito longo.',
+    emailRequired: 'Informe seu e-mail.',
+    emailInvalid: 'E-mail inválido.',
+    whatsappInvalid: 'WhatsApp inválido. Use DDD + número.',
+    passwordMin: 'A senha deve ter pelo menos 8 caracteres.',
+    passwordMax: 'A senha deve ter no máximo 128 caracteres.',
+    passwordMismatch: 'As senhas não conferem.',
+    stateInvalid: 'Selecione um estado válido.',
+    cityMin: 'Informe sua cidade.',
+    cityMax: 'Cidade inválida.',
+    consentRequired:
+      'É necessário aceitar a Política de Privacidade para continuar.',
   },
   legal: {
     lead: 'Ao se cadastrar, você concorda com os',
@@ -710,6 +745,8 @@ export const SIGNUP = {
     errorDescription: 'Revise os dados e tente novamente em alguns instantes.',
     rateLimited:
       'Muitas tentativas em pouco tempo. Aguarde um instante e tente novamente.',
+    accountExists:
+      'Já existe uma conta com esses dados. Tente entrar em vez de criar uma nova.',
   },
   ariaLabels: {
     form: 'Formulário de cadastro da nutriz',
