@@ -19,6 +19,7 @@
     "db:seed-admin": "dotenv -e .env.local -- tsx prisma/seed-admin.ts",
     "db:set-admin-password": "dotenv -e .env.local -- tsx prisma/set-admin-password.ts",
     "check:validators": "tsx scripts/check-validators.ts",
+    "whatsapp:sim": "dotenv -e .env.local -- tsx scripts/whatsapp-simulator.ts",
     "test": "dotenv -e .env.local -- vitest run",
     "test:watch": "dotenv -e .env.local -- vitest",
     "test:unit": "dotenv -e .env.local -- vitest run tests/unit",

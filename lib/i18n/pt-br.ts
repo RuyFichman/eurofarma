@@ -972,6 +972,63 @@ export const APPOINTMENT = {
   },
 } as const
 
+/**
+ * Falas do chatbot do WhatsApp (Sprint 6.5).
+ *
+ * Copy visível como qualquer outra (Princípio 7), com duas restrições próprias
+ * do canal: os títulos de botão da Meta têm **limite de 20 caracteres**, e o
+ * tom precisa aguentar ser lido no meio da rotina de quem acabou de ter bebê
+ * (Princípio 9). Nada aqui promete lembrete, confirmação ou remarcação — o bot
+ * só registra o que ela conta.
+ */
+export const WHATSAPP_BOT = {
+  askScheduled: {
+    body: 'Oi! Aqui é o NutriLink 💙\n\nVocê conseguiu agendar sua visita ao banco de leite?',
+    yes: 'Sim, consegui',
+    no: 'Ainda não',
+  },
+  askDate: {
+    body: 'Que notícia boa! 💙\n\nPara qual dia e horário ficou? Responda assim: DD/MM HH:MM\n\nPor exemplo: 05/06 09:30',
+  },
+  dateNotUnderstood: {
+    body: 'Não consegui entender a data. Pode escrever no formato DD/MM HH:MM?\n\nPor exemplo: 05/06 09:30',
+  },
+  confirmDate: {
+    // {date} e {time} são substituídos no servidor.
+    bodyTemplate: 'Anotei: {date}, às {time}.\n\nEstá certo?',
+    yes: 'Está certo',
+    no: 'Corrigir',
+  },
+  scheduledSaved: {
+    // {url} é a área da nutriz.
+    bodyTemplate:
+      'Prontinho, anotei 💙\n\nVocê pode ver os detalhes e as orientações para o dia aqui: {url}\n\nQualquer mudança, é só me contar por aqui.',
+  },
+  askFailureReason: {
+    body: 'Tudo bem, isso acontece e não é o fim da linha.\n\nO que aconteceu?',
+    button: 'Escolher motivo',
+    options: {
+      NO_ANSWER: 'Não atenderam',
+      NO_SLOT: 'Sem vaga',
+      TOO_FAR: 'Longe demais',
+      GAVE_UP: 'Deixei para depois',
+      OTHER: 'Outro motivo',
+    },
+  },
+  notScheduledSaved: {
+    bodyTemplate:
+      'Obrigada por contar 💙\n\nAnotei aqui. Se quiser tentar outra unidade, você encontra as mais próximas de você em: {url}\n\nQuando conseguir agendar, me avise por aqui.',
+  },
+  unknownNumber: {
+    // Sem confirmar nem negar cadastro de ninguém — só convida.
+    bodyTemplate:
+      'Oi! Aqui é o NutriLink 💙\n\nPara acompanhar seu agendamento, crie sua conta em: {url}\n\nÉ rapidinho e você passa a ver tudo em um lugar só.',
+  },
+  fallback: {
+    body: 'Desculpa, não entendi 😕\n\nToque em um dos botões para eu conseguir te ajudar.',
+  },
+} as const
+
 export const THANKS = {
   meta: {
     title: 'Cadastro concluído',
