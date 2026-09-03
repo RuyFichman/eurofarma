@@ -61,19 +61,20 @@ O scaffold do Next.js **já existe** e a esteira de qualidade funciona: `pnpm de
 |---|---|---|
 | Framework | Next.js (App Router) | 15 |
 | UI runtime | React | 19 |
-| Linguagem | TypeScript estrito | `strict: true`, `noUncheckedIndexedAccess: true` (toolchain ainda não montado — ver seção 3) |
+| Linguagem | TypeScript estrito | `strict: true`, `noUncheckedIndexedAccess: true` |
 | Estilo | Tailwind CSS | 4 (CSS variables como design tokens) |
 | Componentes | shadcn/ui | última |
 | Banco | PostgreSQL via Supabase | **cloud** — projeto `eurofarma` / org `fiap` (ver seção 13) |
 | ORM | Prisma | **6.x** (fixado; não atualizar para 7 sem migração) |
 | Validação | Zod | **3.x** (fixado; APIs do v4 mudaram) |
-| Auth | Supabase Auth (`@supabase/ssr` 0.10) | **em uso** no admin: base 5.1, login 5.2, middleware + role 5.3 |
-| Forms | React Hook Form + Zod | instalados (RHF 7 + `@hookform/resolvers` 5); usados no `SearchFilters` |
+| Auth | Supabase Auth (`@supabase/ssr` 0.10) | **em uso** nos dois públicos: admin (5.1–5.3) e nutriz (6.2 conta, 6.3 sessão) |
+| Forms | React Hook Form + Zod | RHF 7 + `@hookform/resolvers` 5; busca, cadastro, login (admin e nutriz), formulário de unidade |
 | Conteúdo | MDX | educativo, políticas, termos |
 | Pacotes | pnpm | obrigatório (não usar npm/yarn) |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | unit + integration (sprint futuro) |
+| Testes | Vitest | unit + integration — **360 testes** passando |
 | Testes e2e | Playwright | sprint futuro |
+| Chatbot | WhatsApp Cloud API (Meta), sem SDK | código pronto (6.5); **falta a conta na Meta** — ver seção 3 |
 
 O banco é **Supabase cloud** (sem Docker local). Migrations são geradas com Prisma **offline** (`prisma migrate diff`) e aplicadas via **MCP do Supabase** (`apply_migration`) — o `prisma migrate dev` não roda bem no cloud (shadow DB) nem pelo pooler. `DATABASE_URL` no `.env.local` aponta para o **pooler** (porta 6543, `pgbouncer=true`); o CLI do Prisma lê o `.env.local` via `dotenv-cli`. Pin de Prisma 6 e Zod 3 são intencionais (ver seção 13).
 
@@ -150,14 +151,13 @@ Scripts disponíveis em `package.json` (estado atual):
 nutrilink/
 ├── AGENTS.md               # guia operacional dos agentes (fonte da verdade)
 ├── CLAUDE.md               # só importa o AGENTS.md via @AGENTS.md
-├── README.md
 ├── .env.example
 ├── .env.local              # NUNCA commitar
 ├── .nvmrc                  # Node 22
 ├── .gitignore
 ├── package.json
 ├── tsconfig.json
-├── middleware.ts           # gate de autenticação de /admin/* + refresh de sessão
+├── middleware.ts           # gate de autenticação de /admin/* e da área da nutriz
 ├── next.config.ts
 ├── tailwind.config.ts
 ├── eslint.config.mjs
@@ -197,6 +197,7 @@ nutrilink/
 │   ├── auth/
 │   │   └── confirmar/      # troca o code do link de e-mail por sessão (6.3)
 │   ├── api/                # route handlers
+│   │   ├── whatsapp/       # webhook do chatbot (6.5)
 │   │   ├── units/
 │   │   ├── cities/
 │   │   ├── nutriz/
@@ -215,11 +216,16 @@ nutrilink/
 │   ├── auth/               # helpers Supabase Auth (clients, gate de role, next path)
 │   ├── validators/         # schemas Zod (fonte única)
 │   ├── analytics/          # PostHog (futuro)
+│   ├── whatsapp/           # chatbot: assinatura, payload, fluxo, envio (6.5)
+│   ├── maps/               # URL de mapa estático Mapbox
+│   ├── seo/                # JSON-LD da unidade
+│   ├── security/           # rate limit em memória
 │   ├── i18n/               # copy pt-br em constantes
 │   └── utils/              # utilitários puros
 ├── content/
 │   ├── educativo/          # MDX da página educativa
 │   └── legal/              # MDX de privacidade e termos
+├── scripts/                # smoke test dos validators, simulador do WhatsApp
 ├── data/
 │   └── seeds/
 │       └── units/          # CSVs de bancos de leite
