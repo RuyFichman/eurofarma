@@ -863,6 +863,115 @@ export const NUTRIZ_AUTH = {
   },
 } as const
 
+/**
+ * Copy da tela de agendamento da nutriz (Sprint 6.4).
+ *
+ * Regra de honestidade que atravessa todo este bloco: o agendamento é
+ * **autodeclarado**. Quem marcou foi o banco de leite, por fora; a plataforma
+ * só guarda o que a nutriz contou pelo WhatsApp. Nada aqui pode dizer
+ * "confirmado", prometer lembrete que não enviamos, ou sugerir que cancelar por
+ * aqui avisa a unidade.
+ */
+export const APPOINTMENT = {
+  status: {
+    upcoming: {
+      label: 'Informado por você',
+      note: 'Estes são os dados que você nos passou pelo WhatsApp. Quem confirma a visita é o banco de leite.',
+    },
+    past: {
+      label: 'Data já passou',
+      note: 'Se a visita aconteceu, obrigada por doar 💙. Se precisar remarcar, fale de novo com o banco de leite.',
+    },
+    cancelled: {
+      label: 'Cancelado',
+      note: 'Você marcou este agendamento como cancelado. Quando combinar uma nova data, é só nos contar pelo WhatsApp.',
+    },
+    completed: {
+      label: 'Concluído',
+      note: 'Obrigada por doar 💙',
+    },
+    referenceLabel: 'Ref',
+  },
+  details: {
+    title: 'Detalhes do agendamento',
+    date: 'Data',
+    time: 'Horário',
+    timeUnknown: 'A combinar',
+    declaredAt: 'Informado em',
+  },
+  guidance: {
+    title: 'Orientações para o dia',
+    items: [
+      {
+        title: 'Leve o leite já coletado',
+        description:
+          'Se extraiu em casa, leve em frasco de vidro esterilizado, etiquetado com data e hora da extração, dentro de bolsa térmica.',
+      },
+      {
+        title: 'Leve um documento com foto',
+        description:
+          'RG, CNH ou passaporte. Se for com o bebê, leve também a Caderneta de Saúde da Criança.',
+      },
+      {
+        title: 'Chegue com alguns minutos de antecedência',
+        description:
+          'Sobra tempo para o acolhimento e para preencher os formulários com calma.',
+      },
+      {
+        title: 'Você pode levar o bebê',
+        description:
+          'A maior parte das unidades tem espaço para amamentação. Na dúvida, pergunte à equipe antes de ir.',
+      },
+    ],
+    unitInstructionsTitle: 'O que esta unidade orienta',
+    // Mesma ressalva da página pública da unidade: as orientações acima são
+    // gerais, e cada BLH tem as suas.
+    disclaimer:
+      'Cada banco de leite pode ter orientações próprias de coleta e entrega. Confirme com a equipe antes de ir.',
+  },
+  location: {
+    title: 'Local do atendimento',
+    cepLabel: 'CEP',
+    directions: 'Como chegar',
+    mapAltTemplate: 'Mapa com a localização de {unitName}',
+    unknownTitle: 'Você não nos disse qual banco de leite',
+    unknownBody:
+      'Tudo bem — o agendamento continua valendo. Se quiser, conte pelo WhatsApp com qual unidade você combinou e mostramos o endereço aqui.',
+  },
+  actions: {
+    title: 'Ações rápidas',
+    whatsapp: 'Falar com o banco pelo WhatsApp',
+    call: 'Ligar para o banco',
+    unitPage: 'Ver página da unidade',
+    searchOther: 'Buscar outro banco',
+  },
+  cancel: {
+    title: 'Precisa cancelar?',
+    // Explicitamente NÃO promete avisar a unidade — quem avisa é a nutriz.
+    body: 'O cancelamento é feito com o banco de leite. Depois de avisar a equipe, marque aqui para mantermos seu acompanhamento em dia.',
+    action: 'Marcar como cancelado',
+    confirm: 'Confirmar cancelamento',
+    submitting: 'Marcando...',
+    dismiss: 'Voltar',
+    error: 'Não foi possível marcar agora. Tente novamente em instantes.',
+  },
+  notScheduled: {
+    badge: 'Não consegui agendar',
+    title: 'Você nos contou que ainda não conseguiu agendar',
+    body: 'Isso acontece, e não é o fim da linha. Você pode tentar outra unidade ou falar de novo com a mesma equipe em outro horário.',
+    reasonLabel: 'Motivo que você informou',
+    reasons: {
+      NO_ANSWER: 'A unidade não atendeu',
+      NO_SLOT: 'Não havia vaga disponível',
+      TOO_FAR: 'A unidade era longe demais',
+      GAVE_UP: 'Você decidiu não seguir por enquanto',
+      OTHER: 'Outro motivo',
+    },
+    searchCta: 'Buscar outro banco de leite',
+    howCta: 'Ver como funciona a doação',
+  },
+} as const
+
 export const THANKS = {
   meta: {
     title: 'Cadastro concluído',

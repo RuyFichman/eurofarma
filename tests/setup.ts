@@ -12,7 +12,12 @@ afterEach(async () => {
   if (!testPath.includes('integration')) {
     return
   }
-  // Ordem importa: whatsapp_clicks tem FK RESTRICT para units.
+  // Ordem importa: whatsapp_clicks tem FK RESTRICT para units, e appointments
+  // tem FK RESTRICT para nutriz_profiles — sem apagar o agendamento primeiro, a
+  // remoção da nutriz de teste falha e o banco cloud acumula lixo entre rodadas.
+  await prisma.appointment.deleteMany({
+    where: { nutrizProfile: { fullName: { startsWith: '__test__' } } },
+  })
   await prisma.whatsappClick.deleteMany({
     where: { unit: { slug: { startsWith: '__test__' } } },
   })
