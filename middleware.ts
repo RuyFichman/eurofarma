@@ -10,14 +10,25 @@ import {
 } from '@/lib/auth/supabase-middleware'
 
 const LOGIN_PATH = '/admin/login'
+const NUTRIZ_LOGIN_PATH = '/entrar'
+const NUTRIZ_AREA_PATH = '/meu-agendamento'
+
+/** A rota é da área logada da nutriz? */
+function isNutrizArea(pathname: string): boolean {
+  return (
+    pathname === NUTRIZ_AREA_PATH || pathname.startsWith(`${NUTRIZ_AREA_PATH}/`)
+  )
+}
 
 /**
- * Gate de **autenticação** de todo o namespace `/admin/*` — e é aqui que a
- * sessão do Supabase é renovada a cada navegação.
+ * Gate de **autenticação** das duas áreas logadas — `/admin/*` e a área da
+ * nutriz — e é aqui que a sessão do Supabase é renovada a cada navegação.
  *
- * A checagem de **role** (ADMIN) NÃO acontece aqui: o middleware roda no Edge e
- * o role vive no Postgres, acessado via Prisma (Node). Quem faz esse segundo
- * gate é `app/admin/(painel)/layout.tsx` via `requireAdminUser()`.
+ * A checagem de **quem** é a pessoa NÃO acontece aqui: o middleware roda no Edge
+ * e tanto o role do admin quanto o perfil da nutriz vivem no Postgres, acessados
+ * via Prisma (Node). Esse segundo gate é feito nos layouts —
+ * `app/admin/(painel)/layout.tsx` com `requireAdminUser()` e
+ * `app/(public)/meu-agendamento/layout.tsx` com `requireNutrizUser()`.
  */
 export async function middleware(request: NextRequest) {
   const { supabase, getResponse } = createSupabaseMiddlewareClient(request)
@@ -31,7 +42,18 @@ export async function middleware(request: NextRequest) {
 
   const { pathname, search } = request.nextUrl
 
-  // Login é a única rota pública do namespace; quem já tem sessão não fica nela.
+  // Área da nutriz. Sem `?next=`: hoje só existe uma rota protegida no público,
+  // então guardar o destino não acrescentaria nada e abriria superfície de open
+  // redirect à toa. Se a área crescer, herdar o padrão do `sanitizeAdminNextPath`.
+  if (isNutrizArea(pathname)) {
+    if (user) return response
+    return withSessionCookies(
+      NextResponse.redirect(new URL(NUTRIZ_LOGIN_PATH, request.url)),
+      response,
+    )
+  }
+
+  // Login é a única rota pública do namespace admin; quem já tem sessão não fica nela.
   if (pathname === LOGIN_PATH) {
     if (!user) return response
     const next = sanitizeAdminNextPath(request.nextUrl.searchParams.get('next'))
@@ -62,5 +84,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin', '/admin/:path*'],
+  matcher: [
+    '/admin',
+    '/admin/:path*',
+    '/meu-agendamento',
+    '/meu-agendamento/:path*',
+  ],
 }

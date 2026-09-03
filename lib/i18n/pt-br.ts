@@ -663,18 +663,32 @@ export const SIGNUP = {
     // Login (Supabase Auth) é sprint futuro — a aba fica visível, porém inativa.
     loginUnavailable: 'O acesso à conta chega em breve',
   },
-  heading: 'Crie seu cadastro',
+  heading: 'Crie sua conta',
   subtitle:
-    'Cadastre-se para começar sua jornada de doação de leite humano. Leva menos de um minuto.',
+    'Crie sua conta para começar sua jornada de doação de leite humano e acompanhar seu agendamento. Leva menos de um minuto.',
   fields: {
     fullName: {
       label: 'Nome completo',
       placeholder: 'Seu nome completo',
     },
+    email: {
+      label: 'E-mail',
+      placeholder: 'voce@email.com',
+      helper: 'É com ele que você entra na sua área depois.',
+    },
     whatsapp: {
       label: 'WhatsApp',
       placeholder: '(11) 90000-0000',
-      helper: 'É por aqui que um banco de leite vai falar com você.',
+      helper:
+        'É por aqui que um banco de leite fala com você — e é como reconhecemos você no nosso WhatsApp.',
+    },
+    password: {
+      label: 'Senha',
+      placeholder: 'Pelo menos 8 caracteres',
+    },
+    passwordConfirm: {
+      label: 'Confirmar senha',
+      placeholder: 'Repita a senha',
     },
     state: {
       label: 'Estado',
@@ -693,10 +707,31 @@ export const SIGNUP = {
     },
   },
   actions: {
-    submit: 'Criar meu cadastro',
+    submit: 'Criar minha conta',
     submitting: 'Enviando...',
     orContinue: 'ou continue com',
     whatsappCta: 'Falar com um banco pelo WhatsApp',
+    showPassword: 'Mostrar senha',
+    hidePassword: 'Ocultar senha',
+  },
+  /**
+   * Mensagens de validação do formulário (Princípio 7 — nada de string visível
+   * hardcoded no schema). Reusadas pelo `signupFormSchema` no cliente.
+   */
+  validation: {
+    fullNameMin: 'Informe seu nome completo.',
+    fullNameMax: 'Nome muito longo.',
+    emailRequired: 'Informe seu e-mail.',
+    emailInvalid: 'E-mail inválido.',
+    whatsappInvalid: 'WhatsApp inválido. Use DDD + número.',
+    passwordMin: 'A senha deve ter pelo menos 8 caracteres.',
+    passwordMax: 'A senha deve ter no máximo 128 caracteres.',
+    passwordMismatch: 'As senhas não conferem.',
+    stateInvalid: 'Selecione um estado válido.',
+    cityMin: 'Informe sua cidade.',
+    cityMax: 'Cidade inválida.',
+    consentRequired:
+      'É necessário aceitar a Política de Privacidade para continuar.',
   },
   legal: {
     lead: 'Ao se cadastrar, você concorda com os',
@@ -710,10 +745,230 @@ export const SIGNUP = {
     errorDescription: 'Revise os dados e tente novamente em alguns instantes.',
     rateLimited:
       'Muitas tentativas em pouco tempo. Aguarde um instante e tente novamente.',
+    accountExists:
+      'Já existe uma conta com esses dados. Tente entrar em vez de criar uma nova.',
   },
   ariaLabels: {
     form: 'Formulário de cadastro da nutriz',
     backToHome: 'Voltar para a página inicial',
+  },
+} as const
+
+/**
+ * Copy das telas de sessão da nutriz (Sprint 6.3): entrar, redefinir senha e a
+ * área protegida. Separada de `ADMIN_LOGIN` de propósito — o tom aqui é o do
+ * público (Princípio 9), não o do painel.
+ */
+export const NUTRIZ_AUTH = {
+  login: {
+    meta: {
+      title: 'Entrar',
+      description:
+        'Acesse sua conta do NutriLink para acompanhar seu agendamento de doação de leite humano.',
+    },
+    backToHome: 'Voltar ao início',
+    heading: 'Que bom te ver de novo',
+    subtitle: 'Entre para acompanhar seu agendamento e sua jornada de doação.',
+    fields: {
+      email: { label: 'E-mail', placeholder: 'voce@email.com' },
+      password: { label: 'Senha', placeholder: 'Sua senha' },
+    },
+    actions: {
+      submit: 'Entrar',
+      submitting: 'Entrando...',
+      forgotPassword: 'Esqueci minha senha',
+      sendingReset: 'Enviando...',
+      showPassword: 'Mostrar senha',
+      hidePassword: 'Ocultar senha',
+      signupLead: 'Ainda não tem conta?',
+      signupLink: 'Criar cadastro',
+    },
+    feedback: {
+      // Genérica por segurança: nunca diz se o problema foi o e-mail ou a senha.
+      invalidCredentials: 'E-mail ou senha inválidos.',
+      genericError:
+        'Não foi possível entrar agora. Tente novamente em alguns minutos.',
+      rateLimited:
+        'Muitas tentativas de acesso. Tente novamente em alguns minutos.',
+      // Igual exista ou não a conta (anti-enumeração).
+      resetSuccess:
+        'Se este e-mail estiver cadastrado, enviaremos instruções para redefinir a senha.',
+      resetError:
+        'Não foi possível enviar as instruções agora. Tente novamente em alguns minutos.',
+      resetNeedsEmail: 'Informe um e-mail válido para redefinir a senha.',
+    },
+    validation: {
+      emailRequired: 'Informe seu e-mail.',
+      emailInvalid: 'E-mail inválido.',
+      passwordRequired: 'Informe sua senha.',
+      passwordMin: 'A senha deve ter pelo menos 8 caracteres.',
+      passwordMax: 'A senha deve ter no máximo 128 caracteres.',
+    },
+    ariaLabels: { form: 'Formulário de acesso da nutriz' },
+  },
+  newPassword: {
+    meta: {
+      title: 'Redefinir senha',
+      description: 'Defina uma nova senha para sua conta do NutriLink.',
+    },
+    heading: 'Criar uma nova senha',
+    subtitle: 'Escolha uma senha nova para voltar a acessar sua conta.',
+    fields: {
+      password: { label: 'Nova senha', placeholder: 'Pelo menos 8 caracteres' },
+      passwordConfirm: {
+        label: 'Confirmar nova senha',
+        placeholder: 'Repita a senha',
+      },
+    },
+    actions: {
+      submit: 'Salvar nova senha',
+      submitting: 'Salvando...',
+      backToLogin: 'Voltar para entrar',
+    },
+    feedback: {
+      // O link do e-mail é o que autentica esta tela; sem ele não há o que fazer.
+      invalidLink:
+        'Este link de redefinição expirou ou já foi usado. Peça um novo na tela de acesso.',
+      genericError:
+        'Não foi possível salvar a nova senha agora. Tente novamente em alguns minutos.',
+      success: 'Senha atualizada. Você já pode entrar com ela.',
+    },
+    validation: {
+      passwordMin: 'A senha deve ter pelo menos 8 caracteres.',
+      passwordMax: 'A senha deve ter no máximo 128 caracteres.',
+      passwordMismatch: 'As senhas não conferem.',
+    },
+    ariaLabels: { form: 'Formulário de nova senha' },
+  },
+  area: {
+    meta: {
+      title: 'Meu agendamento',
+      description: 'Acompanhe seu agendamento de doação de leite humano.',
+    },
+    // {firstName} é substituído no componente.
+    greetingTemplate: 'Olá, {firstName}!',
+    subtitle: 'Sua saúde e a do seu bebê importam 💙',
+    badge: 'Área da nutriz',
+    empty: {
+      title: 'Você ainda não tem agendamento por aqui',
+      body: 'Quando você combinar uma visita com um banco de leite e nos contar pelo WhatsApp, os detalhes aparecem nesta página.',
+      searchCta: 'Encontrar banco de leite',
+      howCta: 'Ver como funciona a doação',
+    },
+    logout: 'Sair',
+  },
+  header: {
+    login: 'Entrar',
+    account: 'Meu agendamento',
+  },
+} as const
+
+/**
+ * Copy da tela de agendamento da nutriz (Sprint 6.4).
+ *
+ * Regra de honestidade que atravessa todo este bloco: o agendamento é
+ * **autodeclarado**. Quem marcou foi o banco de leite, por fora; a plataforma
+ * só guarda o que a nutriz contou pelo WhatsApp. Nada aqui pode dizer
+ * "confirmado", prometer lembrete que não enviamos, ou sugerir que cancelar por
+ * aqui avisa a unidade.
+ */
+export const APPOINTMENT = {
+  status: {
+    upcoming: {
+      label: 'Informado por você',
+      note: 'Estes são os dados que você nos passou pelo WhatsApp. Quem confirma a visita é o banco de leite.',
+    },
+    past: {
+      label: 'Data já passou',
+      note: 'Se a visita aconteceu, obrigada por doar 💙. Se precisar remarcar, fale de novo com o banco de leite.',
+    },
+    cancelled: {
+      label: 'Cancelado',
+      note: 'Você marcou este agendamento como cancelado. Quando combinar uma nova data, é só nos contar pelo WhatsApp.',
+    },
+    completed: {
+      label: 'Concluído',
+      note: 'Obrigada por doar 💙',
+    },
+    referenceLabel: 'Ref',
+  },
+  details: {
+    title: 'Detalhes do agendamento',
+    date: 'Data',
+    time: 'Horário',
+    timeUnknown: 'A combinar',
+    declaredAt: 'Informado em',
+  },
+  guidance: {
+    title: 'Orientações para o dia',
+    items: [
+      {
+        title: 'Leve o leite já coletado',
+        description:
+          'Se extraiu em casa, leve em frasco de vidro esterilizado, etiquetado com data e hora da extração, dentro de bolsa térmica.',
+      },
+      {
+        title: 'Leve um documento com foto',
+        description:
+          'RG, CNH ou passaporte. Se for com o bebê, leve também a Caderneta de Saúde da Criança.',
+      },
+      {
+        title: 'Chegue com alguns minutos de antecedência',
+        description:
+          'Sobra tempo para o acolhimento e para preencher os formulários com calma.',
+      },
+      {
+        title: 'Você pode levar o bebê',
+        description:
+          'A maior parte das unidades tem espaço para amamentação. Na dúvida, pergunte à equipe antes de ir.',
+      },
+    ],
+    unitInstructionsTitle: 'O que esta unidade orienta',
+    // Mesma ressalva da página pública da unidade: as orientações acima são
+    // gerais, e cada BLH tem as suas.
+    disclaimer:
+      'Cada banco de leite pode ter orientações próprias de coleta e entrega. Confirme com a equipe antes de ir.',
+  },
+  location: {
+    title: 'Local do atendimento',
+    cepLabel: 'CEP',
+    directions: 'Como chegar',
+    mapAltTemplate: 'Mapa com a localização de {unitName}',
+    unknownTitle: 'Você não nos disse qual banco de leite',
+    unknownBody:
+      'Tudo bem — o agendamento continua valendo. Se quiser, conte pelo WhatsApp com qual unidade você combinou e mostramos o endereço aqui.',
+  },
+  actions: {
+    title: 'Ações rápidas',
+    whatsapp: 'Falar com o banco pelo WhatsApp',
+    call: 'Ligar para o banco',
+    unitPage: 'Ver página da unidade',
+    searchOther: 'Buscar outro banco',
+  },
+  cancel: {
+    title: 'Precisa cancelar?',
+    // Explicitamente NÃO promete avisar a unidade — quem avisa é a nutriz.
+    body: 'O cancelamento é feito com o banco de leite. Depois de avisar a equipe, marque aqui para mantermos seu acompanhamento em dia.',
+    action: 'Marcar como cancelado',
+    confirm: 'Confirmar cancelamento',
+    submitting: 'Marcando...',
+    dismiss: 'Voltar',
+    error: 'Não foi possível marcar agora. Tente novamente em instantes.',
+  },
+  notScheduled: {
+    badge: 'Não consegui agendar',
+    title: 'Você nos contou que ainda não conseguiu agendar',
+    body: 'Isso acontece, e não é o fim da linha. Você pode tentar outra unidade ou falar de novo com a mesma equipe em outro horário.',
+    reasonLabel: 'Motivo que você informou',
+    reasons: {
+      NO_ANSWER: 'A unidade não atendeu',
+      NO_SLOT: 'Não havia vaga disponível',
+      TOO_FAR: 'A unidade era longe demais',
+      GAVE_UP: 'Você decidiu não seguir por enquanto',
+      OTHER: 'Outro motivo',
+    },
+    searchCta: 'Buscar outro banco de leite',
+    howCta: 'Ver como funciona a doação',
   },
 } as const
 

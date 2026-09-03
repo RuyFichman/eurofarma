@@ -5,7 +5,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { MapPin, MessageCircle, User } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  MapPin,
+  MessageCircle,
+  User,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -31,9 +39,11 @@ const COPY = SIGNUP
 /** Campos do form para os quais aceitamos erro vindo da API (`error.fields`). */
 const FORM_FIELD_KEYS = [
   'fullName',
+  'email',
   'phoneWhatsapp',
   'state',
   'city',
+  'password',
 ] as const satisfies ReadonlyArray<keyof SignupFormInput>
 
 /** Lê os UTMs da URL atual (sem dado pessoal). Chaves vazias são omitidas. */
@@ -84,14 +94,18 @@ export function SignupForm() {
   const router = useRouter()
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<SignupFormInput, unknown, SignupFormValues>({
     resolver: zodResolver(signupFormSchema),
     defaultValues: {
       fullName: '',
+      email: '',
       phoneWhatsapp: '',
       state: '',
       city: '',
+      password: '',
+      passwordConfirm: '',
       lgpdConsent: false,
     },
   })
@@ -102,8 +116,12 @@ export function SignupForm() {
       const response = await fetch('/api/nutriz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // `passwordConfirm` fica no cliente: é conferência de digitação, não
+        // dado que o servidor precise receber.
         body: JSON.stringify({
           fullName: values.fullName,
+          email: values.email,
+          password: values.password,
           phoneWhatsapp: values.phoneWhatsapp,
           state: values.state,
           city: values.city,
@@ -113,7 +131,8 @@ export function SignupForm() {
       })
 
       if (response.ok) {
-        // Sucesso → página de agradecimento (mantém o botão travado durante a navegação).
+        // Sucesso → página de agradecimento (mantém o botão travado durante a
+        // navegação). A sessão já veio nos cookies da resposta.
         setIsRedirecting(true)
         router.push('/obrigada')
         return
@@ -121,6 +140,11 @@ export function SignupForm() {
 
       if (response.status === 429) {
         setSubmitError(COPY.api.rateLimited)
+        return
+      }
+
+      if (response.status === 409) {
+        setSubmitError(COPY.api.accountExists)
         return
       }
 
@@ -184,6 +208,32 @@ export function SignupForm() {
             id="signup-name-error"
             message={errors.fullName?.message}
           />
+        </div>
+
+        {/* E-mail — vira o login da conta (Sprint 6.2) */}
+        <div className="space-y-2">
+          <Label htmlFor="signup-email">{COPY.fields.email.label}</Label>
+          <div className="relative">
+            <Mail
+              className="text-muted-foreground pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2"
+              aria-hidden="true"
+            />
+            <Input
+              id="signup-email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              className="bg-background h-11 rounded-xl pr-4 pl-11"
+              placeholder={COPY.fields.email.placeholder}
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby="signup-email-helper signup-email-error"
+              {...form.register('email')}
+            />
+          </div>
+          <p id="signup-email-helper" className="text-muted-foreground text-xs">
+            {COPY.fields.email.helper}
+          </p>
+          <FieldError id="signup-email-error" message={errors.email?.message} />
         </div>
 
         {/* WhatsApp */}
@@ -274,6 +324,85 @@ export function SignupForm() {
               />
             </div>
             <FieldError id="signup-city-error" message={errors.city?.message} />
+          </div>
+        </div>
+
+        {/* Senha + confirmação. O botão de mostrar/ocultar alterna os dois
+            campos de uma vez: conferir a digitação num só não ajudaria. */}
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="signup-password">
+              {COPY.fields.password.label}
+            </Label>
+            <div className="relative">
+              <Lock
+                className="text-muted-foreground pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <Input
+                id="signup-password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                className="bg-background h-11 rounded-xl pr-12 pl-11"
+                placeholder={COPY.fields.password.placeholder}
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={
+                  errors.password ? 'signup-password-error' : undefined
+                }
+                {...form.register('password')}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((visible) => !visible)}
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 rounded-md p-1"
+                aria-label={
+                  showPassword
+                    ? COPY.actions.hidePassword
+                    : COPY.actions.showPassword
+                }
+                aria-pressed={showPassword}
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="size-4" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+            <FieldError
+              id="signup-password-error"
+              message={errors.password?.message}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="signup-password-confirm">
+              {COPY.fields.passwordConfirm.label}
+            </Label>
+            <div className="relative">
+              <Lock
+                className="text-muted-foreground pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <Input
+                id="signup-password-confirm"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                className="bg-background h-11 rounded-xl pr-4 pl-11"
+                placeholder={COPY.fields.passwordConfirm.placeholder}
+                aria-invalid={Boolean(errors.passwordConfirm)}
+                aria-describedby={
+                  errors.passwordConfirm
+                    ? 'signup-password-confirm-error'
+                    : undefined
+                }
+                {...form.register('passwordConfirm')}
+              />
+            </div>
+            <FieldError
+              id="signup-password-confirm-error"
+              message={errors.passwordConfirm?.message}
+            />
           </div>
         </div>
 

@@ -35,6 +35,16 @@ export const nutrizSignupApiSchema = z.object({
   fullName: stringNotEmptySchema
     .min(3, 'Informe seu nome completo.')
     .max(120, 'Nome muito longo.'),
+  // Sprint 6.2: e-mail e senha passaram a ser obrigatórios porque o cadastro
+  // cria uma conta no Supabase Auth, não só um lead. A **coluna** `email`
+  // continua nullable no banco de propósito — perfis criados antes da 6.2 são
+  // leads legítimos sem conta, e inventar um e-mail para eles seria pior que
+  // deixar o campo vazio.
+  email: emailSchema.max(254, 'E-mail muito longo.'),
+  password: z
+    .string()
+    .min(8, 'A senha deve ter pelo menos 8 caracteres.')
+    .max(128, 'A senha deve ter no máximo 128 caracteres.'),
   phoneWhatsapp: whatsappSchema,
   state: z.string().trim().toUpperCase().pipe(ufSchema),
   city: stringNotEmptySchema

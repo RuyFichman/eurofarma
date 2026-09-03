@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import type { NutrizProfile, Prisma, Unit } from '@prisma/client'
+import type { Appointment, NutrizProfile, Prisma, Unit } from '@prisma/client'
 
 import { prisma } from '../../lib/db/prisma'
 
@@ -94,4 +94,33 @@ export async function createTestWhatsappClicks(params: {
   }))
   const result = await prisma.whatsappClick.createMany({ data: rows })
   return result.count
+}
+
+/**
+ * Cria um agendamento de teste. Nao tem prefixo `__test__` proprio: a linha e
+ * alcancada pelo cleanup atraves da nutriz dona dela, entao o `nutrizProfileId`
+ * precisa ser de um perfil criado por `createTestNutrizProfile`.
+ *
+ * `reference` recebe sufixo unico porque a coluna e `@unique` no schema.
+ */
+export async function createTestAppointment(params: {
+  nutrizProfileId: string
+  unitId?: string | null
+  status?: Prisma.AppointmentCreateInput['status']
+  scheduledAt?: Date | null
+  failureReason?: Prisma.AppointmentCreateInput['failureReason']
+  declaredAt?: Date
+}): Promise<Appointment> {
+  const suffix = uniqueSuffix()
+  return prisma.appointment.create({
+    data: {
+      reference: `AGD-TEST-${suffix}`,
+      nutrizProfile: { connect: { id: params.nutrizProfileId } },
+      ...(params.unitId ? { unit: { connect: { id: params.unitId } } } : {}),
+      status: params.status ?? 'DECLARED',
+      scheduledAt: params.scheduledAt ?? null,
+      failureReason: params.failureReason ?? null,
+      ...(params.declaredAt ? { declaredAt: params.declaredAt } : {}),
+    },
+  })
 }

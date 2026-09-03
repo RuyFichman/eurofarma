@@ -1,6 +1,29 @@
 /** Destino padrão do painel quando não há `?next=` válido. */
 export const ADMIN_DEFAULT_PATH = '/admin/dashboard'
 
+/** Destino padrão do site público quando não há `next` confiável. */
+export const PUBLIC_DEFAULT_PATH = '/entrar'
+
+/**
+ * Sanitiza um destino do **site público** — hoje o `?next=` do callback de
+ * e-mail (`/auth/confirmar`, Sprint 6.3).
+ *
+ * Aceita qualquer caminho relativo deste site, sem amarrar a um namespace (o
+ * público não tem um). As rejeições são as mesmas do `sanitizeAdminNextPath`:
+ * URL absoluta, protocol-relative (`//host`) e backslash — que alguns
+ * navegadores normalizam para `/`, viabilizando open redirect. Entrada suspeita
+ * cai no padrão em vez de virar erro.
+ */
+export function sanitizeRelativeAppPath(
+  value: string | undefined | null,
+  fallback: string = PUBLIC_DEFAULT_PATH,
+): string {
+  if (!value) return fallback
+  if (value.includes('\\') || value.includes('://')) return fallback
+  if (!value.startsWith('/') || value.startsWith('//')) return fallback
+  return value
+}
+
 /** Rotas do namespace `/admin` que não devem ser destino de retorno pós-login. */
 const NON_RETURNABLE = ['/admin/login', '/admin/sem-acesso']
 
