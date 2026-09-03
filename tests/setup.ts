@@ -18,6 +18,9 @@ afterEach(async () => {
   await prisma.appointment.deleteMany({
     where: { nutrizProfile: { fullName: { startsWith: '__test__' } } },
   })
+  await prisma.whatsappConversation.deleteMany({
+    where: { nutrizProfile: { fullName: { startsWith: '__test__' } } },
+  })
   await prisma.whatsappClick.deleteMany({
     where: { unit: { slug: { startsWith: '__test__' } } },
   })
