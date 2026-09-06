@@ -781,8 +781,9 @@ export const NUTRIZ_AUTH = {
         'Acesse sua conta do NutriLink para acompanhar seu agendamento de doação de leite humano.',
     },
     backToHome: 'Voltar ao início',
-    heading: 'Que bom te ver de novo',
-    subtitle: 'Entre para acompanhar seu agendamento e sua jornada de doação.',
+    heading: 'Bem-vinda de volta 💙',
+    subtitle: 'Acesse sua conta para acompanhar seus agendamentos e doações.',
+    tabs: { login: 'Entrar', signup: 'Criar conta' },
     fields: {
       email: { label: 'E-mail', placeholder: 'voce@email.com' },
       password: { label: 'Senha', placeholder: 'Sua senha' },
