@@ -226,13 +226,10 @@ export function SignupForm() {
               className="bg-background h-11 rounded-xl pr-4 pl-11"
               placeholder={COPY.fields.email.placeholder}
               aria-invalid={Boolean(errors.email)}
-              aria-describedby="signup-email-helper signup-email-error"
+              aria-describedby={errors.email ? 'signup-email-error' : undefined}
               {...form.register('email')}
             />
           </div>
-          <p id="signup-email-helper" className="text-muted-foreground text-xs">
-            {COPY.fields.email.helper}
-          </p>
           <FieldError id="signup-email-error" message={errors.email?.message} />
         </div>
 
@@ -252,16 +249,12 @@ export function SignupForm() {
               className="bg-background h-11 rounded-xl pr-4 pl-11"
               placeholder={COPY.fields.whatsapp.placeholder}
               aria-invalid={Boolean(errors.phoneWhatsapp)}
-              aria-describedby="signup-whatsapp-helper signup-whatsapp-error"
+              aria-describedby={
+                errors.phoneWhatsapp ? 'signup-whatsapp-error' : undefined
+              }
               {...form.register('phoneWhatsapp')}
             />
           </div>
-          <p
-            id="signup-whatsapp-helper"
-            className="text-muted-foreground text-xs"
-          >
-            {COPY.fields.whatsapp.helper}
-          </p>
           <FieldError
             id="signup-whatsapp-error"
             message={errors.phoneWhatsapp?.message}

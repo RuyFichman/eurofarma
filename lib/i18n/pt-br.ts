@@ -688,13 +688,10 @@ export const SIGNUP = {
     email: {
       label: 'E-mail',
       placeholder: 'voce@email.com',
-      helper: 'É com ele que você entra na sua área depois.',
     },
     whatsapp: {
       label: 'WhatsApp',
       placeholder: '(11) 90000-0000',
-      helper:
-        'É por aqui que um banco de leite fala com você — e é como reconhecemos você no nosso WhatsApp.',
     },
     password: {
       label: 'Senha',
