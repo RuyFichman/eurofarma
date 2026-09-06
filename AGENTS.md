@@ -24,7 +24,6 @@ NÃO está em uso ainda (não sugira, não configure, não referencie como atual
 - Playwright e2e (planejado para sprint futuro).
 - **Conta na Meta** — o **código** do chatbot está pronto (6.5), mas **não existe app na Meta, número de teste, template nem URL pública**. Sem isso o bot não conversa com ninguém de verdade; o fluxo inteiro roda localmente pelo `pnpm whatsapp:sim`. As quatro variáveis `WHATSAPP_*` do `.env.example` precisam ser preenchidas com valores reais (hoje o `.env.local` tem valores locais de teste, que só servem para o simulador).
 - **Recuperação de senha por e-mail** — o fluxo existe (6.3), mas depende de SMTP. O Supabase embutido é fortemente limitado; **sem SMTP próprio configurado, o e-mail pode não chegar**. A tela `/redefinir-senha` e o callback `/auth/confirmar` estão prontos e funcionam assim que o link chegar.
-- **Gráficos no painel** — a 5.5 saiu deliberadamente sem biblioteca de charts (série temporal com zero ponto não comunica nada). Quando entrarem, carregar a skill `dataviz` antes da primeira linha de chart.
 - **`content/`** — ainda não criado; nasce no sprint de conteúdo/MDX. A **área admin já existe** como **segmento literal `app/admin/`** (URLs `/admin/*`), com `/admin/login` (5.2) e `/admin/dashboard` + `/admin/sem-acesso` (5.3) — **não** é route group `(admin)` (que seria omitido da URL); o group **interno** `(painel)` agrupa as telas protegidas sem mexer na URL; ver §13. (O grupo `(public)` já existe, com `layout.tsx` — Header + `<main id="main-content">` + Footer — a home `/` e `/style-guide`.)
 
 Quando precisar mencionar esses itens, marque-os explicitamente como "previsto para sprints futuros".
@@ -337,6 +336,8 @@ Ao receber uma tarefa neste projeto:
 - Multi-idioma (apenas pt-br).
 
 ## 13. Decisões arquiteturais importantes
+
+- **Gráficos administrativos (2026-09-06)** → gráficos de linhas (cadastros × agendamentos informados nos últimos seis meses de São Paulo, mês atual parcial) e rosca (origem UTM acumulada dos cadastros) em `/admin/dashboard`, abaixo dos indicadores. SVG nativo sem dependências; linhas com inspeção por mouse/teclado e tabela acessível, rosca com legenda numérica. Dados reais agregados em `lib/db/queries/dashboard-charts.ts`, sem PII, respeitando `deletedAt`; agendamentos contam por `declaredAt`, com data de visita e status DECLARED/COMPLETED/CANCELLED. Origem é `utm_source`, nunca `contactPreference`: WhatsApp/wa.me, site/web/website, outras e não informada; não existe métrica de acessos globais. Meses vazios são zero com escala inteira; base vazia tem explicação. Copy em `DASHBOARD_CHARTS`. O time autorizou explicitamente prosseguir sem a skill `dataviz`, indisponível no ambiente.
 
 - **Marca renomeada de Lactare para NutriLink (2026-09-02)** → toda copy pública, metadado, identificação do painel, mensagem de WhatsApp e documentação de produto usa NutriLink. O email técnico legado `admin@lactare.local` não foi migrado porque é um identificador existente no Supabase Auth; ele não deve aparecer como marca na interface.
 - **WhatsApp via `wa.me` direto** (não Business API) → custo zero e tracking suficiente no MVP via rota `api/track`.

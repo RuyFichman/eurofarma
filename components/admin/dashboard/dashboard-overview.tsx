@@ -11,11 +11,13 @@ import type {
 } from '@/lib/db/queries/dashboard-metrics'
 import { ADMIN } from '@/lib/i18n/pt-br'
 import { formatCount } from '@/lib/utils/format-number'
+import type { ReactNode } from 'react'
 
 const COPY = ADMIN.dashboard
 
 type DashboardOverviewProps = {
   metrics: AdminDashboardMetrics
+  children?: ReactNode
 }
 
 /** Contagem de uma chave específica do breakdown (0 se ausente). */
@@ -43,7 +45,10 @@ function toStateItems(counts: DashboardStateCount[]): BreakdownItem[] {
  * do zero — com a base ainda pequena, o estado vazio é o caminho principal, não
  * a exceção (spec 5.5, §3).
  */
-export function DashboardOverview({ metrics }: DashboardOverviewProps) {
+export function DashboardOverview({
+  metrics,
+  children,
+}: DashboardOverviewProps) {
   const { units, nutriz, whatsappClicks, periodDays } = metrics
 
   const activeUnits = countOf(units.byStatus, 'ACTIVE')
@@ -111,6 +116,8 @@ export function DashboardOverview({ metrics }: DashboardOverviewProps) {
           />
         </dl>
       </section>
+
+      {children}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <AdminBreakdownList

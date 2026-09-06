@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { DashboardOverview } from '@/components/admin/dashboard/dashboard-overview'
 import { getAdminDashboardMetrics } from '@/lib/db/queries/dashboard-metrics'
 import { ADMIN } from '@/lib/i18n/pt-br'
+import { getDashboardCharts } from '@/lib/db/queries/dashboard-charts'
+import { DashboardCharts } from '@/components/admin/dashboard/dashboard-charts'
 
 export const metadata: Metadata = {
   title: ADMIN.dashboard.seo.title,
@@ -22,7 +24,10 @@ export const metadata: Metadata = {
  * números não congelarem em build.
  */
 export default async function AdminDashboardPage() {
-  const metrics = await getAdminDashboardMetrics()
+  const [metrics, charts] = await Promise.all([
+    getAdminDashboardMetrics(),
+    getDashboardCharts(),
+  ])
 
   return (
     <div className="space-y-6">
@@ -37,7 +42,9 @@ export default async function AdminDashboardPage() {
         </p>
       </div>
 
-      <DashboardOverview metrics={metrics} />
+      <DashboardOverview metrics={metrics}>
+        <DashboardCharts data={charts} />
+      </DashboardOverview>
     </div>
   )
 }

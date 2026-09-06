@@ -1646,6 +1646,32 @@ export const A11Y = {
 
 export type NavItem = (typeof NAV.items)[number]
 
+export const DASHBOARD_CHARTS = {
+  evolution: 'Evolução: Cadastros vs. Agendamentos',
+  registrations: 'Cadastros',
+  appointments: 'Agendamentos informados',
+  period: '{start} – {end} · mês atual parcial',
+  evolutionNote:
+    'Agendamentos por mês em que foram informados, incluindo os cancelados. Não representa confirmação pela unidade.',
+  evolutionEmpty:
+    'Ainda não há cadastros ou agendamentos informados neste período.',
+  origins: 'Origem dos Cadastros',
+  originsSubtitle: 'Total acumulado: {count} nutrizes',
+  originsNote:
+    'Origem registrada via UTM no cadastro. Sem identificação, a origem fica como não informada.',
+  originsEmpty:
+    'Ainda não há cadastros para mostrar a distribuição de origens.',
+  originLabels: {
+    whatsapp: 'WhatsApp',
+    web: 'Site',
+    other: 'Outras origens',
+    unknown: 'Não informada',
+  },
+  total: 'total',
+  viewData: 'Ver dados do gráfico',
+  month: 'Mês',
+} as const
+
 /** Protótipo visual solicitado pelo time; dados de consulta são ilustrativos. */
 export const APPOINTMENT_PREVIEW = {
   nav: [
