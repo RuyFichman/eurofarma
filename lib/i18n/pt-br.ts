@@ -1663,7 +1663,7 @@ export const APPOINTMENT_PREVIEW = {
   status: 'Confirmada',
   reference: 'Ref: AGD-2026-04892',
   networkLabel: 'Rede',
-  network: 'Lactare',
+  network: 'NutriLink',
   confirmation:
     'Seu agendamento foi confirmado pelo banco de leite. Você receberá um lembrete via WhatsApp 24h antes.',
   detailsTitle: 'Detalhes do Agendamento',
@@ -1692,7 +1692,7 @@ export const APPOINTMENT_PREVIEW = {
     },
   ],
   locationTitle: 'Local do Atendimento',
-  unit: 'BLH Lactare — Pinheiros',
+  unit: 'BLH NutriLink — Pinheiros',
   address: 'Rua Cardeal Arcoverde, 423 — Pinheiros, São Paulo – SP',
   cep: 'CEP 05407-001',
   phone: '(11) 3022-4891',
