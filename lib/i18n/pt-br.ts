@@ -304,8 +304,18 @@ export const CONTENT = {
   videos: {
     title: 'Vídeos Explicativos',
     items: [
-      { title: 'Como funciona o primeiro contato', duration: '2:34' },
-      { title: 'Como agendar sua visita', duration: '3:18' },
+      {
+        title: 'Como funciona o cadastro',
+        duration: '2:34',
+        thumbnail:
+          'https://images.unsplash.com/photo-1773243086607-0e2d41fb59c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80',
+      },
+      {
+        title: 'Como agendar sua visita',
+        duration: '3:18',
+        thumbnail:
+          'https://images.unsplash.com/photo-1774041339887-9ab8c56f7482?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80',
+      },
     ],
   },
   checklist: {

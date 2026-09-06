@@ -18,8 +18,19 @@ export function ContentVideos() {
         {videos.items.map((video) => (
           <div
             key={video.title}
-            className="from-primary to-chart-3 relative flex aspect-video items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br shadow-sm"
+            className="from-primary to-chart-3 relative flex aspect-video items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br bg-cover bg-center shadow-sm"
+            style={
+              video.thumbnail
+                ? { backgroundImage: `url("${video.thumbnail}")` }
+                : undefined
+            }
           >
+            {video.thumbnail ? (
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-black/15"
+              />
+            ) : null}
             <Badge className="absolute top-3 left-3 gap-1">
               <Video className="size-3" aria-hidden="true" />
               Vídeo
