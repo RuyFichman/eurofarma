@@ -429,7 +429,7 @@ export function SignupForm() {
             />
             <Label
               htmlFor="signup-consent"
-              className="text-muted-foreground text-sm leading-relaxed font-normal"
+              className="text-muted-foreground block min-w-0 flex-1 text-sm leading-relaxed font-normal"
             >
               {COPY.fields.consent.lead}{' '}
               <Link href="/privacidade" className="text-primary underline">

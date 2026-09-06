@@ -649,6 +649,10 @@ export const SIGNUP = {
   },
   hero: {
     quote: 'Cada gota de leite humano doado é um ato de amor que salva vidas.',
+    quoteLines: [
+      'Cada gota de leite humano doado',
+      'é um ato de amor que salva vidas.',
+    ],
     quoteSource: 'Ministério da Saúde — rBLH',
     bullets: [
       'Acompanhe sua jornada de doação',
@@ -1641,3 +1645,66 @@ export const A11Y = {
 } as const
 
 export type NavItem = (typeof NAV.items)[number]
+
+/** Protótipo visual solicitado pelo time; dados de consulta são ilustrativos. */
+export const APPOINTMENT_PREVIEW = {
+  nav: [
+    { label: 'Home', href: '/' },
+    { label: 'Conteúdos', href: '/como-funciona' },
+    { label: 'Buscar Bancos', href: '/buscar' },
+    { label: 'Meu Agendamento', href: '/meu-agendamento' },
+  ],
+  brandStart: 'Nutri',
+  brandEnd: 'Link',
+  area: 'Área da Nutriz',
+  greeting: 'Olá, {name}! 💙 Sua saúde e a do seu bebê importam.',
+  logout: 'Sair',
+  statusLabel: 'Status da consulta',
+  status: 'Confirmada',
+  reference: 'Ref: AGD-2026-04892',
+  networkLabel: 'Rede',
+  network: 'Lactare',
+  confirmation:
+    'Seu agendamento foi confirmado pelo banco de leite. Você receberá um lembrete via WhatsApp 24h antes.',
+  detailsTitle: 'Detalhes do Agendamento',
+  details: [
+    { label: 'Data', value: 'Quinta-feira, 05 de junho de 2026' },
+    { label: 'Horário', value: '09:30' },
+    { label: 'Tipo de Atendimento', value: 'Coleta de Leite + Consulta' },
+  ],
+  guidanceTitle: 'Orientações para o Dia',
+  guidance: [
+    {
+      title: 'Traga o leite coletado',
+      body: 'Se extraiu leite em casa, traga em frasco de vidro esterilizado, etiquetado com data e hora da extração, acondicionado em bolsa térmica.',
+    },
+    {
+      title: 'Apresente documento com foto',
+      body: 'RG, CNH ou passaporte. Para bebês, traga também a Caderneta de Saúde da Criança.',
+    },
+    {
+      title: 'Chegue com 10 minutos de antecedência',
+      body: 'Isso garante tempo para triagem e preenchimento de formulários sem atrasar sua consulta.',
+    },
+    {
+      title: 'Pode trazer o bebê',
+      body: 'O ambiente é adaptado para mães com bebês. Temos espaço de amamentação disponível.',
+    },
+  ],
+  locationTitle: 'Local do Atendimento',
+  unit: 'BLH Lactare — Pinheiros',
+  address: 'Rua Cardeal Arcoverde, 423 — Pinheiros, São Paulo – SP',
+  cep: 'CEP 05407-001',
+  phone: '(11) 3022-4891',
+  directions: 'Como Chegar',
+  quickTitle: 'Ações Rápidas',
+  actions: [
+    'Falar com Suporte via WhatsApp',
+    'Reagendar Consulta',
+    'Buscar Outro Banco',
+  ],
+  cancelTitle: 'Precisa cancelar?',
+  cancelBody:
+    'Cancelamentos com até 24h de antecedência não geram pendências no seu cadastro.',
+  cancelAction: 'Solicitar cancelamento →',
+} as const

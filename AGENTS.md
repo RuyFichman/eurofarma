@@ -405,3 +405,7 @@ Ao receber uma tarefa neste projeto:
 - **rBLH:** Rede Brasileira de Bancos de Leite Humano; rede nacional que articula os BLHs e pontos de coleta.
 - **Doação de leite:** ato de a nutriz doar o excedente de leite materno para abastecer os bancos de leite.
 - **LGPD:** Lei Geral de Proteção de Dados; norma brasileira que rege a coleta e o tratamento de dados pessoais.
+
+### Protótipo da área da nutriz (2026-09-05)
+
+Por solicitação explícita do time, `/meu-agendamento` agora apresenta um protótipo estático fiel à imagem fornecida, após login real. O nome e as iniciais vêm da sessão; consulta, status, endereço, orientações e mapa são ilustrativos. Inclusive “Confirmada”, lembrete, “Lactare” e “Reagendar Consulta” reproduzem o mockup por solicitação e não representam capacidades do produto. Botões de consulta ficam desativados; navegação e logout funcionam. Os componentes e queries reais da 6.4 continuam disponíveis, mas não são consumidos nesta página temporariamente. Copy em `APPOINTMENT_PREVIEW`, estilos escopados em `components/nutriz/appointment-preview.css` com tokens locais para as cores da referência. `PublicChrome` omite header/footer públicos nesta rota, que tem cabeçalho próprio. A aba Entrar em `/cadastro` agora navega para `/entrar`; autenticação, autorização e redirecionamento existentes são preservados.

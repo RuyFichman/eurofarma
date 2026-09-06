@@ -32,17 +32,15 @@ export default function CadastroPage() {
             {SIGNUP.backToHome}
           </Link>
 
-          {/* Abas Entrar/Criar conta. "Entrar" (login) é Sprint 5 — fica visível,
-              porém inativa, em vez de simular uma autenticação inexistente. */}
+          {/* Navegação entre login e cadastro. */}
           <div className="bg-card rounded-3xl border p-5 shadow-sm sm:p-7">
             <div className="bg-muted/70 mb-7 grid grid-cols-2 gap-1 rounded-xl border p-1">
-              <span
-                aria-disabled="true"
-                title={SIGNUP.tabs.loginUnavailable}
-                className="text-muted-foreground cursor-not-allowed rounded-lg px-4 py-2.5 text-center text-sm font-medium"
+              <Link
+                href="/entrar"
+                className="text-muted-foreground hover:bg-card hover:text-primary rounded-lg px-4 py-2.5 text-center text-sm font-medium"
               >
                 {SIGNUP.tabs.login}
-              </span>
+              </Link>
               <span
                 aria-current="page"
                 className="bg-card text-primary rounded-lg border px-4 py-2.5 text-center text-sm font-semibold shadow-sm"
