@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db/prisma'
 import { nutrizSignupApiSchema } from '@/lib/validators/nutriz'
 import { sanitizeSourceUtm } from '@/lib/utils/utm'
 import { jsonError } from '@/lib/utils/api-errors'
+import { getClientIp } from '@/lib/security/client-ip'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { createSupabaseAdminClient } from '@/lib/auth/supabase-admin'
 import { createSupabaseServerClient } from '@/lib/auth/supabase-server'
@@ -22,16 +23,6 @@ const RATE_LIMIT = { limit: 5, windowMs: 60_000 } as const
 /** Mensagem única para conflito de conta (não distingue e-mail de WhatsApp). */
 const ACCOUNT_EXISTS_MESSAGE =
   'Já existe uma conta com esses dados. Tente entrar em vez de criar uma nova.'
-
-/** IP do cliente a partir dos headers de proxy (fallback `unknown` em local). */
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) {
-    const first = forwarded.split(',')[0]?.trim()
-    if (first) return first
-  }
-  return request.headers.get('x-real-ip')?.trim() || 'unknown'
-}
 
 /**
  * O Supabase sinaliza e-mail já cadastrado com 422 (ou mensagem de "already
@@ -63,7 +54,7 @@ function isDuplicateAuthUserError(error: {
  */
 export async function POST(request: NextRequest) {
   // 0. Rate limiting por IP (anti-abuso básico).
-  const ip = getClientIp(request)
+  const ip = getClientIp(request.headers)
   const limited = rateLimit(`nutriz:${ip}`, RATE_LIMIT)
   if (!limited.success) {
     return NextResponse.json(

@@ -4,7 +4,7 @@
 
 **Desafio:** Challenge FIAP 2026 — 3º ano, Sistemas de Informação — Projeto Lactare
 
-**Versão:** 2.1
+**Versão:** 2.2
 
 **Última atualização:** 12 de setembro de 2026
 
@@ -19,7 +19,7 @@ O NutriLink é a solução digital do Lactare, criada para reduzir as barreiras 
 A solução tem três frentes:
 
 1. **Chatbot no WhatsApp** — porta de entrada principal, onde a nutriz tira dúvidas, verifica se está na área de cobertura e, se quiser, se cadastra.
-2. **Plataforma web** — consulta dos municípios atendidos, futura verificação automática por CEP, conteúdo educativo, cadastro, login e área da nutriz.
+2. **Plataforma web** — verificação de cobertura por CEP ou município, conteúdo educativo, cadastro, login e área da nutriz.
 3. **Dashboard administrativo** — métricas de alcance, engajamento e conversão para a equipe do Lactare.
 
 ## 2. O Problema
@@ -77,7 +77,7 @@ O motivo para concentrar o canal conversacional no WhatsApp está no Anexo A.1.
 ### 4.2 Plataforma Web
 
 - Conteúdo educativo: “Como funciona”, perguntas frequentes, checklist e vídeos.
-- Verificador de cobertura por município, com os 30 municípios da área de atuação do Lactare agrupados por sub-região; a resolução automática por CEP é a próxima etapa.
+- Verificador de cobertura por CEP ou município: o CEP é resolvido pelo ViaCEP e o município resultante é comparado com a lista ativa administrada pelo Lactare.
 - Cadastro, login e área pessoal, incluindo lembretes quando ativados.
 - Painel administrativo; ver seção 4.3.
 
@@ -96,7 +96,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 1. Primeiro contato pelo WhatsApp.
 2. O chatbot apresenta o projeto e esclarece dúvidas.
-3. A nutriz verifica se seu município faz parte da área atendida; futuramente, essa consulta também será resolvida automaticamente pelo CEP.
+3. A nutriz informa o CEP ou seleciona o município para verificar se a localização faz parte da área atendida e se existe possibilidade de coleta residencial.
 4. A nutriz pode realizar um cadastro simplificado e opcional.
 5. A nutriz entra em contato direto com o Lactare para combinar a doação.
 6. A nutriz pode ativar lembretes opcionais.
@@ -108,7 +108,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 | ID | Descrição |
 |---|---|
-| RF01 | Verificar elegibilidade de coleta domiciliar a partir do CEP. |
+| RF01 | Verificar a possibilidade de coleta residencial a partir do CEP ou município, sem representar confirmação logística. |
 | RF02 | Exibir os municípios atendidos pelo Lactare e suas sub-regiões. Bancos de leite e pontos de coleta não são entidades gerenciadas pelo NutriLink. |
 | RF03 | Informar quando a nutriz está fora da área de cobertura e indicar canal externo oficial. |
 | RF04 | Permitir cadastro opcional com consentimento LGPD. |
@@ -167,20 +167,21 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 - Cadastro opcional de nutriz com consentimento obrigatório no formulário e provisionamento de conta no Supabase Auth.
 - Login, recuperação de senha condicionada à entrega de e-mail pelo SMTP e sessão da nutriz.
 - Painel administrativo com autenticação e autorização por perfil `ADMIN`.
-- Página pública `/verificar-cobertura`, com os 30 municípios informados pelo time, agrupados nas seis sub-regiões adotadas pelo projeto.
-- Resposta para cidade fora da lista com encaminhamento ao diretório oficial externo da rBLH.
+- Página pública `/verificar-cobertura`, com consulta por CEP ou município e os 30 municípios agrupados nas seis sub-regiões adotadas pelo projeto.
+- Endpoint `POST /api/coverage`: valida o CEP, consulta o ViaCEP com timeout e compara o município e a UF com `service_municipalities`, sem persistir o CEP.
+- Resultado conservador: município ativo indica possibilidade de coleta residencial, cuja triagem, modalidade, data e disponibilidade ainda dependem de confirmação direta do Lactare.
+- Resposta para localização fora da lista com encaminhamento ao diretório oficial externo da rBLH.
 - Dashboard adaptado para municípios ativos, sub-regiões e cadastros de nutrizes.
 - Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes.
-- Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada e versionada; sua aplicação no Supabase cloud ainda está pendente.
+- Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local.
 - Área pessoal adaptada para mostrar a cidade cadastrada e encaminhar ao verificador de cobertura, sem apresentar agendamento ou confirmação de coleta.
-- Suíte com 362 testes passando nesta atualização: 295 unitários e 67 de integração. Os testes existentes ainda não consultam a nova tabela, pois sua migration não foi aplicada no Supabase cloud.
+- Suíte com 381 testes passando nesta atualização: 314 unitários e 67 de integração.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
-- **Elegibilidade:** a seleção por município já funciona; a resolução automática de CEP para município ainda precisa ser implementada.
-- **Persistência de municípios:** o schema, a migration, as consultas e o CRUD estão prontos no código, mas a migration ainda não foi aplicada no Supabase cloud.
+- **Elegibilidade operacional:** o produto verifica se o CEP ou município pertence à área configurada e indica possibilidade de coleta residencial; a confirmação da modalidade e da logística continua dependendo do Lactare.
 - **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
 - **Métricas:** o dashboard mostra métricas básicas, mas ainda não calcula o funil completo, retenção, adesão a lembretes nem os cruzamentos de região e perfil.
 - **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
@@ -189,7 +190,6 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 
 ### 9.3 Funcionalidades ainda não implementadas
 
-- RF01: completar a elegibilidade automática por CEP; a consulta por município está implementada.
 - RF06: lembretes personalizados com opt-in separado e job agendado.
 - RF07: tracking dos canais atuais de contato com o Lactare.
 - RF12: cartão de impacto após confirmação legítima da doação.
@@ -210,14 +210,12 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 
 ### 9.5 Ordem recomendada de implementação
 
-1. Aplicar a migration de `service_municipalities` no Supabase cloud e validar os 30 registros.
-2. Completar a elegibilidade por CEP usando a lista de municípios como fonte de verdade.
-3. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro e encaminhamento ao Lactare.
-4. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
-5. Completar o dashboard com funil, retenção, cobertura, região e perfil.
-6. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
-7. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
-8. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
+1. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro e encaminhamento ao Lactare.
+2. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
+3. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+4. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
+5. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
+6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
 ### 9.6 Fora do escopo atual
 
@@ -273,6 +271,10 @@ Arujá, Barueri, Caieiras, Cajamar, Carapicuíba, Cotia, Diadema, Embu das Artes
 Foi encontrada uma divergência nas fontes públicas: o site institucional da Eurofarma e publicações do perfil oficial do Lactare usam, em algumas campanhas, a descrição mais restrita “Zona Sul de São Paulo, região do ABC, Cotia ou Itapevi”. O Mapa do Leite foi adotado como fonte de verdade por ser uma ferramenta dedicada especificamente à checagem de cobertura. A descrição de campanhas pode refletir um recorte de captação ativa em determinado momento.
 
 Permanece pendente a confirmação de que a coleta domiciliar gratuita é oferecida de forma uniforme nos 30 municípios. Até a validação direta com o Lactare, o sistema pode afirmar que o município está na área de atuação, mas não deve prometer uma modalidade de coleta que não esteja configurada e validada.
+
+#### Como a consulta por CEP funciona
+
+O CEP informado é validado localmente e enviado ao endpoint interno `POST /api/coverage`. O servidor consulta o ViaCEP, usa somente os campos de município e UF e compara o resultado com os municípios ativos administrados no NutriLink. O CEP não é persistido nem enviado ao tracking. CEP inexistente, formato inválido e indisponibilidade do provedor têm respostas diferentes. A consulta possui timeout e rate limit local; o limitador deve ser distribuído antes de exposição pública em múltiplas instâncias.
 
 #### Tratamento da base nacional já existente
 
@@ -350,7 +352,7 @@ Se o link carregar um identificador de indicação, o campo de origem poderá re
 
 | CT | UC relacionado | Cenário | Resultado esperado |
 |---|---|---|---|
-| CT01 | UC01 | CEP de um município presente no Mapa do Leite | Indica que o município está na área do Lactare; a modalidade de coleta segue a regra validada e configurada, sem promessa indevida. |
+| CT01 | UC01 | CEP de um município presente no Mapa do Leite | Indica possibilidade de coleta residencial e informa que triagem, modalidade, data e disponibilidade dependem de confirmação do Lactare. |
 | CT02 | UC01 | CEP de município fora do Mapa do Leite | Trata como fora de área e segue o CT03. |
 | CT03 | UC03 | CEP fora da área de cobertura | Informa isso claramente e direciona a um canal externo oficial. |
 | CT04 | UC04 | Cadastro sem aceitar o consentimento LGPD | Bloqueia o envio. |
@@ -433,5 +435,6 @@ O site institucional do Lactare orienta quem mora fora da região atendida a pro
 15. rBLH Brasil / Fiocruz — [“Regulamento Técnico”](https://rblh.fiocruz.br/regulamento-tecnico), incluindo RDC nº 171/2006 e RDC nº 50/2002.
 16. Lactare — [site institucional e Mapa do Leite](https://www.lactare.com.br).
 17. [Instagram oficial do Lactare, @lactarebr](https://www.instagram.com/lactarebr/).
+18. [ViaCEP — documentação oficial do webservice](https://viacep.com.br/), formato de consulta por oito dígitos e tratamento de CEP inexistente.
 
 > Nota de governança: dados quantitativos, endereços, horários, área de atuação e alegações institucionais devem ser revalidados perto da entrega, pois podem mudar. A data e a fonte da validação devem ser registradas no documento ou no dado administrável correspondente.
