@@ -1,26 +1,30 @@
-import { prisma } from '@/lib/db/prisma'
 import {
   getChartMonths,
   getRegistrationOrigin,
   ORIGIN_KEYS,
   type DashboardChartsData,
-} from '@/lib/admin/dashboard/charts'
+} from '../../admin/dashboard/charts'
+import { prisma } from '../prisma'
+import type { DashboardNutrizScope } from './dashboard-segmentation'
 
 /** Só agregações; não carrega nomes, contatos ou registros individuais. */
 export async function getDashboardCharts(
   now = new Date(),
+  nutrizScope: DashboardNutrizScope = { deletedAt: null },
 ): Promise<DashboardChartsData> {
   const months = getChartMonths(now)
   const counts = await prisma.$transaction(
     months.map(({ start, end }) =>
       prisma.nutrizProfile.count({
-        where: { deletedAt: null, createdAt: { gte: start, lt: end } },
+        where: {
+          AND: [nutrizScope, { createdAt: { gte: start, lt: end } }],
+        },
       }),
     ),
   )
   const sources = await prisma.nutrizProfile.groupBy({
     by: ['sourceUtm'],
-    where: { deletedAt: null, createdAt: { lt: now } },
+    where: { AND: [nutrizScope, { createdAt: { lt: now } }] },
     _count: { id: true },
   })
   return {

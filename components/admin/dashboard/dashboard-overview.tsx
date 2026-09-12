@@ -2,30 +2,20 @@ import type { ReactNode } from 'react'
 import { HeartHandshake, Map, MapPin, UserPlus } from 'lucide-react'
 
 import { AdminBreakdownList } from '@/components/admin/dashboard/admin-breakdown-list'
-import type { BreakdownItem } from '@/components/admin/dashboard/admin-breakdown-list'
 import { AdminStatCard } from '@/components/admin/dashboard/admin-stat-card'
-import type {
-  AdminDashboardMetrics,
-  DashboardStateCount,
-} from '@/lib/db/queries/dashboard-metrics'
+import type { AdminDashboardMetrics } from '@/lib/db/queries/dashboard-metrics'
 import { ADMIN, COVERAGE } from '@/lib/i18n/pt-br'
 import { formatCount } from '@/lib/utils/format-number'
 
 const COPY = ADMIN.dashboard
 
-function toStateItems(counts: DashboardStateCount[]): BreakdownItem[] {
-  return counts.map((row) => ({
-    id: row.state,
-    label: row.state,
-    count: row.count,
-  }))
-}
-
 export function DashboardOverview({
   metrics,
+  hasFilters,
   children,
 }: {
   metrics: AdminDashboardMetrics
+  hasFilters: boolean
   children?: ReactNode
 }) {
   const { municipalities, nutriz, periodDays } = metrics
@@ -63,10 +53,15 @@ export function DashboardOverview({
             value={nutriz.total}
             description={
               nutriz.total > 0
-                ? COPY.metrics.nutriz.description
+                ? (hasFilters
+                    ? COPY.metrics.nutriz.filteredDescription
+                    : COPY.metrics.nutriz.description
+                  )
                     .replace('{count}', formatCount(nutriz.createdInPeriod))
                     .replace('{days}', String(periodDays))
-                : COPY.metrics.nutriz.empty
+                : hasFilters
+                  ? COPY.metrics.nutriz.filteredEmpty
+                  : COPY.metrics.nutriz.empty
             }
           />
           <AdminStatCard
@@ -75,11 +70,13 @@ export function DashboardOverview({
             value={nutriz.createdInPeriod}
             description={
               nutriz.createdInPeriod > 0
-                ? COPY.metrics.newNutriz.description.replace(
-                    '{days}',
-                    String(periodDays),
-                  )
-                : COPY.metrics.newNutriz.empty
+                ? (hasFilters
+                    ? COPY.metrics.newNutriz.filteredDescription
+                    : COPY.metrics.newNutriz.description
+                  ).replace('{days}', String(periodDays))
+                : hasFilters
+                  ? COPY.metrics.newNutriz.filteredEmpty
+                  : COPY.metrics.newNutriz.empty
             }
           />
         </dl>
@@ -87,7 +84,30 @@ export function DashboardOverview({
 
       {children}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <AdminBreakdownList
+          title={COPY.nutrizByRegion.title}
+          description={COPY.nutrizByRegion.description}
+          emptyMessage={COPY.nutrizByRegion.empty}
+          items={nutriz.byRegion.map((row) => ({
+            id: row.key,
+            label:
+              row.key === 'OUTSIDE_OR_UNMAPPED'
+                ? COPY.nutrizByRegion.outsideOrUnmapped
+                : COVERAGE.regions[row.key],
+            count: row.count,
+          }))}
+        />
+        <AdminBreakdownList
+          title={COPY.nutrizByStage.title}
+          description={COPY.nutrizByStage.description}
+          emptyMessage={COPY.nutrizByStage.empty}
+          items={nutriz.byStage.map((row) => ({
+            id: row.key,
+            label: COPY.filters.stage.options[row.key],
+            count: row.count,
+          }))}
+        />
         <AdminBreakdownList
           title={COPY.municipalitiesByStatus.title}
           description={COPY.municipalitiesByStatus.description.replace(
@@ -110,12 +130,6 @@ export function DashboardOverview({
             label: COVERAGE.regions[row.key],
             count: row.count,
           }))}
-        />
-        <AdminBreakdownList
-          title={COPY.nutrizByState.title}
-          description={COPY.nutrizByState.description}
-          emptyMessage={COPY.nutrizByState.empty}
-          items={toStateItems(nutriz.byState)}
         />
       </div>
     </div>

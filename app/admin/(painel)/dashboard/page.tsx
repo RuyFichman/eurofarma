@@ -1,10 +1,17 @@
 import type { Metadata } from 'next'
 
-import { DashboardOverview } from '@/components/admin/dashboard/dashboard-overview'
-import { getAdminDashboardMetrics } from '@/lib/db/queries/dashboard-metrics'
-import { ADMIN } from '@/lib/i18n/pt-br'
-import { getDashboardCharts } from '@/lib/db/queries/dashboard-charts'
 import { DashboardCharts } from '@/components/admin/dashboard/dashboard-charts'
+import { DashboardFiltersForm } from '@/components/admin/dashboard/dashboard-filters'
+import { DashboardOverview } from '@/components/admin/dashboard/dashboard-overview'
+import {
+  hasActiveDashboardFilters,
+  parseDashboardFilters,
+  type DashboardSearchParams,
+} from '@/lib/admin/dashboard/filters'
+import { getDashboardCharts } from '@/lib/db/queries/dashboard-charts'
+import { getAdminDashboardMetrics } from '@/lib/db/queries/dashboard-metrics'
+import { buildDashboardNutrizScope } from '@/lib/db/queries/dashboard-segmentation'
+import { ADMIN } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
   title: ADMIN.dashboard.seo.title,
@@ -23,10 +30,18 @@ export const metadata: Metadata = {
  * que lê cookies de sessão —, então não precisa de `force-dynamic` para os
  * números não congelarem em build.
  */
-export default async function AdminDashboardPage() {
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<DashboardSearchParams>
+}) {
+  const filters = parseDashboardFilters(await searchParams)
+  const hasFilters = hasActiveDashboardFilters(filters)
+  const now = new Date()
+  const nutrizScope = await buildDashboardNutrizScope(filters)
   const [metrics, charts] = await Promise.all([
-    getAdminDashboardMetrics(),
-    getDashboardCharts(),
+    getAdminDashboardMetrics(nutrizScope, now),
+    getDashboardCharts(now, nutrizScope),
   ])
 
   return (
@@ -42,7 +57,9 @@ export default async function AdminDashboardPage() {
         </p>
       </div>
 
-      <DashboardOverview metrics={metrics}>
+      <DashboardFiltersForm filters={filters} />
+
+      <DashboardOverview metrics={metrics} hasFilters={hasFilters}>
         <DashboardCharts data={charts} />
       </DashboardOverview>
     </div>

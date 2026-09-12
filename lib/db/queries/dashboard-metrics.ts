@@ -1,23 +1,29 @@
-import type { ServiceRegion } from '@prisma/client'
+import type { InterestStatus, ServiceRegion } from '@prisma/client'
 
+import {
+  buildDashboardLocationKey,
+  DASHBOARD_STAGE_VALUES,
+  type DashboardStage,
+} from '../../admin/dashboard/filters'
 import {
   SERVICE_REGION_VALUES,
   type ServiceRegionValue,
 } from '../../constants/service-municipalities'
 import { prisma } from '../prisma'
+import type { DashboardNutrizScope } from './dashboard-segmentation'
 
 export const DASHBOARD_PERIOD_DAYS = 30
 export const MUNICIPALITY_STATUS_KEYS = ['ACTIVE', 'INACTIVE'] as const
+export const NUTRIZ_REGION_KEYS = [
+  ...SERVICE_REGION_VALUES,
+  'OUTSIDE_OR_UNMAPPED',
+] as const
 
 export type MunicipalityStatusKey = (typeof MUNICIPALITY_STATUS_KEYS)[number]
+export type NutrizRegionKey = (typeof NUTRIZ_REGION_KEYS)[number]
 
 export type DashboardBreakdown<K extends string> = {
   key: K
-  count: number
-}
-
-export type DashboardStateCount = {
-  state: string
   count: number
 }
 
@@ -33,7 +39,8 @@ export type AdminDashboardMetrics = {
   nutriz: {
     total: number
     createdInPeriod: number
-    byState: DashboardStateCount[]
+    byRegion: DashboardBreakdown<NutrizRegionKey>[]
+    byStage: DashboardBreakdown<DashboardStage>[]
   }
 }
 
@@ -43,15 +50,21 @@ function subtractDays(from: Date, days: number): Date {
   return result
 }
 
-export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics> {
-  const since = subtractDays(new Date(), DASHBOARD_PERIOD_DAYS)
+export async function getAdminDashboardMetrics(
+  nutrizScope: DashboardNutrizScope = { deletedAt: null },
+  now = new Date(),
+): Promise<AdminDashboardMetrics> {
+  const since = subtractDays(now, DASHBOARD_PERIOD_DAYS)
 
   const [
     municipalitiesTotal,
     activeMunicipalities,
     activeMunicipalitiesByRegion,
+    nutrizTotal,
     nutrizCreatedInPeriod,
-    nutrizByState,
+    nutrizByStage,
+    nutrizLocations,
+    municipalitiesForRegion,
   ] = await prisma.$transaction([
     prisma.serviceMunicipality.count(),
     prisma.serviceMunicipality.count({ where: { isActive: true } }),
@@ -60,21 +73,45 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
       where: { isActive: true },
       _count: { id: true },
     }),
+    prisma.nutrizProfile.count({ where: nutrizScope }),
     prisma.nutrizProfile.count({
-      where: { deletedAt: null, createdAt: { gte: since } },
+      where: { AND: [nutrizScope, { createdAt: { gte: since, lte: now } }] },
     }),
     prisma.nutrizProfile.groupBy({
-      by: ['state'],
-      where: { deletedAt: null },
+      by: ['interestStatus'],
+      where: nutrizScope,
       _count: { id: true },
-      orderBy: [{ _count: { id: 'desc' } }, { state: 'asc' }],
+    }),
+    prisma.nutrizProfile.findMany({
+      where: nutrizScope,
+      select: { state: true, city: true },
+    }),
+    prisma.serviceMunicipality.findMany({
+      select: { state: true, name: true, region: true },
     }),
   ])
 
   const regionCounts = new Map<ServiceRegion, number>(
     activeMunicipalitiesByRegion.map((row) => [row.region, row._count.id]),
   )
-  const nutrizTotal = nutrizByState.reduce((sum, row) => sum + row._count.id, 0)
+  const stageCounts = new Map<InterestStatus, number>(
+    nutrizByStage.map((row) => [row.interestStatus, row._count.id]),
+  )
+  const regionByLocation = new Map<string, ServiceRegion>(
+    municipalitiesForRegion.map((municipality) => [
+      buildDashboardLocationKey(municipality.state, municipality.name),
+      municipality.region,
+    ]),
+  )
+  const nutrizRegionCounts = new Map<NutrizRegionKey, number>()
+
+  for (const nutriz of nutrizLocations) {
+    const region = regionByLocation.get(
+      buildDashboardLocationKey(nutriz.state, nutriz.city),
+    )
+    const key: NutrizRegionKey = region ?? 'OUTSIDE_OR_UNMAPPED'
+    nutrizRegionCounts.set(key, (nutrizRegionCounts.get(key) ?? 0) + 1)
+  }
 
   return {
     periodDays: DASHBOARD_PERIOD_DAYS,
@@ -97,9 +134,13 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
     nutriz: {
       total: nutrizTotal,
       createdInPeriod: nutrizCreatedInPeriod,
-      byState: nutrizByState.map((row) => ({
-        state: row.state,
-        count: row._count.id,
+      byRegion: NUTRIZ_REGION_KEYS.map((region) => ({
+        key: region,
+        count: nutrizRegionCounts.get(region) ?? 0,
+      })),
+      byStage: DASHBOARD_STAGE_VALUES.map((stage) => ({
+        key: stage,
+        count: stageCounts.get(stage as InterestStatus) ?? 0,
       })),
     },
   }

@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **381 testes passando**: 314 unitários e 67 de integração. A migration de `service_municipalities` já está aplicada no Supabase cloud, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **391 testes passando**: 323 unitários e 68 de integração. A migration de `service_municipalities` já está aplicada no Supabase cloud, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -97,7 +97,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Login, logout, recuperação e redefinição de senha da nutriz.
 - Área autenticada da nutriz com identificação da cidade cadastrada e acesso ao verificador de cobertura.
 - Login, logout, middleware, autorização por role e shell administrativo.
-- Dashboard administrativo adaptado para municípios, sub-regiões e cadastros de nutrizes.
+- Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal e às distribuições agregadas; dados pessoais não são exibidos.
 - Listagem de nutrizes com exposição reduzida de contato.
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
@@ -118,7 +118,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF07 — tracking de contato | **Não implementado no fluxo atual.** O tracking antigo dependia de unidades e sua rota foi aposentada. O novo evento deve acompanhar o contato direto com o Lactare. |
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
 | RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
-| RF10 — indicadores do funil | **Parcial.** O dashboard já resume municípios, sub-regiões e nutrizes; faltam alcance, funil completo, retenção e adesão a lembretes. |
+| RF10 — indicadores do funil | **Parcial.** O dashboard resume municípios e nutrizes e já permite segmentar os cadastros por sub-região, estágio e origem de forma combinável. Ainda faltam alcance, funil completo, retenção e adesão a lembretes. |
 | RF11 — chatbot completo | **Parcial.** Infraestrutura e simulação local existem; faltam FAQ, elegibilidade, cadastro, lembretes, pós-doação e ativação real na Meta. |
 | RF12 — cartão de impacto | **Não implementado.** |
 | RF13 — mensagem de indicação | **Não implementado.** |
@@ -148,7 +148,7 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Rate limiting distribuído.
 - Proteção anti-spam nos formulários públicos.
 - Consentimento separado e job de lembretes.
-- Segmentação por sub-região e perfil.
+- Segmentos comportamentais que ainda não têm eventos próprios: recorrência, adesão a lembretes, indicação entre doadoras e velocidade até a primeira doação.
 - Definição da fonte legítima de confirmação de uma doação.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
@@ -167,7 +167,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 1. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
 2. Implementar lembretes opcionais sem semântica de agendamento.
-3. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+3. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
 4. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
 5. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
 6. Ativar a integração real com a Meta quando a infraestrutura externa existir.
@@ -492,14 +492,15 @@ Sub-regiões:
 - **Leste / Alto Tietê:** Arujá, Ferraz de Vasconcelos, Guarulhos, Itaquaquecetuba, Poá e Suzano.
 - **Capital:** São Paulo.
 
-Segmentos de perfil planejados:
+Segmentos implementados no dashboard:
 
-- estágio da jornada;
-- adesão a lembretes;
-- origem do contato;
-- velocidade até a primeira doação.
+- sub-região da Grande São Paulo, relacionada pela cidade da nutriz e pela configuração de `ServiceMunicipality`;
+- estágio administrativo da jornada, a partir de `interestStatus` (`INTERESTED`, `CONTACTED`, `DONATED` ou `UNKNOWN`);
+- origem do cadastro, classificada somente quando existe `utm_source` explícita.
 
-Região e perfil são dimensões separadas e combináveis. A região já existe em `ServiceMunicipality`, na consulta pública, nos filtros administrativos e no dashboard. O vínculo entre região e perfil da nutriz e os demais segmentos comportamentais ainda não estão implementados. Não invente valores nem derive status clínico.
+Os três filtros vivem na URL (`region`, `stage` e `origin`), são combináveis e geram um único recorte compartilhado pelos cartões, pela evolução mensal e pelas distribuições. A região usa todos os municípios configurados, inclusive inativos, para que a desativação operacional de uma cidade não apague sua classificação histórica.
+
+Ainda não estão implementados os segmentos de adesão a lembretes, recorrência, indicação própria e velocidade até a primeira doação. Eles exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
 
 ## 13. Regras de produto vigentes
 
