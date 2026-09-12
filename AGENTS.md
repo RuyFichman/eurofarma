@@ -2,411 +2,562 @@
 
 ## 1. Sobre este arquivo
 
-Este é o guia operacional **de qualquer agente de código** que trabalhe no projeto NutriLink Digital — Claude Code, Codex ou outro. Leia este arquivo por completo antes de qualquer tarefa. Ele define stack, convenções, estrutura e o que está dentro e fora de escopo. Atualize-o sempre que uma decisão arquitetural for tomada, uma convenção mudar, ou o estágio do projeto avançar (ex.: quando deploy entrar em escopo).
+Este é o guia operacional de qualquer agente de código que trabalhe no projeto NutriLink Digital. Leia-o por completo antes de qualquer tarefa.
 
-**Este arquivo é a fonte única da verdade.** O `CLAUDE.md` na raiz não duplica nada: ele só importa este arquivo via `@AGENTS.md`, que é como o Claude Code carrega conteúdo externo. Escreva aqui — editar o `CLAUDE.md` faria as duas versões divergirem, que é exatamente o problema que essa importação evita.
+Este arquivo é a fonte de verdade para:
 
-## 2. Visão do produto
+- estado técnico atual;
+- escopo vigente;
+- arquitetura;
+- convenções;
+- segurança;
+- fluxo de trabalho.
 
-NutriLink Digital é uma plataforma web que conecta nutrizes (mães que amamentam) a bancos de leite humano e pontos de coleta no Brasil. O objetivo é reduzir o atrito entre a vontade de doar e a ação de doar: a nutriz encontra a unidade mais próxima e fala com ela pelo WhatsApp em poucos cliques. O WhatsApp (via links `wa.me` com tracking) é o canal principal de conversão. O produto inclui landing pública, página educativa, busca por estado/cidade, cadastro opcional de nutriz, painel admin e dashboard de métricas.
+O documento detalhado de produto está em [docs/projeto-nutrilink.md](docs/projeto-nutrilink.md). Se uma descrição histórica em issue, commit ou arquivo antigo conflitar com este guia, prevalecem este arquivo e a especificação de produto. A seção 3 deste arquivo é a referência para distinguir o que já existe do que ainda é alvo.
+
+O CLAUDE.md da raiz apenas importa este arquivo por meio de @AGENTS.md. Não duplique estas instruções nem edite CLAUDE.md para registrar decisões.
+
+Atualize este arquivo quando:
+
+- uma decisão arquitetural mudar;
+- uma convenção nova for adotada;
+- uma funcionalidade mudar de estado;
+- uma pendência de segurança for resolvida;
+- o escopo do produto for alterado.
+
+## 2. Visão e escopo do produto
+
+NutriLink é a solução digital do Lactare, banco de leite humano da Eurofarma. O objetivo é reduzir as barreiras de informação, elegibilidade, contato e continuidade da jornada de nutrizes na área atendida pelo Lactare, na Grande São Paulo.
+
+O produto tem três frentes:
+
+1. **Chatbot no WhatsApp:** porta de entrada principal para perguntas frequentes, elegibilidade, cadastro opcional, lembretes e pós-doação.
+2. **Plataforma web:** conteúdo educativo, elegibilidade por CEP ou município, cadastro, login e área pessoal.
+3. **Dashboard administrativo:** gestão da área atendida e indicadores de alcance, engajamento, conversão, retenção e adesão a lembretes.
+
+### 2.1 Limites obrigatórios
+
+O NutriLink:
+
+- atende a operação do Lactare;
+- pode encaminhar quem está fora da área para um diretório oficial externo da rBLH ou do Ministério da Saúde;
+- trata apenas dados necessários à jornada não clínica da nutriz;
+- usa lembretes opcionais, com consentimento separado;
+- pode registrar origem por indicação sem oferecer recompensa material.
+
+O NutriLink não é:
+
+- diretório nacional próprio de bancos de leite;
+- sistema de agendamento ou confirmação automática de coleta;
+- sistema de triagem clínica;
+- prontuário da nutriz ou do bebê;
+- sistema dos hospitais parceiros;
+- programa de recompensa material;
+- aplicativo móvel nativo.
+
+A combinação de data e horário de uma coleta continua sendo feita diretamente entre a nutriz e a equipe do Lactare. Nenhuma interface pode prometer “coleta confirmada” sem uma fonte operacional real e autorizada.
+
+### 2.2 Escopo institucional
+
+- **NutriLink:** produto digital.
+- **Lactare:** banco de leite e operação atendida pelo produto.
+- **Eurofarma:** mantenedora institucional do Lactare.
+- **Hospitais parceiros:** recebem o leite processado e cuidam dos pacientes; seus dados clínicos ficam fora do escopo.
+
+Não remover a palavra “Lactare” de textos que expliquem cobertura, atendimento ou responsabilidade operacional. NutriLink e Lactare não são nomes intercambiáveis.
 
 ## 3. Estado atual do projeto
 
-MVP em desenvolvimento inicial. **Apenas ambiente local.** Não há deploy, domínio nem produção.
+**Referência desta seção:** 11 de setembro de 2026.
 
-NÃO está em uso ainda (não sugira, não configure, não referencie como atual):
+MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
-- Deploy (Vercel ou qualquer hospedagem).
-- Domínio próprio ou DNS.
-- Ambientes de staging/production.
-- CI/CD (GitHub Actions etc.).
-- Monitoramento (Sentry, PostHog, Datadog).
-- Playwright e2e (planejado para sprint futuro).
-- **Conta na Meta** — o **código** do chatbot está pronto (6.5), mas **não existe app na Meta, número de teste, template nem URL pública**. Sem isso o bot não conversa com ninguém de verdade; o fluxo inteiro roda localmente pelo `pnpm whatsapp:sim`. As quatro variáveis `WHATSAPP_*` do `.env.example` precisam ser preenchidas com valores reais (hoje o `.env.local` tem valores locais de teste, que só servem para o simulador).
-- **Recuperação de senha por e-mail** — o fluxo existe (6.3), mas depende de SMTP. O Supabase embutido é fortemente limitado; **sem SMTP próprio configurado, o e-mail pode não chegar**. A tela `/redefinir-senha` e o callback `/auth/confirmar` estão prontos e funcionam assim que o link chegar.
-- **`content/`** — ainda não criado; nasce no sprint de conteúdo/MDX. A **área admin já existe** como **segmento literal `app/admin/`** (URLs `/admin/*`), com `/admin/login` (5.2) e `/admin/dashboard` + `/admin/sem-acesso` (5.3) — **não** é route group `(admin)` (que seria omitido da URL); o group **interno** `(painel)` agrupa as telas protegidas sem mexer na URL; ver §13. (O grupo `(public)` já existe, com `layout.tsx` — Header + `<main id="main-content">` + Footer — a home `/` e `/style-guide`.)
+A esteira funciona com:
 
-Quando precisar mencionar esses itens, marque-os explicitamente como "previsto para sprints futuros".
+- pnpm dev;
+- pnpm build;
+- pnpm lint;
+- pnpm typecheck;
+- pnpm format;
+- pnpm check;
+- pnpm check:validators;
+- pnpm test, test:unit, test:integration e test:coverage.
 
-O scaffold do Next.js **já existe** e a esteira de qualidade funciona: `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm format`, `pnpm check`, `pnpm check:validators` e `pnpm test`/`test:unit`/`test:integration`/`test:coverage` (Vitest) rodam todos. TS estrito ativo (`strict` + `noUncheckedIndexedAccess`); imports com `@/*` mapeiam para a raiz.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte tem **365 testes passando** no baseline desta atualização.
 
-**Design system:** tokens visuais em `app/globals.css` (paleta **Azul** em HSL: primary azul profundo `#3A7AB8`, secondary/accent azul suave `#D6EAFF`, fundo azul gelado `#F4F9FF`, texto/footer navy `#1A2B3C`, acento azul claro `#5BA4D4` em ring/charts/sidebar; radius, shadows; Tailwind v4 `@theme inline`, sem dark mode; `--whatsapp` é o verde de marca do WhatsApp e os `--topic-*` tingem os cartões do "Comece por Aqui" — as duas exceções à paleta azul, ver seção 13). Fonte **Inter** via `next/font`. **shadcn/ui instalado** — componentes em `components/ui/` (button, card, input, label, select, checkbox, radio-group, badge). Adicione mais com `pnpm dlx shadcn@latest add <componente>`. Referência visual viva em `/style-guide`. Nunca hardcode cor (`bg-[#...]`); use os tokens (`bg-primary`, `text-muted-foreground`, etc.).
+### 3.1 O que está implementado
 
-**Layout público e copy:** `Header` (Client — sticky, glass, nav desktop + `Sheet` mobile, link ativo via `usePathname`) e `Footer` (Server — `bg-sidebar`) vivem em `components/shared/` e são aplicados a tudo no grupo `(public)` via seu `layout.tsx`. Páginas em `(public)` NÃO devem ter `<main>` próprio (o layout já provê `<main id="main-content">`). Logo em `components/shared/logo.tsx` (SVG gota inline, placeholder até o oficial). **Toda string visível vem de `lib/i18n/pt-br.ts`** (`SITE`/`NAV`/`FOOTER`/`A11Y`) — nunca hardcode texto.
+- Scaffold Next.js e design system.
+- Landing pública, página “Sobre”, conteúdo educativo e style guide.
+- Busca e detalhe de unidades da base nacional legada.
+- Cadastro opcional de nutriz com consentimento obrigatório no formulário.
+- Provisionamento da conta da nutriz no Supabase Auth.
+- Login, logout, recuperação e redefinição de senha da nutriz.
+- Área autenticada da nutriz com fluxo técnico legado de tentativa de combinação de visita.
+- Login, logout, middleware, autorização por role e shell administrativo.
+- Dashboard administrativo com métricas básicas.
+- Listagem de nutrizes com exposição reduzida de contato.
+- Listagem, cadastro e edição de unidades do modelo legado.
+- Tracking de clique no WhatsApp de unidade.
+- Webhook da WhatsApp Cloud API, verificação de assinatura e simulador local.
+- Máquina de estados local do chatbot para um fluxo limitado sobre tentativa de combinar visita.
 
-**Pendência de segurança aberta:** RLS (Row Level Security) está **desabilitado** em todas as 8 tabelas no Supabase cloud. Como a `publishable key` é pública, isso expõe leitura/escrita de tudo (incluindo `nutriz_profiles`). Habilitar RLS + policies é pré-requisito antes de qualquer exposição pública do app. **Atenção:** o endpoint público `POST /api/nutriz` (Sprint 4.3) já grava PII de nutriz nessa tabela — reforça que RLS, rate limiting distribuído (o da 4.4 é em memória) e anti-spam (Turnstile, dispensado por ora) são pré-requisitos antes de qualquer exposição pública.
+### 3.2 Situação dos requisitos funcionais
 
-**Progresso por sprint:** Sprint 0 (scaffold) ✅ · 1.1 (schema Prisma) ✅ · 1.2 (migration inicial) ✅ · 1.3 (lib: prisma singleton, validators Zod, slug) ✅ · 1.5 (importador de CSV do seed — `prisma/seed.ts`: upsert por slug, validação linha a linha, `seed-errors.log`; as 6 unidades de exemplo que ele trouxe foram **apagadas** na 1.4, o pipeline continua) ✅ · 1.6 (seed do admin via Supabase Auth) ✅ · 1.7 (Vitest: 66 testes — unit + integração; `findUnitsByLocation` em `lib/db/queries/units.ts`) ✅ · 2.1 (design tokens + shadcn + style guide) ✅ · 2.2 (header + footer responsivos + i18n `lib/i18n/pt-br.ts`) ✅ · 2.3 (landing pública: hero, stats, "quem faz parte da rede", dicas e CTA final — Server Components em `components/shared/home-*.tsx`, copy em `HOME` no i18n) ✅ · 2.4 (sobre: hero, história, missão, linha do tempo, parcerias e CTA final — Server Component em `app/(public)/sobre/page.tsx`, copy em `ABOUT` no i18n; datas e logos com `TODO` p/ validação Eurofarma) ✅ · 2.5 (página educativa em `/como-funciona`, rota e nav reusados: hero com busca, "Comece por Aqui", "O Caminho da Doação" (timeline 5 passos), vídeos, checklist interativo, "Amamentação na Prática", "Histórias Reais" e FAQ — Server Components em `components/shared/content-*.tsx`, **só o checklist é Client**; FAQ usa `<details>` nativo, sem JS; copy em `CONTENT` no i18n. Construída como hub **estruturado, não MDX** — artigos MDX individuais ficam para depois; chatbot trocado por WhatsApp direto (§12), busca/chips presentational, depoimentos ilustrativos e links "Ler artigo" com `TODO`) ✅ · 3.1 (API pública `GET /api/cities?state=UF` — cidades distintas de unidades ACTIVE, ordenadas pt-BR; validator `lib/validators/location.ts` reusa `ufSchema`; cache 1h) ✅ · 3.2 (API pública paginada `GET /api/units` — filtros `state`(obrigatório)/`city`/`neighborhood`/`type`/`has_whatsapp` + `page`/`limit`; resposta `{filters,units,meta}`; `select` restrito + `lib/mappers/unit-mapper.ts` (sem campos admin/PII); `lib/validators/unit-search.ts` com códigos 400 distintos por campo; cache 5min) ✅ · 3.3 (componente `components/shared/search-filters.tsx` — Client, React Hook Form + Zod, sincroniza filtros na URL via App Router, busca cidades em `/api/cities` com `AbortController`; copy em `SEARCH` no i18n; UFs em `lib/constants/brazilian-states.ts`; **não** renderizado ainda — entra em `/buscar` na 3.4) ✅ · 3.4 (página `/buscar` — Server Component lê os filtros da URL e renderiza os resultados **server-side**: `SearchFilters` (Client, 3.3) escreve os filtros na URL → `SearchResults` (async Server, `components/shared/search-results.tsx`) consome `searchPublicUnits` — query compartilhada nova em `lib/db/queries/units.ts`, **fonte única** reusada pelo route handler `/api/units` (o `select` público virou `PUBLIC_UNIT_SELECT` no mapper); `UnitCard` (Server, `components/shared/unit-card.tsx`) com badge de tipo, endereço bairro/cidade/UF, horário (texto livre) e CTA WhatsApp via `wa.me` (token `--whatsapp`) ou telefone via `tel:`; utils puros `lib/utils/whatsapp.ts` + `lib/utils/format-phone.ts`; estados inicial/vazio/erro, paginação por links e `<Suspense>` com esqueleto; copy em `SEARCH.page`/`results`/`pagination`/`card`. **Fora de escopo nesta tela** (sem dados ou §12): mapa, distância/"perto de mim" por GPS, rating/estrelas, "aberto agora" e o "Chatbot WhatsApp" do mockup — contato é por unidade via `wa.me`) ✅ · 3.5 (`UnitCard` definitivo — Server Component `components/shared/unit-card.tsx` com nome, badge de tipo, endereço resumido `Bairro, Cidade - UF`, horário com fallback e badges "Telefone/WhatsApp disponível"; ações isoladas no Client Component `components/shared/unit-card-actions.tsx`: "Ligar" (`tel:`), "WhatsApp" (`wa.me` com `whatsappMessage` da unidade ou mensagem padrão) e "Ver detalhes" → `/banco-de-leite/[slug]` (página é da 3.6). Tracking do clique no WhatsApp **preparado** via `navigator.sendBeacon` → fallback `fetch({keepalive:true})` para `/api/track` (rota só na 3.8; 404 ignorado, **nunca** bloqueia o redirect; evento `whatsapp_clicked`, payload sem PII da nutriz). Utils puros `lib/utils/whatsapp.ts` (`normalizeBrazilianWhatsappNumber`/`buildWhatsappUrl({phone,message})`) e `lib/utils/phone.ts` (substituem `format-phone.ts`); `whatsappMessage` + `contact.hasPhone` adicionados ao `PublicUnit`/`PUBLIC_UNIT_SELECT`; copy em `SEARCH.page.unitCard`) ✅ · 3.6 (página de detalhes `/banco-de-leite/[slug]` — Server Component, busca por slug ATIVO via `getActiveUnitBySlug` + `UNIT_DETAIL_SELECT`/`lib/mappers/unit-detail-mapper.ts`, `notFound()` se inexistente/inativa, `export const revalidate=3600`, `generateMetadata` por template no i18n, JSON-LD `LocalBusiness` em `lib/seo/unit-json-ld.ts`, mapa estático Mapbox com fallback textual (`lib/maps/mapbox-static.ts` — sem token → fallback), ações isoladas em `components/shared/unit-detail-actions.tsx`; copy em `UNIT_DETAIL`; **sem `<main>` próprio** (o layout `(public)` já provê)) ✅ · 4.1 (cadastro da nutriz em `/cadastro` — split-screen `SignupHero` (Server) + `SignupForm` (Client, RHF + Zod `signupFormSchema` **Prisma-free**); **coleta mínima LGPD**: nome, WhatsApp, UF, cidade, consentimento — **sem CPF, sem senha, sem login** (o mockup era tela de login/CPF; adaptado à marca NutriLink e aos campos reais); copy em `SIGNUP`) ✅ · 4.5 (página `/obrigada` pós-cadastro — Server Component, mensagem humanizada, CTAs "Encontrar banco próximo"→`/buscar` e "Ver como funciona a doação"→`/como-funciona`, `robots: noindex`; copy em `THANKS`) ✅ · 4.3 (`POST /api/nutriz` — cadastro **opcional**; `runtime="nodejs"`, Zod `nutrizSignupApiSchema`, normalização de WhatsApp, **upsert lógico** por `phoneWhatsapp` (não é `@unique` → `findFirst`+`update`/`create` em `$transaction`), `lgpdConsentAt=now()`, `marketingConsent=false`, `WHATSAPP`/`INTERESTED`, UTMs sanitizadas (`lib/utils/utm.ts`), erros padronizados (`lib/utils/api-errors.ts`: `INVALID_JSON`/`VALIDATION_ERROR`/`LGPD_CONSENT_REQUIRED`/`INTERNAL_ERROR`), `201 {ok:true}` sem PII; **Turnstile (4.2) dispensado pelo time** no MVP) ✅ · 4.4 (rate limiting em `POST /api/nutriz` — `lib/security/rate-limit.ts` **em memória**, 5/min por IP → `429 RATE_LIMITED` + `Retry-After`; **por-processo**, trocar por store distribuído antes de deploy multi-instância; e o `/cadastro` agora **redireciona para `/obrigada`** no sucesso) ✅ · 5.1 (base Supabase Auth — `@supabase/ssr`: `lib/auth/supabase-server.ts` (`createServerClient` + cookies do `next/headers`), `supabase-client.ts` (`createBrowserClient`) e `get-current-user.ts`; usa `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` como anon key — service_role nunca no client) ✅ · 5.2 (login admin em **`/admin/login`** — Server Component `app/admin/login/page.tsx` (redireciona p/ `/admin/dashboard` se já logado) + `LoginForm` Client (RHF + Zod `adminLoginSchema`, mostrar/ocultar senha, "Esqueci minha senha") + Server Actions `actions.ts` (`loginAdminAction`/`requestAdminPasswordResetAction`); `signInWithPassword` via Supabase com **erro genérico** (nunca vaza `error.message`), **lockout em memória por email** (5 falhas/5min, `lib/auth/login-rate-limit.ts`) e recuperação **anti-enumeração**; copy em `ADMIN_LOGIN`; `components/ui/alert.tsx` adicionado. **Rota = segmento literal `app/admin/`** para a URL ser `/admin/login` (route group `(admin)` seria omitido) — ver §13. Sem middleware/layout/dashboard) ✅ · 5.3 (proteção do painel — **`middleware.ts` na raiz** faz o gate de *autenticação* de todo `/admin/*` e renova o token de sessão (`lib/auth/supabase-middleware.ts`, matcher `['/admin','/admin/:path*']`); o gate de *autorização* (role ADMIN via Prisma) fica em `app/admin/(painel)/layout.tsx` → `requireAdminUser()` (`lib/auth/get-admin-user.ts`), porque **Prisma não roda no Edge**; chrome admin em `components/admin/` (`admin-shell` Server + `admin-nav`/`admin-mobile-menu` Client + `admin-account` com logout por Server Action em `app/admin/actions.ts`); `/admin/sem-acesso` para sessão válida sem permissão (fora do group, senão loop); `?next=` sanitizado por `sanitizeAdminNextPath` (`lib/auth/safe-next-path.ts`, anti open redirect, 5 testes); `/admin/dashboard` entra como **placeholder** só para fechar o fluxo — indicadores são 5.5; toda a área admin é `noindex` via `app/admin/layout.tsx`; env do Supabase deduplicada em `lib/auth/supabase-env.ts`; copy em `ADMIN`) ✅ · 5.4 (shell administrativo — sidebar fixa `w-64` visível a partir de **`lg`** (`components/admin/admin-sidebar.tsx`), header sticky `h-16` (`admin-header.tsx`), navegação mobile em `Sheet` (`admin-mobile-nav.tsx`), item ativo por `usePathname` + `aria-current="page"` (`admin-nav.tsx`), conta + logout por Server Action (`admin-user-menu.tsx`), skip link → `<main id="admin-main">` com `max-w-7xl` (acomoda tabelas futuras); itens da nav em **`lib/admin/navigation.ts`** (só `key`+`href`, Prisma-free) com rótulos em **`ADMIN_LAYOUT`** no i18n; só `admin-nav` e `admin-mobile-nav` são Client) ✅ · 3.8 (`POST /api/track` — fecha o circuito de tracking que a 3.5 deixou preparado; `runtime="nodejs"`, lista **fechada** de eventos em `lib/validators/track.ts` (só `whatsapp_clicked`), grava `WhatsappClick` com `unitId` + UTMs sanitizadas + referrer, rate limit 30/min por IP; erros no padrão do projeto (`VALIDATION_ERROR`/`UNKNOWN_UNIT` por FK P2003/`INTERNAL_ERROR`); **zero PII** — `nutrizProfileId` fica nulo e o IP só serve de chave em memória) ✅ · 5.5 (dashboard admin com dados reais — `getAdminDashboardMetrics()` em `lib/db/queries/dashboard-metrics.ts`, 4 cartões (unidades ativas, estados atendidos, nutrizes, cliques no WhatsApp em 30d) + breakdowns por situação/tipo/UF + top 5 unidades contatadas; componentes Server em `components/admin/dashboard/`; copy em `ADMIN.dashboard`) ✅ · 5.6 (listagem administrativa de unidades em **`/admin/unidades`** — primeira tela operacional do painel, dentro de `(painel)/`; **Server Component puro**: filtros vivem na URL (`q`/`status`/`type`/`state`/`city`/`page`), normalizados por `parseAdminUnitFilters` (`lib/admin/units/filters.ts`, Prisma-free, nunca lança) e consultados por `getAdminUnits` (`lib/db/queries/admin-units.ts`, `select` restrito + `$transaction([count, findMany])`, 20 por página, ordem `status → name → id`); formulário **GET nativo** (zero JS, `<select>` nativo no lugar do `Select` do shadcn); tabela semântica a partir de `md` e cartões abaixo disso (`components/admin/units/`); estados vazios distintos para base vazia e filtro sem resultado; `Nova unidade`/`Editar` **só navegam** — formulário e mutações são sprint futura, então `/admin/unidades/nova` e `/admin/unidades/[id]/editar` ainda dão 404 de propósito; copy em `ADMIN.units`) ✅ · 5.7 (formulário de unidade — `/admin/unidades/nova` e `/admin/unidades/[id]/editar` deixam de dar 404; **um só** `AdminUnitForm` (`components/admin/units/admin-unit-form.tsx`, Client, RHF + Zod) com união discriminada `create | edit`, 18 campos em 6 seções (`admin-unit-form-section.tsx`) e primitivos de campo em `admin-unit-form-fields.tsx` que montam `Label`/`aria-describedby`/`aria-invalid` uma vez só; schema **Prisma-free** em `lib/admin/units/unit-form-schema.ts` (reusa `ADMIN_UNIT_*_VALUES` de `filters.ts`, cujo import do Prisma é type-only), opções em `unit-form-options.ts` (rótulos vindos dos mesmos `getAdminUnit*Label` da 5.6) e prefill por `map-unit-to-form-values.ts`; leitura da edição por `getAdminUnitById` + `ADMIN_UNIT_FORM_SELECT` (em `lib/db/queries/admin-units.ts`), `notFound()` para id inexistente; `components/ui/textarea.tsx` adicionado; copy em `ADMIN.units.form`; 36 testes novos. **Sem persistência de propósito** — o submit valida e exibe "Formulário validado", nunca "cadastrada com sucesso"; gravar é a 5.8) ✅ · 5.8 (persistência do formulário — o painel deixa de ser só leitura: **Server Actions** `createAdminUnitAction`/`updateAdminUnitAction` em `app/admin/(painel)/unidades/actions.ts` (convenção do `app/admin/login/actions.ts`; **nenhuma** rota `/api/admin/*` foi criada), na ordem **autorizar → validar → normalizar → gravar → revalidar → redirecionar**; `requireAdminUser()` é chamado **fora do `try`** para o `redirect` interno não ser capturado; revalidação em `unit-form-schema` (o mesmo schema do cliente — validação de browser é UX, não segurança); normalização em `lib/admin/units/normalize-unit-input.ts`, reusando `cepSchema`/`phoneSchema`/`emailSchema` e `normalizeBrazilianWhatsappNumber`, de modo que unidade cadastrada pela tela fique indistinguível da vinda do seed; escrita isolada em `createAdminUnit`/`updateAdminUnit`/`findAvailableUnitSlug` (`lib/db/queries/admin-units.ts`), com lista explícita de colunas contra mass assignment e `Prisma.DbNull` para apagar `openingHours`; slug por `generateSlug` + sufixo livre em **uma** consulta, com P2002 tratado como conflito seguro; `revalidatePath` em `/admin/unidades`, `/admin/dashboard`, `/`, `/buscar`, `/api/units`, `/api/cities` e `/banco-de-leite/<slug>`; 30 testes novos, sendo 14 de integração que escrevem no banco real e se limpam pelo prefixo `__test__`) ✅ · **listagem de nutrizes** (sem número — pedida direto pelo time; `/admin/nutrizes`, segundo item da sidebar a sair do 404): Server Component puro no mesmo molde da 5.6 — filtros na URL (`q`/`status`/`state`/`page`) por `parseAdminNutrizFilters` (`lib/admin/nutrizes/filters.ts`, Prisma-free), consulta em `getAdminNutrizes` (`lib/db/queries/admin-nutrizes.ts`, `select` restrito + `$transaction`, 20 por página, ordem `createdAt desc → id`), formulário GET nativo, tabela a partir de `md` e cartões abaixo (`components/admin/nutrizes/`); **só o contato é Client** (`admin-nutriz-contact.tsx`). Sem criar/editar/excluir — mudar `interestStatus` é o próximo passo natural; copy em `ADMIN.nutrizes`; utils novos `formatBrazilianPhone`/`maskBrazilianPhone` (`lib/utils/phone.ts`) e `formatShortDate` (`lib/utils/format-date.ts`); 26 testes novos ✅ · 6.1 (schema do agendamento — migration `20260902164755_add_nutriz_appointments` aplicada via MCP e registrada à mão no `_prisma_migrations`; modelos `Appointment` e `WhatsappConversation`, enums `AppointmentStatus`/`AppointmentFailureReason`/`WhatsappConversationStep`, `authUserId` e **`phoneWhatsapp` agora `@unique`** em `NutrizProfile`, com o `@@index([phoneWhatsapp])` removido por redundância. **Só schema** — nenhuma rota, tela ou webhook; 255 testes passando) ✅ · 6.2 (conta da nutriz — o `POST /api/nutriz` deixou de gravar só um lead e passou a **provisionar usuário no Supabase Auth** e vinculá-lo ao perfil por `authUserId`; e-mail e senha entraram no `/cadastro` (`signupFormSchema` com `passwordConfirm` só no cliente) e no `nutrizSignupApiSchema`; conta criada **já confirmada** via Admin API (`lib/auth/supabase-admin.ts`), com auto-login por `signInWithPassword` para a nutriz cair logada em `/obrigada`; `ACCOUNT_ALREADY_EXISTS` 409 nos dois caminhos de conflito (WhatsApp com conta no Postgres, e-mail duplicado no Auth); rollback do usuário criado se a gravação falhar; mensagens de validação migradas para `SIGNUP.validation` no i18n; 18 testes novos, 273 no total) ✅ · 6.3 (sessão da nutriz — `/entrar` (Server, redireciona quem já tem sessão de nutriz) + `LoginForm` Client com Server Actions em `app/(public)/entrar/actions.ts` (`loginNutrizAction`/`requestNutrizPasswordResetAction`), reusando o **lockout em memória** da 5.2 (`login-rate-limit.ts`, 5 falhas/5min por e-mail) e erro sempre genérico; recuperação anti-enumeração cujo link passa pelo route handler **`/auth/confirmar`** (troca `code` por sessão — Server Component não grava cookie) e chega em **`/redefinir-senha`**; área protegida **`/meu-agendamento`** (placeholder, tela real é a 6.4) com dois gates no mesmo molde do painel: `middleware.ts` (Edge, autenticação) + `app/(public)/meu-agendamento/layout.tsx` → `requireNutrizUser()` (`lib/auth/get-nutriz-user.ts`, Node/Prisma); logout por Server Action; atalho de conta no cabeçalho via `components/shared/header-account.tsx` (Client, para as páginas públicas seguirem estáticas); `sanitizeRelativeAppPath` em `safe-next-path.ts`; copy em `NUTRIZ_AUTH`; 17 testes novos, 290 no total) ✅ · 6.4 (tela do agendamento — `/meu-agendamento` deixa de ser placeholder: `getCurrentNutrizAppointment` (`lib/db/queries/appointments.ts`, **duas consultas** por causa dos nulos, ver §13) + `cancelNutrizAppointment`; três estados (visita informada, "não consegui agendar", nada ainda); componentes Server em `components/nutriz/` (`appointment-summary`/`guidance`/`location`/`not-scheduled`), **só `appointment-actions` é Client** (cancelamento em dois passos); reusa `UNIT_DETAIL_SELECT`/`mapUnitToPublicUnitDetail` da 3.6 e o mapa estático Mapbox com fallback textual; `formatLongDate`/`formatTime` em `format-date.ts` e utils puros em `appointment-display.ts`; cleanup dos testes ganhou `appointment.deleteMany` **antes** da nutriz (FK RESTRICT); copy em `APPOINTMENT`; 18 testes novos, 308 no total) ✅ · 6.5 (chatbot do WhatsApp — `POST/GET /api/whatsapp/webhook`: aperto de mão de verificação da Meta (challenge em **texto puro**) e recebimento de mensagens com **assinatura HMAC obrigatória** (`lib/whatsapp/signature.ts`, corpo cru + `timingSafeEqual`); fluxo em máquina de estados **pura** (`lib/whatsapp/conversation.ts`) — pergunta se agendou → data em formato fixo → confirmação → grava, ou lista de 5 motivos → grava `NOT_SCHEDULED`; parser literal `DD/MM HH:MM` com fuso fixo de São Paulo e inferência de ano (`parse-schedule.ts`); extração tolerante do payload aninhado, ignorando recibos de entrega (`payload.ts`); casamento do número com e sem o **nono dígito** (`phone-candidates.ts`); envio pela Cloud API sem SDK (`client.ts`); consultas em `lib/db/queries/whatsapp-conversations.ts`; copy em `WHATSAPP_BOT`; **simulador local `pnpm whatsapp:sim`** que assina e envia payloads sem depender da Meta; 52 testes novos, 360 no total. **O código está pronto e verificado; falta a conta na Meta** — ver §3) ✅.
+| Requisito | Situação atual |
+|---|---|
+| RF01 — elegibilidade por CEP | **Não implementado.** A busca atual é por UF/cidade na base nacional legada. |
+| RF02 — pontos do Lactare | **Parcial.** Há endereço, horário e mapa estático para unidades legadas; faltam os pontos oficiais validados do Lactare. |
+| RF03 — fora da cobertura | **Não implementado.** |
+| RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
+| RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
+| RF06 — lembretes opcionais | **Não implementado.** |
+| RF07 — tracking de contato | **Parcial.** Só o clique no WhatsApp de unidade é registrado. |
+| RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
+| RF09 — municípios atendidos | **Não implementado.** O CRUD atual gerencia unidades nacionais legadas, não a área do Lactare. |
+| RF10 — indicadores do funil | **Parcial.** Existem métricas básicas; faltam alcance, funil completo, retenção, cobertura e adesão a lembretes. |
+| RF11 — chatbot completo | **Parcial.** Infraestrutura e simulação local existem; faltam FAQ, elegibilidade, cadastro, lembretes, pós-doação e ativação real na Meta. |
+| RF12 — cartão de impacto | **Não implementado.** |
+| RF13 — mensagem de indicação | **Não implementado.** |
+| RF14 — reconhecimentos | **Não implementado.** |
+| RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
 
-**Carga de dados reais (Sprint 1.4, em andamento desde 2026-08-28):** o `_exemplo-fallback.csv` da 1.5 foi **removido** — arquivo e as 6 unidades que ele criou — porque conviver com a fonte oficial geraria duas versões da mesma unidade. A base agora tem só dados reais da rBLH, um CSV por UF em `data/seeds/units/` (`ac.csv`, …), transcritos do texto que o time envia. Carregado até agora (2026-08-29): **AC 5 · AL 7 · AM 19 · AP 4 · BA 12 · CE 47 · DF 20 · ES 8 · GO 8 · MA 5 · MG 45 · MS 5 · MT 5 · PA 7 · PB 29 · PE 14 · PI 6 · PR 34 · RJ 31 · RN 10 · RO 1 · RR 1 · RS 21 · SC 27 · SP 111 · TO 5 = 487 unidades** em 26 UFs (falta só **SE**).
+### 3.3 Código e dados legados que não definem mais o escopo
 
-**Consequência da carga nos testes:** os fixtures se isolavam usando uma UF "que o seed não usa" (`TO`/`AC`). Com o país quase todo carregado isso deixou de funcionar e quebrou 16 testes de integração. O isolamento agora é por **marcador próprio**, não por UF: `TEST_CITY` (`'Cidade Teste'`, em `tests/helpers/factories.ts`) para as queries públicas, que filtram por cidade, e o prefixo `__test__` do nome para as queries admin, que filtram por `q`. Nenhum teste novo pode voltar a assumir UF vazia.
+O repositório contém 487 unidades da rBLH em 26 UFs, além de APIs, páginas e CRUDs voltados a essa base nacional. Isso foi desenvolvido antes da decisão Lactare-only.
 
-**Pendências abertas da carga (decisões do time, não minhas):**
+A partir desta versão:
 
-1. **Coluna `whatsapp` está vazia em 100% das unidades** — a fonte da rBLH só traz telefone. Como o `wa.me` é o canal de conversão do produto e o motor do indicador de cliques da 5.5, a busca inteira hoje só oferece `tel:`. Uns 10 registros vieram com celular de 11 dígitos (candidatos naturais), mas **ninguém autorizou** tratar celular como WhatsApp — mandar a nutriz para um número que não responde é pior que só oferecer o telefone.
-2. **~9 telefones em formato de celular antigo** (8 dígitos começando em 8/9, ex.: `82 8121-1058`, `92 9504-8734`, `61 9821-0211`). Pela regra da Anatel bastaria prefixar o nono dígito, e isso é automatizável — mas não foi aplicado, porque número errado na mão da nutriz é pior que número que alguém confere.
-3. **Pares BLH + posto no mesmo endereço** (Manaus, João Pessoa, Guarabira, Patos, Apucarana, Vila Velha, Recife…). Em geral são dois serviços reais do mesmo hospital; em ao menos um caso (Zilda Arns × Instituto Cândida Vargas, em João Pessoa) **o telefone também é idêntico**, o que sugere duplicidade da fonte.
-4. **CEPs incompatíveis com o município** em ~4 unidades (Mâncio Lima/AC, Hospital de Santana/AP, Santa Helena/DF, Hospital da Mulher do Agreste/PE) e um CEP antigo em Porto Velho. Importados como vieram — hoje o CEP não alimenta nenhuma função, mas quebrariam geocoding.
-5. **`address_complement` não existe no importador**, embora exista na tabela. Já se perderam complementos úteis ("Esquina com a Av. A", "Conjunto Nova Assunção", andares e blocos). Adicionar a coluna ao `unitCsvRowSchema` + `seed.ts` é mudança de ~5 linhas, oferecida e ainda não pedida. Convenções da transcrição: cidade em caixa alta na fonte vira capitalização normal (aparece no card público); seção "Banco de Leite" → `MILK_BANK`, "Posto/Ponto de Coleta" → `COLLECTION_POINT`; WhatsApp, horário e instruções ficam vazios quando a fonte não traz. Toda linha importada entra como `ACTIVE` — **inclusive unidade sem telefone e sem WhatsApp**: o time confirmou (2026-08-28) que parte da rede não tem telefone mesmo, então contato vazio não é erro de transcrição nem motivo para segurar a unidade em `PENDING`; ela aparece na busca com endereço e sem botão de contato. Não levantar isso de novo a cada carga.
+- não continuar a carga nacional;
+- não tratar a ausência de Sergipe como tarefa de produto;
+- não apresentar essa base como escopo oficial do NutriLink;
+- não criar funcionalidades novas dependentes do diretório nacional;
+- não apagar tabelas, CSVs ou registros sem plano de migração, impacto e reversão;
+- planejar a substituição da experiência pública pelo fluxo de cobertura do Lactare.
 
-**Próximas sprints (ordem sugerida):** **6.6** (painel: fila de "não conseguiu agendar" — o dado que a 6.5 passou a gerar). Em paralelo: terminar a **1.4** (falta só Sergipe) e a **2.6** (privacidade/termos legais em MDX — ficou **mais** urgente, não menos: o checkbox de consentimento do `/cadastro` já aponta para `/privacidade` e `/termos`, que dão 404, e passaremos a coletar senha e dado de agendamento sob esse mesmo consentimento). **4.2** (anti-spam Turnstile) segue dispensado. Sem número ainda: exclusão/arquivamento de unidade (a 5.8 entregou criar e editar, **não** excluir), os demais CRUDs do painel (nutrizes, conteúdos, campanhas), RLS e store distribuído de rate limit.
+Os modelos Appointment e WhatsappConversation e a tela atual /meu-agendamento também são legado técnico. Eles podem ser migrados ou reaproveitados para lembretes e continuidade da jornada, mas não autorizam linguagem de agendamento, confirmação de visita ou promessa logística.
 
-**Admin inicial:** provisionado por `pnpm db:seed-admin` (email em `INITIAL_ADMIN_EMAIL`, hoje `admin@lactare.local`). Esse endereço permanece como **credencial técnica legada** após a troca da marca para NutriLink; renomeá-lo exige uma alteração coordenada no Supabase Auth e em `public.users`, não uma simples troca de copy. Existe em `auth.users` (Supabase Auth) e em `public.users` com `role=ADMIN`, mesmo `id` nas duas tabelas. Script idempotente: re-rodar não regenera senha. Para redefinir a senha use `pnpm db:set-admin-password` (Admin API via service_role; gera uma forte de 20 chars e imprime uma vez, ou usa `ADMIN_PASSWORD` do ambiente). **Não** dá para usar o "Reset password" do painel nem o "Esqueci minha senha" da tela de login: ambos dependem de email, e `admin@lactare.local` é domínio fictício — além disso ainda não existe tela para definir a nova senha a partir do link de recuperação. O fluxo de login do painel (`/admin/login`) foi implementado na Sprint 5.2 (base de auth `@supabase/ssr` na 5.1) e autentica esse admin via `signInWithPassword`. A proteção global por middleware + checagem de role saiu na Sprint 5.3; o shell do painel na 5.4; o dashboard com indicadores reais é a 5.5. **O gate de role depende de o `id` em `public.users` ser igual ao de `auth.users`** — se um dia alguém for criado só no Supabase Auth, sem espelho em `public.users`, cairá em `/admin/sem-acesso`.
+Qualquer preview estático na home que use estado “confirmado” ou lembrete de coleta é apenas protótipo visual. Não é funcionalidade entregue e deve ser removido ou adaptado ao escopo vigente.
+
+### 3.4 Pendências críticas
+
+- Política de Privacidade e Termos de Uso.
+- RLS no Supabase.
+- Rate limiting distribuído.
+- Proteção anti-spam nos formulários públicos.
+- Modelagem da área de atuação do Lactare e dos 30 municípios.
+- Verificação de elegibilidade por CEP.
+- Fluxo transparente para fora da cobertura.
+- Consentimento separado e job de lembretes.
+- Segmentação por sub-região e perfil.
+- Definição da fonte legítima de confirmação de uma doação.
+- Cartão de impacto, indicação e reconhecimentos.
+- Conta Meta, número, templates e URL pública para o WhatsApp.
+
+### 3.5 Validações externas pendentes
+
+- Confirmar com o Lactare se a coleta domiciliar gratuita é uniforme nos 30 municípios ou se varia por logística.
+- Validar pontos de entrega, endereços, horários, contatos e instruções oficiais.
+- Definir quem registra uma doação como confirmada.
+- Validar textos jurídicos e consentimentos.
+
+Até essas respostas existirem, prefira linguagem conservadora. Estar na área de atuação não autoriza prometer coleta domiciliar gratuita uniforme.
+
+### 3.6 Próximas entregas recomendadas
+
+1. Privacidade, Termos, RLS e proteção contra abuso.
+2. Área atendida do Lactare e elegibilidade por CEP ou município.
+3. Isolamento da experiência nacional legada.
+4. Chatbot com menu, FAQ, elegibilidade, cadastro e encaminhamento.
+5. Lembretes opcionais sem semântica de agendamento.
+6. Dashboard com funil, retenção, cobertura, região e perfil.
+7. Confirmação de doação, cartão de impacto, indicação e reconhecimentos.
+8. Ativação real na Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
-| Camada | Tecnologia | Versão / Nota |
+| Camada | Tecnologia | Versão ou nota |
 |---|---|---|
-| Framework | Next.js (App Router) | 15 |
+| Framework | Next.js App Router | 15 |
 | UI runtime | React | 19 |
-| Linguagem | TypeScript estrito | `strict: true`, `noUncheckedIndexedAccess: true` (toolchain ainda não montado — ver seção 3) |
-| Estilo | Tailwind CSS | 4 (CSS variables como design tokens) |
-| Componentes | shadcn/ui | última |
-| Banco | PostgreSQL via Supabase | **cloud** — projeto `eurofarma` / org `fiap` (ver seção 13) |
-| ORM | Prisma | **6.x** (fixado; não atualizar para 7 sem migração) |
-| Validação | Zod | **3.x** (fixado; APIs do v4 mudaram) |
-| Auth | Supabase Auth (`@supabase/ssr` 0.10) | **em uso** no admin: base 5.1, login 5.2, middleware + role 5.3 |
-| Forms | React Hook Form + Zod | instalados (RHF 7 + `@hookform/resolvers` 5); usados no `SearchFilters` |
-| Conteúdo | MDX | educativo, políticas, termos |
-| Pacotes | pnpm | obrigatório (não usar npm/yarn) |
+| Linguagem | TypeScript estrito | strict e noUncheckedIndexedAccess |
+| Estilo | Tailwind CSS | 4, com tokens CSS |
+| Componentes | shadcn/ui | componentes em components/ui |
+| Banco | PostgreSQL via Supabase | cloud, projeto eurofarma / org fiap |
+| ORM | Prisma | 6.x fixado |
+| Validação | Zod | 3.x fixado |
+| Autenticação | Supabase Auth com @supabase/ssr | admin e nutriz |
+| Formulários | React Hook Form + Zod | busca, cadastro, autenticação e unidades |
+| Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
+| Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | unit + integration (sprint futuro) |
-| Testes e2e | Playwright | sprint futuro |
+| Testes | Vitest | unitários e integração; 365 no baseline |
+| E2E | Playwright | sprint futuro |
+| Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 
-O banco é **Supabase cloud** (sem Docker local). Migrations são geradas com Prisma **offline** (`prisma migrate diff`) e aplicadas via **MCP do Supabase** (`apply_migration`) — o `prisma migrate dev` não roda bem no cloud (shadow DB) nem pelo pooler. `DATABASE_URL` no `.env.local` aponta para o **pooler** (porta 6543, `pgbouncer=true`); o CLI do Prisma lê o `.env.local` via `dotenv-cli`. Pin de Prisma 6 e Zod 3 são intencionais (ver seção 13).
+Não atualizar Prisma para 7 nem Zod para 4 sem uma migração planejada.
 
-## 5. Setup local passo a passo
+## 5. Setup local
 
-Pré-requisitos: Node 22 LTS (ambiente atual usa 24), pnpm. **Não precisa de Docker nem Supabase CLI** — o banco é cloud.
+Pré-requisitos: Node 22 LTS ou o ambiente atual compatível e pnpm. Não é necessário Docker nem Supabase CLI.
 
-```bash
-# 1. Clonar e entrar no repo
-git clone https://github.com/RuyFichman/eurofarma.git && cd eurofarma
-
-# 2. Variáveis de ambiente
-cp .env.example .env.local   # preencher DATABASE_URL (pooler) e chaves; NUNCA commitar .env.local
-
-# 3. Instalar dependências
+~~~bash
+git clone https://github.com/RuyFichman/eurofarma.git
+cd eurofarma
+cp .env.example .env.local
 pnpm install
-
-# 4. Gerar o Prisma Client
 pnpm db:generate
-
-# 5. (schema já aplicado no cloud) Validar a camada lib
-pnpm check:validators        # smoke test dos validators/slug, deve dar "Falhou: 0"
-
-# 6. Rodar o servidor de desenvolvimento (após o scaffold do Next.js existir)
+pnpm check:validators
 pnpm dev
-```
+~~~
 
-> Migrations **não** se aplicam com `prisma migrate dev` aqui. Gere o SQL offline com
-> `pnpm exec prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script`,
-> salve em `prisma/migrations/<timestamp>_<nome>/migration.sql` e aplique via MCP do Supabase
-> (`apply_migration`). Registre no `_prisma_migrations` com o checksum SHA-256 do arquivo.
+Preencha .env.local localmente. Nunca versionar segredos.
 
-> **Se o seu ambiente não tem o MCP do Supabase:** faça os dois primeiros passos — gerar o SQL
-> offline e salvar o arquivo — e **pare aí**, avisando o usuário para aplicar. Não tente aplicar a
-> migration por outro caminho. `pnpm db:migrate` continua não funcionando para ninguém: o banco é
-> cloud e a `DATABASE_URL` aponta para o pooler.
+O banco é Supabase cloud. DATABASE_URL aponta para o pooler, porta 6543, com pgbouncer=true. O Prisma CLI carrega .env.local por dotenv-cli.
 
-> **Mais de um agente com acesso ao mesmo banco.** Claude Code e Codex podem ter o MCP do Supabase
-> ao mesmo tempo, e os dois escrevem no **mesmo** projeto cloud — não há banco local nem staging para
-> amortecer erro. Duas consequências práticas: (1) antes de qualquer `apply_migration`/`execute_sql`,
-> confirme que o `project_id` é `mvixmggxwbrljlovfvac`; (2) o `_prisma_migrations` é preenchido **à
-> mão** com o checksum SHA-256, então antes de aplicar uma migration verifique se o outro agente já
-> não a aplicou — `list_migrations` primeiro, sempre. Migration aplicada duas vezes ou registrada
-> pela metade deixa o histórico inconsistente, e não há rollback automático.
+### 5.1 Migrations
 
-> **O que é recuperável, para calibrar o cuidado.** As 487 unidades **não** são insubstituíveis: elas
-> vêm dos CSVs versionados em `data/seeds/units/` e o `prisma/seed.ts` faz upsert por slug, então
-> `pnpm db:seed` reconstrói a tabela `units`. O admin sai de `pnpm db:seed-admin`. O que **não** tem
-> como recriar é `whatsapp_clicks` (analytics acumulada) e `nutriz_profiles` (PII que a pessoa
-> confiou à plataforma — e que, uma vez perdida, não dá para pedir de volta). Trate essas duas
-> tabelas com mais cuidado que as demais; não é motivo para paralisar trabalho nas outras.
+Não usar prisma migrate dev neste projeto: o shadow database não funciona de forma confiável no Supabase cloud via pooler.
 
-Scripts disponíveis em `package.json` (estado atual):
+Fluxo obrigatório:
 
-| Script | Ação | Funciona? |
-|---|---|---|
-| `pnpm db:generate` | Prisma generate | ✅ |
-| `pnpm db:migrate` | `dotenv -e .env.local -- prisma migrate dev` | ⚠️ não usar no cloud (shadow/pooler) |
-| `pnpm db:studio` | `dotenv -e .env.local -- prisma studio` | ✅ |
-| `pnpm db:seed` | `dotenv -e .env.local -- prisma db seed` | ✅ |
-| `pnpm db:seed-admin` | provisiona o admin inicial (Supabase Auth + `public.users`) | ✅ |
-| `pnpm db:set-admin-password` | redefine a senha do admin inicial via Admin API | ✅ |
-| `pnpm check:validators` | smoke test dos validators (`tsx`) | ✅ |
-| `pnpm dev` / `build` / `start` | Next.js (dev / build de produção / serve) | ✅ |
-| `pnpm lint` | ESLint (`eslint .`) | ✅ |
-| `pnpm typecheck` | `tsc --noEmit` | ✅ |
-| `pnpm format` / `format:check` | Prettier (escreve / verifica) | ✅ |
-| `pnpm check` | `lint` + `typecheck` + `format:check` | ✅ |
-| `pnpm test` | Vitest (`vitest run`); variantes `test:watch` / `test:unit` / `test:integration` / `test:coverage` | ✅ |
+1. Atualizar prisma/schema.prisma.
+2. Gerar SQL offline com prisma migrate diff.
+3. Salvar em prisma/migrations/<timestamp>_<nome>/migration.sql.
+4. Revisar o SQL.
+5. Aplicar pelo MCP do Supabase com apply_migration.
+6. Registrar a migration em _prisma_migrations com o checksum SHA-256 do arquivo, quando necessário.
+7. Gerar novamente o Prisma Client.
+8. Executar testes.
 
-## 6. Estrutura de pastas
+Se o ambiente não tiver MCP do Supabase, gerar e revisar o SQL, mas não improvisar aplicação por outro caminho.
 
-```
-nutrilink/
-├── AGENTS.md               # guia operacional dos agentes (fonte da verdade)
-├── CLAUDE.md               # só importa o AGENTS.md via @AGENTS.md
-├── README.md
-├── .env.example
-├── .env.local              # NUNCA commitar
-├── .nvmrc                  # Node 22
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── middleware.ts           # gate de autenticação de /admin/* + refresh de sessão
-├── next.config.ts
-├── tailwind.config.ts
-├── eslint.config.mjs
-├── prettier.config.mjs
-├── prisma/
-│   ├── schema.prisma       # fonte da verdade do schema
-│   ├── migrations/
-│   └── seed.ts
-├── app/
-│   ├── layout.tsx          # layout raiz
-│   ├── (public)/           # área pública (landing, busca, cadastro)
-│   │   ├── layout.tsx
-│   │   ├── page.tsx                 # landing
-│   │   ├── sobre/
-│   │   ├── como-funciona/           # educativo (MDX)
-│   │   ├── buscar/
-│   │   ├── banco-de-leite/[slug]/
-│   │   ├── cadastro/
-│   │   ├── obrigada/
-│   │   ├── entrar/                  # login da nutriz (6.3)
-│   │   ├── redefinir-senha/         # nova senha a partir do link de e-mail (6.3)
-│   │   ├── meu-agendamento/         # área protegida — layout faz o gate de perfil (6.3)
-│   │   ├── privacidade/
-│   │   └── termos/
-│   ├── admin/              # painel admin — segmento LITERAL /admin/* (não route group)
-│   │   ├── layout.tsx      # noindex de toda a área admin (sem chrome)
-│   │   ├── actions.ts      # Server Action de logout
-│   │   ├── login/          # /admin/login (5.2): page.tsx, login-form.tsx, actions.ts
-│   │   ├── sem-acesso/     # sessão válida sem role ADMIN (5.3)
-│   │   └── (painel)/       # telas protegidas — o group NÃO aparece na URL
-│   │       ├── layout.tsx  # gate de role (requireAdminUser) + AdminShell
-│   │       ├── dashboard/  # /admin/dashboard (placeholder na 5.3, dados na 5.4)
-│   │       ├── unidades/   # /admin/unidades (5.6) — listagem; nova/ e [id]/editar são sprint futura
-│   │       ├── nutrizes/   # (futuro)
-│   │       ├── conteudos/  # (futuro)
-│   │       └── campanhas/  # (futuro)
-│   ├── auth/
-│   │   └── confirmar/      # troca o code do link de e-mail por sessão (6.3)
-│   ├── api/                # route handlers
-│   │   ├── units/
-│   │   ├── cities/
-│   │   ├── nutriz/
-│   │   ├── track/          # tracking de cliques wa.me
-│   │   └── admin/
-│   ├── not-found.tsx
-│   ├── error.tsx
-│   └── global-error.tsx
-├── components/
-│   ├── ui/                 # shadcn/ui — NÃO editar manualmente
-│   ├── shared/             # header, footer, cards reutilizáveis
-│   └── admin/              # shell do painel: sidebar, header, nav, mobile-nav, user-menu
-├── lib/
-│   ├── db/                 # cliente Prisma singleton
-│   ├── admin/              # navegação do painel (key+href; rótulos no i18n)
-│   ├── auth/               # helpers Supabase Auth (clients, gate de role, next path)
-│   ├── validators/         # schemas Zod (fonte única)
-│   ├── analytics/          # PostHog (futuro)
-│   ├── i18n/               # copy pt-br em constantes
-│   └── utils/              # utilitários puros
-├── content/
-│   ├── educativo/          # MDX da página educativa
-│   └── legal/              # MDX de privacidade e termos
-├── data/
-│   └── seeds/
-│       └── units/          # CSVs de bancos de leite
-├── public/
-└── docs/                   # documentação técnica adicional
-```
+## 6. Organização do projeto
 
-## 7. Princípios não-negociáveis
+Estrutura principal:
 
-1. **TypeScript estrito.** Nenhum `any`. Tipagem explícita em toda API pública (props, retornos de função exportada, parâmetros de route handlers). Use `unknown` + validação Zod quando o tipo for incerto.
-2. **Server Components por padrão.** Marque `"use client"` apenas quando há interatividade real: forms, filtros, estado local, event handlers, hooks de browser. Busca de dados e renderização estática ficam no servidor.
-3. **Mobile-first.** Projete primeiro para 375px. No Tailwind, escreva o estilo base para mobile e use `md:` / `lg:` para telas maiores. Nunca o contrário (nada de `max-md:`).
-4. **Validação Zod em toda entrada.** Tanto no form (client) quanto no route handler (server). Schemas centralizados em `lib/validators/`. Nunca confie em dado vindo do cliente sem revalidar no servidor.
-5. **Acessibilidade WCAG AA.** Contraste suficiente, navegação completa por teclado, `label` em todo input, ARIA quando necessário. Prefira componentes shadcn/ui — já são acessíveis.
-6. **LGPD desde o dia 1.** Minimização de dados. NÃO colete CPF, RG, data de nascimento nem dados de saúde. Consentimento explícito via checkbox NÃO pré-marcado para qualquer coleta. Colete apenas o mínimo para o contato (nome, cidade/estado, forma de contato).
-7. **Copy em pt-br via constantes** em `lib/i18n/pt-br.ts`. Não hardcode texto visível em componentes.
-8. **Componentes pequenos.** Máximo ~200 linhas. Passou disso, quebre em subcomponentes.
-9. **Linguagem acolhedora.** A nutriz está em momento emocionalmente sensível. Evite imperativos rígidos ("Você DEVE doar") e termos clínicos sem necessidade. Tom convidativo e gentil.
+~~~text
+app/
+  (public)/                 rotas públicas
+  admin/                    segmento literal /admin
+    (painel)/               telas protegidas sem alterar a URL
+  api/                      route handlers
+  auth/confirmar/           callback de autenticação
+components/
+  admin/                    interface administrativa
+  nutriz/                   área autenticada da nutriz
+  shared/                   componentes públicos compartilhados
+  ui/                       shadcn/ui
+data/seeds/units/           CSVs nacionais legados
+docs/
+  projeto-nutrilink.md      especificação funcional e de produto
+lib/
+  admin/                    regras Prisma-free do painel
+  auth/                     clientes e gates de autenticação
+  constants/                constantes compartilhadas
+  db/queries/               acesso a dados
+  i18n/pt-br.ts             textos visíveis
+  maps/                     mapa estático
+  security/                 rate limit
+  utils/                    funções puras
+  validators/               schemas Zod
+  whatsapp/                 webhook, payload, fluxo e cliente
+prisma/
+  migrations/
+  schema.prisma
+  seed.ts
+scripts/
+tests/
+  helpers/
+  integration/
+  unit/
+~~~
+
+### 6.1 Rotas e layouts
+
+- O grupo app/(public) já fornece Header, main#main-content e Footer.
+- Páginas públicas não devem criar outro elemento main.
+- A área admin usa o segmento literal app/admin para preservar URLs /admin/*.
+- O grupo interno (painel) organiza telas protegidas sem entrar na URL.
+- app/admin/sem-acesso fica fora do grupo protegido para evitar loop.
+- middleware.ts faz apenas o gate de autenticação e renovação de sessão.
+- A autorização por role usa Prisma no layout Node; Prisma não roda no Edge.
+
+### 6.2 Server e Client Components
+
+- Prefira Server Components.
+- Use Client Components somente para estado, eventos, APIs do navegador ou bibliotecas que os exijam.
+- Isole a menor parte interativa possível.
+- Consultas ficam em lib/db/queries.
+- Validação compartilhada deve ficar fora de componentes e, quando possível, ser Prisma-free.
+
+## 7. Design system, acessibilidade e conteúdo
+
+Os tokens estão em app/globals.css.
+
+- primary: azul profundo #3A7AB8;
+- secondary e accent: azul suave #D6EAFF;
+- fundo: azul gelado #F4F9FF;
+- texto e footer: navy #1A2B3C;
+- ring, charts e sidebar: azul claro #5BA4D4;
+- verde reservado ao token de marca do WhatsApp;
+- topic tokens são exceções controladas para cartões educativos;
+- fonte Inter via next/font;
+- sem dark mode nesta etapa.
+
+Nunca hardcode cor em classes como bg-[#...]. Use tokens semânticos.
+
+Componentes shadcn ficam em components/ui. Adicione novos componentes com:
+
+~~~bash
+pnpm dlx shadcn@latest add <componente>
+~~~
+
+A referência visual viva está em /style-guide.
+
+Todo texto visível da interface deve vir de lib/i18n/pt-br.ts. Não hardcode copy em componentes. Textos devem:
+
+- ser acolhedores e objetivos;
+- não prometer atendimento, coleta ou impacto clínico sem fonte;
+- diferenciar NutriLink, Lactare e hospitais;
+- deixar claro quando algo é lembrete, não agendamento;
+- indicar fontes e datas para métricas institucionais.
+
+O Header é sticky e responsivo. O link ativo usa usePathname. O logo atual é um SVG placeholder em components/shared/logo.tsx até existir ativo oficial.
 
 ## 8. Convenções de código
 
-Nomenclatura:
+- Use pnpm; nunca npm ou yarn.
+- Mantenha TypeScript estrito.
+- Use imports @/* para a raiz.
+- Prefira funções pequenas, puras e testáveis.
+- Centralize validações em Zod.
+- Revalide dados no servidor; validação do cliente é UX, não segurança.
+- Restrinja selects do Prisma às colunas necessárias.
+- Use listas explícitas de campos em mutações para evitar mass assignment.
+- Normalize telefone, CEP, slug e UTM em utilitários compartilhados.
+- Não exponha mensagens internas de autenticação ou banco.
+- Não inclua PII em logs, tracking, URLs ou referrers.
+- Preserve alterações do usuário em worktree suja.
+- Não introduza dependência nova sem necessidade clara.
+- Não crie APIs administrativas quando Server Actions atendem a mesma necessidade dentro do App Router.
 
-| Item | Padrão | Exemplo |
-|---|---|---|
-| Arquivos | `kebab-case` | `unit-card.tsx`, `format-phone.ts` |
-| Componentes (export) | `PascalCase` | `UnitCard` |
-| Funções / variáveis | `camelCase` | `formatPhone` |
-| Constantes globais | `UPPER_SNAKE_CASE` | `WA_BASE_URL` |
-| Tipos / interfaces | `PascalCase`, sem prefixo `I` | `Unit`, `NutrizInput` |
-| Schemas Zod | `<entidade>Schema` | `unitCreateSchema` |
-| Pastas | `kebab-case` | `banco-de-leite/` |
+### 8.1 Banco e nomes
 
-Correto: `components/shared/unit-card.tsx` exportando `UnitCard`.
-Incorreto: `components/shared/UnitCard.tsx` ou `components/shared/unitCard.tsx`.
+- Modelos e enums Prisma usam nomes em inglês.
+- Textos de interface ficam em português do Brasil.
+- Slugs devem ser estáveis e únicos.
+- Valores vazios opcionais devem ser normalizados de modo consistente.
+- Campos de saúde não pertencem ao schema do NutriLink.
 
-Imports:
+### 8.2 Testes de integração
 
-- Use sempre caminho absoluto com `@/` (configurado em `tsconfig.json`).
-- Correto: `import { db } from "@/lib/db"`. Incorreto: `import { db } from "../../lib/db"`.
+Nunca suponha que uma UF está vazia.
 
-Formatação:
+- Queries públicas usam TEST_CITY, “Cidade Teste”, para isolar fixtures.
+- Queries administrativas usam prefixo __test__ no nome e filtro q.
+- Limpe dependências antes das entidades referenciadas; Appointment deve ser removido antes de NutrizProfile enquanto a FK legada existir.
 
-- Prettier é a autoridade. Não discuta estilo manualmente — rode `pnpm format`.
-- ESLint para regras de qualidade. Antes de considerar uma tarefa pronta, rode `pnpm check`.
+## 9. Segurança e LGPD
 
-## 9. Convenções de Git
+### 9.1 Bloqueador de exposição pública
 
-- **Conventional Commits** obrigatório: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `style:`.
-- Branch principal: `main`. Branches de feature: `feat/nome-curto` (ex.: `feat/busca-por-cidade`).
-- PRs explicam o **porquê** da mudança, não só o quê.
-- Husky + lint-staged rodam lint e format no `pre-commit`. Não burle os hooks.
+RLS permanece pendente nas tabelas do Supabase. A publishable key é pública e o endpoint POST /api/nutriz grava PII.
 
-## 10. Validação e segurança
+Antes de qualquer deploy ou demonstração pública com dados reais, são obrigatórios:
 
-- **Zod em toda entrada de usuário**, client e server. Um schema por entidade em `lib/validators/`, reutilizado nos dois lados. Exemplo:
+- habilitar RLS;
+- criar e testar policies;
+- publicar Privacidade e Termos;
+- trocar o rate limit em memória por store distribuído;
+- adicionar proteção anti-spam;
+- revisar logs e respostas de erro;
+- validar consentimentos;
+- revisar chaves e URLs do ambiente.
 
-```ts
-// lib/validators/nutriz.ts
-import { z } from "zod";
+Não sugerir que o sistema está pronto para produção enquanto essas pendências existirem.
 
-export const nutrizCreateSchema = z.object({
-  nome: z.string().min(2).max(120),
-  cidade: z.string().min(2).max(120),
-  estado: z.string().length(2),
-  whatsapp: z.string().regex(/^\d{10,11}$/),
-  consentimento: z.literal(true), // checkbox obrigatório, não pré-marcado
-});
+### 9.2 Consentimentos
 
-export type NutrizCreateInput = z.infer<typeof nutrizCreateSchema>;
-```
+- O consentimento de cadastro deve ser explícito.
+- O consentimento de lembretes deve ser separado e opcional.
+- Consentimento não pode vir pré-marcado.
+- A retirada do opt-in deve ser implementável e auditável.
+- Dados devem ser reduzidos ao mínimo necessário.
+- Dados clínicos não devem ser coletados.
 
-- **LGPD:** minimização de dados. Sem CPF/RG/data de nascimento/dados de saúde. Consentimento explícito e registrado. Páginas de privacidade e termos em `content/legal/`.
-- **Rate limiting:** `POST /api/nutriz` limita 5/min por IP (`lib/security/rate-limit.ts`, Sprint 4.4), `POST /api/track` limita 30/min por IP (Sprint 3.8) e o login admin tem lockout de 5 falhas/5min por email (`lib/auth/login-rate-limit.ts`, Sprint 5.2). Os três são **em memória, por processo** — trocar por store distribuído antes de deploy multi-instância.
-- Nunca exponha segredos no cliente. Variáveis sensíveis ficam em `.env.local` (fora do git) e só em código de servidor.
+### 9.3 Rate limiting e anti-spam
 
-## 11. Como trabalhar neste projeto
+Os limitadores atuais são em memória e por processo. Eles servem somente para o ambiente local/MVP. Não são suficientes em múltiplas instâncias.
 
-> **ISOLAMENTO — leia antes de qualquer coisa.** Esta máquina tem **outros projetos** do usuário que também usam Supabase, Prisma, Next.js e ferramentas parecidas. NUNCA toque em nada fora do diretório deste projeto (`C:\fiap\eurofarma`, ou `/mnt/c/fiap/eurofarma` no WSL). Em concreto:
-> - **Não** edite, mova ou apague arquivos fora desta pasta.
-> - **Não** rode comandos globais que afetem outros projetos: nada de `pnpm -g`, `npm i -g`, `prisma` apontando para outro schema, `supabase link`/`supabase start` de outro projeto, `git` em outro repositório, alterar `~/.npmrc`, variáveis de ambiente do sistema, etc.
-> - **Banco:** opere SOMENTE no projeto Supabase `eurofarma` (ref `mvixmggxwbrljlovfvac`, org `fiap`). Antes de qualquer `apply_migration`/`execute_sql` via MCP, confirme que o `project_id` é esse. Nunca rode DDL/seed contra outro projeto.
-> - **MCP do Supabase:** se `list_organizations` não retornar a org `fiap`, **pare** e avise — pode estar conectado na conta de outro projeto. Não aplique mudanças "no que estiver conectado".
-> - **Configuração recomendada do MCP quando mais de um agente trabalha no repo.** Só **um** agente
->   deve ter escrita no banco (hoje o Claude Code, que executa o fluxo de migration com o registro
->   manual no `_prisma_migrations`). Os demais recebem o MCP escopado e somente-leitura:
->   `https://mcp.supabase.com/mcp?project_ref=mvixmggxwbrljlovfvac&read_only=true`.
->   `read_only=true` roda toda query como usuário Postgres de leitura — `SELECT`, `list_tables`,
->   `list_migrations` e `get_advisors` continuam funcionando, `apply_migration` e escrita não.
->   `project_ref` trava no projeto e **desabilita as ferramentas de conta**, então a regra do bullet
->   acima deixa de depender de o agente reparar no erro: `list_organizations` nem existe. Isso
->   transforma a regra de isolamento em garantia do servidor em vez de instrução neste arquivo.
-> - Use sempre caminhos **dentro** deste repo. Na dúvida sobre escopo, pergunte em vez de agir.
+Turnstile foi dispensado no MVP anterior, mas a proteção anti-spam continua requisito antes de exposição pública. Não confundir “dispensado por ora” com “resolvido”.
 
-Ao receber uma tarefa neste projeto:
+## 10. Autenticação
 
-1. **Leia este arquivo primeiro.** Ele é a fonte das convenções.
-2. **Antes de criar um schema Zod**, verifique `lib/validators/` — pode já existir.
-3. **Antes de criar um componente de UI**, verifique se um componente shadcn/ui em `components/ui/` já resolve. Não reinvente botão, input, dialog, etc.
-4. **Decida Server vs Client Component** pelo critério do Princípio 2. Na dúvida, Server.
-5. **Texto visível** sempre via `lib/i18n/pt-br.ts`. Não hardcode.
-6. **Coloque cada coisa no seu lugar:** rota em `app/`, componente compartilhado em `components/shared/`, lógica pura em `lib/utils/`, acesso a dados via `lib/db/`.
-7. **Não sugira deploy, domínio, produção, CI/CD ou monitoramento** como ação atual. Estamos em local.
-8. **Ao terminar**, rode `pnpm check` e `pnpm test` e relate o resultado real, inclusive falhas. O `pnpm check:validators` continua disponível como smoke test rápido dos validators.
-9. **Se uma decisão arquitetural nova for tomada**, registre-a na seção 13 deste arquivo.
-10. **Não peça aprovação** para seguir convenções já definidas aqui — apenas siga.
+### 10.1 Admin
 
-## 12. O que está fora de escopo no MVP
+- Supabase Auth autentica.
+- public.users, com role ADMIN, autoriza.
+- O id de public.users deve ser igual ao id de auth.users.
+- Usuário autenticado sem espelho ADMIN vai para /admin/sem-acesso.
+- Erros de login são genéricos.
+- O lockout atual é em memória: cinco falhas em cinco minutos por e-mail.
 
-- ~~Chatbot/integração WhatsApp Business API~~ — **entrou em escopo em 2026-09-02** (Sprint 6.x, ver seção 13). O `wa.me` continua sendo o canal de contato com a unidade na busca e na página de detalhes; o chatbot é outra coisa, um fluxo pós-contato que pergunta se a nutriz conseguiu agendar.
-- Geolocalização avançada / "perto de mim" por GPS.
-- Mapa interativo.
-- Aplicativo mobile nativo.
-- BI / data warehouse / relatórios avançados.
-- Multi-idioma (apenas pt-br).
+O admin técnico inicial é criado por:
 
-## 13. Decisões arquiteturais importantes
+~~~bash
+pnpm db:seed-admin
+~~~
 
-- **Gráficos administrativos (2026-09-06)** → gráficos de linhas (cadastros × agendamentos informados nos últimos seis meses de São Paulo, mês atual parcial) e rosca (origem UTM acumulada dos cadastros) em `/admin/dashboard`, abaixo dos indicadores. SVG nativo sem dependências; linhas com inspeção por mouse/teclado e tabela acessível, rosca com legenda numérica. Dados reais agregados em `lib/db/queries/dashboard-charts.ts`, sem PII, respeitando `deletedAt`; agendamentos contam por `declaredAt`, com data de visita e status DECLARED/COMPLETED/CANCELLED. Origem é `utm_source`, nunca `contactPreference`: WhatsApp/wa.me, site/web/website, outras e não informada; não existe métrica de acessos globais. Meses vazios são zero com escala inteira; base vazia tem explicação. Copy em `DASHBOARD_CHARTS`. O time autorizou explicitamente prosseguir sem a skill `dataviz`, indisponível no ambiente.
+O e-mail atual é admin@lactare.local. Ele é uma credencial técnica legada, não copy de produto. Renomeá-lo exige mudança coordenada no Supabase Auth e em public.users.
 
-- **Marca renomeada de Lactare para NutriLink (2026-09-02)** → toda copy pública, metadado, identificação do painel, mensagem de WhatsApp e documentação de produto usa NutriLink. O email técnico legado `admin@lactare.local` não foi migrado porque é um identificador existente no Supabase Auth; ele não deve aparecer como marca na interface.
-- **WhatsApp via `wa.me` direto** (não Business API) → custo zero e tracking suficiente no MVP via rota `api/track`.
-- **Supabase cloud, não local em Docker** → decisão de 2026-05-31. Sem Docker/Supabase CLI na máquina e foco em velocidade de MVP. Projeto `eurofarma`, org `fiap`, ref `mvixmggxwbrljlovfvac`, região `sa-east-1`. Trade-off aceito: diverge do isolamento local; RLS precisa ser tratado antes de exposição pública.
-- **Migrations geradas offline + aplicadas via MCP do Supabase** → `prisma migrate dev` não funciona no cloud (shadow DB sem permissão) e não temos a senha do banco fora do `.env.local`. Geramos o SQL com `prisma migrate diff` e aplicamos com `apply_migration`; o `_prisma_migrations` é populado manualmente com o checksum SHA-256 do arquivo. `.gitattributes` força `eol=lf` para o checksum não quebrar.
-- **Prisma fixado em 6.x** → o schema usa `datasource.url` e generator `prisma-client-js`, removidos no Prisma 7. Migração para o 7 (driver adapters + `prisma.config.ts`) fica para o sprint de deploy na Vercel, onde o ganho serverless compensa.
-- **Zod fixado em 3.x** → o código usa `z.nativeEnum`, `z.string().email()`, `z.literal(true,{message})`, APIs deprecadas/alteradas no Zod 4.
-- **Prisma como ORM** sobre o Postgres do Supabase → migrations versionadas e queries type-safe; schema é a fonte da verdade.
-- **App Router com route group `(public)`** → separação clara de layouts e responsabilidades sem poluir a URL. A área **admin**, porém, usa **segmento literal `app/admin/`** (não route group), para ter URLs `/admin/*` — ver o bullet da Sprint 5.2.
-- **Copy centralizada em `lib/i18n/pt-br.ts`** → consistência de tom e facilidade de revisão de linguagem acolhedora.
-- **shadcn/ui** em vez de biblioteca de componentes fechada → controle total do código, acessibilidade e theming via CSS variables.
-- **Paleta Azul** (trocada da Berry/Sage/Cream em 2026-06-01, a pedido do time) → tokens HSL em `app/globals.css`. `--primary` usa o **azul profundo `#3A7AB8`** e não o azul claro `#5BA4D4` pedido originalmente para botões, porque `#5BA4D4` com texto branco fica em ~2.7:1 e reprova no WCAG AA (Princípio 5); o azul claro vira acento em `--ring`/charts/sidebar. Não re-litigar sem aceitar abrir mão do AA.
-- **Token `--whatsapp` (verde de marca)** → criado em 2026-06-01 para o CTA "Perguntar no WhatsApp" da página educativa, a pedido do time (que quis o verde do mockup em vez do azul da paleta). Foi a primeira exceção à paleta azul (a segunda são os `--topic-*`, abaixo). O verde foi **aprofundado para `hsl(142 71% 30%)`** porque o `#25D366` puro do WhatsApp fica em ~2:1 com texto branco e reprova no WCAG AA (Princípio 5); o tom escolhido dá ~5:1. Continua sendo um token (`bg-whatsapp`), nunca hex hardcoded.
-- **APIs públicas de busca (Sprints 3.1/3.2)** → contrato REST estável: `state` sempre obrigatório e normalizado (trim+uppercase); erros 400 com **código por campo** (`MISSING_STATE`/`INVALID_STATE`/`INVALID_TYPE`/`INVALID_HAS_WHATSAPP`/`INVALID_PAGE`/`INVALID_LIMIT`) e 500 `INTERNAL_ERROR` **sem vazar** stack/Prisma/`error.message`; UF válida sem resultado → lista vazia + 200 (nunca 404); cache via `Cache-Control` + `export const revalidate` (1h em cities, 5min em units), `no-store` nos erros. O `/api/units` usa `select` restrito + mapper para **nunca** expor `adminNotes`/`adminResponsibleId`/e-mail/instruções/coords/timestamps/PII. Tipos públicos em **snake_case** (`milk_bank`...) desacoplados do enum Prisma.
-- **`UnitCard` definitivo + tracking preparado (Sprint 3.5)** → o card é Server Component (`components/shared/unit-card.tsx`); toda a interatividade (links + tracking) fica isolada em `unit-card-actions.tsx` (`'use client'`), mantendo o card no servidor. O clique no WhatsApp dispara `navigator.sendBeacon('/api/track', ...)` com fallback `fetch({keepalive:true})` — **não bloqueia** o redirect e **ignora 404** silenciosamente (a rota `/api/track` é da Sprint 3.8). Evento `whatsapp_clicked`; payload carrega só id/slug da unidade + `source` + path + UTMs + referrer (**zero PII da nutriz**). O campo `whatsappMessage` passou a integrar o contrato público (`PublicUnit`/`PUBLIC_UNIT_SELECT`) — é a saudação voltada à nutriz, não dado admin. Utils de telefone migraram de `format-phone.ts` para `lib/utils/phone.ts` e o `whatsapp.ts` passou a API por objeto. **Nota de reconciliação:** o prompt da sprint assumia `unit-search-result-card.tsx` e `lib/db/queries/search-units.ts`, mas a 3.4 já consolidou o card em `unit-card.tsx` e a query em `searchPublicUnits` (`lib/db/queries/units.ts`) — mantive esses nomes para não duplicar.
-- **Página `/buscar` server-first + query compartilhada (Sprint 3.4)** → o `SearchFilters` (Client) escreve os filtros na URL e a página é um **Server Component** que lê `searchParams` e renderiza os resultados no servidor — **sem self-fetch** do próprio `/api/units` (evita hop HTTP e URL absoluta em RSC). A lógica de busca foi extraída para `searchPublicUnits` em `lib/db/queries/units.ts`, **fonte única** consumida tanto pelo route handler quanto pela página; o `select` público virou `PUBLIC_UNIT_SELECT` no mapper (mantém colunas e tipo em sincronia). `<Suspense>` keyed pelos params mostra esqueleto durante a navegação por filtros. Endereço público exibe **bairro/cidade/UF** (rua/número não estão no contrato 3.2). **Intencionalmente fora desta tela** (falta de dado estruturado ou §12): mapa (a definir depois), distância/"perto de mim" por GPS, rating/estrelas, "aberto agora" (horário é texto livre, sem timezone) e o "Chatbot WhatsApp" do mockup — o canal de contato é por unidade via `wa.me` (tracking por `api/track` é sprint futuro).
-- **`lib/constants/unit-types.ts` é Prisma-free (Sprint 3.3)** → como `SearchFilters` é Client Component e depende (via validator) dos tipos públicos, importar `@prisma/client` ali arrastaria o Prisma para o bundle do navegador. Os mapas enum↔público ficam isolados em `lib/constants/unit-types-prisma.ts` (só servidor: route handlers, mappers, seeds). Regra geral: **nada importado por Client Component pode transitar para `@prisma/client`**. Imports dentro de `lib/` usam caminho relativo entre irmãos (o Vitest não resolve o alias `@/`); `app/` e `components/` usam `@/`.
-- **Página de detalhes + SEO local (Sprint 3.6)** → `/banco-de-leite/[slug]` é Server Component que busca por slug ATIVO (`getActiveUnitBySlug`, `select` restrito `UNIT_DETAIL_SELECT` no `unit-detail-mapper.ts` — nunca expõe admin/PII), `notFound()` para inexistente/inativa, `revalidate=3600` e `generateMetadata` por template no i18n. Schema.org **`LocalBusiness`** (não `MedicalBusiness`, para evitar classificação médica sem validação jurídica), sem campos vazios, renderizado via `dangerouslySetInnerHTML` com escape de `<`. Mapa = **imagem estática Mapbox** (`lib/maps/mapbox-static.ts`, prefere `NEXT_PUBLIC_MAPBOX_TOKEN`); **sem token → fallback textual** de endereço (não bloqueia). A página **não** tem `<main>` próprio (o layout `(public)` já provê).
-- **Cadastro da nutriz adaptado do mockup (Sprints 4.1/4.5)** → o mockup enviado era uma tela de **login/criar conta com CPF + senha**; foi **reinterpretado** para o cadastro real: opt-in **mínimo sob LGPD** (nome, WhatsApp, UF, cidade, consentimento não pré-marcado) — **sem CPF** (veto Princípio 6), **sem senha/login** (auth é Sprint 5, nutriz não tem conta no modelo). Mantido só o **visual** split-screen (marca NutriLink). `signupFormSchema` em `lib/validators/signup-form.ts` é **Prisma-free** (Client) e espelha o `nutrizSignupSchema` server. `/cadastro` (página, não modal) → no sucesso **redireciona para `/obrigada`** (4.5; `robots:noindex`).
-- **Endpoint de cadastro `POST /api/nutriz` (Sprints 4.3/4.4)** → `runtime="nodejs"` (Prisma). Cadastro **opcional**. Contrato: `201 {ok:true}` **sem nenhum dado pessoal**; erros padronizados via `lib/utils/api-errors.ts` (`INVALID_JSON` 400 / `VALIDATION_ERROR` 400 com `fields` seguros / `LGPD_CONSENT_REQUIRED` 400 quando o consentimento é o único problema / `RATE_LIMITED` 429 / `INTERNAL_ERROR` 500 sem vazar Prisma/stack). **Upsert lógico** por `phoneWhatsapp` (a coluna **não é `@unique`** — `findFirst`+`update`/`create` em `$transaction`; re-cadastro limpa `deletedAt`). UTMs por `sanitizeSourceUtm` (só as 5 chaves, trim, máx 200, `null` se vazio). **Turnstile (Sprint 4.2) foi dispensado pelo time** no MVP (decisão registrada; TODO para reintroduzir antes de exposição pública). **Reconciliação:** o prompt da 4.3 assumia `nutriz-signup-modal.tsx` + Turnstile prontos; a realidade é a página `/cadastro`+`signup-form.tsx` (4.1) e sem Turnstile — segui essa realidade.
-- **Rate limiting em memória (Sprint 4.4)** → `lib/security/rate-limit.ts` é janela fixa **por processo**, 5/min por IP (header `x-forwarded-for`/`x-real-ip`, fallback `unknown`). Suficiente para local/single-server; **não compartilha estado entre instâncias serverless** — trocar por store distribuído (Redis/Upstash) mantendo a mesma interface antes de deploy. Não instalou dependência nova.
-- **Supabase Auth no admin (Sprints 5.1/5.2)** → base com **`@supabase/ssr`**: `createSupabaseServerClient` (cookies via `next/headers`; `setAll` em try/catch — a renovação de token virá do middleware na 5.3) e `createSupabaseBrowserClient`, ambos com `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (a anon/publishable key, pública por design; a **service_role NUNCA** vai pro client). Login em `/admin/login` via **Server Action** `signInWithPassword` (cookie de sessão no SSR); erro **sempre genérico** ("Email ou senha inválidos.", nunca `error.message`); **lockout em memória por email** (5 falhas/5min — por-processo, handoff p/ store distribuído em prod, não usa IP p/ minimizar PII); recuperação por `resetPasswordForEmail` com **mensagem genérica anti-enumeração**. Validação dupla (client RHF + server) com `adminLoginSchema`/`adminPasswordResetSchema` (mensagens em `ADMIN_LOGIN`). Middleware de proteção global + checagem de role + layout/dashboard ficam para as Sprints 5.3/5.4.
-- **Shell administrativo e a renumeração 5.3/5.4 (Sprint 5.4)** → o plano original deste arquivo dizia "5.3 = middleware + role + layout admin" e "5.4 = dashboard"; o time redefiniu a **5.4 como o layout administrativo** e o dashboard funcional virou a **5.5**. Na prática a 5.3 entregou um shell inicial e a 5.4 o **refinou** conforme a spec: breakpoint `lg` (não `md`), header sticky separado da sidebar, `max-w-7xl` no conteúdo (tabelas futuras), navegação extraída para `lib/admin/navigation.ts` e copy do shell isolada em `ADMIN_LAYOUT` (o objeto `ADMIN` ficou só com copy de **telas**: dashboard e sem-acesso). `/admin/dashboard` segue **placeholder** — indicadores reais são sprint futura. Regra que sobrevive: **rótulo nunca mora em `lib/admin/navigation.ts`** (só `key`+`href`), e esse módulo precisa continuar Prisma-free porque é consumido por Client Component.
-- **Proteção do painel em dois gates: middleware (Edge) + layout (Node) (Sprint 5.3)** → o `middleware.ts` da raiz cobre todo `/admin/*` e faz **só autenticação** (`supabase.auth.getUser()`, que revalida no servidor em vez de confiar no cookie) mais a **renovação do token** de sessão — por isso todo retorno passa por `withSessionCookies`, senão um redirect descartaria o token recém-emitido. A **checagem de role NÃO cabe no middleware**: ele roda no Edge e o role vive no Postgres, alcançável só via Prisma (Node). Esse segundo gate é o `app/admin/(painel)/layout.tsx`, que chama `requireAdminUser()`. Consequência a respeitar: **toda tela protegida nova entra dentro de `(painel)/`** — criar uma página direto em `app/admin/` lhe dá o gate de sessão, mas **não** o de role. `/admin/login` e `/admin/sem-acesso` ficam de fora do group de propósito (herdar o layout do painel faria o gate redirecionar para elas mesmas, em loop). O `?next=` passa por `sanitizeAdminNextPath` (só caminho relativo dentro de `/admin`, rejeita `//host`, `://` e `\`) para não virar open redirect. Alternativa descartada: `experimental.nodeMiddleware` do Next 15 para usar Prisma no middleware — experimental demais para o MVP, e concentrar autorização perto dos dados é mais seguro. O lockout de login (5.2) e o rate limit (4.4) continuam **em memória por processo** — mesma dívida de store distribuído antes de deploy multi-instância.
-- **Tracking com lista fechada de eventos (Sprint 3.8)** → não existe modelo genérico de evento no schema: há `WhatsappClick` e `ContactIntent`, tabelas próprias. Então `POST /api/track` aceita **um** evento (`whatsapp_clicked`) validado por `z.literal`, e evento novo exige entrada no validator **e** uma tabela que o comporte — nunca um `metadata` JSON solto. O payload do cliente traz `unit_slug`, `source` e `path`, que **não são persistidos** por não terem coluna (o Zod os descarta); ficam declarados no validator só para documentar o contrato. Unidade inexistente é detectada pelo **P2003 da FK**, não por um `SELECT` prévio — num endpoint de tracking uma consulta a mais por clique não se paga. Rate limit de 30/min (não 5 como no cadastro): clicar em várias unidades na busca é uso legítimo.
-- **Dashboard 5.5: agregação por UF, nunca por cidade** → com a base pequena, "nutrizes por cidade" reidentifica a pessoa (1 ou 2 cadastros num município). Toda agregação de nutriz é por UF e respeita `deletedAt`. A **cobertura geográfica conta só unidades `ACTIVE`** — uma UF que só tem unidade pendente não está atendida, e exibi-la como cobertura enganaria. Indicador zerado **nunca** aparece como "0" pelado: cada cartão troca a linha de contexto por uma explicação do porquê, porque com a base atual o estado vazio é o caminho principal, não a exceção. Sem `force-dynamic` na página: o `requireAdminUser()` do layout lê cookies, o que já torna a rota dinâmica (confirmado no build, `ƒ /admin/dashboard`).
-- **Admin é segmento literal `app/admin/`, não route group (Sprint 5.2)** → para a URL ser `/admin/login` (e futuramente `/admin/dashboard`), a área admin vive em `app/admin/` **literal**. Um route group `(admin)` seria **omitido da URL** (resultaria em `/login`, `/dashboard` — colide com o namespace público e contraria as URLs `/admin/*` esperadas). O layout/chrome admin virá em `app/admin/layout.tsx` (5.3). Isto **revisa** a menção a route group `(admin)` que constava do §3/§6 originais. `/admin/login` herda só o root layout (sem Header/Footer públicos), exatamente o desejado para a tela de login.
+Como o domínio é fictício, a recuperação por e-mail não serve para esse usuário. Redefina com:
 
-- **Listagem de unidades server-first, com a URL como estado (Sprint 5.6)** → `/admin/unidades` é Server Component puro: `parseAdminUnitFilters` lê `q`/`status`/`type`/`state`/`city`/`page` da URL e `getAdminUnits` consulta o Prisma direto — **sem self-fetch** de `/api/units` (mesma decisão da 3.4) e sem estado de cliente. O formulário de filtros é **GET nativo**, não o padrão Client+RHF da 3.3: aqui nenhum campo depende de outro (a cidade é texto livre, não select alimentado por API), então o form nativo entrega o mesmo com zero JS, é acessível por construção e — por não ter campo `page` — já reseta a paginação ao submeter. Isso força um `<select>` **nativo** no lugar do `Select` do shadcn, que é Radix e não envia valor em submit sem estado no cliente. O contrato de URL do painel usa **os próprios valores do enum** (`status=ACTIVE`), diferente do `snake_case` desacoplado da API pública, porque não é superfície pública; a leitura é tolerante (`?status=active` funciona) e valor inválido é **ignorado**, nunca erro — URL editada à mão não pode derrubar o painel. `page` tem teto (10.000) porque `skip` do Prisma é Int32. Ordenação `status → name → id`: o `id` garante paginação estável (nomes se repetem entre cidades) e, em Postgres, `status asc` segue a ordem de declaração do enum (PENDING, ACTIVE, INACTIVE), o que põe o que aguarda revisão no topo. A listagem tem **DTO admin próprio** (`AdminUnitListItem`) em vez de reusar o mapper público: mostra situação (que o público nunca vê) e reduz telefone/WhatsApp a **indicadores booleanos** — o número é assunto da tela de edição. Estados vazios são dois e não podem ser trocados: base sem nenhuma unidade convida a cadastrar a primeira; filtro sem resultado convida a limpar os filtros. O link "Ver página pública" só aparece em unidade `ACTIVE`, porque `/banco-de-leite/[slug]` chama `notFound()` para PENDING/INACTIVE (regra da 3.6). Copy em `ADMIN.units`, seguindo a convenção de que `ADMIN` guarda copy **de telas** e `ADMIN_LAYOUT` a do shell.
+~~~bash
+pnpm db:set-admin-password
+~~~
 
-- **Transcrição da base da rBLH e isolamento dos testes (Sprint 1.4)** → os dados chegam como **texto colado**, não como planilha: o time manda o bloco de um estado por vez e a transcrição para CSV é feita aqui. Por isso as regras de normalização são explícitas e valem para as próximas cargas: cidade em CAIXA ALTA vira capitalização normal e recebe acento (`SAO LUIS` → São Luís); nomes em caixa alta idem; `00`/`000`/`--`/`---`/`S/Nº` no campo de número são preenchimento vazio (viram vazio ou `S/N`); número de porta perde o ponto de milhar; setor/quadra/lote e "Campus X" são **juntados ao logradouro** em vez de virarem complemento descartado; referências de localização ("em frente à Caixa Econômica", "Saída para Araruna") vão para `instructions`, que é exibido na página da unidade; rodovia com número (`Rodovia PR, 558`) é logradouro, não porta; e sufixos de UF/cidade no nome (`/PB`, `- MS`, `GO`) são removidos porque o card já mostra a localização. **Telefone é o campo mais sujo:** faltando DDD, ele é inferido pela cidade (feito em Manaus, Fortaleza, São Luís e Juiz de Fora); truncado (menos de 10 dígitos) fica **vazio**, nunca completado a esmo; e `0` de prefixo interurbano é removido. Correção de cidade só acontece com **duas evidências independentes** (nome da unidade + faixa de CEP, ou prefixo telefônico) — foi o caso de Santa Terezinha de Itaipu/PR, Francisco Morato/SP e Guarulhos/SP. **Consequência estrutural:** com as 27 UFs povoadas, teste de integração **não pode mais se isolar escolhendo uma UF vazia** — o isolamento é por `TEST_CITY` (queries públicas, que filtram por cidade) ou pelo prefixo `__test__` no nome (query admin, que filtra por `q`).
+O script gera uma senha forte ou usa ADMIN_PASSWORD do ambiente. Nunca registrar a senha no repositório.
 
-- **Tokens `--topic-*` para os cartões do "Comece por Aqui" (2026-08-29)** → a seção 1 de `/como-funciona` usa **uma família de cor por assunto** (azul = elegibilidade, verde = mitos, lilás = segurança), a pedido do time, que apontou o mockup original como referência. São seis tokens em `globals.css` (`--topic-blue|green|lilac` + `-foreground`), registrados no `@theme inline` — a regra de **nunca hardcodar cor** continua valendo, e por isso a exceção virou token em vez de `bg-[#...]`. Cada `-foreground` foi escolhido para passar WCAG AA sobre a superfície da própria família; medido no navegador: link 5,55–6,08:1, título ~13:1, descrição 5,21–5,43:1. **Uso restrito a essa seção** — o resto do site segue a paleta azul, e espalhar essas cores por outras telas transformaria a exceção em segunda paleta. O `ContentSectionHeader` ganhou `descriptionPlacement="beside"` para a descrição ficar ao lado do título (como no mockup) sem mudar as outras seções, que continuam no padrão `below`.
+### 10.2 Nutriz
 
-- **Formulário de unidade valida, mas não normaliza nem grava (Sprint 5.7)** → o `adminUnitFormSchema` mantém **todo campo como string com o que o admin digitou**: sem `.transform()` para dígitos, sem `'' → null`. Converter para o formato de armazenamento (telefone só com dígitos, WhatsApp com DDI 55 via `whatsappSchema`, CEP `00000-000`, vazio → `null`) é responsabilidade explícita da 5.8, junto com a gravação — assim existe **um** ponto onde o dado muda de forma, em vez de dois discordando. As regras de dígito do form espelham as de `lib/validators/common.ts`; se uma mudar, as duas mudam. Coordenadas são **texto**, não `z.number()`: o input precisa distinguir "vazio" de "zero", e `valueAsNumber` transforma campo vazio em `NaN`. `lat`/`lng` valem como **par** — uma sozinha não localiza nada e quebraria o mapa estático da 3.6. Tipo e situação usam `.refine` com type predicate em vez de `z.enum` porque a entrada precisa representar "nada selecionado" (`''`) enquanto a saída já sai estreitada no literal, pronta para a 5.8 mapear ao enum do Prisma. **Slug não é editável** e nem aparece como campo: ele compõe a URL pública (`/banco-de-leite/[slug]`), e ensinar o admin a mexer nela quebraria links já divulgados — na edição ele é exibido como leitura, com atalho para a página pública **só quando a unidade está `ACTIVE`** (a rota da 3.6 dá `notFound()` em PENDING/INACTIVE). Unidade nova nasce **`PENDING`**, acompanhando o `@default(PENDING)` do schema: publicar é ato deliberado, não efeito colateral de cadastrar. O submit da 5.7 **não lê os valores validados** — enquanto não há persistência, nada justifica trafegar ou registrar dado de unidade — e o aviso diz "Formulário validado", nunca "cadastrada com sucesso", porque nada foi gravado.
+- O cadastro provisiona usuário confirmado por Admin API e vincula authUserId ao perfil.
+- Conflitos de e-mail ou WhatsApp retornam ACCOUNT_ALREADY_EXISTS sem vazar detalhes.
+- Falha na gravação deve tentar reverter o usuário recém-criado.
+- O login usa erro genérico e o mesmo lockout em memória.
+- Recuperação de senha depende de SMTP; o Supabase embutido é fortemente limitado.
+- /auth/confirmar troca o code por sessão.
+- /redefinir-senha conclui a atualização.
+- /meu-agendamento exige sessão e vínculo válido com o perfil.
 
-- **Mutações de unidade por Server Action, com a normalização em um lugar só (Sprint 5.8)** → o gate de rota da 5.3 protege a *tela*, não a *mutação*: Server Action é endpoint próprio e por isso cada uma chama `requireAdminUser()` **antes de qualquer trabalho** e **fora do `try`** (o `redirect` interno do helper sinaliza por exceção e seria engolido pelo `catch`). O payload é revalidado no servidor com o **mesmo** `adminUnitFormSchema` do cliente — a validação do browser é UX, a do servidor é integridade. A normalização vive só em `normalize-unit-input.ts` e reusa os schemas de `lib/validators/common.ts` mais o `normalizeBrazilianWhatsappNumber` do público: é isso que faz uma unidade cadastrada pela tela ficar **indistinguível** de uma importada do CSV da rBLH (CEP `00000-000`, telefone só dígitos, WhatsApp com DDI 55 — formatos conferidos na base). A gravação passa por uma **lista explícita de colunas** (`toUnitWriteData`), nunca `data: input`: `id`, `slug`, timestamps, `adminNotes` e `adminResponsibleId` não têm caminho a partir do formulário. `adminResponsibleId` **não é preenchido** — apesar de existir mapeamento seguro (`public.users.id` = `auth.users.id`), o campo significa "admin responsável pela unidade", não "quem editou por último", e atribuí-lo seria inventar regra de domínio. O slug é calculado **uma vez, na criação**, com sufixo escolhido em uma única consulta (`findAvailableUnitSlug`) em vez de um loop de `SELECT`s; a corrida remanescente é fechada pelo `@unique`, com P2002 virando conflito legível. **Update nunca regera slug.** Erro de banco jamais chega à UI como veio: `error.message`, código do Prisma e stack ficam no servidor. A revalidação cobre também `/`, `/api/units` e `/api/cities`, que têm cache próprio — sem isso, publicar uma unidade não apareceria na busca até o TTL expirar. **Exclusão continua fora de escopo**: apagar unidade tem implicações de integridade referencial (`WhatsappClick` tem FK RESTRICT), de histórico de links públicos e de métricas, e merece sprint própria.
+## 11. WhatsApp
 
-- **A listagem de nutrizes é tratada como tela de dado pessoal, não como mais um CRUD** → unidade é instituição, nutriz é pessoa, e isso muda o desenho em quatro pontos concretos. (1) O **soft delete não é filtro opcional**: `deletedAt: null` faz parte da consulta, porque quem pediu exclusão não pode reaparecer no painel (o `POST /api/nutriz` limpa `deletedAt` se ela voltar a se cadastrar — o registro volta por decisão dela, não do painel). (2) **Não existe filtro por cidade**, embora exista em unidades: numa base pequena, filtrar município isola indivíduos — é a mesma razão pela qual o dashboard da 5.5 agrega nutriz só por UF. (3) O **WhatsApp aparece mascarado** (`(11) •••••-••21`) com botão de revelar por linha: o painel é aberto em demonstração com frequência, e revelar linha a linha expõe só o contato de quem está sendo atendido naquele momento. É redução de exposição visual, **não** controle de acesso — o número está no HTML, e quem não pode vê-lo não deveria ter sessão de admin. (4) **Não há exportação em massa**: um botão de CSV transformaria a tela numa superfície de exfiltração de PII, e nada no MVP pede isso. O `select` também deixa `sourceUtm` de fora — é dado de campanha, não ajuda quem vai atender, e traria rastreamento para uma tela que já mostra PII. O estado vazio de base **não tem call to action**, diferente do de unidades: não existe "cadastrar primeira nutriz" pelo painel, porque quem se cadastra é a própria pessoa, com consentimento explícito. Consentimento LGPD e permissão de campanha ficam visíveis na linha porque governam o que pode ser enviado — descobrir isso na hora do disparo é tarde.
+### 11.1 Estado técnico
 
-- **O agendamento é autodeclarado pela nutriz, não confirmado pela plataforma (Sprint 6.1, 2026-09-02)** → o fluxo real é: a nutriz marca **direto com a unidade** (telefone ou `wa.me`), e depois o chatbot pergunta "conseguiu agendar? para qual dia?". Quem confirmou foi o banco de leite, por fora. Por isso `AppointmentStatus` **não tem `CONFIRMED`** — só `DECLARED`, `NOT_SCHEDULED`, `CANCELLED`, `COMPLETED` — e a interface diz **"informado por você"**, nunca "confirmado pelo banco de leite": afirmar confirmação que não verificamos faria a nutriz confiar numa tela errada se a unidade remarcasse. Isso descarta a alternativa antes cogitada de o admin confirmar cada agendamento (vira gargalo) e a de a unidade confirmar (as 487 unidades da rBLH não são usuárias da plataforma: não há `User` ligado a `Unit`, nenhuma tem credencial, nenhuma sabe que o NutriLink existe). `unitId` é **opcional** porque a nutriz pode não dizer com qual banco falou, e `ON DELETE SET NULL` mantém o agendamento vivo se a unidade for removida — a data que ela informou é dela, não da unidade. Já `nutrizProfileId` é `RESTRICT`, como em `WhatsappClick`. O **"não consegui agendar" é o dado mais valioso da conversa** (é a nutriz que quis doar e travou), por isso vira `NOT_SCHEDULED` + `failureReason` de **lista fechada** (`NO_ANSWER`/`NO_SLOT`/`TOO_FAR`/`GAVE_UP`/`OTHER`), respondida por botões no WhatsApp — texto livre aqui não agrega e não agrupa.
+O código da integração existe, mas não há:
 
-- **`phoneWhatsapp` virou `@unique`: o número é o identificador da nutriz no chatbot (Sprint 6.1)** → o webhook resolve o perfil a partir do número que enviou a mensagem, então precisa existir **exatamente um** perfil por número. Antes não era único (o `POST /api/nutriz` fazia `findFirst` + `update`/`create` em `$transaction` justamente por isso — o código continua correto, mas essa justificativa caiu e a rota pode virar `upsert` quando alguém encostar nela). A constraint entrou sem conflito porque a base tinha 1 perfil e 1 número distinto; com milhares de cadastros seria migração dolorosa. O `@@index([phoneWhatsapp])` foi removido por redundância. **O WhatsApp já era obrigatório** no formulário e no banco desde a 4.1 — não houve mudança de coleta.
+- app configurado na Meta;
+- número de teste ou número oficial;
+- templates aprovados;
+- URL pública;
+- credenciais reais.
 
-- **O número de WhatsApp NÃO é verificado no cadastro — risco aceito pelo time (2026-09-02)** → a decisão foi explícita, no mesmo espírito do Turnstile dispensado. O vetor é conhecido e deve ser reavaliado antes de exposição pública: como o login é por **email + senha** e a identificação no bot é pelo **número**, alguém pode se cadastrar informando o número de outra pessoa e passar a ver, na própria área logada, os agendamentos que aquela pessoa declarar ao chatbot. A mitigação natural é verificar o número por código (OTP) no cadastro — que é o mesmo mecanismo do login por OTP, descartado em favor de email + senha. Não relevantar a cada sprint; anotar como pendência de produção junto com RLS e rate limit distribuído.
+As quatro variáveis WHATSAPP_* do .env.example precisam de valores reais. Valores locais servem apenas ao simulador.
 
-- **O chatbot vive neste repositório, falando direto com a Cloud API da Meta (2026-09-02)** → revisa o §12, que vetava chatbot em favor do `wa.me`. Os dois convivem: `wa.me` é o contato com a unidade na busca e na página de detalhes; o chatbot é o fluxo **pós-contato**. Descartado intermediário no-code (Take Blip, Z-API, Evolution) porque, com escopo de demonstração, ele só adiciona conta de terceiro e custo — o webhook é um route handler no padrão que o projeto já usa. Usar o **test number** da Meta (gratuito, sem verificação de negócio, envia para até 5 números cadastrados à mão) é deliberado: a janela de 24h praticamente desaparece quando a nutriz manda a primeira mensagem, então a demonstração não depende de template aprovado — templates e cobrança só aparecem quando o bot inicia conversa dias depois, que é problema de produção. Duas regras do contrato do webhook: ele recebe **data já estruturada (ISO)**, nunca a frase digitada (o bot pede formato fixo `DD/MM HH:MM` e confirma "Anotei X, confirma?" — interpretar "quinta que vem" erra, e data errada na tela da nutriz é pior que tela vazia), e é **assinado por HMAC** (`X-Hub-Signature-256`), porque endpoint que aceita número + data sem autenticação deixa qualquer um agendar em nome de terceiros e, pior, descobrir se um número está cadastrado. O estado da conversa mora em `WhatsappConversation` (chaveado pelo número, `nutrizProfileId` nulo para quem nunca se cadastrou), não em memória do processo.
+O webhook:
 
-- **O chatbot é uma máquina de estados pura, e o webhook é a casca (Sprint 6.5)** → `advanceConversation` recebe passo, rascunho e mensagem e devolve o que responder, para onde ir e o que gravar; efeito colateral só existe no route handler. É isso que torna o fluxo inteiro testável **sem Meta, sem rede e sem banco** — e o fluxo é a parte que mais vai mudar quando o time ouvir as primeiras conversas reais. **A assinatura HMAC é a única barreira do endpoint**: sem `WHATSAPP_APP_SECRET` configurado ele recusa tudo, em vez de aceitar qualquer corpo enquanto ninguém configurou o ambiente; o HMAC é calculado sobre o **corpo cru** (por isso `request.text()` + `JSON.parse`, nunca `request.json()`, que reordenaria chaves e quebraria a conferência). Depois da assinatura conferida, **responde 200 sempre**, inclusive em erro interno: a Meta reenvia quando não recebe 2xx, e reenvio faz o bot responder em duplicata. A **data é parseada literalmente** (`DD/MM HH:MM`), nunca linguagem natural — "quinta que vem" errado põe a nutriz no banco de leite no dia errado, e o bot prefere repetir a instrução; sem ano informado, assume o próximo em que a data ainda não passou. O fuso é fixo em **UTC-3** porque o Brasil não tem horário de verão desde 2019 — sem isso o horário dependeria do fuso do servidor. Os motivos de "não consegui" vão em **lista** e não em botões: a Meta aceita no máximo três botões, e são cinco motivos. O número é casado **com e sem o nono dígito** (`phone-candidates.ts`), porque a Meta identifica celular brasileiro das duas formas e comparar só a string exata faria a nutriz não ser reconhecida; a variação é gerada só para faixa de celular (assinante de 9 dígitos iniciando em 9, ou de 8 na faixa 6–9), nunca para fixo — inventar variação onde não há regra criaria colisão entre pessoas. Número sem cadastro recebe convite e **não** gera conversa, e a mensagem não confirma nem nega a existência de conta de ninguém. **Idempotência parcial, conscientemente:** reenvio chega com a conversa já em `FINISHED`, estado que não grava nada; resta a janela entre gravar o agendamento e gravar o passo, que exigiria guardar o `messageId` processado (coluna nova) — vale fazer se aparecer duplicata na prática. **Efeito conhecido:** a conversa é chaveada pelo número **como a Meta o envia**, então as duas formas do mesmo celular geram duas linhas em `whatsapp_conversations`; não corrompe nada (o agendamento cai no mesmo perfil), mas fragmentaria o passo se a Meta alternasse as formas no meio de uma conversa. O `pnpm whatsapp:sim` assina e envia payloads no formato da Meta contra o webhook local — foi como a sprint foi verificada, e continua servindo para reproduzir um caso sem celular na mão.
+- usa GET para o challenge de verificação em texto puro;
+- usa POST com corpo cru;
+- exige assinatura HMAC;
+- compara assinatura com timingSafeEqual;
+- ignora recibos que não sejam mensagens;
+- usa a Cloud API diretamente, sem SDK;
+- associa telefones considerando variantes com e sem nono dígito.
 
-- **A tela do agendamento é lida em duas consultas, e o mockup foi podado onde não havia verdade (Sprint 6.4)** → `getCurrentNutrizAppointment` faz **duas** consultas em vez de um `orderBy` só por causa dos nulos: "não consegui agendar" tem `scheduledAt` nulo e, em Postgres, `order by scheduled_at desc` põe nulo primeiro — o registro de fracasso passaria na frente de uma visita marcada de verdade. Então primeiro busca-se a próxima visita futura; só na ausência dela cai-se no registro mais recente. A tela tem **três estados e nenhum é erro**: visita informada, "não consegui agendar" e nada ainda — e o vazio continua sendo o caminho principal até a 6.5, porque quem preenche esta página é a conversa no WhatsApp, não um formulário do site. Do mockup **saíram**, por não terem lastro: o selo "Confirmada" (virou **"Informado por você"**, pela regra da 6.1 — a plataforma não confirma nada), o **lembrete "via WhatsApp 24h antes"** (não enviamos mensagem ativa; `wa.me` só abre conversa a partir do clique dela) e o botão **"Reagendar"** (remarcar é com a unidade; oferecer isso na tela sugeriria que a plataforma remarca). O bloco de cancelamento ficou, mas reescrito: ele **não avisa a unidade** e a copy diz isso — é só a nutriz atualizando o próprio registro, e não existe a regra de "pendências no cadastro" que o mockup inventava. Também ficou de fora **"Tipo de Atendimento"**: não há coluna no `Appointment` nem pergunta no bot para alimentá-la, e preencher com suposição seria pior que omitir. A ação de cancelar cruza `id` **e** `nutrizProfileId` no `where` (não confia no id vindo do cliente) e devolve booleano sem detalhe — distinguir "não existe" de "é de outra pessoa" contaria algo sobre registro alheio. `unit` é opcional o caminho todo, e o `status` da unidade entrou no select porque o link `/banco-de-leite/[slug]` só vale para `ACTIVE` (a rota da 3.6 dá `notFound()` nas demais). **Efeito colateral nos testes:** o cleanup do `tests/setup.ts` passou a apagar `appointments` **antes** de `nutriz_profiles` — a FK é RESTRICT, e sem isso qualquer teste que crie agendamento derruba a limpeza e deixa lixo no banco cloud.
+Teste local:
 
-- **A área da nutriz repete os dois gates do painel, e o cabeçalho não (Sprint 6.3)** → `/meu-agendamento` é protegido em duas camadas pela mesma razão do `/admin`: o `middleware.ts` roda no **Edge** e só sabe se existe sessão, enquanto "esta sessão é de uma nutriz?" mora no Postgres e exige Prisma (**Node**). O segundo gate é `app/(public)/meu-agendamento/layout.tsx` com `requireNutrizUser()`. Consequência a respeitar: **toda tela nova da área entra dentro dessa pasta** — uma página irmã em `(public)/` ganha o chrome do site e nenhum dos dois gates. O gate trata como `forbidden` tanto sessão sem perfil quanto perfil com `deletedAt`, e manda para a **home**, não para `/entrar`: quem cai aí já tem sessão válida, então o login o devolveria em loop. Não há tela de "sem acesso" no público — o equivalente do painel só faz sentido onde a pessoa esperava ter permissão. Sem `?next=`: existe uma única rota protegida no público, então guardar o destino não acrescentaria nada e abriria superfície de open redirect à toa. A **`/entrar` recusa quem não é nutriz** — credencial de admin autentica e é imediatamente deslogada, com a mesma mensagem genérica —, senão o site público passaria a oferecer "Meu agendamento" a quem não tem agendamento nenhum. Já o atalho de conta no cabeçalho é **Client Component** (`header-account.tsx`) e não gate: ler a sessão no layout `(public)` tornaria **dinâmica toda página do site** — home, sobre, como-funciona, cadastro e obrigada hoje são estáticas no build, e trocá-las por render sob demanda em nome de um link seria caro demais. Ele sabe só que existe sessão, nunca de quem.
+~~~bash
+pnpm whatsapp:sim
+~~~
 
-- **A recuperação de senha passa por um route handler, não por página (Sprint 6.3)** → o link do e-mail aponta para **`/auth/confirmar?next=/redefinir-senha`** porque trocar o `code` por sessão exige **gravar cookie**, e Server Component não grava (o `setAll` do `supabase-server.ts` engole a escrita de propósito). O handler troca, redireciona, e a página só pergunta "existe sessão?" — sem ela o link expirou ou já foi usado, e a tela explica isso em vez de mostrar um formulário incapaz de salvar. O `next` passa por `sanitizeRelativeAppPath` (irmão público do `sanitizeAdminNextPath`, sem namespace fixo), porque um redirect vindo da URL é open redirect esperando acontecer. **Dependência a lembrar:** isso só funciona de ponta a ponta com SMTP que entregue — o Supabase embutido é limitadíssimo, e é o mesmo muro que impede o "Esqueci minha senha" do admin. A tela e o callback ficam prontos independentemente disso; o que falta é o e-mail sair.
+### 11.2 Fluxo-alvo
 
-- **A conta da nutriz nasce confirmada, e a coluna `email` continua nullable (Sprint 6.2)** → o `POST /api/nutriz` cria o usuário pela **Admin API** com `email_confirm: true` em vez de `signUp` com link de confirmação. Dois motivos: o SMTP embutido do Supabase é fortemente limitado (e `admin@lactare.local` já mostrou que e-mail é frágil neste projeto), e um link não clicado deixaria a nutriz sem acesso à própria área logo depois de se cadastrar. O custo é que **o e-mail não é verificado** — mesma família do risco aceito do WhatsApp não verificado, e igualmente pendente de revisão antes de exposição pública. Isso exige `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` **em runtime**, não só em script; elas não têm prefixo `NEXT_PUBLIC_`, e é isso (não um `server-only`, que não está instalado) que garante que a chave nunca entre no bundle. O e-mail é obrigatório **na entrada** (formulário e API), mas a **coluna segue nullable**: perfis criados antes da 6.2 são leads legítimos sem conta, e inventar e-mail para eles seria pior que deixar vazio — quem não tem `authUserId` simplesmente não tem conta. Auth e Postgres são dois sistemas sem transação comum, então falha na gravação **apaga o usuário recém-criado**; sem isso sobraria conta órfã segurando o e-mail. Conflito responde **409 `ACCOUNT_ALREADY_EXISTS`** com mensagem única nos dois caminhos (WhatsApp já com conta, detectado no Postgres; e-mail duplicado, detectado no Auth) — a mensagem não distingue qual campo colidiu, mas o 409 em si já revela que *algum* dos dois existe: enumeração aceita conscientemente numa tela de cadastro, coerente com o número não verificado. Depois de gravar, o endpoint faz `signInWithPassword` para a nutriz cair **logada** em `/obrigada`; falha nesse passo **não** desfaz o cadastro, porque a conta existe e ela pode entrar pela tela de login (6.3).
+O fluxo completo deverá permitir:
 
-- **Domínio não resolve webhook — hospedagem resolve (2026-09-02)** → o time decidiu comprar um domínio para o chatbot funcionar. Registro a correção para não se perder: DNS só traduz nome em endereço; a Meta precisa de algo **ligado e acessível** naquele endereço quando chama. Domínio apontado para a máquina de alguém exigiria IP público fixo, porta aberta e `pnpm dev` rodando — pior que um túnel de desenvolvimento (`cloudflared`/`ngrok`), que serve para desenvolver a 6.5 hoje com a ressalva de que a URL muda a cada sessão e precisa ser recadastrada na Meta. **O código do webhook é idêntico nos dois cenários**, só muda a URL registrada — nada trava enquanto o grupo decide. Quando deploy entrar de fato, atualizar a seção 3 e observar que ir ao ar é exatamente o evento que dispara os gates já registrados: **RLS desabilitado nas 8 tabelas** (com a publishable key no bundle, `nutriz_profiles` fica legível por qualquer um), **Turnstile dispensado** num endpoint público de cadastro, os **três rate limits em memória por processo** (inúteis em serverless) e o **pin do Prisma 6**, cuja migração para o 7 já estava reservada para esse momento.
+1. apresentação e menu;
+2. perguntas frequentes;
+3. elegibilidade por CEP ou município;
+4. orientação dentro ou fora da área;
+5. cadastro opcional com consentimento;
+6. contato direto com o Lactare;
+7. opt-in separado de lembretes;
+8. acompanhamento pós-doação;
+9. cartão, indicação e reconhecimento depois de uma confirmação legítima.
 
-## 14. Glossário
+A máquina de estados atual cobre somente um fluxo legado e limitado. Não chamar RF11 de concluído.
 
-- **Nutriz:** mãe que está amamentando; público principal da plataforma e potencial doadora de leite.
-- **Banco de leite humano (BLH):** serviço que coleta, processa, controla a qualidade e distribui leite humano a recém-nascidos que precisam.
-- **Ponto de coleta:** unidade vinculada a um BLH que recebe doações, mas não faz todo o processamento.
-- **rBLH:** Rede Brasileira de Bancos de Leite Humano; rede nacional que articula os BLHs e pontos de coleta.
-- **Doação de leite:** ato de a nutriz doar o excedente de leite materno para abastecer os bancos de leite.
-- **LGPD:** Lei Geral de Proteção de Dados; norma brasileira que rege a coleta e o tratamento de dados pessoais.
+Mensagens do bot devem vir de WHATSAPP_BOT em lib/i18n/pt-br.ts e responder em poucos segundos. O bot nunca executa triagem e nunca confirma agendamento.
 
-### Protótipo da área da nutriz (2026-09-05)
+## 12. Área do Lactare e segmentação
 
-Por solicitação explícita do time, `/meu-agendamento` agora apresenta um protótipo estático fiel à imagem fornecida, após login real. O nome e as iniciais vêm da sessão; consulta, status, endereço, orientações e mapa são ilustrativos. Inclusive “Confirmada”, lembrete, “Lactare” e “Reagendar Consulta” reproduzem o mockup por solicitação e não representam capacidades do produto. Botões de consulta ficam desativados; navegação e logout funcionam. Os componentes e queries reais da 6.4 continuam disponíveis, mas não são consumidos nesta página temporariamente. Copy em `APPOINTMENT_PREVIEW`, estilos escopados em `components/nutriz/appointment-preview.css` com tokens locais para as cores da referência. `PublicChrome` omite header/footer públicos nesta rota, que tem cabeçalho próprio. A aba Entrar em `/cadastro` agora navega para `/entrar`; autenticação, autorização e redirecionamento existentes são preservados.
+A fonte de produto adotada é o Mapa do Leite do Lactare, com 30 municípios. A lista completa e as fontes estão em docs/projeto-nutrilink.md.
+
+Sub-regiões:
+
+- **Oeste:** Itapevi, Barueri, Carapicuíba, Cotia, Jandira, Osasco, Pirapora do Bom Jesus, Santana de Parnaíba e Vargem Grande Paulista.
+- **Sudoeste:** Embu das Artes, Embu-Guaçu, Itapecerica da Serra e Taboão da Serra.
+- **ABC:** Diadema, Mauá, Ribeirão Pires, Rio Grande da Serra, Santo André, São Bernardo do Campo e São Caetano do Sul.
+- **Norte:** Caieiras, Cajamar e Francisco Morato.
+- **Leste / Alto Tietê:** Arujá, Ferraz de Vasconcelos, Guarulhos, Itaquaquecetuba, Poá e Suzano.
+- **Capital:** São Paulo.
+
+Segmentos de perfil planejados:
+
+- estágio da jornada;
+- adesão a lembretes;
+- origem do contato;
+- velocidade até a primeira doação.
+
+Região e perfil são dimensões separadas e combináveis. Elas ainda não estão implementadas. Não invente valores nem derive status clínico.
+
+## 13. Regras de produto vigentes
+
+Estas decisões substituem decisões antigas conflitantes:
+
+1. **Escopo Lactare-only:** a base nacional é legado, não direção futura.
+2. **WhatsApp Cloud API como porta de entrada:** links wa.me ou tel podem continuar como ações de contato, mas não substituem o chatbot-alvo.
+3. **Sem agendamento:** datas podem servir como referência de lembrete; não representam reserva ou confirmação.
+4. **Sem dados clínicos:** triagem pertence ao Lactare e dados de bebês pertencem aos hospitais.
+5. **Cobertura configurável:** a lista de municípios deve ser administrável e refletida imediatamente na elegibilidade.
+6. **Fora da área:** orientar para fonte externa oficial; não manter diretório nacional próprio.
+7. **Lembretes por opt-in separado:** nunca ativados automaticamente.
+8. **Compartilhamento sem recompensa material:** cartão, mensagem e reconhecimento são simbólicos.
+9. **Impacto verificável:** não calcular “bebês salvos” nem alegações clínicas individuais.
+10. **Segurança antes de exposição:** RLS, textos legais e proteção contra abuso são bloqueadores.
+
+## 14. Git e entrega
+
+- Trabalhe em branch de feature.
+- Antes de começar, confira branch, status e diferença para origin/main.
+- Não sobrescreva alterações alheias.
+- Não faça git reset --hard ou descarte mudanças sem autorização explícita.
+- Commits devem ser pequenos e coerentes.
+- Não misture refatoração ampla com correção pontual.
+- Documente decisões novas neste arquivo e, quando forem de produto, também em docs/projeto-nutrilink.md.
+
+Antes de concluir uma mudança de código, rode verificações proporcionais ao risco. Para mudanças amplas:
+
+~~~bash
+pnpm check
+pnpm test
+~~~
+
+Mudanças somente em Markdown não exigem build ou testes de aplicação, mas devem ser revisadas quanto a links, consistência de termos e estado do Git.
+
+## 15. Fora do escopo e sprints futuros
+
+Marque explicitamente como “previsto para sprint futuro” qualquer menção a:
+
+- deploy, domínio, staging ou produção;
+- CI/CD;
+- monitoramento;
+- Playwright;
+- ativação real da Meta;
+- diretório nacional;
+- aplicativo móvel;
+- múltiplos idiomas;
+- dados clínicos;
+- integrações com sistemas hospitalares.
+
+Não configure esses itens sem uma nova decisão de escopo e autorização do time.
+
+## 16. Glossário curto
+
+- **BLH:** Banco de Leite Humano.
+- **LGPD:** Lei Geral de Proteção de Dados Pessoais.
+- **Nutriz:** mulher que amamenta e é potencial doadora.
+- **Opt-in:** ativação voluntária e explícita.
+- **PII:** dado que identifica ou pode identificar uma pessoa.
+- **rBLH:** Rede Brasileira de Bancos de Leite Humano.
+- **RLS:** Row Level Security.
+- **Triagem:** avaliação de saúde feita por profissional do Lactare, fora do NutriLink.
