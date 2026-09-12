@@ -474,7 +474,7 @@ export function SignupForm() {
         size="lg"
         className="border-whatsapp/30 text-whatsapp hover:bg-whatsapp/5 hover:text-whatsapp h-12 w-full rounded-xl px-6"
       >
-        <Link href="/buscar">
+        <Link href="/verificar-cobertura">
           <MessageCircle aria-hidden="true" />
           {COPY.actions.whatsappCta}
         </Link>

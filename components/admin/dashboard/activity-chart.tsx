@@ -14,15 +14,11 @@ const TOP = 20
 const BOTTOM = 220
 const SERIES = [
   { key: 'registrations', color: 'var(--chart-3)', dashed: false },
-  { key: 'appointments', color: 'var(--chart-2)', dashed: true },
 ] as const
 
 export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
   const [active, setActive] = useState<number | null>(null)
-  const max = Math.max(
-    0,
-    ...months.flatMap((month) => [month.registrations, month.appointments]),
-  )
+  const max = Math.max(0, ...months.map((month) => month.registrations))
   const { ceiling, ticks } = getChartScale(max)
   const x = (index: number) =>
     LEFT + (index * (RIGHT - LEFT)) / Math.max(1, months.length - 1)
@@ -126,7 +122,7 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
               fill="transparent"
               tabIndex={0}
               role="img"
-              aria-label={`${month.label}: ${COPY.registrations} ${month.registrations}; ${COPY.appointments} ${month.appointments}`}
+              aria-label={`${month.label}: ${COPY.registrations} ${month.registrations}`}
               className="focus:stroke-ring focus:outline-none"
               onMouseEnter={() => setActive(index)}
               onMouseLeave={() => setActive(null)}
@@ -158,7 +154,7 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
         aria-live="polite"
       >
         {selected
-          ? `${selected.label} · ${COPY.registrations}: ${formatCount(selected.registrations)} · ${COPY.appointments}: ${formatCount(selected.appointments)}`
+          ? `${selected.label} · ${COPY.registrations}: ${formatCount(selected.registrations)}`
           : max === 0
             ? COPY.evolutionEmpty
             : '\u00a0'}
@@ -176,7 +172,6 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
                 {COPY.month}
               </th>
               <th scope="col">{COPY.registrations}</th>
-              <th scope="col">{COPY.appointments}</th>
             </tr>
           </thead>
           <tbody>
@@ -186,7 +181,6 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
                   {month.label}
                 </th>
                 <td>{formatCount(month.registrations)}</td>
-                <td>{formatCount(month.appointments)}</td>
               </tr>
             ))}
           </tbody>

@@ -61,7 +61,7 @@ function withLinks(reply: BotReply, siteUrl: string): BotReply {
   if (reply.body === WHATSAPP_BOT.notScheduledSaved.bodyTemplate) {
     return {
       type: 'text',
-      body: reply.body.replace('{url}', `${siteUrl}/buscar`),
+      body: reply.body.replace('{url}', `${siteUrl}/verificar-cobertura`),
     }
   }
   return reply

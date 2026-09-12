@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  Building2,
   FileText,
   LayoutDashboard,
+  MapPin,
   Megaphone,
   Users,
   type LucideIcon,
@@ -22,14 +22,14 @@ type AdminNavProps = {
 
 const ICONS: Record<AdminNavKey, LucideIcon> = {
   dashboard: LayoutDashboard,
-  units: Building2,
+  municipalities: MapPin,
   nutrizes: Users,
   contents: FileText,
   campaigns: Megaphone,
 }
 
 /**
- * Marca a rota ativa. `startsWith` cobre subrotas (ex.: `/admin/unidades/nova`)
+ * Marca a rota ativa. `startsWith` cobre subrotas (ex.: `/admin/municipios/novo`)
  * sem que um href curto capture os demais itens — nenhum href aqui é prefixo de
  * outro, e `/admin` sozinho não está na lista justamente por isso.
  */

@@ -1,6 +1,18 @@
 import { describe, it, expect } from 'vitest'
 
-import { generateSlug, generateSlugWithSuffix } from '../../lib/utils/slug'
+import {
+  generateSimpleSlug,
+  generateSlug,
+  generateSlugWithSuffix,
+} from '../../lib/utils/slug'
+
+describe('generateSimpleSlug', () => {
+  it('gera o slug estável de um município com acentos', () => {
+    expect(generateSimpleSlug('São Bernardo do Campo')).toBe(
+      'sao-bernardo-do-campo',
+    )
+  })
+})
 
 describe('generateSlug', () => {
   it('gera slug básico em ASCII', () => {

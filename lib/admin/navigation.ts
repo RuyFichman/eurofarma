@@ -7,7 +7,7 @@
  */
 export const ADMIN_NAV_ITEMS = [
   { key: 'dashboard', href: '/admin/dashboard' },
-  { key: 'units', href: '/admin/unidades' },
+  { key: 'municipalities', href: '/admin/municipios' },
   { key: 'nutrizes', href: '/admin/nutrizes' },
   { key: 'contents', href: '/admin/conteudos' },
   { key: 'campaigns', href: '/admin/campanhas' },

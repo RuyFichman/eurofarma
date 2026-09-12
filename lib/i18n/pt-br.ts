@@ -2,7 +2,7 @@ export const SITE = {
   name: 'NutriLink',
   tagline: 'Conectando vidas através do leite humano.',
   description:
-    'Plataforma digital que conecta nutrizes a bancos de leite humano e pontos de coleta no Brasil.',
+    'Solução digital do Lactare para orientar nutrizes e verificar a área de atuação na Grande São Paulo.',
   credits: 'Uma iniciativa NutriLink · Eurofarma',
   partnerCredit: 'Desenvolvido em parceria com FIAP',
 } as const
@@ -11,13 +11,13 @@ export const NAV = {
   items: [
     { label: 'Início', href: '/' },
     { label: 'Como funciona', href: '/como-funciona' },
-    { label: 'Encontrar banco de leite', href: '/buscar' },
+    { label: 'Verificar cobertura', href: '/verificar-cobertura' },
     { label: 'Sobre', href: '/sobre' },
   ],
   cta: {
-    label: 'Encontrar banco de leite',
-    shortLabel: 'Encontrar banco',
-    href: '/buscar',
+    label: 'Verificar cobertura',
+    shortLabel: 'Cobertura',
+    href: '/verificar-cobertura',
   },
   mobileMenu: {
     open: 'Abrir menu',
@@ -36,7 +36,10 @@ export const FOOTER = {
     terms: { label: 'Termos de Uso', href: '/termos' },
     about: { label: 'Sobre o NutriLink', href: '/sobre' },
     howItWorks: { label: 'Como funciona', href: '/como-funciona' },
-    findBank: { label: 'Encontrar banco de leite', href: '/buscar' },
+    findBank: {
+      label: 'Verificar cidade atendida',
+      href: '/verificar-cobertura',
+    },
   },
   contact: {
     title: 'Contato institucional',
@@ -47,13 +50,16 @@ export const FOOTER = {
 
 export const HOME = {
   hero: {
-    badge: 'Rede Brasileira de Bancos de Leite Humano',
+    badge: 'Área de atuação do Lactare',
     titleLead: 'Seu leite é um',
     titleHighlight: 'presente de vida',
     titleTail: 'para quem mais precisa',
     description:
-      'O NutriLink conecta nutrizes aos bancos de leite humano da rBLH e torna a doação de leite materno mais simples, segura e acolhedora.',
-    primaryCta: { label: 'Encontrar banco de leite', href: '/buscar' },
+      'O NutriLink ajuda você a descobrir se sua cidade é atendida pelo Lactare e orienta os próximos passos da doação de leite humano.',
+    primaryCta: {
+      label: 'Verificar minha cidade',
+      href: '/verificar-cobertura',
+    },
     secondaryCta: { label: 'Como funciona', href: '/como-funciona' },
     trust: [
       'Seus dados protegidos pela LGPD',
@@ -62,48 +68,37 @@ export const HOME = {
     imageAlt: 'Bebê recém-nascido aconchegado em um cobertor macio',
   },
   stats: {
-    /** Heading do bloco — visualmente oculto, lido por leitor de tela. */
-    title: 'A rede em números',
-    /**
-     * Os dois primeiros vêm do banco (é o que a nutriz realmente encontra na
-     * busca); `fallback` cobre a falha da consulta. Os dois últimos são da
-     * rBLH e não derivam da nossa base — daí a nota de fonte.
-     */
-    units: { label: 'Unidades cadastradas', fallback: '220+' },
-    states: { label: 'Estados atendidos', fallback: '27' },
-    donors: { value: '48 mil', label: 'Doadoras ativas na rede' },
-    babies: { value: '2,3 mi', label: 'Bebês beneficiados' },
+    title: 'Área de atuação em números',
+    municipalities: { label: 'Municípios configurados', fallback: '30' },
+    regions: { label: 'Sub-regiões da Grande SP', fallback: '6' },
     sourceNote:
-      'Unidades e estados vêm da nossa base; doadoras e bebês são dados da rBLH/Fiocruz.',
+      'A cobertura exibida segue a lista administrável de municípios atendidos pelo Lactare.',
   },
   network: {
-    eyebrow: 'Conheça a rede',
-    title: 'Quem faz parte do NutriLink?',
+    eyebrow: 'Conheça a solução',
+    title: 'NutriLink e Lactare, cada um com seu papel',
     subtitle:
-      'O NutriLink é o elo digital entre a nutriz e a maior rede de bancos de leite humano do Brasil.',
+      'O NutriLink reduz a distância entre a sua dúvida e o contato com a equipe que realiza o atendimento.',
     cards: [
       {
         title: 'O que é o NutriLink?',
         description:
-          'É a plataforma que aproxima você do banco de leite mais perto. Em poucos cliques, você encontra a unidade certa e fala com ela pelo WhatsApp.',
+          'É a experiência digital que informa, verifica a cobertura do Lactare e acompanha sua jornada de forma simples e acolhedora.',
         items: [
-          'Busca por estado e cidade',
-          'Contato direto pelo WhatsApp',
+          'Verificação por município',
+          'Cadastro opcional e continuidade da jornada',
           'Conteúdo acolhedor e confiável',
         ],
         cta: { label: 'Saiba mais', href: '/sobre' },
       },
       {
-        title: 'A rBLH — Rede Brasileira de Bancos de Leite Humano',
+        title: 'Lactare — banco de leite humano da Eurofarma',
         description:
-          'Coordenada pela Fiocruz e pelo Ministério da Saúde, é a maior rede de bancos de leite humano do mundo e referência em segurança alimentar para recém-nascidos.',
+          'É a operação responsável pelo atendimento, pela triagem profissional, pela coleta conforme disponibilidade e pelo processamento seguro do leite doado.',
         items: [
-          'Maior rede do mundo em BLH',
-          'Coordenada pela Fiocruz',
-          // Sem número aqui: a faixa de indicadores logo acima já mostra a
-          // contagem real da base, e dois totais diferentes na mesma tela
-          // se contradiriam.
-          'Unidades em todas as regiões do país',
+          'Atuação na Grande São Paulo',
+          'Triagem feita por profissionais',
+          'Contato direto para combinar os próximos passos',
         ],
         cta: { label: 'Saiba mais', href: '/como-funciona' },
       },
@@ -138,8 +133,11 @@ export const HOME = {
   finalCta: {
     title: 'Pronta para fazer a diferença?',
     description:
-      'Encontre o banco de leite mais perto de você e fale com a equipe pelo WhatsApp. É simples, rápido e cheio de cuidado.',
-    primaryCta: { label: 'Encontrar banco de leite', href: '/buscar' },
+      'Descubra se sua cidade está na área do Lactare e veja como continuar. É simples, transparente e acolhedor.',
+    primaryCta: {
+      label: 'Verificar minha cidade',
+      href: '/verificar-cobertura',
+    },
     secondaryCta: { label: 'Como funciona', href: '/como-funciona' },
   },
 } as const
@@ -148,63 +146,58 @@ export const ABOUT = {
   meta: {
     title: 'Sobre o NutriLink',
     description:
-      'Conheça a história do NutriLink, programa de doação de leite humano que já mobilizou mais de 12 mil doadoras no Brasil.',
+      'Conheça o NutriLink, solução digital criada para apoiar a jornada de doação no Lactare.',
   },
   hero: {
     eyebrow: 'Sobre o NutriLink',
-    title: 'Uma ponte digital entre quem quer doar e quem precisa.',
+    title: 'Uma ponte digital entre a nutriz e o Lactare.',
     description:
-      'Uma iniciativa que conecta vidas há 6 anos, mobilizando nutrizes e bancos de leite humano por todo o Brasil.',
-    impactLabel: 'Impacto construído em rede',
+      'Informação, cobertura e continuidade da jornada reunidas em uma experiência simples para a Grande São Paulo.',
+    impactLabel: 'Escopo da solução',
     impact: [
-      { value: '6 anos', label: 'de jornada' },
-      { value: '+12,4 mil', label: 'doadoras mobilizadas' },
-      { value: '+5 mil', label: 'bebês beneficiados' },
+      { value: '30', label: 'municípios configurados' },
+      { value: '6', label: 'sub-regiões da Grande SP' },
+      { value: '3', label: 'frentes digitais integradas' },
     ],
   },
   history: {
     eyebrow: 'Nossa essência',
     title: 'Nossa história',
     paragraphs: [
-      'O NutriLink nasceu como um programa institucional da Eurofarma, com o propósito de apoiar os bancos de leite humano e fortalecer a cultura de doação de leite materno no Brasil.',
-      'Em 6 anos de jornada, o programa mobilizou mais de 12.400 doadoras e ajudou a beneficiar mais de 5.000 bebês prematuros com leite humano doado — cada gota representa uma vida amparada em um momento decisivo.',
-      'Com o NutriLink Digital, ampliamos esse alcance por meio de canais digitais, aproximando ainda mais as nutrizes dos bancos de leite e tornando a doação simples, acolhedora e ao alcance de todas.',
+      'O Lactare é o banco de leite humano da Eurofarma e realiza o atendimento, a triagem profissional e o processamento do leite doado.',
+      'O NutriLink nasceu para reduzir as barreiras digitais dessa jornada: esclarecer dúvidas, verificar a área atendida e facilitar o contato com o Lactare.',
+      'A solução concentra a entrada no WhatsApp e usa a plataforma web para conteúdos, consentimentos, área pessoal e gestão administrativa.',
     ],
   },
   mission: {
     eyebrow: 'O que nos move',
     title: 'Nossa missão',
     quote:
-      'Garantir que toda nutriz no Brasil tenha acesso fácil, acolhedor e informado aos bancos de leite humano, ampliando o impacto da doação de leite materno e salvando mais vidas.',
+      'Oferecer às nutrizes da área do Lactare um caminho simples, acolhedor e transparente entre a primeira dúvida e o contato com a equipe responsável.',
   },
   timeline: {
     eyebrow: 'Nossa trajetória',
     title: 'Marcos da jornada',
     description:
-      'Um programa que cresceu com propósito e agora ganha novas possibilidades no ambiente digital.',
+      'A operação do Lactare ganha uma jornada digital sem substituir o atendimento profissional.',
     milestones: [
       {
         year: '2019',
+        description: 'Inauguração do Lactare pela Eurofarma em Itapevi',
+      },
+      {
+        year: 'Operação',
         description:
-          'Início do programa NutriLink como iniciativa institucional',
+          'Coleta, processamento e doação de leite para hospitais públicos parceiros',
       },
       {
-        year: '2020',
+        year: 'Expansão',
+        description: 'Parceria ampliada para o Hospital Geral de Carapicuíba',
+      },
+      {
+        year: '2026',
         description:
-          'Primeiras parcerias com bancos de leite humano em São Paulo',
-      },
-      {
-        year: '2022',
-        description: 'Expansão para 5 estados brasileiros',
-      },
-      {
-        year: '2024',
-        description: 'Atingimos a marca de 10.000 doadoras mobilizadas',
-      },
-      {
-        year: '2025',
-        description:
-          'Lançamento do NutriLink Digital, ampliando o alcance via web e WhatsApp',
+          'Desenvolvimento do NutriLink Digital para web, WhatsApp e gestão',
       },
     ],
   },
@@ -212,14 +205,22 @@ export const ABOUT = {
     eyebrow: 'Construído em conjunto',
     title: 'Parceiros institucionais',
     description:
-      'Trabalhamos lado a lado com a Rede Brasileira de Bancos de Leite Humano (rBLH), hospitais públicos e privados, maternidades e organizações de saúde em todo o Brasil.',
-    items: ['rBLH/Fiocruz', 'Hospitais parceiros', 'SUS', 'Eurofarma'],
+      'Cada instituição tem um papel próprio: a Eurofarma mantém o Lactare, e os hospitais parceiros recebem o leite processado para uso assistencial.',
+    items: [
+      'Eurofarma',
+      'Lactare',
+      'Hospital Geral de Itapevi',
+      'Hospital Geral de Carapicuíba',
+    ],
   },
   finalCta: {
     title: 'Faça parte dessa história.',
     description:
-      'Encontre um banco de leite próximo e inicie sua jornada como doadora.',
-    cta: { label: 'Encontrar banco de leite', href: '/buscar' },
+      'Verifique se sua cidade faz parte da área de atuação do Lactare.',
+    cta: {
+      label: 'Verificar minha cidade',
+      href: '/verificar-cobertura',
+    },
   },
 } as const
 
@@ -277,17 +278,17 @@ export const CONTENT = {
       {
         title: 'Primeiro contato pelo WhatsApp',
         description:
-          'Encontre o banco de leite mais perto de você e fale direto com a equipe pelo WhatsApp, em poucos cliques.',
+          'Converse com o NutriLink para esclarecer dúvidas e iniciar sua jornada com o Lactare.',
       },
       {
-        title: 'Triagem de elegibilidade',
+        title: 'Verificação da área atendida',
         description:
-          'A equipe do banco de leite confirma sua aptidão como doadora com base em critérios clínicos simples.',
+          'Informe sua cidade para saber se ela faz parte da área de atuação configurada do Lactare.',
       },
       {
-        title: 'Agendamento da coleta',
+        title: 'Contato com o Lactare',
         description:
-          'Combine a data, o horário e o banco de leite mais conveniente para você. Em muitos casos há coleta domiciliar assistida.',
+          'A equipe do Lactare realiza a triagem profissional e combina diretamente os próximos passos, conforme disponibilidade.',
       },
       {
         title: 'Extração e preparação em casa',
@@ -295,9 +296,9 @@ export const CONTENT = {
           'Siga o guia de higiene e extração, armazene em frasco esterilizado e etiquete com data e hora. Simples assim.',
       },
       {
-        title: 'Entrega no banco de leite',
+        title: 'Doação ao Lactare',
         description:
-          'Leve ao banco na data combinada. O leite passa por pasteurização, análise e distribuição para os bebês que precisam.',
+          'O Lactare recebe o leite conforme a orientação combinada e realiza processamento e controle de qualidade.',
       },
     ],
   },
@@ -311,7 +312,7 @@ export const CONTENT = {
           'https://images.unsplash.com/photo-1773243086607-0e2d41fb59c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80',
       },
       {
-        title: 'Como agendar sua visita',
+        title: 'Como falar com o Lactare',
         duration: '3:18',
         thumbnail:
           'https://images.unsplash.com/photo-1774041339887-9ab8c56f7482?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400&q=80',
@@ -389,36 +390,36 @@ export const CONTENT = {
   },
   stories: {
     eyebrow: 'Seção 4',
-    title: 'Histórias Reais',
+    title: 'Jornadas possíveis',
     description:
-      'Relatos de mães e famílias que fazem parte desta rede de amor.',
+      'Exemplos ilustrativos de como a informação e o acolhimento podem apoiar cada etapa.',
     items: [
       {
         role: 'Doadora',
         quote:
           'Quando descobri que meu leite poderia salvar a vida de um bebê prematuro, chorei de emoção. O processo foi muito mais simples do que imaginava. Hoje é parte da minha rotina e me sinto parte de algo enorme.',
-        name: 'Maria Silva',
-        detail: 'Doadora há 8 meses — São Paulo, SP',
+        name: 'Jornada ilustrativa 1',
+        detail: 'Exemplo de uma primeira doação',
       },
       {
-        role: 'Família Beneficiada',
+        role: 'Continuidade',
         quote:
           'Nosso filho nasceu com 28 semanas. Durante 4 meses, o leite humano doado foi o único alimento que ele recebeu. Hoje ele tem 2 anos e é cheio de vida. Não temos palavras para agradecer.',
-        name: 'Família Pereira',
-        detail: 'Beneficiada pelo BLH — Rio de Janeiro, RJ',
+        name: 'Jornada ilustrativa 2',
+        detail: 'Exemplo de acompanhamento acolhedor',
       },
       {
         role: 'Doadora',
         quote:
           'Tinha muito leite sobrando e não sabia o que fazer. Uma amiga me indicou o NutriLink. Em menos de uma semana já estava cadastrada e fazendo minha primeira coleta. É gratificante demais.',
-        name: 'Fernanda Costa',
-        detail: 'Doadora voluntária — Campinas, SP',
+        name: 'Jornada ilustrativa 3',
+        detail: 'Exemplo de indicação entre nutrizes',
       },
     ],
     cta: {
       lead: 'Você também faz parte dessa história.',
       label: 'Quero ser doadora',
-      href: '/buscar',
+      href: '/verificar-cobertura',
     },
   },
   faq: {
@@ -428,7 +429,7 @@ export const CONTENT = {
       {
         question: 'Posso doar se estou tomando medicamentos?',
         answer:
-          'Depende do medicamento. A maioria dos remédios comuns (vitaminas, suplementos, antialérgicos leves) não impede a doação. A equipe do banco de leite avalia caso a caso durante a triagem. Sempre informe todos os medicamentos que usa.',
+          'Depende do medicamento. A equipe do Lactare avalia cada caso durante a triagem profissional. Sempre informe todos os medicamentos que usa.',
       },
       {
         question: 'O leite que sobra depois que o bebê mamou pode ser doado?',
@@ -438,7 +439,7 @@ export const CONTENT = {
       {
         question: 'Quantas vezes por semana posso fazer a coleta?',
         answer:
-          'Não há um limite fixo — vai depender da sua produção. Algumas doadoras levam leite semanalmente, outras quinzenalmente. O importante é não comprometer a alimentação do seu próprio bebê.',
+          'Não há um limite único — isso depende da sua produção e da orientação recebida. O importante é não comprometer a alimentação do seu próprio bebê.',
       },
       {
         question: 'Meu bebê vai ter menos leite se eu doar?',
@@ -448,7 +449,7 @@ export const CONTENT = {
       {
         question: 'Posso parar de ser doadora quando quiser?',
         answer:
-          'Absolutamente. A doação é sempre voluntária e você pode encerrar a qualquer momento, sem nenhuma obrigação. Basta comunicar o banco de leite responsável.',
+          'Sim. A doação é sempre voluntária e você pode encerrar a qualquer momento, sem nenhuma obrigação. Basta comunicar a equipe do Lactare.',
       },
       {
         question: 'Para quais bebês o leite doado é destinado?',
@@ -458,12 +459,74 @@ export const CONTENT = {
     ],
     help: {
       title: 'Não encontrou sua resposta?',
-      whatsapp: { label: 'Perguntar no WhatsApp', href: '/buscar' },
+      whatsapp: {
+        label: 'Verificar cobertura',
+        href: '/verificar-cobertura',
+      },
       articles: { label: 'Ver todos os artigos', href: '#' },
     },
   },
 } as const
 
+export const COVERAGE = {
+  regions: {
+    CAPITAL: 'Capital',
+    WEST: 'Oeste',
+    SOUTHWEST: 'Sudoeste',
+    ABC: 'ABC',
+    NORTH: 'Norte',
+    EAST_ALTO_TIETE: 'Leste / Alto Tietê',
+  },
+  meta: {
+    title: 'Verificar cobertura',
+    description:
+      'Consulte os municípios da Grande São Paulo que fazem parte da área de atuação configurada do Lactare.',
+  },
+  hero: {
+    eyebrow: 'Área de atuação do Lactare',
+    title: 'Sua cidade é atendida?',
+    description:
+      'Selecione seu município para saber se ele faz parte da área de atuação atual do Lactare.',
+  },
+  checker: {
+    title: 'Selecione sua cidade',
+    description:
+      'A lista é atualizada pela equipe responsável no painel administrativo.',
+    label: 'Município',
+    placeholder: 'Escolha um município',
+    outsideOption: 'Minha cidade não aparece na lista',
+    submit: 'Verificar cobertura',
+    validation: 'Selecione uma opção para continuar.',
+  },
+  eligible: {
+    badge: 'Dentro da área de atuação',
+    title: '{city} é atendida pelo Lactare',
+    description:
+      'Você pode continuar sua jornada pelo NutriLink. A modalidade e a disponibilidade da coleta são confirmadas diretamente pela equipe do Lactare.',
+    signup: 'Quero criar meu cadastro',
+    learnMore: 'Entender como funciona',
+  },
+  outside: {
+    badge: 'Fora da área de atuação atual',
+    title: 'Sua cidade não está na lista do Lactare',
+    description:
+      'O NutriLink trabalha somente com a área do Lactare. Para encontrar atendimento em outra região, consulte a fonte oficial da Rede Brasileira de Bancos de Leite Humano.',
+    officialDirectory: 'Consultar a rBLH oficial',
+    officialDirectoryHref: 'https://rblh.fiocruz.br/',
+  },
+  municipalities: {
+    title: 'Municípios atendidos',
+    description:
+      'A lista abaixo representa a configuração atual do Lactare e está organizada por sub-região da Grande São Paulo.',
+    count: '{count} municípios ativos',
+    location: '{city}, São Paulo, Brazil',
+    emptyTitle: 'Cobertura indisponível no momento',
+    emptyDescription:
+      'Não foi possível carregar a lista de municípios. Tente novamente em alguns instantes.',
+  },
+} as const
+
+/** Copy legada da antiga busca nacional. Não usar em novas superfícies. */
 export const SEARCH = {
   page: {
     title: 'Buscar bancos de leite',
@@ -666,8 +729,8 @@ export const SIGNUP = {
     quoteSource: 'Ministério da Saúde — rBLH',
     bullets: [
       'Acompanhe sua jornada de doação',
-      'Encontre o banco de leite mais próximo de você',
-      'Fale direto com a equipe pelo WhatsApp',
+      'Consulte a área de atuação do Lactare',
+      'Mantenha seus dados de contato em um só lugar',
     ],
   },
   backToHome: 'Voltar ao início',
@@ -679,7 +742,7 @@ export const SIGNUP = {
   },
   heading: 'Crie sua conta',
   subtitle:
-    'Crie sua conta para começar sua jornada de doação de leite humano e acompanhar seu agendamento. Leva menos de um minuto.',
+    'Crie sua conta para começar sua jornada de doação de leite humano e acompanhar os próximos passos. Leva menos de um minuto.',
   fields: {
     fullName: {
       label: 'Nome completo',
@@ -721,7 +784,7 @@ export const SIGNUP = {
     submit: 'Criar minha conta',
     submitting: 'Enviando...',
     orContinue: 'ou continue com',
-    whatsappCta: 'Falar com um banco pelo WhatsApp',
+    whatsappCta: 'Verificar cobertura do Lactare',
     showPassword: 'Mostrar senha',
     hidePassword: 'Ocultar senha',
   },
@@ -775,11 +838,11 @@ export const NUTRIZ_AUTH = {
     meta: {
       title: 'Entrar',
       description:
-        'Acesse sua conta do NutriLink para acompanhar seu agendamento de doação de leite humano.',
+        'Acesse sua conta do NutriLink para acompanhar sua jornada de doação de leite humano.',
     },
     backToHome: 'Voltar ao início',
     heading: 'Bem-vinda de volta 💙',
-    subtitle: 'Acesse sua conta para acompanhar seus agendamentos e doações.',
+    subtitle: 'Acesse sua conta para acompanhar sua jornada e seus dados.',
     tabs: { login: 'Entrar', signup: 'Criar conta' },
     fields: {
       email: { label: 'E-mail', placeholder: 'voce@email.com' },
@@ -854,24 +917,27 @@ export const NUTRIZ_AUTH = {
   },
   area: {
     meta: {
-      title: 'Meu agendamento',
-      description: 'Acompanhe seu agendamento de doação de leite humano.',
+      title: 'Minha área',
+      description: 'Acompanhe sua jornada de doação de leite humano.',
     },
     // {firstName} é substituído no componente.
     greetingTemplate: 'Olá, {firstName}!',
-    subtitle: 'Sua saúde e a do seu bebê importam 💙',
+    subtitle: 'Sua jornada com informação e transparência 💙',
     badge: 'Área da nutriz',
     empty: {
-      title: 'Você ainda não tem agendamento por aqui',
-      body: 'Quando você combinar uma visita com um banco de leite e nos contar pelo WhatsApp, os detalhes aparecem nesta página.',
-      searchCta: 'Encontrar banco de leite',
+      title: 'Comece verificando sua cidade',
+      body: 'Consulte se o seu município faz parte da área de atuação atual do Lactare. A verificação não representa agendamento nem confirmação de coleta.',
+      searchCta: 'Verificar cobertura',
       howCta: 'Ver como funciona a doação',
     },
+    registeredLocation: 'Cidade informada no cadastro',
+    coverageNotice:
+      'A presença da cidade no seu cadastro não confirma cobertura. Consulte a lista atual antes de continuar.',
     logout: 'Sair',
   },
   header: {
     login: 'Entrar',
-    account: 'Meu agendamento',
+    account: 'Minha área',
   },
 } as const
 
@@ -1045,20 +1111,20 @@ export const THANKS = {
   meta: {
     title: 'Cadastro concluído',
     description:
-      'Recebemos seu cadastro no NutriLink. Em breve um banco de leite humano falará com você pelo WhatsApp para combinar os próximos passos da doação.',
+      'Seu cadastro foi concluído no NutriLink. Agora você pode verificar a cobertura do Lactare e acompanhar sua jornada.',
   },
   badge: 'Cadastro recebido',
   title: 'Obrigada por fazer parte dessa rede de amor 💙',
-  body: 'Seu cadastro foi recebido com todo o cuidado. Em breve, um banco de leite humano vai falar com você pelo WhatsApp para combinar os próximos passos da sua doação.',
+  body: 'Seu cadastro foi recebido com todo o cuidado. Agora você pode verificar se sua cidade faz parte da área de atuação do Lactare.',
   nextSteps: {
     title: 'O que acontece agora?',
     items: [
-      'Um banco de leite entra em contato com você pelo WhatsApp',
-      'A equipe confirma sua elegibilidade com perguntas simples',
-      'Vocês combinam a coleta no melhor dia e horário para você',
+      'Verifique se sua cidade está na área de atuação',
+      'Consulte os conteúdos para se preparar com segurança',
+      'A triagem e os próximos passos são combinados diretamente com o Lactare',
     ],
   },
-  primaryCta: 'Encontrar banco próximo',
+  primaryCta: 'Verificar minha cidade',
   secondaryCta: 'Ver como funciona a doação',
 } as const
 
@@ -1066,7 +1132,7 @@ export const ADMIN_LOGIN = {
   seo: {
     title: 'Entrar no painel admin',
     description:
-      'Acesse o painel administrativo do NutriLink para gerenciar unidades, conteúdos e indicadores.',
+      'Acesse o painel administrativo do NutriLink para gerenciar municípios, conteúdos e indicadores.',
   },
   brand: {
     name: 'NutriLink Admin',
@@ -1075,7 +1141,7 @@ export const ADMIN_LOGIN = {
   hero: {
     title: 'Entrar no painel',
     description:
-      'Acesse com seu email e senha para gerenciar unidades, conteúdos e indicadores do NutriLink.',
+      'Acesse com seu email e senha para gerenciar municípios, conteúdos e indicadores do NutriLink.',
     restrictedNotice: 'Acesso restrito à equipe autorizada.',
   },
   form: {
@@ -1130,7 +1196,7 @@ export const ADMIN_LAYOUT = {
     label: 'Navegação administrativa',
     items: {
       dashboard: 'Dashboard',
-      units: 'Unidades',
+      municipalities: 'Municípios',
       nutrizes: 'Nutrizes',
       contents: 'Conteúdos',
       campaigns: 'Campanhas',
@@ -1167,7 +1233,7 @@ export const ADMIN = {
     },
     title: 'Dashboard',
     description:
-      'Acompanhe o alcance da rede, os cadastros de nutrizes e os contatos por WhatsApp.',
+      'Acompanhe a área de atuação do Lactare e os cadastros de nutrizes.',
 
     /** Rótulo de janela temporal. `{days}` é substituído em tempo de render. */
     period: 'Últimos {days} dias',
@@ -1175,15 +1241,15 @@ export const ADMIN = {
     metrics: {
       /** Heading do bloco de cartões — visualmente oculto, lido por leitor de tela. */
       title: 'Indicadores principais',
-      activeUnits: {
-        label: 'Unidades ativas',
-        description: 'Aparecem na busca pública',
-        empty: 'Nenhuma unidade publicada até agora',
+      activeMunicipalities: {
+        label: 'Municípios ativos',
+        description: 'Aparecem na verificação pública',
+        empty: 'Nenhum município publicado até agora',
       },
-      statesCovered: {
-        label: 'Estados atendidos',
-        description: 'UFs com ao menos uma unidade ativa',
-        empty: 'Nenhuma UF coberta até agora',
+      regionsCovered: {
+        label: 'Sub-regiões cobertas',
+        description: 'Regiões com ao menos um município ativo',
+        empty: 'Nenhuma sub-região coberta até agora',
       },
       nutriz: {
         label: 'Nutrizes cadastradas',
@@ -1191,43 +1257,28 @@ export const ADMIN = {
         description: '{count} nos últimos {days} dias',
         empty: 'Nenhuma nutriz se cadastrou até agora',
       },
-      whatsappClicks: {
-        label: 'Cliques no WhatsApp',
-        /** `{total}` = acumulado desde o início da coleta. */
-        description: '{total} desde o início da medição',
-        empty: 'Nenhum contato registrado até agora',
+      newNutriz: {
+        label: 'Novos cadastros',
+        description: 'Nos últimos {days} dias',
+        empty: 'Nenhum cadastro novo no período',
       },
     },
 
-    unitsByStatus: {
-      title: 'Unidades por situação',
-      /** `{total}` = todas as unidades cadastradas, publicadas ou não. */
-      description: '{total} unidades cadastradas no total',
-      empty:
-        'Ainda não há unidades cadastradas. Elas chegam pela importação da base da rBLH.',
+    municipalitiesByStatus: {
+      title: 'Municípios por situação',
+      description: '{total} municípios cadastrados no total',
+      empty: 'Ainda não há municípios cadastrados.',
       labels: {
-        ACTIVE: 'Ativas',
-        PENDING: 'Aguardando revisão',
-        INACTIVE: 'Inativas',
+        ACTIVE: 'Ativos',
+        INACTIVE: 'Inativos',
       },
     },
 
-    unitsByType: {
-      title: 'Unidades por tipo',
-      description: 'Composição da rede cadastrada',
-      labels: {
-        MILK_BANK: 'Bancos de leite',
-        COLLECTION_POINT: 'Postos de coleta',
-        HOSPITAL: 'Hospitais',
-        PARTNER: 'Parceiros',
-      },
-    },
-
-    unitsByState: {
-      title: 'Cobertura por estado',
-      description: 'Unidades ativas em cada UF',
+    municipalitiesByRegion: {
+      title: 'Cobertura por sub-região',
+      description: 'Municípios ativos em cada sub-região da Grande São Paulo',
       empty:
-        'Nenhuma unidade ativa ainda — por isso não há cobertura geográfica para mostrar.',
+        'Nenhum município ativo ainda — por isso não há cobertura para mostrar.',
     },
 
     nutrizByState: {
@@ -1235,22 +1286,120 @@ export const ADMIN = {
       description:
         'Agregado por UF, nunca por cidade, para não identificar cadastros individuais.',
       empty:
-        'Nenhuma nutriz se cadastrou ainda. O cadastro é opcional: a nutriz pode buscar unidades e falar pelo WhatsApp sem deixar dados.',
+        'Nenhuma nutriz se cadastrou ainda. O cadastro é opcional para consultar a cobertura.',
     },
-
-    topUnits: {
-      title: 'Unidades mais contatadas',
-      /** `{days}` = tamanho da janela. */
-      description: 'Cliques no WhatsApp nos últimos {days} dias',
-      empty:
-        'Nenhum clique no WhatsApp foi registrado nesta janela, então ainda não há ranking.',
+  },
+  municipalities: {
+    seo: {
+      title: 'Municípios | NutriLink Admin',
+      description: 'Gerencie a área de atuação do Lactare por município.',
+    },
+    title: 'Municípios atendidos',
+    description:
+      'Gerencie as cidades que aparecem na verificação pública de cobertura do Lactare.',
+    createAction: 'Adicionar município',
+    filters: {
+      label: 'Filtros da lista de municípios',
+      search: { label: 'Buscar município', placeholder: 'Digite o nome' },
+      status: {
+        label: 'Situação',
+        all: 'Todas',
+        active: 'Ativos',
+        inactive: 'Inativos',
+      },
+      region: { label: 'Sub-região', all: 'Todas as sub-regiões' },
+      actions: { apply: 'Filtrar', clear: 'Limpar filtros' },
+    },
+    results: {
+      countOne: 'município encontrado',
+      countOther: 'municípios encontrados',
+    },
+    table: {
+      caption: 'Municípios da área de atuação do Lactare',
       columns: {
-        unit: 'Unidade',
-        location: 'Localização',
-        clicks: 'Cliques',
+        municipality: 'Município',
+        region: 'Sub-região',
+        status: 'Situação',
+        updatedAt: 'Atualizado em',
+        actions: 'Ações',
+      },
+      location: '{city}, São Paulo, Brazil',
+      active: 'Ativo',
+      inactive: 'Inativo',
+      edit: 'Editar',
+      editAria: 'Editar {city}',
+    },
+    empty: {
+      database: {
+        title: 'Nenhum município cadastrado',
+        description:
+          'Adicione o primeiro município para iniciar a área de atuação.',
+      },
+      filtered: {
+        title: 'Nenhum município encontrado',
+        description: 'Ajuste ou limpe os filtros para tentar novamente.',
+      },
+    },
+    pagination: {
+      label: 'Paginação dos municípios',
+      previous: 'Anterior',
+      next: 'Próxima',
+      status: 'Página {page} de {total}',
+    },
+    form: {
+      create: {
+        seo: {
+          title: 'Adicionar município | NutriLink Admin',
+          description: 'Adicione uma cidade à área de atuação do Lactare.',
+        },
+        title: 'Adicionar município',
+        description:
+          'Cadastre uma cidade de São Paulo e defina sua sub-região.',
+        submit: 'Adicionar município',
+      },
+      edit: {
+        seo: {
+          title: 'Editar município | NutriLink Admin',
+          description: 'Atualize um município da área de atuação do Lactare.',
+        },
+        title: 'Editar município',
+        description:
+          'Atualize o nome, a sub-região ou a disponibilidade pública.',
+        submit: 'Salvar alterações',
+      },
+      fields: {
+        name: { label: 'Município', placeholder: 'Ex.: Osasco' },
+        region: { label: 'Sub-região', placeholder: 'Selecione' },
+        status: { label: 'Situação', placeholder: 'Selecione' },
+        state: { label: 'Estado', value: 'São Paulo (SP)' },
+        country: { label: 'País', value: 'Brazil' },
+      },
+      status: {
+        active: 'Ativo — aparece na verificação pública',
+        inactive: 'Inativo — não aparece como área atendida',
+      },
+      actions: { back: 'Voltar para municípios', cancel: 'Cancelar' },
+      validation: {
+        nameRequired: 'Informe o nome do município.',
+        nameMax: 'O nome do município é muito longo.',
+        regionRequired: 'Selecione uma sub-região válida.',
+        statusRequired: 'Selecione uma situação válida.',
+      },
+      mutations: {
+        submittingCreate: 'Adicionando município...',
+        submittingUpdate: 'Salvando alterações...',
+        createError:
+          'Não foi possível adicionar o município agora. Tente novamente.',
+        updateError:
+          'Não foi possível salvar o município agora. Tente novamente.',
+        validationGeneric: 'Revise os campos destacados.',
+        conflict: 'Este município já está cadastrado.',
+        notFound: 'Este município não existe mais.',
+        errorTitle: 'Não foi possível salvar',
       },
     },
   },
+  /** Área administrativa legada de unidades. Não expor na navegação. */
   units: {
     seo: {
       title: 'Unidades | NutriLink Admin',
@@ -1625,7 +1774,7 @@ export const ADMIN = {
       database: {
         title: 'Nenhuma nutriz cadastrada',
         description:
-          'O cadastro é opcional: a nutriz pode encontrar uma unidade e falar pelo WhatsApp sem deixar dados. Quem escolher se cadastrar aparece aqui.',
+          'O cadastro é opcional: a nutriz pode verificar a cobertura sem deixar dados. Quem escolher se cadastrar aparece aqui.',
       },
       filtered: {
         title: 'Nenhuma nutriz encontrada',
@@ -1655,14 +1804,11 @@ export const A11Y = {
 export type NavItem = (typeof NAV.items)[number]
 
 export const DASHBOARD_CHARTS = {
-  evolution: 'Evolução: Cadastros vs. Agendamentos',
+  evolution: 'Evolução dos cadastros',
   registrations: 'Cadastros',
-  appointments: 'Agendamentos informados',
   period: '{start} – {end} · mês atual parcial',
-  evolutionNote:
-    'Agendamentos por mês em que foram informados, incluindo os cancelados. Não representa confirmação pela unidade.',
-  evolutionEmpty:
-    'Ainda não há cadastros ou agendamentos informados neste período.',
+  evolutionNote: 'Cadastros criados em cada mês, sem incluir perfis removidos.',
+  evolutionEmpty: 'Ainda não há cadastros neste período.',
   origins: 'Origem dos Cadastros',
   originsSubtitle: 'Total acumulado: {count} nutrizes',
   originsNote:
@@ -1678,67 +1824,4 @@ export const DASHBOARD_CHARTS = {
   total: 'total',
   viewData: 'Ver dados do gráfico',
   month: 'Mês',
-} as const
-
-/** Protótipo visual solicitado pelo time; dados de consulta são ilustrativos. */
-export const APPOINTMENT_PREVIEW = {
-  nav: [
-    { label: 'Home', href: '/' },
-    { label: 'Conteúdos', href: '/como-funciona' },
-    { label: 'Buscar Bancos', href: '/buscar' },
-    { label: 'Meu Agendamento', href: '/meu-agendamento' },
-  ],
-  brandStart: 'Nutri',
-  brandEnd: 'Link',
-  area: 'Área da Nutriz',
-  greeting: 'Olá, {name}! 💙 Sua saúde e a do seu bebê importam.',
-  logout: 'Sair',
-  statusLabel: 'Status da consulta',
-  status: 'Confirmada',
-  reference: 'Ref: AGD-2026-04892',
-  networkLabel: 'Rede',
-  network: 'NutriLink',
-  confirmation:
-    'Seu agendamento foi confirmado pelo banco de leite. Você receberá um lembrete via WhatsApp 24h antes.',
-  detailsTitle: 'Detalhes do Agendamento',
-  details: [
-    { label: 'Data', value: 'Quinta-feira, 05 de junho de 2026' },
-    { label: 'Horário', value: '09:30' },
-    { label: 'Tipo de Atendimento', value: 'Coleta de Leite + Consulta' },
-  ],
-  guidanceTitle: 'Orientações para o Dia',
-  guidance: [
-    {
-      title: 'Traga o leite coletado',
-      body: 'Se extraiu leite em casa, traga em frasco de vidro esterilizado, etiquetado com data e hora da extração, acondicionado em bolsa térmica.',
-    },
-    {
-      title: 'Apresente documento com foto',
-      body: 'RG, CNH ou passaporte. Para bebês, traga também a Caderneta de Saúde da Criança.',
-    },
-    {
-      title: 'Chegue com 10 minutos de antecedência',
-      body: 'Isso garante tempo para triagem e preenchimento de formulários sem atrasar sua consulta.',
-    },
-    {
-      title: 'Pode trazer o bebê',
-      body: 'O ambiente é adaptado para mães com bebês. Temos espaço de amamentação disponível.',
-    },
-  ],
-  locationTitle: 'Local do Atendimento',
-  unit: 'BLH NutriLink — Pinheiros',
-  address: 'Rua Cardeal Arcoverde, 423 — Pinheiros, São Paulo – SP',
-  cep: 'CEP 05407-001',
-  phone: '(11) 3022-4891',
-  directions: 'Como Chegar',
-  quickTitle: 'Ações Rápidas',
-  actions: [
-    'Falar com Suporte via WhatsApp',
-    'Reagendar Consulta',
-    'Buscar Outro Banco',
-  ],
-  cancelTitle: 'Precisa cancelar?',
-  cancelBody:
-    'Cancelamentos com até 24h de antecedência não geram pendências no seu cadastro.',
-  cancelAction: 'Solicitar cancelamento →',
 } as const

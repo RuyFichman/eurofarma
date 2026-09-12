@@ -12,19 +12,11 @@ export async function getDashboardCharts(
 ): Promise<DashboardChartsData> {
   const months = getChartMonths(now)
   const counts = await prisma.$transaction(
-    months.flatMap(({ start, end }) => [
+    months.map(({ start, end }) =>
       prisma.nutrizProfile.count({
         where: { deletedAt: null, createdAt: { gte: start, lt: end } },
       }),
-      prisma.appointment.count({
-        where: {
-          nutrizProfile: { deletedAt: null },
-          status: { in: ['DECLARED', 'COMPLETED', 'CANCELLED'] },
-          scheduledAt: { not: null },
-          declaredAt: { gte: start, lt: end },
-        },
-      }),
-    ]),
+    ),
   )
   const sources = await prisma.nutrizProfile.groupBy({
     by: ['sourceUtm'],
@@ -35,8 +27,7 @@ export async function getDashboardCharts(
     months: months.map((month, index) => ({
       key: month.key,
       label: month.label,
-      registrations: counts[index * 2] ?? 0,
-      appointments: counts[index * 2 + 1] ?? 0,
+      registrations: counts[index] ?? 0,
     })),
     origins: ORIGIN_KEYS.map((key) => ({
       key,

@@ -46,7 +46,7 @@ export default function ObrigadaPage() {
 
         <div className="mt-10 flex flex-col items-center gap-4">
           <Button asChild size="lg" className="w-full sm:w-auto">
-            <Link href="/buscar">
+            <Link href="/verificar-cobertura">
               <MapPin aria-hidden="true" />
               {THANKS.primaryCta}
             </Link>
