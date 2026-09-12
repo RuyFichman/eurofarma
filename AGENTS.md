@@ -68,7 +68,7 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 ## 3. Estado atual do projeto
 
-**Referência desta seção:** 11 de setembro de 2026.
+**Referência desta seção:** 12 de setembro de 2026.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
@@ -83,22 +83,24 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte tem **365 testes passando** no baseline desta atualização.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **362 testes passando**: 295 unitários e 67 de integração. Os testes existentes ainda não consultam a nova tabela, pois sua migration não foi aplicada no Supabase cloud.
 
 ### 3.1 O que está implementado
 
 - Scaffold Next.js e design system.
 - Landing pública, página “Sobre”, conteúdo educativo e style guide.
-- Busca e detalhe de unidades da base nacional legada.
+- Página pública de verificação de cobertura por município em `/verificar-cobertura`, com os 30 municípios do Lactare agrupados em seis sub-regiões.
+- Resposta transparente para cidade fora da lista, com encaminhamento ao diretório oficial externo da rBLH.
 - Cadastro opcional de nutriz com consentimento obrigatório no formulário.
 - Provisionamento da conta da nutriz no Supabase Auth.
 - Login, logout, recuperação e redefinição de senha da nutriz.
-- Área autenticada da nutriz com fluxo técnico legado de tentativa de combinação de visita.
+- Área autenticada da nutriz com identificação da cidade cadastrada e acesso ao verificador de cobertura.
 - Login, logout, middleware, autorização por role e shell administrativo.
-- Dashboard administrativo com métricas básicas.
+- Dashboard administrativo adaptado para municípios, sub-regiões e cadastros de nutrizes.
 - Listagem de nutrizes com exposição reduzida de contato.
-- Listagem, cadastro e edição de unidades do modelo legado.
-- Tracking de clique no WhatsApp de unidade.
+- Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
+- Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada e versionada. Ela ainda precisa ser aplicada no Supabase cloud.
+- Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
 - Webhook da WhatsApp Cloud API, verificação de assinatura e simulador local.
 - Máquina de estados local do chatbot para um fluxo limitado sobre tentativa de combinar visita.
 
@@ -106,16 +108,16 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte t
 
 | Requisito | Situação atual |
 |---|---|
-| RF01 — elegibilidade por CEP | **Não implementado.** A busca atual é por UF/cidade na base nacional legada. |
-| RF02 — pontos do Lactare | **Parcial.** Há endereço, horário e mapa estático para unidades legadas; faltam os pontos oficiais validados do Lactare. |
-| RF03 — fora da cobertura | **Não implementado.** |
+| RF01 — elegibilidade por CEP | **Parcial.** A verificação por município existe; a resolução automática de CEP para município ainda não foi implementada. |
+| RF02 — área atendida | **Implementado no escopo atualizado.** A interface exibe os 30 municípios atendidos; bancos de leite e pontos de coleta não são mais entidades públicas ou administrativas do produto. |
+| RF03 — fora da cobertura | **Implementado para seleção de município.** Cidade fora da lista recebe explicação e link oficial da rBLH; falta integrar a mesma resposta à futura consulta por CEP. |
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
 | RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
 | RF06 — lembretes opcionais | **Não implementado.** |
-| RF07 — tracking de contato | **Parcial.** Só o clique no WhatsApp de unidade é registrado. |
+| RF07 — tracking de contato | **Não implementado no fluxo atual.** O tracking antigo dependia de unidades e sua rota foi aposentada. O novo evento deve acompanhar o contato direto com o Lactare. |
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
-| RF09 — municípios atendidos | **Não implementado.** O CRUD atual gerencia unidades nacionais legadas, não a área do Lactare. |
-| RF10 — indicadores do funil | **Parcial.** Existem métricas básicas; faltam alcance, funil completo, retenção, cobertura e adesão a lembretes. |
+| RF09 — municípios atendidos | **Implementado no código, pendente no banco.** O CRUD administra `service_municipalities`; requer aplicação da migration no Supabase cloud. |
+| RF10 — indicadores do funil | **Parcial.** O dashboard já resume municípios, sub-regiões e nutrizes; faltam alcance, funil completo, retenção e adesão a lembretes. |
 | RF11 — chatbot completo | **Parcial.** Infraestrutura e simulação local existem; faltam FAQ, elegibilidade, cadastro, lembretes, pós-doação e ativação real na Meta. |
 | RF12 — cartão de impacto | **Não implementado.** |
 | RF13 — mensagem de indicação | **Não implementado.** |
@@ -126,38 +128,37 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte t
 
 O repositório contém 487 unidades da rBLH em 26 UFs, além de APIs, páginas e CRUDs voltados a essa base nacional. Isso foi desenvolvido antes da decisão Lactare-only.
 
-A partir desta versão:
+A partir desta versão, a experiência de unidades está isolada do produto ativo:
 
 - não continuar a carga nacional;
 - não tratar a ausência de Sergipe como tarefa de produto;
 - não apresentar essa base como escopo oficial do NutriLink;
 - não criar funcionalidades novas dependentes do diretório nacional;
 - não apagar tabelas, CSVs ou registros sem plano de migração, impacto e reversão;
-- planejar a substituição da experiência pública pelo fluxo de cobertura do Lactare.
+- não reativar `/buscar`, `/banco-de-leite/*`, `/admin/unidades`, `/api/units` ou o tracking vinculado a unidades;
+- preservar os registros e o modelo `Unit` somente como legado interno até existir uma migration de remoção segura e reversível.
 
-Os modelos Appointment e WhatsappConversation e a tela atual /meu-agendamento também são legado técnico. Eles podem ser migrados ou reaproveitados para lembretes e continuidade da jornada, mas não autorizam linguagem de agendamento, confirmação de visita ou promessa logística.
+Os modelos Appointment e WhatsappConversation também são legado técnico. Eles podem ser migrados ou reaproveitados para lembretes e continuidade da jornada, mas não autorizam linguagem de agendamento, confirmação de visita ou promessa logística. A rota `/meu-agendamento` foi mantida por compatibilidade, mas sua interface ativa é “Minha área” e não exibe agendamento.
 
-Qualquer preview estático na home que use estado “confirmado” ou lembrete de coleta é apenas protótipo visual. Não é funcionalidade entregue e deve ser removido ou adaptado ao escopo vigente.
+Não criar preview estático com estado “confirmado” ou lembrete de coleta sem uma fonte operacional legítima. A home e a área da nutriz devem manter linguagem de cobertura e orientação, não de agendamento.
 
 ### 3.4 Pendências críticas
 
-- Política de Privacidade e Termos de Uso.
-- RLS no Supabase.
+- Aplicar no Supabase cloud a migration versionada de `service_municipalities` e conferir os 30 registros.
 - Rate limiting distribuído.
 - Proteção anti-spam nos formulários públicos.
-- Modelagem da área de atuação do Lactare e dos 30 municípios.
 - Verificação de elegibilidade por CEP.
-- Fluxo transparente para fora da cobertura.
 - Consentimento separado e job de lembretes.
 - Segmentação por sub-região e perfil.
 - Definição da fonte legítima de confirmação de uma doação.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
+- Política de Privacidade, Termos de Uso e RLS continuam obrigatórios antes de exposição pública, mas foram adiados pelo time para depois da entrega de municípios.
 
 ### 3.5 Validações externas pendentes
 
 - Confirmar com o Lactare se a coleta domiciliar gratuita é uniforme nos 30 municípios ou se varia por logística.
-- Validar pontos de entrega, endereços, horários, contatos e instruções oficiais.
+- Validar o canal oficial e as instruções de contato exibidas depois da confirmação de cobertura.
 - Definir quem registra uma doação como confirmada.
 - Validar textos jurídicos e consentimentos.
 
@@ -165,14 +166,14 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Privacidade, Termos, RLS e proteção contra abuso.
-2. Área atendida do Lactare e elegibilidade por CEP ou município.
-3. Isolamento da experiência nacional legada.
-4. Chatbot com menu, FAQ, elegibilidade, cadastro e encaminhamento.
-5. Lembretes opcionais sem semântica de agendamento.
-6. Dashboard com funil, retenção, cobertura, região e perfil.
-7. Confirmação de doação, cartão de impacto, indicação e reconhecimentos.
-8. Ativação real na Meta quando a infraestrutura externa existir.
+1. Aplicar a migration de municípios no Supabase cloud e validar os 30 registros.
+2. Completar a elegibilidade por CEP usando `service_municipalities` como fonte de verdade.
+3. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
+4. Implementar lembretes opcionais sem semântica de agendamento.
+5. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+6. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
+7. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+8. Ativar a integração real com a Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
@@ -187,11 +188,11 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | ORM | Prisma | 6.x fixado |
 | Validação | Zod | 3.x fixado |
 | Autenticação | Supabase Auth com @supabase/ssr | admin e nutriz |
-| Formulários | React Hook Form + Zod | busca, cadastro, autenticação e unidades |
+| Formulários | React Hook Form + Zod | cobertura, cadastro, autenticação e municípios |
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | unitários e integração; 365 no baseline |
+| Testes | Vitest | 362 passando: 295 unitários e 67 de integração |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 
@@ -238,9 +239,9 @@ Estrutura principal:
 
 ~~~text
 app/
-  (public)/                 rotas públicas
+  (public)/                 rotas públicas; cobertura em /verificar-cobertura
   admin/                    segmento literal /admin
-    (painel)/               telas protegidas sem alterar a URL
+    (painel)/               telas protegidas; municípios em /admin/municipios
   api/                      route handlers
   auth/confirmar/           callback de autenticação
 components/
@@ -498,7 +499,7 @@ Segmentos de perfil planejados:
 - origem do contato;
 - velocidade até a primeira doação.
 
-Região e perfil são dimensões separadas e combináveis. Elas ainda não estão implementadas. Não invente valores nem derive status clínico.
+Região e perfil são dimensões separadas e combináveis. A região já existe em `ServiceMunicipality`, na consulta pública, nos filtros administrativos e no dashboard. O vínculo entre região e perfil da nutriz e os demais segmentos comportamentais ainda não estão implementados. Não invente valores nem derive status clínico.
 
 ## 13. Regras de produto vigentes
 

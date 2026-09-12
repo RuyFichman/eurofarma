@@ -3,7 +3,6 @@ export type MonthlyActivity = {
   key: string
   label: string
   registrations: number
-  appointments: number
 }
 export const ORIGIN_KEYS = ['whatsapp', 'web', 'other', 'unknown'] as const
 export type RegistrationOrigin = (typeof ORIGIN_KEYS)[number]

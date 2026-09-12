@@ -4,9 +4,9 @@
 
 **Desafio:** Challenge FIAP 2026 — 3º ano, Sistemas de Informação — Projeto Lactare
 
-**Versão:** 2.0
+**Versão:** 2.1
 
-**Última atualização:** 11 de setembro de 2026
+**Última atualização:** 12 de setembro de 2026
 
 **Equipe:** [preencher nomes do squad]
 
@@ -19,7 +19,7 @@ O NutriLink é a solução digital do Lactare, criada para reduzir as barreiras 
 A solução tem três frentes:
 
 1. **Chatbot no WhatsApp** — porta de entrada principal, onde a nutriz tira dúvidas, verifica se está na área de cobertura e, se quiser, se cadastra.
-2. **Plataforma web** — verificação de elegibilidade por CEP, conteúdo educativo, cadastro, login e área da nutriz.
+2. **Plataforma web** — consulta dos municípios atendidos, futura verificação automática por CEP, conteúdo educativo, cadastro, login e área da nutriz.
 3. **Dashboard administrativo** — métricas de alcance, engajamento e conversão para a equipe do Lactare.
 
 ## 2. O Problema
@@ -40,7 +40,7 @@ A solução tem três frentes:
 | Dor | Efeito |
 |---|---|
 | A nutriz não sabe se está na área de cobertura do Lactare | Desiste antes de tentar |
-| Não sabe se a coleta é domiciliar ou em ponto físico | Confusão ou contato perdido |
+| Não sabe qual é o próximo passo depois de confirmar a cobertura | Confusão ou contato perdido |
 | A informação sobre o processo é dispersa | Fricção no primeiro contato |
 | Falta acompanhamento depois do primeiro contato | Baixa recorrência |
 | A equipe do Lactare não tem visibilidade das métricas de engajamento | Decisões sem dados sobre onde investir esforço |
@@ -77,7 +77,7 @@ O motivo para concentrar o canal conversacional no WhatsApp está no Anexo A.1.
 ### 4.2 Plataforma Web
 
 - Conteúdo educativo: “Como funciona”, perguntas frequentes, checklist e vídeos.
-- Verificador de elegibilidade por CEP ou município, com mapa da área de atuação do Lactare.
+- Verificador de cobertura por município, com os 30 municípios da área de atuação do Lactare agrupados por sub-região; a resolução automática por CEP é a próxima etapa.
 - Cadastro, login e área pessoal, incluindo lembretes quando ativados.
 - Painel administrativo; ver seção 4.3.
 
@@ -96,7 +96,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 1. Primeiro contato pelo WhatsApp.
 2. O chatbot apresenta o projeto e esclarece dúvidas.
-3. A nutriz verifica a elegibilidade por CEP.
+3. A nutriz verifica se seu município faz parte da área atendida; futuramente, essa consulta também será resolvida automaticamente pelo CEP.
 4. A nutriz pode realizar um cadastro simplificado e opcional.
 5. A nutriz entra em contato direto com o Lactare para combinar a doação.
 6. A nutriz pode ativar lembretes opcionais.
@@ -109,7 +109,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 | ID | Descrição |
 |---|---|
 | RF01 | Verificar elegibilidade de coleta domiciliar a partir do CEP. |
-| RF02 | Exibir os pontos de entrega do Lactare, com endereço, horário e mapa. |
+| RF02 | Exibir os municípios atendidos pelo Lactare e suas sub-regiões. Bancos de leite e pontos de coleta não são entidades gerenciadas pelo NutriLink. |
 | RF03 | Informar quando a nutriz está fora da área de cobertura e indicar canal externo oficial. |
 | RF04 | Permitir cadastro opcional com consentimento LGPD. |
 | RF05 | Permitir login da nutriz cadastrada. |
@@ -145,7 +145,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 - Exposição reduzida de dados pessoais no painel administrativo.
 - Rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública; o limitador atual é apenas local e em memória.
 - Nenhum dado clínico da nutriz ou dos bebês é tratado pelo NutriLink.
-- O estado-alvo não mantém dados próprios de outros bancos de leite. A base nacional existente no código é legado técnico e deverá ser descontinuada ou isolada por migração segura, sem remoção improvisada de dados.
+- O produto ativo não mantém nem expõe um diretório próprio de outros bancos de leite. A base nacional existente permanece somente como legado técnico interno, isolada das interfaces e APIs ativas, até uma futura remoção segura e reversível.
 
 ## 8. Diferenciais Competitivos
 
@@ -155,11 +155,11 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 - Usa lembretes opcionais no lugar de um agendamento que dependeria de terceiros.
 - Oferece dashboard com indicadores reais de funil: alcance → engajamento → conversão → retenção.
 - Incentiva crescimento orgânico por indicação, cartão de impacto, mensagem pronta e reconhecimento por status, sem recompensa material e respeitando as restrições do setor.
-- Mantém uma arquitetura que pode evoluir para novos pontos do Lactare ou parceiros formalizados, sem apresentar hoje uma cobertura que não existe.
+- Mantém a lista de municípios como fonte explícita e administrável da cobertura do Lactare, sem apresentar uma cobertura que não existe.
 
 ## 9. Estado Atual e Roadmap
 
-Esta seção descreve o repositório em 11 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
+Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
 
 ### 9.1 Funcionalidades implementadas e verificadas
 
@@ -167,53 +167,55 @@ Esta seção descreve o repositório em 11 de setembro de 2026. Ela prevalece so
 - Cadastro opcional de nutriz com consentimento obrigatório no formulário e provisionamento de conta no Supabase Auth.
 - Login, recuperação de senha condicionada à entrega de e-mail pelo SMTP e sessão da nutriz.
 - Painel administrativo com autenticação e autorização por perfil `ADMIN`.
-- Dashboard com métricas básicas dos dados legados: unidades, estados, nutrizes e cliques no WhatsApp.
-- Cadastro e edição administrativa de unidades do modelo legado, além de listagem de unidades e nutrizes.
-- Rastreamento de cliques no WhatsApp, sem PII da nutriz no evento.
+- Página pública `/verificar-cobertura`, com os 30 municípios informados pelo time, agrupados nas seis sub-regiões adotadas pelo projeto.
+- Resposta para cidade fora da lista com encaminhamento ao diretório oficial externo da rBLH.
+- Dashboard adaptado para municípios ativos, sub-regiões e cadastros de nutrizes.
+- Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes.
+- Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada e versionada; sua aplicação no Supabase cloud ainda está pendente.
+- Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local.
-- Área pessoal com um fluxo técnico de informação sobre tentativa de combinação de visita. Esse fluxo é legado e não deve ser apresentado como agendamento ou confirmação de coleta.
-- Suíte automatizada com 365 testes no estado auditado nesta atualização.
+- Área pessoal adaptada para mostrar a cidade cadastrada e encaminhar ao verificador de cobertura, sem apresentar agendamento ou confirmação de coleta.
+- Suíte com 362 testes passando nesta atualização: 295 unitários e 67 de integração. Os testes existentes ainda não consultam a nova tabela, pois sua migration não foi aplicada no Supabase cloud.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
-- **Busca e detalhes de unidades:** funcionam para a base nacional legada da rBLH, mas ainda não representam a experiência Lactare-only nem a elegibilidade pelos 30 municípios.
-- **Pontos de entrega:** endereço, horário e mapa estático existem no modelo legado, mas os pontos oficiais do Lactare ainda precisam ser validados e configurados.
+- **Elegibilidade:** a seleção por município já funciona; a resolução automática de CEP para município ainda precisa ser implementada.
+- **Persistência de municípios:** o schema, a migration, as consultas e o CRUD estão prontos no código, mas a migration ainda não foi aplicada no Supabase cloud.
 - **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
 - **Métricas:** o dashboard mostra métricas básicas, mas ainda não calcula o funil completo, retenção, adesão a lembretes nem os cruzamentos de região e perfil.
-- **Tracking de contato:** registra clique no WhatsApp de unidade; ainda não cobre todos os canais relevantes nem o fluxo completo do Lactare.
+- **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
 - **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
 
 ### 9.3 Funcionalidades ainda não implementadas
 
-- RF01: elegibilidade do Lactare por CEP ou município.
-- RF03: orientação de fora de cobertura com canal oficial externo.
+- RF01: completar a elegibilidade automática por CEP; a consulta por município está implementada.
 - RF06: lembretes personalizados com opt-in separado e job agendado.
-- RF09: gestão específica da lista de municípios atendidos pelo Lactare.
+- RF07: tracking dos canais atuais de contato com o Lactare.
 - RF12: cartão de impacto após confirmação legítima da doação.
 - RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimentos por status na área pessoal.
 - RF15: atribuição específica de novos cadastros por indicação.
-- Páginas de Política de Privacidade e Termos de Uso.
-- RLS, rate limiting distribuído e proteção anti-spam.
+- Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
+- RLS, rate limiting distribuído e proteção anti-spam, também adiados, mas ainda obrigatórios antes de exposição pública.
 - Validação operacional de e-mail e WhatsApp, caso exigida pelo Lactare.
 - Ativação real do chatbot na Meta.
 
 ### 9.4 Validações externas pendentes
 
 - Confirmar com o Lactare se a coleta domiciliar gratuita é uniforme para todos os 30 municípios do Mapa do Leite ou se varia conforme distância e logística.
-- Validar os pontos oficiais de entrega, horários, telefones e instruções que poderão ser publicados.
+- Validar o canal oficial e as instruções de contato que poderão ser publicados após a confirmação de cobertura.
 - Definir quem e como confirma uma doação no NutriLink antes de gerar cartão de impacto, atualizar status ou contar recorrência.
 - Validar a redação jurídica da Política de Privacidade, dos Termos de Uso e dos consentimentos.
 
 ### 9.5 Ordem recomendada de implementação
 
-1. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso.
-2. Modelar e implementar a área de atuação do Lactare e a elegibilidade por CEP ou município.
-3. Isolar a experiência pública da base nacional legada e substituir a busca nacional pelo fluxo Lactare-only.
-4. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro e encaminhamento ao Lactare.
-5. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
-6. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+1. Aplicar a migration de `service_municipalities` no Supabase cloud e validar os 30 registros.
+2. Completar a elegibilidade por CEP usando a lista de municípios como fonte de verdade.
+3. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro e encaminhamento ao Lactare.
+4. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
+5. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+6. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
 7. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
 8. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
@@ -274,19 +276,19 @@ Permanece pendente a confirmação de que a coleta domiciliar gratuita é oferec
 
 #### Tratamento da base nacional já existente
 
-O repositório contém uma base nacional legada da rBLH, criada antes desta decisão de escopo. Ela não representa o produto-alvo, não deve continuar sendo expandida e deverá ser isolada, arquivada ou removida por uma migração segura e auditável. Esta decisão não autoriza apagar dados sem análise de impacto e plano de reversão.
+O repositório contém uma base nacional legada da rBLH, criada antes desta decisão de escopo. Ela não representa o produto-alvo, não deve continuar sendo expandida e já foi isolada das páginas, APIs e menus ativos. Os registros e o modelo interno foram preservados até que uma remoção futura possa ser feita por migration segura e auditável. Esta decisão não autoriza apagar dados sem análise de impacto e plano de reversão.
 
 ### A.6 Por que o cadastro existe, mas é opcional
 
 O cadastro não é necessário para a verificação básica de elegibilidade. Ele viabiliza a continuidade da jornada entre WhatsApp e web, o envio de lembretes para quem der opt-in, métricas reais de conversão e retenção e o registro de consentimento exigido pela LGPD.
 
-### A.7 Como deverá funcionar a segmentação por região e perfil
+### A.7 Como funciona e deverá evoluir a segmentação por região e perfil
 
-O desafio lista “segmentação básica por região ou perfil” como diferencial. A arquitetura-alvo prevê as duas dimensões como filtros combináveis, pois uma nutriz possui simultaneamente localização e características de jornada. Essa segmentação ainda não está implementada no dashboard atual.
+O desafio lista “segmentação básica por região ou perfil” como diferencial. Os municípios já possuem uma sub-região própria e o dashboard resume essa distribuição. A segmentação combinável com o perfil da nutriz ainda é alvo, pois uma nutriz possui simultaneamente localização e características de jornada.
 
 #### Dimensão 1 — Região
 
-Em vez de apresentar somente 30 municípios isolados, os municípios do Mapa do Leite serão agrupados nas sub-regiões da Região Metropolitana de São Paulo:
+Em vez de apresentar somente 30 municípios isolados, os municípios do Mapa do Leite são agrupados nas sub-regiões da Região Metropolitana de São Paulo:
 
 | Sub-região | Municípios do Mapa do Leite |
 |---|---|

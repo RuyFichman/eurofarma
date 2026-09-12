@@ -132,7 +132,7 @@ export default function StyleGuidePage(): ReactNode {
       <Section title="Tipografia">
         <h1>Heading 1 — Toda gota importa</h1>
         <h2>Heading 2 — Doe leite materno</h2>
-        <h3>Heading 3 — Encontre um banco de leite</h3>
+        <h3>Heading 3 — Verifique sua cidade</h3>
         <h4>Heading 4 — Como funciona a doação</h4>
         <p>
           Corpo de texto (body). Cada doação de leite materno pode ajudar
@@ -174,16 +174,16 @@ export default function StyleGuidePage(): ReactNode {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Banco de Leite Humano</CardTitle>
-              <CardDescription>São Paulo, SP</CardDescription>
+              <CardTitle>Município atendido</CardTitle>
+              <CardDescription>Osasco, São Paulo, Brazil</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm">
-                Coleta domiciliar mediante agendamento por telefone.
+                Dentro da área de atuação configurada do Lactare.
               </p>
             </CardContent>
             <CardFooter>
-              <Button size="sm">Falar pelo WhatsApp</Button>
+              <Button size="sm">Verificar cobertura</Button>
             </CardFooter>
           </Card>
         </div>

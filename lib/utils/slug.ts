@@ -13,6 +13,14 @@ function toKebab(value: string): string {
     .replace(/^-|-$/g, '')
 }
 
+/** Slug simples para entidades cujo próprio nome já é único, como município. */
+export function generateSimpleSlug(value: string): string {
+  if (value.trim() === '') {
+    throw new Error('generateSimpleSlug: value é obrigatório.')
+  }
+  return toKebab(value)
+}
+
 /**
  * Gera um slug deterministico no formato `<nome-kebab>-<uf-lowercase>-<cidade-kebab>`.
  *

@@ -25,6 +25,17 @@ enum UnitStatus {
   INACTIVE
 }
 
+/// Sub-regiões usadas pelo Lactare para analisar a cobertura da Grande São
+/// Paulo. Não representam unidades físicas nem promessa de coleta.
+enum ServiceRegion {
+  CAPITAL
+  WEST
+  SOUTHWEST
+  ABC
+  NORTH
+  EAST_ALTO_TIETE
+}
+
 enum InterestStatus {
   INTERESTED
   CONTACTED
@@ -159,6 +170,29 @@ model Unit {
   @@index([addressState, addressCity, status])
   @@index([status])
   @@map("units")
+}
+
+/// Município que faz parte da área de atuação configurada do Lactare.
+///
+/// Esta é a fonte operacional da verificação pública de cobertura. O modelo
+/// legado `Unit` continua no schema apenas para preservar relações e dados
+/// históricos, mas não alimenta mais a experiência pública nem a gestão da
+/// área atendida.
+model ServiceMunicipality {
+  id        String        @id @default(uuid())
+  slug      String        @unique
+  name      String
+  state     String        @default("SP") @db.Char(2)
+  country   String        @default("Brazil")
+  region    ServiceRegion
+  isActive  Boolean       @default(true) @map("is_active")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  @@unique([name, state, country])
+  @@index([isActive, name])
+  @@index([region, isActive])
+  @@map("service_municipalities")
 }
 
 model ContactIntent {

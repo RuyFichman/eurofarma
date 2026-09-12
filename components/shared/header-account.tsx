@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { CalendarCheck, LogIn } from 'lucide-react'
+import { LogIn, UserRound } from 'lucide-react'
 
 import { createSupabaseBrowserClient } from '@/lib/auth/supabase-client'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
@@ -11,7 +11,7 @@ const COPY = NUTRIZ_AUTH.header
 
 /**
  * Atalho de conta no cabeçalho: "Entrar" para quem não tem sessão, "Meu
- * agendamento" para quem tem.
+ * minha área para quem tem.
  *
  * É **Client Component de propósito**. A alternativa seria o layout `(public)`
  * ler a sessão no servidor, mas isso torna dinâmica toda página do site — home,
@@ -47,7 +47,7 @@ export function HeaderAccount() {
       href="/meu-agendamento"
       className="text-foreground/80 hover:text-primary hidden items-center gap-1.5 text-sm transition-colors sm:inline-flex"
     >
-      <CalendarCheck className="size-4" aria-hidden="true" />
+      <UserRound className="size-4" aria-hidden="true" />
       {COPY.account}
     </Link>
   ) : (
