@@ -3,8 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   municipalityCount: vi.fn(),
   municipalityGroupBy: vi.fn(),
+  municipalityFindMany: vi.fn(),
   nutrizCount: vi.fn(),
   nutrizGroupBy: vi.fn(),
+  nutrizFindMany: vi.fn(),
   transaction: vi.fn(),
 }))
 
@@ -13,10 +15,12 @@ vi.mock('../../lib/db/prisma', () => ({
     serviceMunicipality: {
       count: mocks.municipalityCount,
       groupBy: mocks.municipalityGroupBy,
+      findMany: mocks.municipalityFindMany,
     },
     nutrizProfile: {
       count: mocks.nutrizCount,
       groupBy: mocks.nutrizGroupBy,
+      findMany: mocks.nutrizFindMany,
     },
     $transaction: mocks.transaction,
   },
@@ -32,8 +36,10 @@ describe('métricas administrativas por município', () => {
     vi.clearAllMocks()
     mocks.municipalityCount.mockReturnValue(undefined)
     mocks.municipalityGroupBy.mockReturnValue(undefined)
+    mocks.municipalityFindMany.mockReturnValue(undefined)
     mocks.nutrizCount.mockReturnValue(undefined)
     mocks.nutrizGroupBy.mockReturnValue(undefined)
+    mocks.nutrizFindMany.mockReturnValue(undefined)
   })
 
   it('calcula ativos, inativos e preenche regiões sem registros com zero', async () => {
@@ -44,10 +50,22 @@ describe('métricas administrativas por município', () => {
         { region: 'WEST', _count: { id: 9 } },
         { region: 'ABC', _count: { id: 7 } },
       ],
+      14,
       3,
       [
-        { state: 'SP', _count: { id: 12 } },
-        { state: 'RJ', _count: { id: 2 } },
+        { interestStatus: 'INTERESTED', _count: { id: 8 } },
+        { interestStatus: 'CONTACTED', _count: { id: 3 } },
+        { interestStatus: 'DONATED', _count: { id: 2 } },
+        { interestStatus: 'UNKNOWN', _count: { id: 1 } },
+      ],
+      [
+        { state: 'SP', city: 'Itapevi' },
+        { state: 'SP', city: 'Santo André' },
+        { state: 'RJ', city: 'Niterói' },
+      ],
+      [
+        { state: 'SP', name: 'Itapevi', region: 'WEST' },
+        { state: 'SP', name: 'Santo Andre', region: 'ABC' },
       ],
     ])
 
@@ -74,20 +92,46 @@ describe('métricas administrativas por município', () => {
     expect(metrics.nutriz).toEqual({
       total: 14,
       createdInPeriod: 3,
-      byState: [
-        { state: 'SP', count: 12 },
-        { state: 'RJ', count: 2 },
+      byRegion: [
+        { key: 'CAPITAL', count: 0 },
+        { key: 'WEST', count: 1 },
+        { key: 'SOUTHWEST', count: 0 },
+        { key: 'ABC', count: 1 },
+        { key: 'NORTH', count: 0 },
+        { key: 'EAST_ALTO_TIETE', count: 0 },
+        { key: 'OUTSIDE_OR_UNMAPPED', count: 1 },
+      ],
+      byStage: [
+        { key: 'INTERESTED', count: 8 },
+        { key: 'CONTACTED', count: 3 },
+        { key: 'DONATED', count: 2 },
+        { key: 'UNKNOWN', count: 1 },
       ],
     })
   })
 
   it('consulta somente municípios ativos para o recorte regional', async () => {
-    mocks.transaction.mockResolvedValue([0, 0, [], 0, []])
+    mocks.transaction.mockResolvedValue([0, 0, [], 0, 0, [], [], []])
 
     await getAdminDashboardMetrics()
 
     expect(mocks.municipalityGroupBy).toHaveBeenCalledWith(
       expect.objectContaining({ where: { isActive: true } }),
+    )
+  })
+
+  it('aplica o mesmo recorte aos indicadores e distribuições de nutrizes', async () => {
+    const scope = { interestStatus: 'DONATED', deletedAt: null } as const
+    mocks.transaction.mockResolvedValue([0, 0, [], 2, 1, [], [], []])
+
+    await getAdminDashboardMetrics(scope)
+
+    expect(mocks.nutrizCount).toHaveBeenCalledWith({ where: scope })
+    expect(mocks.nutrizGroupBy).toHaveBeenCalledWith(
+      expect.objectContaining({ where: scope }),
+    )
+    expect(mocks.nutrizFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: scope }),
     )
   })
 })

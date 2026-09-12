@@ -171,19 +171,19 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 - Endpoint `POST /api/coverage`: valida o CEP, consulta o ViaCEP com timeout e compara o município e a UF com `service_municipalities`, sem persistir o CEP.
 - Resultado conservador: município ativo indica possibilidade de coleta residencial, cuja triagem, modalidade, data e disponibilidade ainda dependem de confirmação direta do Lactare.
 - Resposta para localização fora da lista com encaminhamento ao diretório oficial externo da rBLH.
-- Dashboard adaptado para municípios ativos, sub-regiões e cadastros de nutrizes.
+- Dashboard adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte alimenta cartões, evolução mensal e distribuições agregadas.
 - Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes.
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local.
 - Área pessoal adaptada para mostrar a cidade cadastrada e encaminhar ao verificador de cobertura, sem apresentar agendamento ou confirmação de coleta.
-- Suíte com 381 testes passando nesta atualização: 314 unitários e 67 de integração.
+- Suíte com 391 testes passando nesta atualização: 323 unitários e 68 de integração.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
 - **Elegibilidade operacional:** o produto verifica se o CEP ou município pertence à área configurada e indica possibilidade de coleta residencial; a confirmação da modalidade e da logística continua dependendo do Lactare.
 - **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
-- **Métricas:** o dashboard mostra métricas básicas, mas ainda não calcula o funil completo, retenção, adesão a lembretes nem os cruzamentos de região e perfil.
+- **Métricas:** a segmentação combinável por região, estágio e origem está implementada, mas o dashboard ainda não calcula o funil completo, retenção, adesão a lembretes, recorrência, indicação própria nem velocidade até a primeira doação.
 - **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
 - **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
@@ -212,7 +212,7 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 
 1. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro e encaminhamento ao Lactare.
 2. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
-3. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+3. Completar o dashboard com alcance, funil, retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação.
 4. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
 5. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
 6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
@@ -286,7 +286,7 @@ O cadastro não é necessário para a verificação básica de elegibilidade. El
 
 ### A.7 Como funciona e deverá evoluir a segmentação por região e perfil
 
-O desafio lista “segmentação básica por região ou perfil” como diferencial. Os municípios já possuem uma sub-região própria e o dashboard resume essa distribuição. A segmentação combinável com o perfil da nutriz ainda é alvo, pois uma nutriz possui simultaneamente localização e características de jornada.
+O desafio lista “segmentação básica por região ou perfil” como diferencial. O dashboard implementa as duas dimensões como filtros separados e combináveis: sub-região, estágio administrativo da jornada e origem UTM. Ao combinar, por exemplo, “ABC + doação registrada + WhatsApp”, cartões, evolução mensal e distribuições passam a usar exatamente o mesmo conjunto de nutrizes.
 
 #### Dimensão 1 — Região
 
@@ -303,16 +303,25 @@ Em vez de apresentar somente 30 municípios isolados, os municípios do Mapa do 
 
 #### Dimensão 2 — Perfil
 
-Os recortes de comportamento serão calculados a partir dos dados coletados no fluxo normal, sem exigir perguntas adicionais somente para segmentação:
+Os recortes de comportamento devem ser calculados a partir dos dados coletados no fluxo normal, sem exigir perguntas adicionais somente para segmentação. Nesta versão, somente dimensões sustentadas por dados existentes são exibidas:
+
+| Campo implementado | Valores atuais |
+|---|---|
+| Estágio administrativo da jornada | cadastrada/interessada / em contato / doação registrada / sem estágio definido |
+| Origem UTM do cadastro | WhatsApp / site / outras origens / não informada |
+
+A sub-região é obtida relacionando a UF e a cidade cadastradas pela nutriz com `service_municipalities`. A relação considera também municípios inativos, preservando a classificação histórica caso uma cidade deixe de fazer parte da cobertura operacional. Cadastros de outras localidades aparecem apenas no agregado “fora da Grande SP ou sem correspondência”; o painel não expõe a cidade individual nesse bloco.
+
+Os seguintes recortes continuam planejados porque ainda não há eventos ou campos próprios que permitam calculá-los com segurança:
 
 | Campo | Exemplos de valor |
 |---|---|
-| Estágio da jornada | cadastrada / doou uma vez / recorrente |
 | Adesão a lembretes | ativou e voltou / ativou e não voltou / nunca ativou |
-| Origem do contato | campanha / indicação / orgânico |
+| Recorrência de doação | primeira doação / recorrente |
+| Origem por indicação própria | campanha / indicação / orgânico |
 | Velocidade até a primeira doação | rápida / lenta / não doou |
 
-As dimensões deverão existir como campos separados. As visões principais mostrarão uma dimensão por vez, enquanto o cruzamento, por exemplo “ABC + recorrente + indicação”, ficará disponível em filtros de tabela. Com uma base pequena, recortes excessivamente específicos não devem virar gráficos padrão.
+Esses valores não são inferidos de agendamentos legados, preferência de contato ou ausência de UTM. Quando os eventos existirem, continuarão como campos separados e combináveis. Com uma base pequena, recortes excessivamente específicos não devem virar gráficos padrão.
 
 ### A.8 Por que o incentivo ao compartilhamento não usa recompensa material
 

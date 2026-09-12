@@ -1263,6 +1263,37 @@ export const ADMIN = {
     description:
       'Acompanhe a área de atuação do Lactare e os cadastros de nutrizes.',
 
+    filters: {
+      title: 'Segmentação de nutrizes',
+      description:
+        'Combine sub-região, estágio da jornada e origem. O recorte é aplicado aos indicadores e gráficos de nutrizes; a cobertura dos municípios permanece geral.',
+      label: 'Filtros combináveis do dashboard',
+      region: {
+        label: 'Sub-região da Grande SP',
+        all: 'Todas as sub-regiões',
+      },
+      stage: {
+        label: 'Estágio da jornada',
+        all: 'Todos os estágios',
+        options: {
+          INTERESTED: 'Cadastrada / interessada',
+          CONTACTED: 'Em contato com o Lactare',
+          DONATED: 'Doação registrada',
+          UNKNOWN: 'Sem estágio definido',
+        },
+      },
+      origin: {
+        label: 'Origem do cadastro',
+        all: 'Todas as origens',
+      },
+      actions: {
+        apply: 'Aplicar filtros',
+        clear: 'Limpar',
+      },
+      limitations:
+        'Recorrência, adesão a lembretes, indicação e velocidade até a primeira doação ainda não aparecem como filtros: essas dimensões exigem eventos próprios e não são inferidas de dados incompletos.',
+    },
+
     /** Rótulo de janela temporal. `{days}` é substituído em tempo de render. */
     period: 'Últimos {days} dias',
 
@@ -1283,12 +1314,17 @@ export const ADMIN = {
         label: 'Nutrizes cadastradas',
         /** `{count}` = cadastros no período, `{days}` = tamanho da janela. */
         description: '{count} nos últimos {days} dias',
+        filteredDescription:
+          'No recorte selecionado · {count} nos últimos {days} dias',
         empty: 'Nenhuma nutriz se cadastrou até agora',
+        filteredEmpty: 'Nenhuma nutriz corresponde ao recorte selecionado',
       },
       newNutriz: {
         label: 'Novos cadastros',
         description: 'Nos últimos {days} dias',
+        filteredDescription: 'No recorte · últimos {days} dias',
         empty: 'Nenhum cadastro novo no período',
+        filteredEmpty: 'Nenhum cadastro novo no recorte e período',
       },
     },
 
@@ -1309,12 +1345,19 @@ export const ADMIN = {
         'Nenhum município ativo ainda — por isso não há cobertura para mostrar.',
     },
 
-    nutrizByState: {
-      title: 'Nutrizes por estado',
+    nutrizByRegion: {
+      title: 'Nutrizes por sub-região',
       description:
-        'Agregado por UF, nunca por cidade, para não identificar cadastros individuais.',
-      empty:
-        'Nenhuma nutriz se cadastrou ainda. O cadastro é opcional para consultar a cobertura.',
+        'A cidade cadastrada é relacionada à sub-região configurada, sem exibir dados pessoais.',
+      empty: 'Nenhuma nutriz corresponde ao recorte selecionado.',
+      outsideOrUnmapped: 'Fora da Grande SP ou sem correspondência',
+    },
+
+    nutrizByStage: {
+      title: 'Nutrizes por estágio',
+      description:
+        'Situação administrativa atual do cadastro; não representa triagem clínica nem recorrência.',
+      empty: 'Nenhuma nutriz corresponde ao recorte selecionado.',
     },
   },
   municipalities: {
