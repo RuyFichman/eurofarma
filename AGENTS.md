@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **362 testes passando**: 295 unitários e 67 de integração. Os testes existentes ainda não consultam a nova tabela, pois sua migration não foi aplicada no Supabase cloud.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **362 testes passando**: 295 unitários e 67 de integração. A migration de `service_municipalities` já está aplicada no Supabase cloud, com os 30 municípios conferidos; os testes existentes ainda não consultam a nova tabela.
 
 ### 3.1 O que está implementado
 
@@ -99,7 +99,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Dashboard administrativo adaptado para municípios, sub-regiões e cadastros de nutrizes.
 - Listagem de nutrizes com exposição reduzida de contato.
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
-- Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada e versionada. Ela ainda precisa ser aplicada no Supabase cloud.
+- Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
 - Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
 - Webhook da WhatsApp Cloud API, verificação de assinatura e simulador local.
 - Máquina de estados local do chatbot para um fluxo limitado sobre tentativa de combinar visita.
@@ -116,7 +116,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF06 — lembretes opcionais | **Não implementado.** |
 | RF07 — tracking de contato | **Não implementado no fluxo atual.** O tracking antigo dependia de unidades e sua rota foi aposentada. O novo evento deve acompanhar o contato direto com o Lactare. |
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
-| RF09 — municípios atendidos | **Implementado no código, pendente no banco.** O CRUD administra `service_municipalities`; requer aplicação da migration no Supabase cloud. |
+| RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
 | RF10 — indicadores do funil | **Parcial.** O dashboard já resume municípios, sub-regiões e nutrizes; faltam alcance, funil completo, retenção e adesão a lembretes. |
 | RF11 — chatbot completo | **Parcial.** Infraestrutura e simulação local existem; faltam FAQ, elegibilidade, cadastro, lembretes, pós-doação e ativação real na Meta. |
 | RF12 — cartão de impacto | **Não implementado.** |
@@ -144,7 +144,6 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 
 ### 3.4 Pendências críticas
 
-- Aplicar no Supabase cloud a migration versionada de `service_municipalities` e conferir os 30 registros.
 - Rate limiting distribuído.
 - Proteção anti-spam nos formulários públicos.
 - Verificação de elegibilidade por CEP.
@@ -166,14 +165,13 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Aplicar a migration de municípios no Supabase cloud e validar os 30 registros.
-2. Completar a elegibilidade por CEP usando `service_municipalities` como fonte de verdade.
-3. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
-4. Implementar lembretes opcionais sem semântica de agendamento.
-5. Completar o dashboard com funil, retenção, cobertura, região e perfil.
-6. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
-7. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-8. Ativar a integração real com a Meta quando a infraestrutura externa existir.
+1. Completar a elegibilidade por CEP usando `service_municipalities` como fonte de verdade.
+2. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
+3. Implementar lembretes opcionais sem semântica de agendamento.
+4. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+5. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
+6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+7. Ativar a integração real com a Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
