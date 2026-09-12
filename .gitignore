@@ -15,8 +15,7 @@
 next-env.d.ts
 
 # testing / vitest
-/coverage
-coverage/
+/coverage/
 
 # logs
 *.log

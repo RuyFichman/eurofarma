@@ -66,6 +66,23 @@ export async function getActiveServiceMunicipalities(): Promise<
   )
 }
 
+export async function getActiveServiceMunicipalityByLocation(
+  name: string,
+  state: string,
+): Promise<PublicServiceMunicipality | null> {
+  const normalizedState = state.trim().toUpperCase()
+  if (normalizedState !== 'SP') return null
+
+  return prisma.serviceMunicipality.findFirst({
+    where: {
+      isActive: true,
+      state: normalizedState,
+      name: { equals: name.trim(), mode: 'insensitive' },
+    },
+    select: PUBLIC_MUNICIPALITY_SELECT,
+  })
+}
+
 export async function getPublicCoverageStats(): Promise<PublicCoverageStats> {
   const [activeMunicipalities, regions] = await prisma.$transaction([
     prisma.serviceMunicipality.count({ where: { isActive: true } }),

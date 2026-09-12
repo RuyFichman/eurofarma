@@ -484,35 +484,63 @@ export const COVERAGE = {
   },
   hero: {
     eyebrow: 'Área de atuação do Lactare',
-    title: 'Sua cidade é atendida?',
+    title: 'Verifique a possibilidade de coleta residencial',
     description:
-      'Selecione seu município para saber se ele faz parte da área de atuação atual do Lactare.',
+      'Informe seu CEP ou selecione o município para descobrir se sua localização faz parte da área de atuação do Lactare.',
   },
   checker: {
-    title: 'Selecione sua cidade',
+    title: 'Consultar elegibilidade',
     description:
-      'A lista é atualizada pela equipe responsável no painel administrativo.',
-    label: 'Município',
-    placeholder: 'Escolha um município',
+      'O CEP identifica automaticamente a cidade. Se preferir, faça a consulta diretamente pelo município.',
+    methodLabel: 'Como você quer verificar?',
+    methods: {
+      cep: 'Por CEP',
+      municipality: 'Por município',
+    },
+    cep: {
+      label: 'CEP da residência',
+      placeholder: '00000-000',
+      hint: 'Digite os oito números do CEP.',
+      validation: 'Informe um CEP válido no formato 00000-000.',
+    },
+    municipality: {
+      label: 'Município',
+      placeholder: 'Escolha um município',
+    },
     outsideOption: 'Minha cidade não aparece na lista',
-    submit: 'Verificar cobertura',
-    validation: 'Selecione uma opção para continuar.',
+    submit: 'Verificar possibilidade',
+    submitting: 'Verificando...',
+    municipalityValidation: 'Selecione uma opção para continuar.',
+    responseInvalid:
+      'Não foi possível interpretar a resposta. Tente novamente.',
+    resolvedLocation: 'O CEP {cep} corresponde a {city} — {state}.',
   },
   eligible: {
-    badge: 'Dentro da área de atuação',
-    title: '{city} é atendida pelo Lactare',
+    badge: 'Possibilidade de coleta residencial',
+    title: '{city} faz parte da área atendida',
     description:
-      'Você pode continuar sua jornada pelo NutriLink. A modalidade e a disponibilidade da coleta são confirmadas diretamente pela equipe do Lactare.',
+      'Há possibilidade de coleta residencial nessa localização. Isso ainda não confirma a coleta: triagem, modalidade, data e disponibilidade são combinadas diretamente com a equipe do Lactare.',
     signup: 'Quero criar meu cadastro',
     learnMore: 'Entender como funciona',
   },
   outside: {
     badge: 'Fora da área de atuação atual',
     title: 'Sua cidade não está na lista do Lactare',
+    titleWithCity: '{city} não está na área atual do Lactare',
     description:
-      'O NutriLink trabalha somente com a área do Lactare. Para encontrar atendimento em outra região, consulte a fonte oficial da Rede Brasileira de Bancos de Leite Humano.',
+      'A coleta residencial do Lactare não está disponível para essa localização. Para encontrar atendimento em outra região, consulte a fonte oficial da Rede Brasileira de Bancos de Leite Humano.',
     officialDirectory: 'Consultar a rBLH oficial',
     officialDirectoryHref: 'https://rblh.fiocruz.br/',
+  },
+  api: {
+    invalidJson: 'Não foi possível ler o CEP enviado.',
+    invalidCep: 'Informe um CEP válido no formato 00000-000.',
+    notFound:
+      'Esse CEP não foi encontrado. Confira os números e tente novamente.',
+    unavailable:
+      'Não foi possível consultar o CEP agora. Tente novamente em instantes.',
+    rateLimited:
+      'Muitas consultas em pouco tempo. Aguarde um instante e tente novamente.',
   },
   municipalities: {
     title: 'Municípios atendidos',

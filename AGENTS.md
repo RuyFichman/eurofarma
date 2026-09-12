@@ -83,14 +83,15 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **362 testes passando**: 295 unitários e 67 de integração. A migration de `service_municipalities` já está aplicada no Supabase cloud, com os 30 municípios conferidos; os testes existentes ainda não consultam a nova tabela.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **381 testes passando**: 314 unitários e 67 de integração. A migration de `service_municipalities` já está aplicada no Supabase cloud, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
 - Scaffold Next.js e design system.
 - Landing pública, página “Sobre”, conteúdo educativo e style guide.
-- Página pública de verificação de cobertura por município em `/verificar-cobertura`, com os 30 municípios do Lactare agrupados em seis sub-regiões.
-- Resposta transparente para cidade fora da lista, com encaminhamento ao diretório oficial externo da rBLH.
+- Página pública de verificação de cobertura por CEP ou município em `/verificar-cobertura`, com os 30 municípios do Lactare agrupados em seis sub-regiões.
+- Resolução de CEP pelo ViaCEP em `POST /api/coverage`, seguida da comparação com a lista ativa de `service_municipalities`; o CEP não é persistido.
+- Resposta transparente para localização fora da lista, com encaminhamento ao diretório oficial externo da rBLH.
 - Cadastro opcional de nutriz com consentimento obrigatório no formulário.
 - Provisionamento da conta da nutriz no Supabase Auth.
 - Login, logout, recuperação e redefinição de senha da nutriz.
@@ -108,9 +109,9 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 
 | Requisito | Situação atual |
 |---|---|
-| RF01 — elegibilidade por CEP | **Parcial.** A verificação por município existe; a resolução automática de CEP para município ainda não foi implementada. |
+| RF01 — elegibilidade por CEP | **Implementado no escopo validável.** O ViaCEP resolve município e UF, e a lista ativa indica possibilidade de coleta residencial. A interface não promete confirmação logística. |
 | RF02 — área atendida | **Implementado no escopo atualizado.** A interface exibe os 30 municípios atendidos; bancos de leite e pontos de coleta não são mais entidades públicas ou administrativas do produto. |
-| RF03 — fora da cobertura | **Implementado para seleção de município.** Cidade fora da lista recebe explicação e link oficial da rBLH; falta integrar a mesma resposta à futura consulta por CEP. |
+| RF03 — fora da cobertura | **Implementado.** CEP ou município fora da lista recebe explicação e link oficial da rBLH. |
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
 | RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
 | RF06 — lembretes opcionais | **Não implementado.** |
@@ -146,7 +147,6 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 
 - Rate limiting distribuído.
 - Proteção anti-spam nos formulários públicos.
-- Verificação de elegibilidade por CEP.
 - Consentimento separado e job de lembretes.
 - Segmentação por sub-região e perfil.
 - Definição da fonte legítima de confirmação de uma doação.
@@ -165,13 +165,12 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Completar a elegibilidade por CEP usando `service_municipalities` como fonte de verdade.
-2. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
-3. Implementar lembretes opcionais sem semântica de agendamento.
-4. Completar o dashboard com funil, retenção, cobertura, região e perfil.
-5. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
-6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-7. Ativar a integração real com a Meta quando a infraestrutura externa existir.
+1. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
+2. Implementar lembretes opcionais sem semântica de agendamento.
+3. Completar o dashboard com funil, retenção, cobertura, região e perfil.
+4. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
+5. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+6. Ativar a integração real com a Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
@@ -190,9 +189,10 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 362 passando: 295 unitários e 67 de integração |
+| Testes | Vitest | 381 passando: 314 unitários e 67 de integração |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
+| Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
 
 Não atualizar Prisma para 7 nem Zod para 4 sem uma migração planejada.
 
@@ -480,6 +480,8 @@ Mensagens do bot devem vir de WHATSAPP_BOT em lib/i18n/pt-br.ts e responder em p
 ## 12. Área do Lactare e segmentação
 
 A fonte de produto adotada é o Mapa do Leite do Lactare, com 30 municípios. A lista completa e as fontes estão em docs/projeto-nutrilink.md.
+
+Na web, a nutriz pode selecionar um município ou informar um CEP. O endpoint `POST /api/coverage` valida oito dígitos, consulta o ViaCEP com timeout e compara município/UF com os registros ativos de `ServiceMunicipality`. Estar na lista significa **possibilidade de coleta residencial**, não coleta confirmada. O CEP não é salvo nem enviado ao tracking.
 
 Sub-regiões:
 
