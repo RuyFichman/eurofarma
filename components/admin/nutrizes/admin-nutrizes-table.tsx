@@ -1,4 +1,10 @@
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+
+import { AdminJourneyStatusBadge } from '@/components/admin/nutrizes/admin-journey-status-badge'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { ADMIN_NUTRIZES_PATH } from '@/lib/admin/nutrizes/filters'
 import type { AdminNutrizListItem } from '@/lib/db/queries/admin-nutrizes'
 import { ADMIN } from '@/lib/i18n/pt-br'
 import { formatShortDate } from '@/lib/utils/format-date'
@@ -27,7 +33,7 @@ export function AdminNutrizesTable({
   return (
     <Card className="hidden overflow-hidden py-0 md:block">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[52rem] text-sm">
+        <table className="w-full min-w-[64rem] text-sm">
           <caption className="sr-only">{COPY.caption}</caption>
           <thead>
             <tr className="text-muted-foreground bg-muted/40 border-b text-left">
@@ -44,10 +50,16 @@ export function AdminNutrizesTable({
                 {COPY.columns.status}
               </th>
               <th scope="col" className="px-4 py-3 font-medium">
+                {COPY.columns.journey}
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
                 {COPY.columns.consent}
               </th>
               <th scope="col" className="px-4 py-3 font-medium">
                 {COPY.columns.signedUpAt}
+              </th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                {COPY.columns.actions}
               </th>
             </tr>
           </thead>
@@ -82,6 +94,9 @@ export function AdminNutrizesTable({
                   <AdminNutrizStatusBadge status={nutriz.interestStatus} />
                 </td>
                 <td className="px-4 py-3">
+                  <AdminJourneyStatusBadge status={nutriz.journeyStatus} />
+                </td>
+                <td className="px-4 py-3">
                   <AdminNutrizConsent
                     lgpdConsentAt={nutriz.lgpdConsentAt}
                     marketingConsent={nutriz.marketingConsent}
@@ -89,6 +104,20 @@ export function AdminNutrizesTable({
                 </td>
                 <td className="text-muted-foreground px-4 py-3 whitespace-nowrap">
                   {formatShortDate(nutriz.createdAt)}
+                </td>
+                <td className="px-4 py-3">
+                  <Button asChild variant="ghost" size="sm">
+                    <Link
+                      href={`${ADMIN_NUTRIZES_PATH}/${nutriz.id}`}
+                      aria-label={ADMIN.nutrizJourney.openJourneyAria.replace(
+                        '{name}',
+                        nutriz.fullName,
+                      )}
+                    >
+                      {ADMIN.nutrizJourney.openJourney}
+                      <ArrowRight aria-hidden="true" />
+                    </Link>
+                  </Button>
                 </td>
               </tr>
             ))}

@@ -8,6 +8,7 @@ import {
   type JourneyStatusValue,
 } from '../../lib/journey/status'
 import {
+  adminJourneyStatusUpdateSchema,
   JOURNEY_ADMINISTRATIVE_NOTE_MAX_LENGTH,
   journeyAdministrativeNoteSchema,
   journeyStatusTransitionSchema,
@@ -92,6 +93,28 @@ describe('observação administrativa da jornada', () => {
       journeyAdministrativeNoteSchema.safeParse(
         'a'.repeat(JOURNEY_ADMINISTRATIVE_NOTE_MAX_LENGTH + 1),
       ).success,
+    ).toBe(false)
+  })
+})
+
+describe('payload administrativo da jornada', () => {
+  it('exige um identificador UUID válido para a nutriz', () => {
+    const transition = {
+      fromStatus: 'REGISTERED',
+      toStatus: 'FORM_RECEIVED',
+    }
+
+    expect(
+      adminJourneyStatusUpdateSchema.safeParse({
+        nutrizProfileId: '11111111-1111-4111-8111-111111111111',
+        ...transition,
+      }).success,
+    ).toBe(true)
+    expect(
+      adminJourneyStatusUpdateSchema.safeParse({
+        nutrizProfileId: 'id-invalido',
+        ...transition,
+      }).success,
     ).toBe(false)
   })
 })

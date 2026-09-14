@@ -1,4 +1,10 @@
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+
+import { AdminJourneyStatusBadge } from '@/components/admin/nutrizes/admin-journey-status-badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { ADMIN_NUTRIZES_PATH } from '@/lib/admin/nutrizes/filters'
 import type { AdminNutrizListItem } from '@/lib/db/queries/admin-nutrizes'
 import { ADMIN } from '@/lib/i18n/pt-br'
 import { formatShortDate } from '@/lib/utils/format-date'
@@ -37,6 +43,13 @@ export function AdminNutrizMobileCard({
           {nutriz.neighborhood ? ` · ${nutriz.neighborhood}` : ''}
         </p>
 
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-muted-foreground text-xs">
+            {COPY.table.columns.journey}
+          </span>
+          <AdminJourneyStatusBadge status={nutriz.journeyStatus} />
+        </div>
+
         <div className="space-y-1">
           <AdminNutrizContact
             phoneWhatsapp={nutriz.phoneWhatsapp}
@@ -56,6 +69,13 @@ export function AdminNutrizMobileCard({
             {formatShortDate(nutriz.createdAt)}
           </span>
         </div>
+
+        <Button asChild variant="outline" size="sm" className="w-full">
+          <Link href={`${ADMIN_NUTRIZES_PATH}/${nutriz.id}`}>
+            {ADMIN.nutrizJourney.openJourney}
+            <ArrowRight aria-hidden="true" />
+          </Link>
+        </Button>
       </CardContent>
     </Card>
   )

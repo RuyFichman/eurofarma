@@ -33,7 +33,7 @@ O produto tem três frentes:
 
 1. **Chatbot no WhatsApp:** porta de entrada principal para perguntas frequentes, elegibilidade, cadastro opcional, lembretes e pós-doação.
 2. **Plataforma web:** conteúdo educativo, elegibilidade por CEP ou município, cadastro, login e área pessoal.
-3. **Dashboard administrativo:** gestão da área atendida e indicadores de alcance, engajamento, conversão, retenção e adesão a lembretes.
+3. **Dashboard administrativo:** gestão da área atendida, atualização categórica da jornada das nutrizes e indicadores de alcance, engajamento, conversão, retenção e adesão a lembretes.
 
 ### 2.1 Limites obrigatórios
 
@@ -41,7 +41,7 @@ O NutriLink:
 
 - atende a operação do Lactare;
 - pode encaminhar quem está fora da área para um diretório oficial externo da rBLH ou do Ministério da Saúde;
-- trata apenas dados necessários à jornada não clínica da nutriz;
+- trata apenas dados necessários à jornada da nutriz, incluindo status categóricos informados pelo Lactare, sem detalhes clínicos;
 - usa lembretes opcionais, com consentimento separado;
 - pode registrar origem por indicação sem oferecer recompensa material.
 
@@ -49,7 +49,7 @@ O NutriLink não é:
 
 - diretório nacional próprio de bancos de leite;
 - sistema de agendamento ou confirmação automática de coleta;
-- sistema de triagem clínica;
+- sistema de triagem clínica; pode exibir uma decisão categórica já registrada por profissional do Lactare, mas nunca avalia, aprova ou reprova;
 - prontuário da nutriz ou do bebê;
 - sistema dos hospitais parceiros;
 - programa de recompensa material;
@@ -68,7 +68,7 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 ## 3. Estado atual do projeto
 
-**Referência desta seção:** 13 de setembro de 2026.
+**Referência desta seção:** 14 de setembro de 2026.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, os **349 testes unitários passam**. A suíte completa tem 417 testes; 40 dos 68 testes de integração passam e 28 aguardam a aplicação da migration local do RF16 no Supabase cloud, pois o Prisma Client novo já consulta `journey_status`. A migration anterior de `service_municipalities` está aplicada no Supabase cloud, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 426 testes em 46 arquivos**: 356 unitários e 70 de integração. A migration do RF16 foi aplicada no Supabase cloud em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -98,13 +98,13 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Área autenticada da nutriz com identificação da cidade cadastrada e acesso ao verificador de cobertura.
 - Login, logout, middleware, autorização por role e shell administrativo.
 - Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal e às distribuições agregadas; dados pessoais não são exibidos.
-- Listagem de nutrizes com exposição reduzida de contato.
+- Listagem de nutrizes com exposição reduzida de contato e acesso ao detalhe da jornada em `/admin/nutrizes/[id]`.
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
 - Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
 - Webhook da WhatsApp Cloud API, verificação de assinatura e simulador local.
 - Máquina de estados local do chatbot para um fluxo legado e limitado sobre tentativa de combinar visita. A arquitetura pode ser reaproveitada, mas a pergunta deve ser redimensionada para o recebimento da visita de entrega do kit.
-- Modelo local do RF16 com enum próprio `JourneyStatus`, status atual separado de `interestStatus`, histórico append-only vinculado à nutriz e ao administrador, observação administrativa limitada, regras explícitas de transição e migration SQL versionada. A migration ainda não foi aplicada no Supabase cloud e a edição no painel ainda não existe.
+- RF16 no painel: `JourneyStatus` separado de `interestStatus`, status atual, detalhe da nutriz, histórico append-only com autor e horário, observação administrativa limitada e transições explícitas. A mudança usa o status anterior como condição de concorrência e atualiza perfil e histórico na mesma transação; falha no histórico reverte o status. A migration foi aplicada no Supabase cloud em 13 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; enum, coluna com default `REGISTERED`, índices, CHECKs, FKs `RESTRICT` e trigger de imutabilidade foram conferidos no banco.
 
 ### 3.2 Situação dos requisitos funcionais
 
@@ -125,7 +125,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF13 — mensagem de indicação | **Não implementado.** |
 | RF14 — reconhecimentos | **Não implementado.** |
 | RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
-| RF16 — status da jornada | **Parcial.** O modelo local já separa `JourneyStatus` de `interestStatus`, mantém o status atual no perfil e define histórico imutável, autor, horário, observação administrativa e transições válidas. A migration ainda não foi aplicada no Supabase cloud e faltam a mutação transacional, a autorização e a interface administrativa. |
+| RF16 — status da jornada | **Implementado.** O administrador acessa `/admin/nutrizes/[id]`, consulta status e histórico e registra somente a próxima transição válida. A mutação é autorizada por role `ADMIN`, condicional ao status anterior e atômica com o histórico. Correção e reabertura continuam fora do fluxo até validação operacional do Lactare. |
 | RF17 — aviso de mudança de status | **Não implementado.** Falta notificar automaticamente a nutriz pelo WhatsApp depois de uma atualização válida feita pelo Lactare. |
 
 ### 3.3 Código e dados legados que não definem mais o escopo
@@ -142,7 +142,7 @@ A partir desta versão, a experiência de unidades está isolada do produto ativ
 - não reativar `/buscar`, `/banco-de-leite/*`, `/admin/unidades`, `/api/units` ou o tracking vinculado a unidades;
 - preservar os registros e o modelo `Unit` somente como legado interno até existir uma migration de remoção segura e reversível.
 
-Os modelos Appointment e WhatsappConversation também são legado técnico. Eles podem ser migrados ou reaproveitados para lembretes e continuidade da jornada, mas não autorizam linguagem de agendamento, confirmação de visita ou promessa logística. A rota `/meu-agendamento` foi mantida por compatibilidade, mas sua interface ativa é “Minha área” e não exibe agendamento.
+Os modelos Appointment e WhatsappConversation também são legado técnico. Eles podem ser migrados ou reaproveitados para lembretes e continuidade da jornada, mas não autorizam linguagem de agendamento, confirmação de visita ou promessa logística. O acompanhamento autodeclarado pode perguntar se a nutriz recebeu a visita de entrega do kit, fato que somente ela conhece; nunca deve perguntar resultado de exame ou outro fato cuja fonte é o Lactare. A rota `/meu-agendamento` foi mantida por compatibilidade, mas sua interface ativa é “Minha área” e não exibe agendamento.
 
 Não criar preview estático com estado “confirmado” ou lembrete de coleta sem uma fonte operacional legítima. A home e a área da nutriz devem manter linguagem de cobertura e orientação, não de agendamento.
 
@@ -153,7 +153,7 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Consentimento separado e job de lembretes.
 - Segmentos comportamentais que ainda não têm eventos próprios: recorrência, adesão a lembretes, indicação entre doadoras e velocidade até a primeira doação.
 - Definição da fonte legítima de confirmação de uma doação.
-- Aplicação da migration do RF16 no Supabase cloud e implementação da atualização administrativa transacional e auditável do status categórico, sem armazenar tipo de exame, valores, laudo ou motivo clínico.
+- RLS para `nutriz_profiles` e `journey_status_history`; a autorização do RF16 já existe na aplicação, mas as tabelas continuam sem policies no Supabase.
 - Notificação automática pelo WhatsApp após cada mudança válida de status.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
@@ -164,19 +164,21 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Confirmar com o Lactare se a coleta domiciliar gratuita é uniforme nos 30 municípios ou se varia por logística.
 - Validar o canal oficial e as instruções de contato exibidas depois da confirmação de cobertura.
 - Definir quem registra uma doação como confirmada.
+- Validar com a equipe do Lactare quem atualiza cada status da jornada e se existe capacidade operacional para manter os registros consistentes.
 - Validar textos jurídicos e consentimentos.
 
 Até essas respostas existirem, prefira linguagem conservadora. Estar na área de atuação não autoriza prometer coleta domiciliar gratuita uniforme.
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
-2. Aplicar a migration do RF16 no Supabase cloud, implementar a atualização transacional no painel e então o RF17 com notificação automática pelo WhatsApp.
-3. Implementar lembretes opcionais sem semântica de agendamento.
-4. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
-5. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
+1. Validar com o Lactare correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes; até lá, o painel mantém somente o fluxo progressivo já definido.
+2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
+3. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
+4. Implementar lembretes opcionais sem semântica de agendamento.
+5. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
 6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-7. Ativar a integração real com a Meta quando a infraestrutura externa existir.
+7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+8. Ativar a integração real com a Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
@@ -195,7 +197,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 349 unitários passando; integração cloud parcialmente bloqueada até aplicar a migration do RF16 |
+| Testes | Vitest | 426 passando em 46 arquivos: 356 unitários e 70 de integração contra o Supabase cloud |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -236,6 +238,12 @@ Fluxo obrigatório:
 8. Executar testes.
 
 Se o ambiente não tiver MCP do Supabase, gerar e revisar o SQL, mas não improvisar aplicação por outro caminho.
+
+### 5.2 Entrega acadêmica de banco de dados
+
+O pacote da disciplina de banco de dados está em `docs/entrega-banco-de-dados/`. Ele usa o schema irmão `nutrilink` no mesmo projeto Supabase, separado do schema `public` consumido pela aplicação. Regenerar com `pnpm bd:massa`, `pnpm bd:aplicar`, `pnpm bd:evidencias` e `pnpm bd:documentos`.
+
+Esse schema é uma fotografia acadêmica escrita à mão, com DDL, restrições `CHECK`, massa determinística e evidências. Mudanças em `prisma/schema.prisma` ou no escopo ativo Lactare-only não o atualizam automaticamente, e a aplicação nunca deve apontar para ele. A massa fictícia não deve ser inserida no schema `public` nem misturada com PII real.
 
 ## 6. Organização do projeto
 
@@ -353,7 +361,7 @@ O Header é sticky e responsivo. O link ativo usa usePathname. O logo atual é u
 - Textos de interface ficam em português do Brasil.
 - Slugs devem ser estáveis e únicos.
 - Valores vazios opcionais devem ser normalizados de modo consistente.
-- Campos de saúde não pertencem ao schema do NutriLink.
+- Detalhes clínicos não pertencem ao schema do NutriLink. Um status categórico informado manualmente pelo Lactare pode existir, desde que não contenha tipo de exame, valores, laudo ou motivo clínico.
 
 ### 8.2 Testes de integração
 
@@ -379,6 +387,7 @@ Antes de qualquer deploy ou demonstração pública com dados reais, são obriga
 - revisar logs e respostas de erro;
 - validar consentimentos;
 - revisar chaves e URLs do ambiente.
+- restringir por função e auditar qualquer acesso ou mudança do futuro status categórico da jornada.
 
 Não sugerir que o sistema está pronto para produção enquanto essas pendências existirem.
 
@@ -389,7 +398,7 @@ Não sugerir que o sistema está pronto para produção enquanto essas pendênci
 - Consentimento não pode vir pré-marcado.
 - A retirada do opt-in deve ser implementável e auditável.
 - Dados devem ser reduzidos ao mínimo necessário.
-- Dados clínicos não devem ser coletados.
+- Detalhes clínicos não devem ser coletados. O sistema pode guardar somente o status categórico registrado pelo Lactare depois da avaliação profissional.
 
 ### 9.3 Rate limiting e anti-spam
 
@@ -476,18 +485,19 @@ O fluxo completo deverá permitir:
 5. cadastro opcional com consentimento;
 6. contato direto com o Lactare;
 7. opt-in separado de lembretes;
-8. acompanhamento pós-doação;
-9. cartão, indicação e reconhecimento depois de uma confirmação legítima.
+8. avisos de mudança do status da jornada registrado pelo Lactare;
+9. acompanhamento pós-doação;
+10. cartão, indicação e reconhecimento depois de uma confirmação legítima.
 
 A máquina de estados atual cobre somente um fluxo legado e limitado. Não chamar RF11 de concluído.
 
-Mensagens do bot devem vir de WHATSAPP_BOT em lib/i18n/pt-br.ts e responder em poucos segundos. O bot nunca executa triagem e nunca confirma agendamento.
+Mensagens do bot devem vir de WHATSAPP_BOT em lib/i18n/pt-br.ts e responder em poucos segundos. O bot nunca executa triagem nem confirma agendamento. Pode comunicar um status já registrado pela equipe do Lactare, sem revelar detalhes clínicos.
 
 ## 12. Área do Lactare e segmentação
 
 A fonte de produto adotada é o Mapa do Leite do Lactare, com 30 municípios. A lista completa e as fontes estão em docs/projeto-nutrilink.md.
 
-Na web, a nutriz pode selecionar um município ou informar um CEP. O endpoint `POST /api/coverage` valida oito dígitos, consulta o ViaCEP com timeout e compara município/UF com os registros ativos de `ServiceMunicipality`. Estar na lista significa **possibilidade de coleta residencial**, não coleta confirmada. O CEP não é salvo nem enviado ao tracking.
+Na web, a nutriz pode selecionar um município ou informar um CEP. O endpoint `POST /api/coverage` valida oito dígitos, consulta o ViaCEP com timeout e compara município/UF com os registros ativos de `ServiceMunicipality`. Estar na lista significa **elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite**, não coleta confirmada; a uniformidade operacional nos 30 municípios ainda depende de validação do Lactare. O CEP não é salvo nem enviado ao tracking.
 
 Sub-regiões:
 
@@ -506,7 +516,7 @@ Segmentos implementados no dashboard:
 
 Os três filtros vivem na URL (`region`, `stage` e `origin`), são combináveis e geram um único recorte compartilhado pelos cartões, pela evolução mensal e pelas distribuições. A região usa todos os municípios configurados, inclusive inativos, para que a desativação operacional de uma cidade não apague sua classificação histórica.
 
-Ainda não estão implementados os segmentos de adesão a lembretes, recorrência, indicação própria e velocidade até a primeira doação. O modelo local do RF16 já existe, separado de `interestStatus`, mas ainda não foi aplicado no Supabase cloud nem conectado ao painel. Esses segmentos exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
+Ainda não estão implementados os segmentos de adesão a lembretes, recorrência, indicação própria e velocidade até a primeira doação. O modelo do RF16 já existe, separado de `interestStatus`, e sua migration está aplicada no Supabase cloud, mas ele ainda não está conectado ao painel. Esses segmentos exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
 
 ## 13. Regras de produto vigentes
 
@@ -515,7 +525,7 @@ Estas decisões substituem decisões antigas conflitantes:
 1. **Escopo Lactare-only:** a base nacional é legado, não direção futura.
 2. **WhatsApp Cloud API como porta de entrada:** links wa.me ou tel podem continuar como ações de contato, mas não substituem o chatbot-alvo.
 3. **Sem agendamento:** datas podem servir como referência de lembrete; não representam reserva ou confirmação.
-4. **Sem dados clínicos:** triagem pertence ao Lactare e dados de bebês pertencem aos hospitais.
+4. **Sem detalhes clínicos:** triagem e decisão pertencem ao Lactare, e dados de bebês pertencem aos hospitais. O NutriLink pode armazenar e exibir somente o status categórico informado manualmente pela equipe, sem avaliar exames.
 5. **Cobertura configurável:** a lista de municípios deve ser administrável e refletida imediatamente na elegibilidade.
 6. **Fora da área:** orientar para fonte externa oficial; não manter diretório nacional próprio.
 7. **Lembretes por opt-in separado:** nunca ativados automaticamente.
@@ -554,7 +564,7 @@ Marque explicitamente como “previsto para sprint futuro” qualquer menção a
 - diretório nacional;
 - aplicativo móvel;
 - múltiplos idiomas;
-- dados clínicos;
+- detalhes clínicos ou automação de decisão clínica;
 - integrações com sistemas hospitalares.
 
 Não configure esses itens sem uma nova decisão de escopo e autorização do time.
@@ -566,6 +576,7 @@ Não configure esses itens sem uma nova decisão de escopo e autorização do ti
 - **Nutriz:** mulher que amamenta e é potencial doadora.
 - **Opt-in:** ativação voluntária e explícita.
 - **PII:** dado que identifica ou pode identificar uma pessoa.
+- **Status da jornada:** categoria simples registrada pelo Lactare para informar uma etapa como ficha recebida, exame agendado, apta, não apta ou kit entregue, sem detalhes clínicos.
 - **rBLH:** Rede Brasileira de Bancos de Leite Humano.
 - **RLS:** Row Level Security.
 - **Triagem:** avaliação de saúde feita por profissional do Lactare, fora do NutriLink.

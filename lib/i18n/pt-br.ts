@@ -235,7 +235,7 @@ export const CONTENT = {
     titleLead: 'Tudo que você precisa saber',
     titleHighlight: 'para cuidar e compartilhar',
     description:
-      'Um espaço pensado com carinho para acompanhar cada etapa da sua jornada como nutriz — da primeira dúvida à primeira doação.',
+      'Um espaço pensado com carinho para acompanhar cada etapa da sua jornada como nutriz. Da primeira dúvida à primeira doação.',
     searchLabel: 'Buscar conteúdos',
     searchPlaceholder: 'Buscar artigos, vídeos ou dúvidas frequentes...',
     filters: ['Todos', 'Extração', 'Armazenamento', 'Amamentação', 'Doação'],
@@ -1796,9 +1796,11 @@ export const ADMIN = {
         nutriz: 'Nutriz',
         location: 'Localização',
         contact: 'Contato',
-        status: 'Situação',
+        status: 'Situação do cadastro',
+        journey: 'Jornada',
         consent: 'Consentimento',
         signedUpAt: 'Cadastro',
+        actions: 'Ações',
       },
     },
 
@@ -1853,6 +1855,87 @@ export const ADMIN = {
           'Nenhum cadastro corresponde a esses filtros. Tente ajustar a busca ou limpar os filtros.',
         action: 'Limpar filtros',
       },
+    },
+  },
+  nutrizJourney: {
+    seo: {
+      title: 'Jornada da nutriz | NutriLink Admin',
+      description:
+        'Consulte e atualize o status categórico da jornada da nutriz.',
+    },
+    back: 'Voltar para nutrizes',
+    eyebrow: 'Jornada da nutriz',
+    location: '{city} - {state}',
+    registeredAt: 'Cadastro realizado em {date}',
+    openJourney: 'Ver jornada',
+    openJourneyAria: 'Ver a jornada de {name}',
+    privacyNotice:
+      'Registre somente a etapa informada pela equipe do Lactare. Não inclua tipo de exame, resultado, valor, laudo, diagnóstico ou motivo clínico.',
+    current: {
+      title: 'Status atual',
+      description:
+        'Categoria operacional informada pelo Lactare. O NutriLink não realiza triagem nem toma decisões clínicas.',
+    },
+    form: {
+      title: 'Atualizar status',
+      description:
+        'A mudança será registrada de forma permanente com seu usuário, data e horário.',
+      nextStatus: {
+        label: 'Próximo status',
+        placeholder: 'Selecione o próximo status',
+      },
+      note: {
+        label: 'Observação administrativa (opcional)',
+        placeholder: 'Ex.: atualização recebida da equipe do Lactare',
+        helper:
+          'Até 500 caracteres. Não registre informações clínicas ou resultados de exame.',
+      },
+      submit: 'Registrar mudança de status',
+      submitting: 'Registrando mudança...',
+    },
+    terminal: {
+      title: 'Sem próxima etapa definida',
+      description:
+        'Este status não possui uma transição seguinte autorizada. Correções ou reaberturas dependem de uma decisão operacional do Lactare.',
+    },
+    history: {
+      title: 'Histórico da jornada',
+      description:
+        'Registro imutável das mudanças feitas pela equipe administrativa, das mais recentes para as mais antigas.',
+      initialTitle: 'Cadastro criado',
+      initialDescription: 'A jornada começou com o status Cadastrada.',
+      transition: 'Alterado de {from} para {to}',
+      changedBy: 'Registrado por {name}',
+      noNote: 'Sem observação administrativa.',
+    },
+    status: {
+      REGISTERED: 'Cadastrada',
+      FORM_RECEIVED: 'Ficha recebida',
+      EXAM_SCHEDULED: 'Exame agendado',
+      AWAITING_RESULT: 'Aguardando resultado',
+      ELIGIBLE: 'Apta',
+      NOT_ELIGIBLE: 'Não apta',
+      KIT_DELIVERED: 'Kit entregue',
+      RECURRING_DONATION_ELIGIBLE: 'Apta a doações recorrentes',
+    },
+    validation: {
+      idInvalid: 'A nutriz informada é inválida.',
+      transitionInvalid:
+        'Selecione uma transição permitida para o status atual.',
+      noteMax: 'A observação deve ter no máximo 500 caracteres.',
+      noteClinical:
+        'Registre apenas contexto administrativo, sem laudo, diagnóstico, exame específico ou motivo clínico.',
+    },
+    mutations: {
+      success: 'Status atualizado e registrado no histórico.',
+      validationGeneric: 'Revise os campos destacados.',
+      conflict:
+        'O status foi alterado em outra aba. Atualize a página antes de tentar novamente.',
+      notFound: 'Esta nutriz não está mais disponível.',
+      databaseError:
+        'Não foi possível atualizar o status agora. Tente novamente em alguns instantes.',
+      errorTitle: 'Não foi possível registrar a mudança',
+      successTitle: 'Mudança registrada',
     },
   },
   noAccess: {

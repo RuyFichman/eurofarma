@@ -4,8 +4,10 @@ import {
   canTransitionJourneyStatus,
   JOURNEY_STATUS_VALUES,
 } from '../journey/status'
+import { ADMIN } from '../i18n/pt-br'
 
 export const JOURNEY_ADMINISTRATIVE_NOTE_MAX_LENGTH = 500
+const COPY = ADMIN.nutrizJourney.validation
 
 // Barreira de redução de dados, não classificador clínico. A lista cobre os
 // marcadores mais comuns de laudo, diagnóstico, exame específico e tratamento;
@@ -23,10 +25,9 @@ function containsClinicalDetail(value: string): boolean {
 export const journeyAdministrativeNoteSchema = z
   .string()
   .trim()
-  .max(JOURNEY_ADMINISTRATIVE_NOTE_MAX_LENGTH)
+  .max(JOURNEY_ADMINISTRATIVE_NOTE_MAX_LENGTH, COPY.noteMax)
   .refine((value) => !containsClinicalDetail(value), {
-    message:
-      'Registre apenas contexto administrativo, sem laudo, diagnóstico, exame específico ou motivo clínico.',
+    message: COPY.noteClinical,
   })
   .optional()
   .transform((value) => value || undefined)
@@ -42,9 +43,22 @@ export const journeyStatusTransitionSchema = z
       canTransitionJourneyStatus(fromStatus, toStatus),
     {
       path: ['toStatus'],
-      message: 'Transição de status da jornada não permitida.',
+      message: COPY.transitionInvalid,
     },
   )
+
+export const nutrizProfileIdSchema = z.string().uuid(COPY.idInvalid)
+
+/**
+ * Contrato completo recebido pela Server Action do painel. O identificador
+ * também é revalidado no servidor: embora venha de uma página renderizada pelo
+ * próprio NutriLink, um cliente pode adulterar qualquer argumento da action.
+ */
+export const adminJourneyStatusUpdateSchema = z
+  .object({
+    nutrizProfileId: nutrizProfileIdSchema,
+  })
+  .and(journeyStatusTransitionSchema)
 
 export type JourneyStatusTransitionInput = z.input<
   typeof journeyStatusTransitionSchema
@@ -52,4 +66,8 @@ export type JourneyStatusTransitionInput = z.input<
 
 export type JourneyStatusTransition = z.output<
   typeof journeyStatusTransitionSchema
+>
+
+export type AdminJourneyStatusUpdate = z.output<
+  typeof adminJourneyStatusUpdateSchema
 >
