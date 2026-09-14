@@ -170,13 +170,17 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
-2. Aplicar a migration do RF16 no Supabase cloud, implementar a atualização transacional no painel e então o RF17 com notificação automática pelo WhatsApp.
-3. Implementar lembretes opcionais sem semântica de agendamento.
-4. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
-5. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
-6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-7. Ativar a integração real com a Meta quando a infraestrutura externa existir.
+1. Validar com o Lactare os status, as transições, a correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes.
+2. Preparar a proteção do RF16: retirar `ADMIN_GATE_BYPASS`, definir RLS para `nutriz_profiles` e `journey_status_history` e garantir que somente `ADMIN` possa alterar status ou inserir histórico.
+3. Aplicar a migration do RF16 e suas policies pelo MCP do Supabase, registrar o checksum quando necessário, gerar novamente o Prisma Client e executar a suíte completa.
+4. Implementar o UC16 no painel com leitura do status e histórico, transação atômica, atualização condicional pelo status anterior, autor obtido da sessão e tratamento de concorrência.
+5. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
+6. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
+7. Implementar lembretes opcionais sem semântica de agendamento.
+8. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
+9. Publicar Privacidade e Termos e concluir o endurecimento contra abuso antes de qualquer exposição pública.
+10. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+11. Ativar a integração real com a Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
