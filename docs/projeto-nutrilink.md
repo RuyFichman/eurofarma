@@ -4,9 +4,9 @@
 
 **Desafio:** Challenge FIAP 2026 — 3º ano, Sistemas de Informação — Projeto Lactare
 
-**Versão:** 2.2
+**Versão:** 2.3
 
-**Última atualização:** 12 de setembro de 2026
+**Última atualização:** 13 de setembro de 2026
 
 **Equipe:** [preencher nomes do squad]
 
@@ -123,6 +123,8 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 | RF13 | Gerar uma mensagem de encaminhamento pronta para a nutriz compartilhar com outras pessoas. |
 | RF14 | Atribuir e exibir reconhecimentos por status, como “primeira doação”, “doadora recorrente” e “embaixadora”, na área pessoal da nutriz. |
 | RF15 | Registrar quando um cadastro novo se origina de uma indicação, para fins de métrica, sem vincular a recompensa material. |
+| RF16 | Permitir que o administrador atualize o status categórico da jornada da nutriz — ficha preenchida, exame agendado, aguardando resultado, apta ou não apta, kit entregue e apta a doações recorrentes — sem armazenar detalhes clínicos. |
+| RF17 | Notificar automaticamente a nutriz pelo WhatsApp sempre que o administrador atualizar seu status de jornada. |
 
 ### 5.2 Requisitos Não Funcionais
 
@@ -155,11 +157,13 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 - Usa lembretes opcionais no lugar de um agendamento que dependeria de terceiros.
 - Oferece dashboard com indicadores reais de funil: alcance → engajamento → conversão → retenção.
 - Incentiva crescimento orgânico por indicação, cartão de impacto, mensagem pronta e reconhecimento por status, sem recompensa material e respeitando as restrições do setor.
+- Oferece transparência sobre a jornada: a nutriz é avisada a cada etapa registrada pelo Lactare — ficha, exame e kit — sem ser questionada sobre fatos que somente a equipe pode confirmar.
 - Mantém a lista de municípios como fonte explícita e administrável da cobertura do Lactare, sem apresentar uma cobertura que não existe.
+- Mantém uma arquitetura preparada para novos pontos de entrega e parceiros futuros, embora o produto atual trabalhe somente com dados operacionais do Lactare.
 
 ## 9. Estado Atual e Roadmap
 
-Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
+Esta seção descreve o repositório em 13 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
 
 ### 9.1 Funcionalidades implementadas e verificadas
 
@@ -169,24 +173,26 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 - Painel administrativo com autenticação e autorização por perfil `ADMIN`.
 - Página pública `/verificar-cobertura`, com consulta por CEP ou município e os 30 municípios agrupados nas seis sub-regiões adotadas pelo projeto.
 - Endpoint `POST /api/coverage`: valida o CEP, consulta o ViaCEP com timeout e compara o município e a UF com `service_municipalities`, sem persistir o CEP.
-- Resultado conservador: município ativo indica possibilidade de coleta residencial, cuja triagem, modalidade, data e disponibilidade ainda dependem de confirmação direta do Lactare.
+- Resultado conservador: município ativo indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; triagem, modalidade, data, disponibilidade e uniformidade operacional ainda dependem de confirmação direta do Lactare.
 - Resposta para localização fora da lista com encaminhamento ao diretório oficial externo da rBLH.
 - Dashboard adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte alimenta cartões, evolução mensal e distribuições agregadas.
 - Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes.
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
-- Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local.
+- Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local. Somente o módulo legado de acompanhamento pós-encaminhamento está implementado e simulado; ele ainda precisa ser redimensionado para perguntar sobre o recebimento da visita de entrega do kit, conforme o Anexo A.9.
 - Área pessoal adaptada para mostrar a cidade cadastrada e encaminhar ao verificador de cobertura, sem apresentar agendamento ou confirmação de coleta.
-- Suíte com 391 testes passando nesta atualização: 323 unitários e 68 de integração.
+- Modelo local do RF16 com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A migration está versionada, mas ainda não foi aplicada no Supabase cloud; painel e notificações continuam pendentes.
+- Suíte unitária com 349 testes passando nesta atualização. A suíte completa tem 417 testes; 40 dos 68 testes de integração passam e 28 aguardam a aplicação da migration local do RF16 no Supabase cloud, pois o Prisma Client novo já consulta `journey_status`.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
-- **Elegibilidade operacional:** o produto verifica se o CEP ou município pertence à área configurada e indica possibilidade de coleta residencial; a confirmação da modalidade e da logística continua dependendo do Lactare.
+- **Elegibilidade operacional:** o produto verifica se o CEP ou município pertence à área configurada e indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; a confirmação da modalidade e da logística continua dependendo do Lactare.
 - **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
 - **Métricas:** a segmentação combinável por região, estágio e origem está implementada, mas o dashboard ainda não calcula o funil completo, retenção, adesão a lembretes, recorrência, indicação própria nem velocidade até a primeira doação.
 - **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
 - **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
+- **Status da jornada:** o modelo local do RF16 já representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only e transições explícitas. Ainda faltam aplicar a migration no Supabase cloud, editar o status de forma transacional no painel e implementar a notificação do RF17.
 
 ### 9.3 Funcionalidades ainda não implementadas
 
@@ -196,6 +202,8 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 - RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimentos por status na área pessoal.
 - RF15: atribuição específica de novos cadastros por indicação.
+- RF16: aplicação da migration no Supabase cloud e atualização administrativa transacional do status categórico; o modelo e as regras locais já existem.
+- RF17: notificação automática por WhatsApp após cada atualização válida de status.
 - Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
 - RLS, rate limiting distribuído e proteção anti-spam, também adiados, mas ainda obrigatórios antes de exposição pública.
 - Validação operacional de e-mail e WhatsApp, caso exigida pelo Lactare.
@@ -211,17 +219,22 @@ Esta seção descreve o repositório em 12 de setembro de 2026. Ela prevalece so
 ### 9.5 Ordem recomendada de implementação
 
 1. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro e encaminhamento ao Lactare.
-2. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
-3. Completar o dashboard com alcance, funil, retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação.
-4. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
-5. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
-6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
+2. Aplicar a migration do RF16 no Supabase cloud, implementar a atualização transacional no painel e então o RF17 com notificação automática pelo WhatsApp.
+3. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
+4. Completar o dashboard com alcance, funil, retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação.
+5. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
+6. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
+7. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
-### 9.6 Fora do escopo atual
+### 9.6 Risco de adoção do status da jornada
+
+RF16 e RF17 só entregam valor se a equipe do Lactare atualizar o status de cada nutriz de forma consistente. Sem esse hábito operacional, a notificação não será disparada e a nutriz continuará sem acompanhamento. O compromisso, a responsabilidade e o tempo operacional dessa atualização devem ser validados com a equipe do Lactare antes de priorizar a implementação.
+
+### 9.7 Fora do escopo atual
 
 - Diretório nacional próprio de bancos da rBLH.
 - Agendamento ou confirmação automática de coleta.
-- Triagem clínica ou armazenamento de dados de saúde.
+- Triagem clínica ou armazenamento de detalhes de saúde. Somente o status categórico informado pelo Lactare faz parte do escopo.
 - Dados clínicos dos bebês atendidos pelos hospitais parceiros.
 - Recompensas materiais por doação ou indicação.
 - Aplicativo móvel nativo.
@@ -310,6 +323,8 @@ Os recortes de comportamento devem ser calculados a partir dos dados coletados n
 | Estágio administrativo da jornada | cadastrada/interessada / em contato / doação registrada / sem estágio definido |
 | Origem UTM do cadastro | WhatsApp / site / outras origens / não informada |
 
+O modelo local do RF16 amplia o estágio administrativo com categorias operacionais explícitas: cadastrada, ficha recebida, exame agendado, aguardando resultado, apta, não apta, kit entregue e apta a doações recorrentes. O fluxo é sequencial, bifurca entre apta e não apta e não permite saída de não apta sem uma nova decisão operacional do Lactare. Essa dimensão será registrada manualmente pela equipe, terá histórico append-only vinculado ao administrador e não conterá detalhes clínicos. Até a migration ser aplicada e o painel implementado, o dashboard continua usando apenas `interestStatus`.
+
 A sub-região é obtida relacionando a UF e a cidade cadastradas pela nutriz com `service_municipalities`. A relação considera também municípios inativos, preservando a classificação histórica caso uma cidade deixe de fazer parte da cobertura operacional. Cadastros de outras localidades aparecem apenas no agregado “fora da Grande SP ou sem correspondência”; o painel não expõe a cidade individual nesse bloco.
 
 Os seguintes recortes continuam planejados porque ainda não há eventos ou campos próprios que permitam calculá-los com segurança:
@@ -334,6 +349,25 @@ O incentivo será simbólico e emocional:
 3. **Reconhecimento por status:** títulos simbólicos aparecem na área pessoal conforme regras objetivas, como primeira doação, recorrência ou indicação convertida.
 
 Se o link carregar um identificador de indicação, o campo de origem poderá registrar quantos cadastros novos vieram de outra doadora. O identificador não deve expor dados pessoais nem vincular recompensa material.
+
+### A.9 Por que perguntamos à nutriz somente o que ela realmente sabe
+
+O processo real do Lactare inclui etapas que têm fontes diferentes. Depois do cadastro, a nutriz preenche uma ficha de saúde e realiza um exame de sangue coletado em casa pelo laboratório parceiro Fleury. O resultado é enviado ao Lactare e avaliado por um profissional de saúde. Não existe integração técnica entre Fleury e NutriLink, e o sistema não participa dessa decisão.
+
+O caminho do dado é explícito:
+
+1. A coleta, o laudo e a avaliação clínica acontecem fora do NutriLink.
+2. Um profissional do Lactare decide se a nutriz está apta.
+3. Depois da avaliação, a equipe registra manualmente no painel somente uma categoria de status, como “aguardando resultado”, “apta” ou “não apta”.
+4. O NutriLink registra a mudança de forma auditável e envia automaticamente uma notificação pelo WhatsApp, sem expor detalhes clínicos.
+
+Cada fato do processo tem um responsável. Fatos que somente o Lactare conhece — ficha recebida, exame agendado, resultado avaliado, contato realizado ou kit entregue — são atualizados pela equipe no painel e não devem ser perguntados à nutriz. Fatos que somente a nutriz conhece — se recebeu a visita para entrega do kit, se tem leite disponível ou se quer ativar lembretes — podem ser perguntados diretamente a ela.
+
+O sistema guarda apenas o status categórico necessário para dar transparência à jornada. Não guarda tipo de exame, valores, laudo, diagnóstico ou motivo de reprovação. Se uma nutriz marcada como “não apta” quiser compreender o motivo, o atendimento acontece diretamente com a equipe médica do Lactare.
+
+O módulo local de acompanhamento hoje pergunta se a nutriz conseguiu agendar uma visita. Essa pergunta deve ser redimensionada para verificar se ela recebeu a visita da equipe para entrega do kit. A arquitetura de máquina de estados e registro autodeclarado pode ser reaproveitada, mas o texto e a semântica precisam respeitar quem é a fonte de cada informação.
+
+Essa funcionalidade depende de disciplina operacional: sem atualização consistente dos status pela equipe do Lactare, a nutriz não recebe os avisos e o produto reproduz a falta de acompanhamento que pretende resolver.
 
 ## Anexo B — Casos de Uso e Casos de Teste
 

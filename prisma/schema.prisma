@@ -43,6 +43,19 @@ enum InterestStatus {
   UNKNOWN
 }
 
+/// Etapa categórica informada manualmente pela equipe do Lactare. Este enum
+/// não representa triagem automática e não carrega detalhes clínicos.
+enum JourneyStatus {
+  REGISTERED
+  FORM_RECEIVED
+  EXAM_SCHEDULED
+  AWAITING_RESULT
+  ELIGIBLE
+  NOT_ELIGIBLE
+  KIT_DELIVERED
+  RECURRING_DONATION_ELIGIBLE
+}
+
 enum ContactPreference {
   WHATSAPP
   EMAIL
@@ -96,10 +109,11 @@ model User {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  unitsResponsible Unit[]               @relation("AdminResponsible")
+  unitsResponsible Unit[]                 @relation("AdminResponsible")
   auditLogs        AuditLog[]
   campaigns        Campaign[]
   contentsEdited   EducationalContent[]
+  journeyChanges   JourneyStatusHistory[] @relation("JourneyStatusChangedBy")
 
   @@map("users")
 }
@@ -119,6 +133,9 @@ model NutrizProfile {
   city              String
   neighborhood      String?
   interestStatus    InterestStatus    @default(INTERESTED) @map("interest_status")
+  /// Estado operacional atual da jornada. É independente do `interestStatus`
+  /// legado e só pode avançar pelas transições explícitas do domínio.
+  journeyStatus     JourneyStatus     @default(REGISTERED) @map("journey_status")
   contactPreference ContactPreference @default(WHATSAPP) @map("contact_preference")
   lgpdConsentAt     DateTime          @map("lgpd_consent_at")
   marketingConsent  Boolean           @default(false) @map("marketing_consent")
@@ -131,9 +148,33 @@ model NutrizProfile {
   whatsappClicks WhatsappClick[]
   appointments   Appointment[]
   conversations  WhatsappConversation[]
+  journeyHistory JourneyStatusHistory[]
 
   @@index([state, city, createdAt])
+  @@index([journeyStatus, createdAt])
   @@map("nutriz_profiles")
+}
+
+/// Registro append-only de uma mudança de status feita por um administrador.
+/// A migration protege as linhas contra UPDATE/DELETE e também replica no
+/// banco as transições permitidas pelo domínio.
+model JourneyStatusHistory {
+  id                 String        @id @default(uuid())
+  nutrizProfileId    String        @map("nutriz_profile_id")
+  fromStatus         JourneyStatus @map("from_status")
+  toStatus           JourneyStatus @map("to_status")
+  changedByUserId    String        @map("changed_by_user_id")
+  /// Contexto estritamente operacional; nunca tipo de exame, valor, laudo,
+  /// diagnóstico ou motivo clínico.
+  administrativeNote String?       @map("administrative_note") @db.VarChar(500)
+  changedAt          DateTime      @default(now()) @map("changed_at")
+
+  nutrizProfile NutrizProfile @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)
+  changedByUser User          @relation("JourneyStatusChangedBy", fields: [changedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([nutrizProfileId, changedAt])
+  @@index([changedByUserId, changedAt])
+  @@map("journey_status_history")
 }
 
 model Unit {
