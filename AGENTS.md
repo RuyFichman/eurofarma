@@ -68,7 +68,7 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 ## 3. Estado atual do projeto
 
-**Referência desta seção:** 13 de setembro de 2026.
+**Referência desta seção:** 14 de setembro de 2026.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 417 testes em 44 arquivos**, incluindo os 68 de integração. Os 28 testes que aguardavam a migration do RF16 foram desbloqueados quando ela foi aplicada no Supabase cloud em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 426 testes em 46 arquivos**: 356 unitários e 70 de integração. A migration do RF16 foi aplicada no Supabase cloud em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -98,13 +98,13 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Área autenticada da nutriz com identificação da cidade cadastrada e acesso ao verificador de cobertura.
 - Login, logout, middleware, autorização por role e shell administrativo.
 - Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal e às distribuições agregadas; dados pessoais não são exibidos.
-- Listagem de nutrizes com exposição reduzida de contato.
+- Listagem de nutrizes com exposição reduzida de contato e acesso ao detalhe da jornada em `/admin/nutrizes/[id]`.
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
 - Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
 - Webhook da WhatsApp Cloud API, verificação de assinatura e simulador local.
 - Máquina de estados local do chatbot para um fluxo legado e limitado sobre tentativa de combinar visita. A arquitetura pode ser reaproveitada, mas a pergunta deve ser redimensionada para o recebimento da visita de entrega do kit.
-- Modelo local do RF16 com enum próprio `JourneyStatus`, status atual separado de `interestStatus`, histórico append-only vinculado à nutriz e ao administrador, observação administrativa limitada, regras explícitas de transição e migration SQL versionada. A migration foi aplicada no Supabase cloud em 13 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; enum, coluna com default `REGISTERED`, índices, CHECK de transição, CHECK de observação não vazia, FKs `RESTRICT` e trigger de imutabilidade foram conferidos no banco. A edição no painel ainda não existe.
+- RF16 no painel: `JourneyStatus` separado de `interestStatus`, status atual, detalhe da nutriz, histórico append-only com autor e horário, observação administrativa limitada e transições explícitas. A mudança usa o status anterior como condição de concorrência e atualiza perfil e histórico na mesma transação; falha no histórico reverte o status. A migration foi aplicada no Supabase cloud em 13 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; enum, coluna com default `REGISTERED`, índices, CHECKs, FKs `RESTRICT` e trigger de imutabilidade foram conferidos no banco.
 
 ### 3.2 Situação dos requisitos funcionais
 
@@ -125,7 +125,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF13 — mensagem de indicação | **Não implementado.** |
 | RF14 — reconhecimentos | **Não implementado.** |
 | RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
-| RF16 — status da jornada | **Parcial.** O modelo local já separa `JourneyStatus` de `interestStatus`, mantém o status atual no perfil e define histórico imutável, autor, horário, observação administrativa e transições válidas. A migration está aplicada no Supabase cloud e a estrutura foi conferida. Faltam a mutação transacional, a autorização e a interface administrativa. |
+| RF16 — status da jornada | **Implementado.** O administrador acessa `/admin/nutrizes/[id]`, consulta status e histórico e registra somente a próxima transição válida. A mutação é autorizada por role `ADMIN`, condicional ao status anterior e atômica com o histórico. Correção e reabertura continuam fora do fluxo até validação operacional do Lactare. |
 | RF17 — aviso de mudança de status | **Não implementado.** Falta notificar automaticamente a nutriz pelo WhatsApp depois de uma atualização válida feita pelo Lactare. |
 
 ### 3.3 Código e dados legados que não definem mais o escopo
@@ -153,7 +153,7 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Consentimento separado e job de lembretes.
 - Segmentos comportamentais que ainda não têm eventos próprios: recorrência, adesão a lembretes, indicação entre doadoras e velocidade até a primeira doação.
 - Definição da fonte legítima de confirmação de uma doação.
-- Implementação da atualização administrativa transacional e auditável do status categórico, sem armazenar tipo de exame, valores, laudo ou motivo clínico. A migration já está no Supabase cloud, mas `journey_status_history` nasceu **sem RLS**, como todas as demais tabelas, e o `ADMIN_GATE_BYPASS` continua no código.
+- RLS para `nutriz_profiles` e `journey_status_history`; a autorização do RF16 já existe na aplicação, mas as tabelas continuam sem policies no Supabase.
 - Notificação automática pelo WhatsApp após cada mudança válida de status.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
@@ -171,17 +171,14 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Validar com o Lactare os status, as transições, a correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes.
-2. Proteger o RF16: retirar `ADMIN_GATE_BYPASS`, definir RLS para `nutriz_profiles` e `journey_status_history` e garantir que somente `ADMIN` possa alterar status ou inserir histórico. A estrutura já existe no cloud sem policies, então esta passou a ser a pendência mais urgente do requisito.
-3. Aplicar as policies do RF16 pelo MCP do Supabase e executar a suíte completa novamente. A migration estrutural já foi aplicada, com checksum registrado e Prisma Client regerado.
-4. Implementar o UC16 no painel com leitura do status e histórico, transação atômica, atualização condicional pelo status anterior, autor obtido da sessão e tratamento de concorrência.
-5. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-6. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
-7. Implementar lembretes opcionais sem semântica de agendamento.
-8. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
-9. Publicar Privacidade e Termos e concluir o endurecimento contra abuso antes de qualquer exposição pública.
-10. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-11. Ativar a integração real com a Meta quando a infraestrutura externa existir.
+1. Validar com o Lactare correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes; até lá, o painel mantém somente o fluxo progressivo já definido.
+2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
+3. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
+4. Implementar lembretes opcionais sem semântica de agendamento.
+5. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
+6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+8. Ativar a integração real com a Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
@@ -200,7 +197,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 417 passando em 44 arquivos, incluindo os 68 de integração contra o Supabase cloud |
+| Testes | Vitest | 426 passando em 46 arquivos: 356 unitários e 70 de integração contra o Supabase cloud |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |

@@ -6,7 +6,7 @@
 
 **Versão:** 2.3
 
-**Última atualização:** 13 de setembro de 2026
+**Última atualização:** 14 de setembro de 2026
 
 **Equipe:** [preencher nomes do squad]
 
@@ -170,7 +170,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 ## 9. Estado Atual e Roadmap
 
-Esta seção descreve o repositório em 13 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
+Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
 
 ### 9.1 Funcionalidades implementadas e verificadas
 
@@ -183,13 +183,13 @@ Esta seção descreve o repositório em 13 de setembro de 2026. Ela prevalece so
 - Resultado conservador: município ativo indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; triagem, modalidade, data, disponibilidade e uniformidade operacional ainda dependem de confirmação direta do Lactare.
 - Resposta para localização fora da lista com encaminhamento ao diretório oficial externo da rBLH.
 - Dashboard adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte alimenta cartões, evolução mensal e distribuições agregadas.
-- Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes.
+- Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes e do detalhe da jornada em `/admin/nutrizes/[id]`.
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local. Somente o módulo legado de acompanhamento pós-encaminhamento está implementado e simulado; ele ainda precisa ser redimensionado para perguntar sobre o recebimento da visita de entrega do kit, conforme o Anexo A.9.
 - Área pessoal adaptada para mostrar a cidade cadastrada e encaminhar ao verificador de cobertura, sem apresentar agendamento ou confirmação de coleta.
-- Modelo local do RF16 com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A migration está versionada, mas ainda não foi aplicada no Supabase cloud; painel e notificações continuam pendentes.
-- Suíte unitária com 349 testes passando nesta atualização. A suíte completa tem 417 testes; 40 dos 68 testes de integração passam e 28 aguardam a aplicação da migration local do RF16 no Supabase cloud, pois o Prisma Client novo já consulta `journey_status`.
+- RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration está aplicada no Supabase cloud. A notificação do RF17 continua pendente.
+- Suíte completa com 426 testes passando em 46 arquivos: 356 unitários e 70 de integração contra o Supabase cloud.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -199,7 +199,7 @@ Esta seção descreve o repositório em 13 de setembro de 2026. Ela prevalece so
 - **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
 - **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
-- **Status da jornada:** o modelo local do RF16 já representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only e transições explícitas. Ainda faltam aplicar a migration no Supabase cloud, editar o status de forma transacional no painel e implementar a notificação do RF17.
+- **Status da jornada:** o RF16 representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only, autorização administrativa, atualização transacional e controle de concorrência. Correção ou reabertura ainda dependem de validação operacional do Lactare, e a notificação do RF17 continua pendente.
 
 ### 9.3 Funcionalidades ainda não implementadas
 
@@ -209,7 +209,6 @@ Esta seção descreve o repositório em 13 de setembro de 2026. Ela prevalece so
 - RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimentos por status na área pessoal.
 - RF15: atribuição específica de novos cadastros por indicação.
-- RF16: aplicação da migration no Supabase cloud e atualização administrativa transacional do status categórico; o modelo e as regras locais já existem.
 - RF17: notificação automática por WhatsApp após cada atualização válida de status.
 - Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
 - RLS, rate limiting distribuído e proteção anti-spam, também adiados, mas ainda obrigatórios antes de exposição pública.
@@ -225,17 +224,14 @@ Esta seção descreve o repositório em 13 de setembro de 2026. Ela prevalece so
 
 ### 9.5 Ordem recomendada de implementação
 
-1. Validar com o Lactare os status, as transições, a correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes.
-2. Preparar a proteção do RF16: retirar `ADMIN_GATE_BYPASS`, definir RLS para `nutriz_profiles` e `journey_status_history` e garantir que somente `ADMIN` possa alterar status ou inserir histórico.
-3. Aplicar a migration do RF16 e suas policies pelo MCP do Supabase, registrar o checksum quando necessário, gerar novamente o Prisma Client e executar a suíte completa.
-4. Implementar o UC16 no painel com leitura do status e histórico, transação atômica, atualização condicional pelo status anterior, autor obtido da sessão e tratamento de concorrência.
-5. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-6. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
-7. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
-8. Completar o dashboard com alcance, funil, retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação.
-9. Publicar Privacidade e Termos e concluir o endurecimento contra abuso antes de qualquer exposição pública.
-10. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
-11. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
+1. Validar com o Lactare correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes; até lá, o painel mantém somente o fluxo progressivo já definido.
+2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
+3. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
+4. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
+5. Completar o dashboard com alcance, funil, retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação.
+6. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
+7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+8. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
 ### 9.6 Risco de adoção do status da jornada
 
@@ -334,7 +330,7 @@ Os recortes de comportamento devem ser calculados a partir dos dados coletados n
 | Estágio administrativo da jornada | cadastrada/interessada / em contato / doação registrada / sem estágio definido |
 | Origem UTM do cadastro | WhatsApp / site / outras origens / não informada |
 
-O modelo local do RF16 amplia o estágio administrativo com categorias operacionais explícitas: cadastrada, ficha recebida, exame agendado, aguardando resultado, apta, não apta, kit entregue e apta a doações recorrentes. O fluxo é sequencial, bifurca entre apta e não apta e não permite saída de não apta sem uma nova decisão operacional do Lactare. Essa dimensão será registrada manualmente pela equipe, terá histórico append-only vinculado ao administrador e não conterá detalhes clínicos. Até a migration ser aplicada e o painel implementado, o dashboard continua usando apenas `interestStatus`.
+O RF16 amplia o estágio administrativo com categorias operacionais explícitas: cadastrada, ficha recebida, exame agendado, aguardando resultado, apta, não apta, kit entregue e apta a doações recorrentes. O fluxo é sequencial, bifurca entre apta e não apta e não permite saída de não apta sem uma nova decisão operacional do Lactare. Essa dimensão é registrada manualmente pela equipe no painel, com histórico append-only vinculado ao administrador e sem detalhes clínicos. O dashboard ainda usa apenas `interestStatus`; adotar `journeyStatus` nos indicadores é uma entrega posterior.
 
 A sub-região é obtida relacionando a UF e a cidade cadastradas pela nutriz com `service_municipalities`. A relação considera também municípios inativos, preservando a classificação histórica caso uma cidade deixe de fazer parte da cobertura operacional. Cadastros de outras localidades aparecem apenas no agregado “fora da Grande SP ou sem correspondência”; o painel não expõe a cidade individual nesse bloco.
 

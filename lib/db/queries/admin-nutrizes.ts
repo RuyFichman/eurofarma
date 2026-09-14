@@ -5,6 +5,7 @@ import type {
   AdminNutrizFilters,
   AdminNutrizStatusValue,
 } from '../../admin/nutrizes/filters'
+import type { JourneyStatusValue } from '../../journey/status'
 
 /**
  * Listagem administrativa de nutrizes.
@@ -32,6 +33,7 @@ const ADMIN_NUTRIZ_LIST_SELECT = {
   city: true,
   neighborhood: true,
   interestStatus: true,
+  journeyStatus: true,
   contactPreference: true,
   marketingConsent: true,
   lgpdConsentAt: true,
@@ -53,6 +55,7 @@ export type AdminNutrizListItem = {
   city: string
   neighborhood: string | null
   interestStatus: AdminNutrizStatusValue
+  journeyStatus: JourneyStatusValue
   contactPreference: ContactPreference
   marketingConsent: boolean
   lgpdConsentAt: Date
