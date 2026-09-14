@@ -78,7 +78,7 @@ O motivo para concentrar o canal conversacional no WhatsApp está no Anexo A.1.
 
 - Conteúdo educativo: “Como funciona”, perguntas frequentes, checklist e vídeos.
 - Verificador de elegibilidade por CEP ou município, acompanhado da visualização da área de atuação do Lactare: o CEP é resolvido pelo ViaCEP e o município resultante é comparado com a lista ativa administrada pelo Lactare.
-- Cadastro, login e área pessoal, incluindo lembretes quando ativados.
+- Cadastro, login e área pessoal, com acompanhamento seguro do status da jornada e lembretes quando ativados.
 - Painel administrativo; ver seção 4.3.
 
 O motivo para manter o site junto ao chatbot está no Anexo A.2.
@@ -187,9 +187,9 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local. Somente o módulo legado de acompanhamento pós-encaminhamento está implementado e simulado; ele ainda precisa ser redimensionado para perguntar sobre o recebimento da visita de entrega do kit, conforme o Anexo A.9.
-- Área pessoal adaptada para mostrar a cidade cadastrada e encaminhar ao verificador de cobertura, sem apresentar agendamento ou confirmação de coleta.
+- Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
 - RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration está aplicada no Supabase cloud. A notificação do RF17 continua pendente.
-- Suíte completa com 426 testes passando em 46 arquivos: 356 unitários e 70 de integração contra o Supabase cloud.
+- Suíte completa com 429 testes passando em 47 arquivos: 359 unitários e 70 de integração contra o Supabase cloud.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -199,7 +199,7 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
 - **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
-- **Status da jornada:** o RF16 representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only, autorização administrativa, atualização transacional e controle de concorrência. Correção ou reabertura ainda dependem de validação operacional do Lactare, e a notificação do RF17 continua pendente.
+- **Status da jornada:** o RF16 representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only, autorização administrativa, atualização transacional e controle de concorrência. A área pessoal já apresenta o status e uma linha do tempo reduzida à própria nutriz; correção ou reabertura ainda dependem de validação operacional do Lactare, e a notificação do RF17 continua pendente.
 
 ### 9.3 Funcionalidades ainda não implementadas
 
