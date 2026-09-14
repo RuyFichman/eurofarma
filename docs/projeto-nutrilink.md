@@ -49,7 +49,7 @@ A solução tem três frentes:
 
 ### É
 
-- A ferramenta digital do Lactare para a área geográfica que ele realmente atende.
+- A ferramenta digital oficial do Lactare para a área geográfica que ele realmente atende.
 - Um jeito rápido de a nutriz descobrir se pode doar e como prosseguir, sem precisar ligar às cegas.
 - Um canal de relacionamento contínuo, por meio de lembretes opcionais, entre o Lactare e suas doadoras.
 
@@ -57,7 +57,7 @@ A solução tem três frentes:
 
 - Um diretório nacional de bancos de leite: trabalha somente com dados do Lactare; ver Anexo A.5.
 - Um sistema de agendamento ou confirmação de coleta; ver Anexo A.3.
-- Um substituto da triagem de saúde feita por profissional do Lactare.
+- Um substituto da triagem de saúde feita por profissional do Lactare. O sistema pode exibir o status categórico de um exame já avaliado por um profissional, mas nunca avalia, aprova ou reprova por conta própria; ver Anexo A.9.
 - Um aplicativo nativo: a experiência principal funciona no WhatsApp e na web, sem instalação.
 
 ## 4. Como Funciona
@@ -66,7 +66,7 @@ A solução tem três frentes:
 
 - Apresentação do projeto e respostas a perguntas frequentes.
 - Cadastro simplificado e opcional.
-- Verificação de elegibilidade por CEP ou município: informa se a nutriz está na área de atuação do Lactare e orienta o próximo contato; a uniformidade da coleta domiciliar gratuita nos 30 municípios ainda depende de validação do Lactare, conforme o Anexo A.5.
+- Verificação de elegibilidade por CEP ou município: informa a elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite e orienta o próximo contato; a uniformidade operacional desse atendimento nos 30 municípios ainda depende de validação do Lactare, conforme o Anexo A.5.
 - Orientação transparente para quem está fora da área de atuação.
 - Lembretes personalizados somente para quem ativar o recurso, por opt-in.
 - Acompanhamento após a doação.
@@ -77,7 +77,7 @@ O motivo para concentrar o canal conversacional no WhatsApp está no Anexo A.1.
 ### 4.2 Plataforma Web
 
 - Conteúdo educativo: “Como funciona”, perguntas frequentes, checklist e vídeos.
-- Verificador de cobertura por CEP ou município: o CEP é resolvido pelo ViaCEP e o município resultante é comparado com a lista ativa administrada pelo Lactare.
+- Verificador de elegibilidade por CEP ou município, acompanhado da visualização da área de atuação do Lactare: o CEP é resolvido pelo ViaCEP e o município resultante é comparado com a lista ativa administrada pelo Lactare.
 - Cadastro, login e área pessoal, incluindo lembretes quando ativados.
 - Painel administrativo; ver seção 4.3.
 
@@ -89,6 +89,8 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 - Segmentação combinável por sub-região da Grande São Paulo e perfil da doadora; ver Anexo A.7.
 - Indicação de elegibilidade: dentro ou fora da área de atuação do Lactare.
 - Adesão à funcionalidade de lembretes.
+- Atualização manual do status da jornada de cada nutriz pela equipe do Lactare: ficha de saúde, exame agendado, resultado aprovado ou não aprovado, kit entregue e aptidão para doações recorrentes. O NutriLink guarda somente categorias, sem detalhes clínicos; ver Anexo A.9.
+- Notificação automática pelo WhatsApp sempre que o administrador atualizar o status da jornada; ver Anexo A.9.
 - Gestão da lista de municípios atendidos pelo Lactare.
 - Listagem de nutrizes cadastradas com exposição reduzida de dados pessoais.
 
@@ -96,11 +98,14 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 1. Primeiro contato pelo WhatsApp.
 2. O chatbot apresenta o projeto e esclarece dúvidas.
-3. A nutriz informa o CEP ou seleciona o município para verificar se a localização faz parte da área atendida e se existe possibilidade de coleta residencial.
+3. A nutriz informa o CEP ou seleciona o município para verificar a elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite, sem confirmação logística automática.
 4. A nutriz pode realizar um cadastro simplificado e opcional.
-5. A nutriz entra em contato direto com o Lactare para combinar a doação.
-6. A nutriz pode ativar lembretes opcionais.
-7. O NutriLink apoia o acompanhamento e o pós-doação.
+5. A nutriz preenche a ficha de saúde e realiza a coleta do exame de sangue em casa pelo laboratório parceiro Fleury; essas etapas acontecem fora do NutriLink.
+6. Um profissional do Lactare analisa o exame. O NutriLink só recebe, por atualização manual da equipe, o status categórico resultante e avisa a nutriz pelo WhatsApp.
+7. Se estiver apta, a equipe do Lactare entra em contato para combinar a entrega do kit. A presença da nutriz é obrigatória nessa primeira visita, quando recebe orientações de higiene, coleta e armazenamento.
+8. As coletas seguintes são recorrentes e acontecem na residência dentro da janela operacional do Lactare, sem exigir a presença da nutriz.
+9. A nutriz pode ativar lembretes opcionais.
+10. O NutriLink apoia o acompanhamento e o pós-doação.
 
 ## 5. Requisitos
 
@@ -108,7 +113,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 | ID | Descrição |
 |---|---|
-| RF01 | Verificar a possibilidade de coleta residencial a partir do CEP ou município, sem representar confirmação logística. |
+| RF01 | Verificar a elegibilidade geográfica para coleta domiciliar gratuita a partir do CEP ou município, sem representar confirmação logística e respeitando a validação operacional pendente do Lactare. |
 | RF02 | Exibir os municípios atendidos pelo Lactare e suas sub-regiões. Bancos de leite e pontos de coleta não são entidades gerenciadas pelo NutriLink. |
 | RF03 | Informar quando a nutriz está fora da área de cobertura e indicar canal externo oficial. |
 | RF04 | Permitir cadastro opcional com consentimento LGPD. |
@@ -146,7 +151,9 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 - RLS no Supabase; ainda pendente na implementação.
 - Exposição reduzida de dados pessoais no painel administrativo.
 - Rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública; o limitador atual é apenas local e em memória.
-- Nenhum dado clínico da nutriz ou dos bebês é tratado pelo NutriLink.
+- O status de exame é armazenado apenas como categoria simples, como “aguardando resultado”, “apta” ou “não apta”, depois da avaliação e da atualização manual por um profissional do Lactare. O NutriLink nunca armazena tipo de exame, valores, laudo ou motivo de reprovação e nunca toma decisão clínica.
+- O acesso ao status da jornada e ao seu histórico deve ser restrito por função e auditável; a redução do conteúdo clínico não elimina a necessidade de proteção desse dado pessoal.
+- Nenhum dado clínico dos bebês é tratado pelo NutriLink.
 - O produto ativo não mantém nem expõe um diretório próprio de outros bancos de leite. A base nacional existente permanece somente como legado técnico interno, isolada das interfaces e APIs ativas, até uma futura remoção segura e reversível.
 
 ## 8. Diferenciais Competitivos
@@ -394,12 +401,15 @@ Essa funcionalidade depende de disciplina operacional: sem atualização consist
 | UC13 | Nutriz | Receber e compartilhar o cartão de impacto após uma doação confirmada. |
 | UC14 | Nutriz | Gerar e enviar a mensagem de encaminhamento pronta. |
 | UC15 | Sistema | Atribuir reconhecimento conforme a jornada avança. |
+| UC16 | Administrador | Atualizar o status categórico da jornada da nutriz, incluindo ficha, exame e kit. |
+| UC17 | Sistema | Notificar a nutriz pelo WhatsApp quando seu status de jornada for atualizado. |
+| UC18 | Nutriz | Informar se recebeu a visita da equipe para entrega do kit, fato que somente ela pode confirmar. |
 
 ### B.2 Casos de Teste
 
 | CT | UC relacionado | Cenário | Resultado esperado |
 |---|---|---|---|
-| CT01 | UC01 | CEP de um município presente no Mapa do Leite | Indica possibilidade de coleta residencial e informa que triagem, modalidade, data e disponibilidade dependem de confirmação do Lactare. |
+| CT01 | UC01 | CEP de um município presente no Mapa do Leite | Indica elegibilidade geográfica para coleta domiciliar gratuita e informa que triagem, modalidade, data e disponibilidade dependem de confirmação do Lactare. |
 | CT02 | UC01 | CEP de município fora do Mapa do Leite | Trata como fora de área e segue o CT03. |
 | CT03 | UC03 | CEP fora da área de cobertura | Informa isso claramente e direciona a um canal externo oficial. |
 | CT04 | UC04 | Cadastro sem aceitar o consentimento LGPD | Bloqueia o envio. |
@@ -412,12 +422,17 @@ Essa funcionalidade depende de disciplina operacional: sem atualização consist
 | CT11 | RNF02 | Acesso não autenticado aos dados de outra nutriz | RLS bloqueia o acesso. |
 | CT12 | UC12 | Nutriz sem lembrete ativado | Não recebe mensagem de lembrete. |
 | CT13 | UC13 | Doação confirmada por fonte autorizada | O cartão é gerado e oferecido para compartilhamento, sem recompensa material nem alegação clínica individual não comprovada. |
+| CT14 | UC16 e UC17 | Administrador marca a nutriz como “apta” | O sistema registra a mudança e dispara a notificação pelo WhatsApp sem expor detalhes clínicos. |
+| CT15 | UC18 | O sistema formula uma pergunta à nutriz | Nunca pergunta um fato cuja fonte é exclusivamente o Lactare, como resultado de exame ou entrega registrada do kit. |
 
 ## Anexo C — Glossário
 
 - **BLH:** Banco de Leite Humano.
 - **Nutriz:** mulher que amamenta e é potencial doadora.
 - **Triagem:** avaliação de saúde prévia à doação, feita por profissional.
+- **Ficha de saúde:** formulário tratado pelo Lactare para a triagem da doadora; seus detalhes clínicos não pertencem ao NutriLink.
+- **Kit de coleta:** conjunto de recipientes e materiais entregue na primeira visita, com orientações de higiene, coleta e armazenamento.
+- **Status da jornada:** categoria simples que informa a etapa registrada pelo Lactare, como ficha recebida, exame agendado, apta, não apta ou kit entregue, sem detalhes clínicos.
 - **rBLH:** Rede Brasileira de Bancos de Leite Humano, coordenada pelo Ministério da Saúde e pela Fiocruz.
 - **RLS:** Row Level Security — controle que restringe o acesso a linhas do banco conforme a identidade e a permissão.
 - **MVP:** versão mínima funcional de um produto.
@@ -438,13 +453,14 @@ O Lactare é a unidade operacional do banco de leite. É uma unidade regulada pe
 
 O Lactare executa:
 
-- cadastro e triagem da doadora, incluindo acompanhamento médico, consultas e exames;
-- coleta domiciliar gratuita conforme sua área e suas regras operacionais validadas;
+- cadastro e triagem da doadora, incluindo ficha de saúde e exame de sangue coletado em casa pelo laboratório parceiro Fleury e avaliado por um profissional do Lactare;
+- primeira visita para entrega do kit e orientações, com presença obrigatória da nutriz;
+- coletas domiciliares recorrentes dentro da área e das regras operacionais validadas do Lactare, sem exigir a presença da nutriz depois da entrega do kit;
 - processamento, incluindo classificação, pasteurização e controle de qualidade;
 - armazenamento;
 - transferência do leite processado aos hospitais públicos parceiros.
 
-Dados de saúde da nutriz são responsabilidade médica do Lactare. O NutriLink não realiza triagem clínica nem deve armazenar esses dados como parte do seu escopo.
+Dados de saúde da nutriz são responsabilidade médica do Lactare. O NutriLink não realiza triagem clínica nem armazena detalhes de ficha, exame ou laudo; recebe somente o status categórico informado manualmente pela equipe depois da avaliação profissional.
 
 ### D.3 Hospitais parceiros
 
@@ -454,7 +470,8 @@ O Lactare e o NutriLink não têm acesso aos dados clínicos do bebê. O víncul
 
 ### D.4 Consequências para o NutriLink
 
-- O NutriLink lida apenas com dados necessários à jornada da doadora: cadastro, elegibilidade, consentimentos, contato, lembretes e marcos não clínicos.
+- O NutriLink lida apenas com dados necessários à jornada da doadora: cadastro, elegibilidade, consentimentos, contato, lembretes e status categóricos informados pelo Lactare.
+- O status pode comunicar uma decisão já tomada por profissional, mas não inclui tipo de exame, valores, laudo ou motivo clínico e nunca é calculado pelo sistema.
 - Métricas como “quantos bebês foram salvos” ou impacto clínico individual não são rastreáveis pelo produto e não podem ser calculadas ou afirmadas por ele.
 - Números institucionais podem ser exibidos somente com fonte, data e atribuição claras.
 - O dimensionamento deve usar dados que o próprio Lactare assume publicamente, não estimativas clínicas inventadas a partir da população regional.

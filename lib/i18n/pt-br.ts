@@ -235,7 +235,7 @@ export const CONTENT = {
     titleLead: 'Tudo que você precisa saber',
     titleHighlight: 'para cuidar e compartilhar',
     description:
-      'Um espaço pensado com carinho para acompanhar cada etapa da sua jornada como nutriz — da primeira dúvida à primeira doação.',
+      'Um espaço pensado com carinho para acompanhar cada etapa da sua jornada como nutriz. Da primeira dúvida à primeira doação.',
     searchLabel: 'Buscar conteúdos',
     searchPlaceholder: 'Buscar artigos, vídeos ou dúvidas frequentes...',
     filters: ['Todos', 'Extração', 'Armazenamento', 'Amamentação', 'Doação'],
