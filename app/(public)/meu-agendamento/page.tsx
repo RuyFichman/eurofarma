@@ -1,10 +1,17 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { ArrowRight, MapPin, UserRound } from 'lucide-react'
 
+import {
+  NutrizJourneyCurrentStatus,
+  NutrizJourneyGuidance,
+  NutrizJourneyTimeline,
+} from '@/components/nutriz/nutriz-journey-status'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
+import { getNutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
@@ -15,11 +22,14 @@ export const metadata: Metadata = {
 
 export default async function NutrizAreaPage() {
   const nutriz = await requireNutrizUser()
+  const journey = await getNutrizJourneySnapshot(nutriz.id)
+  if (!journey) notFound()
+
   const copy = NUTRIZ_AUTH.area
 
   return (
     <section className="bg-muted/30 min-h-[calc(100dvh-3.5rem)] px-6 py-12 md:min-h-[calc(100dvh-4rem)] md:py-16">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <div className="flex items-center gap-3">
           <span className="bg-secondary text-primary flex size-11 items-center justify-center rounded-2xl">
             <UserRound className="size-5" aria-hidden="true" />
@@ -33,12 +43,23 @@ export default async function NutrizAreaPage() {
         </div>
         <p className="text-muted-foreground mt-3">{copy.subtitle}</p>
 
-        <Card className="mt-8">
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+          <NutrizJourneyCurrentStatus snapshot={journey} />
+          <NutrizJourneyGuidance status={journey.journeyStatus} />
+        </div>
+
+        <div className="mt-6">
+          <NutrizJourneyTimeline snapshot={journey} />
+        </div>
+
+        <Card className="mt-6">
           <CardHeader>
-            <CardTitle>{copy.empty.title}</CardTitle>
+            <CardTitle>{copy.coverage.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground leading-7">{copy.empty.body}</p>
+            <p className="text-muted-foreground leading-7">
+              {copy.coverage.description}
+            </p>
             <div className="bg-muted/50 mt-6 rounded-xl border p-4">
               <p className="text-muted-foreground text-xs">
                 {copy.registeredLocation}
@@ -55,12 +76,12 @@ export default async function NutrizAreaPage() {
               <Button asChild>
                 <Link href="/verificar-cobertura">
                   <MapPin aria-hidden="true" />
-                  {copy.empty.searchCta}
+                  {copy.coverage.searchCta}
                 </Link>
               </Button>
               <Button asChild variant="outline">
                 <Link href="/como-funciona">
-                  {copy.empty.howCta}
+                  {copy.coverage.howCta}
                   <ArrowRight aria-hidden="true" />
                 </Link>
               </Button>

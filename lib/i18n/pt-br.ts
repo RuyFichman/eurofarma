@@ -520,6 +520,21 @@ export const COVERAGE = {
     title: '{city} faz parte da área atendida',
     description:
       'Há possibilidade de coleta residencial nessa localização. Isso ainda não confirma a coleta: triagem, modalidade, data e disponibilidade são combinadas diretamente com a equipe do Lactare.',
+    contact: {
+      eyebrow: 'Próximo passo',
+      title: 'Fale diretamente com o Lactare',
+      description:
+        'Use um dos canais oficiais abaixo para iniciar o atendimento com a equipe responsável pela triagem e pelas orientações da doação.',
+      whatsapp: 'Chamar no WhatsApp',
+      phone: 'Ligar para o Lactare',
+      whatsappLabel: 'WhatsApp oficial',
+      phoneLabel: 'Telefone',
+      hours: 'Horário publicado pelo Lactare: segunda a sexta, das 7h às 22h.',
+      operationalNotice:
+        'A cobertura positiva não confirma coleta ou atendimento. Modalidade, triagem, data e disponibilidade são informadas diretamente pela equipe do Lactare.',
+      source: 'Canal conferido em {date} na fonte oficial: {source}',
+      sourceName: 'site do Lactare',
+    },
     signup: 'Quero criar meu cadastro',
     learnMore: 'Entender como funciona',
   },
@@ -952,15 +967,136 @@ export const NUTRIZ_AUTH = {
     greetingTemplate: 'Olá, {firstName}!',
     subtitle: 'Sua jornada com informação e transparência 💙',
     badge: 'Área da nutriz',
-    empty: {
-      title: 'Comece verificando sua cidade',
-      body: 'Consulte se o seu município faz parte da área de atuação atual do Lactare. A verificação não representa agendamento nem confirmação de coleta.',
+    coverage: {
+      title: 'Cobertura e informações da doação',
+      description:
+        'Acompanhar sua jornada não substitui a consulta da área de atuação do Lactare nem as orientações dadas diretamente pela equipe.',
       searchCta: 'Verificar cobertura',
       howCta: 'Ver como funciona a doação',
     },
     registeredLocation: 'Cidade informada no cadastro',
     coverageNotice:
       'A presença da cidade no seu cadastro não confirma cobertura. Consulte a lista atual antes de continuar.',
+    journey: {
+      current: {
+        eyebrow: 'Sua etapa atual',
+        updatedAt: 'Última atualização registrada em {date}',
+        sourceNotice:
+          'O status é atualizado manualmente pela equipe do Lactare. O NutriLink mostra somente a categoria e a data registradas; não analisa exames nem exibe detalhes clínicos.',
+      },
+      guidance: {
+        title: 'Orientações desta etapa',
+        description:
+          'Estas orientações mudam conforme o status registrado pelo Lactare.',
+        safetyNotice:
+          'Em caso de dúvida sobre ficha, exame ou aptidão, converse diretamente com a equipe do Lactare. O NutriLink não realiza atendimento clínico.',
+      },
+      timeline: {
+        title: 'Linha do tempo da sua jornada',
+        description:
+          'Você vê somente as etapas categóricas registradas e suas datas. Observações internas, responsáveis e detalhes clínicos não aparecem aqui.',
+        current: 'Etapa atual',
+        recordedAt: 'Registrado em {date}',
+      },
+      status: {
+        REGISTERED: {
+          label: 'Cadastrada',
+          title: 'Seu cadastro foi registrado',
+          description:
+            'Seus dados de cadastro estão no NutriLink. Isso não representa triagem concluída nem confirmação de coleta.',
+          timelineDescription:
+            'O cadastro foi criado no NutriLink, com o consentimento informado no formulário.',
+          guidance: [
+            'Confira se o seu município continua na área de atuação atual do Lactare.',
+            'As próximas etapas aparecem aqui somente depois de serem registradas pela equipe do Lactare.',
+          ],
+        },
+        FORM_RECEIVED: {
+          label: 'Ficha recebida',
+          title: 'O recebimento da ficha foi registrado',
+          description:
+            'A equipe do Lactare registrou esta etapa. O NutriLink não guarda as respostas nem informações de saúde da ficha.',
+          timelineDescription:
+            'O Lactare registrou o recebimento da ficha tratada fora do NutriLink.',
+          guidance: [
+            'Continue seguindo as orientações fornecidas diretamente pela equipe do Lactare.',
+            'Esta área mostra apenas o avanço da etapa e não o conteúdo da ficha.',
+          ],
+        },
+        EXAM_SCHEDULED: {
+          label: 'Exame agendado',
+          title: 'A etapa do exame foi combinada',
+          description:
+            'O Lactare registrou que o exame foi agendado fora do NutriLink. A data e as instruções devem ser confirmadas diretamente com a equipe.',
+          timelineDescription:
+            'O Lactare registrou que a etapa do exame foi combinada pelos canais de atendimento.',
+          guidance: [
+            'Confirme data e orientações pelo mesmo canal utilizado no atendimento com o Lactare.',
+            'O NutriLink não agenda exames nem altera a combinação feita com a equipe.',
+          ],
+        },
+        AWAITING_RESULT: {
+          label: 'Aguardando resultado',
+          title: 'A avaliação está com o Lactare',
+          description:
+            'O Lactare registrou que aguarda a avaliação profissional. O NutriLink não consulta, recebe ou interpreta o laudo.',
+          timelineDescription:
+            'A jornada foi marcada como aguardando a avaliação conduzida pelo Lactare.',
+          guidance: [
+            'Aguarde a orientação fornecida diretamente pela equipe responsável do Lactare.',
+            'Não envie laudos, valores ou resultados de exame pelo NutriLink.',
+          ],
+        },
+        ELIGIBLE: {
+          label: 'Apta',
+          title: 'A categoria “apta” foi registrada',
+          description:
+            'O Lactare registrou esta categoria depois da avaliação profissional. O NutriLink não tomou nem calculou essa decisão.',
+          timelineDescription:
+            'O Lactare registrou a categoria “apta”, sem incluir qualquer detalhe clínico.',
+          guidance: [
+            'A próxima etapa operacional é combinar diretamente com o Lactare a entrega do kit.',
+            'O NutriLink não confirma data, horário ou disponibilidade da visita.',
+          ],
+        },
+        NOT_ELIGIBLE: {
+          label: 'Não apta',
+          title: 'A categoria “não apta” foi registrada',
+          description:
+            'O Lactare registrou esta categoria. O NutriLink não guarda nem apresenta o motivo clínico da decisão.',
+          timelineDescription:
+            'O Lactare registrou a categoria “não apta”, sem incluir o motivo ou detalhes clínicos.',
+          guidance: [
+            'Para compreender a decisão, converse diretamente com a equipe responsável do Lactare pelo canal usado no atendimento.',
+            'Não envie laudos ou informações de saúde pelo NutriLink.',
+          ],
+        },
+        KIT_DELIVERED: {
+          label: 'Kit entregue',
+          title: 'A entrega do kit foi registrada',
+          description:
+            'O Lactare registrou que o kit foi entregue. Esta etapa não confirma uma coleta futura nem uma doação realizada.',
+          timelineDescription:
+            'A equipe do Lactare registrou a conclusão da etapa de entrega do kit.',
+          guidance: [
+            'Siga as orientações de higiene, coleta e armazenamento recebidas da equipe do Lactare.',
+            'As coletas seguintes dependem da operação e da combinação direta com o Lactare.',
+          ],
+        },
+        RECURRING_DONATION_ELIGIBLE: {
+          label: 'Apta a doações recorrentes',
+          title: 'A aptidão para recorrência foi registrada',
+          description:
+            'O Lactare registrou que a jornada pode seguir para doações recorrentes. Isso não confirma uma doação nem agenda uma coleta.',
+          timelineDescription:
+            'O Lactare registrou a aptidão para a etapa de doações recorrentes.',
+          guidance: [
+            'Continue seguindo as orientações operacionais fornecidas diretamente pelo Lactare.',
+            'Cada data ou horário continua sendo combinado com a equipe; o NutriLink não realiza agendamentos.',
+          ],
+        },
+      },
+    },
     logout: 'Sair',
   },
   header: {

@@ -78,7 +78,7 @@ O motivo para concentrar o canal conversacional no WhatsApp está no Anexo A.1.
 
 - Conteúdo educativo: “Como funciona”, perguntas frequentes, checklist e vídeos.
 - Verificador de elegibilidade por CEP ou município, acompanhado da visualização da área de atuação do Lactare: o CEP é resolvido pelo ViaCEP e o município resultante é comparado com a lista ativa administrada pelo Lactare.
-- Cadastro, login e área pessoal, incluindo lembretes quando ativados.
+- Cadastro, login e área pessoal, com acompanhamento seguro do status da jornada e lembretes quando ativados.
 - Painel administrativo; ver seção 4.3.
 
 O motivo para manter o site junto ao chatbot está no Anexo A.2.
@@ -182,14 +182,15 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - Endpoint `POST /api/coverage`: valida o CEP, consulta o ViaCEP com timeout e compara o município e a UF com `service_municipalities`, sem persistir o CEP.
 - Resultado conservador: município ativo indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; triagem, modalidade, data, disponibilidade e uniformidade operacional ainda dependem de confirmação direta do Lactare.
 - Resposta para localização fora da lista com encaminhamento ao diretório oficial externo da rBLH.
+- Contato direto depois da cobertura positiva pelo WhatsApp `+55 (11) 96629-0681` ou telefone `(11) 4144-9604`, com o horário publicado de segunda a sexta, das 7h às 22h. Os dados foram conferidos no site oficial do Lactare em 14 de setembro de 2026, e a interface mantém acesso à fonte sem prometer atendimento ou coleta.
 - Dashboard adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte alimenta cartões, evolução mensal e distribuições agregadas.
 - Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes e do detalhe da jornada em `/admin/nutrizes/[id]`.
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local. Somente o módulo legado de acompanhamento pós-encaminhamento está implementado e simulado; ele ainda precisa ser redimensionado para perguntar sobre o recebimento da visita de entrega do kit, conforme o Anexo A.9.
-- Área pessoal adaptada para mostrar a cidade cadastrada e encaminhar ao verificador de cobertura, sem apresentar agendamento ou confirmação de coleta.
+- Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
 - RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration está aplicada no Supabase cloud. A notificação do RF17 continua pendente.
-- Suíte completa com 426 testes passando em 46 arquivos: 356 unitários e 70 de integração contra o Supabase cloud.
+- Suíte completa com 432 testes passando em 48 arquivos: 362 unitários e 70 de integração contra o Supabase cloud.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -199,7 +200,7 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
 - **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
-- **Status da jornada:** o RF16 representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only, autorização administrativa, atualização transacional e controle de concorrência. Correção ou reabertura ainda dependem de validação operacional do Lactare, e a notificação do RF17 continua pendente.
+- **Status da jornada:** o RF16 representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only, autorização administrativa, atualização transacional e controle de concorrência. A área pessoal já apresenta o status e uma linha do tempo reduzida à própria nutriz; correção ou reabertura ainda dependem de validação operacional do Lactare, e a notificação do RF17 continua pendente.
 
 ### 9.3 Funcionalidades ainda não implementadas
 
@@ -218,7 +219,6 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 ### 9.4 Validações externas pendentes
 
 - Confirmar com o Lactare se a coleta domiciliar gratuita é uniforme para todos os 30 municípios do Mapa do Leite ou se varia conforme distância e logística.
-- Validar o canal oficial e as instruções de contato que poderão ser publicados após a confirmação de cobertura.
 - Definir quem e como confirma uma doação no NutriLink antes de gerar cartão de impacto, atualizar status ou contar recorrência.
 - Validar a redação jurídica da Política de Privacidade, dos Termos de Uso e dos consentimentos.
 
