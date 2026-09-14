@@ -569,6 +569,20 @@ export const COVERAGE = {
   },
 } as const
 
+/**
+ * Mensagens do endpoint de tracking de contato (RF07). Ficam separadas de
+ * `COVERAGE` porque o evento acompanha os canais do Lactare em qualquer tela,
+ * não só o resultado da cobertura.
+ */
+export const CONTACT_TRACKING = {
+  api: {
+    invalidJson: 'Não foi possível ler o evento enviado.',
+    invalidPayload: 'Evento de contato inválido.',
+    rateLimited: 'Muitos eventos em pouco tempo. Tente novamente em instantes.',
+    unavailable: 'Não foi possível registrar o evento agora.',
+  },
+} as const
+
 /** Copy legada da antiga busca nacional. Não usar em novas superfícies. */
 export const SEARCH = {
   page: {

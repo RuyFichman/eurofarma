@@ -24,6 +24,13 @@ afterEach(async () => {
   await prisma.whatsappClick.deleteMany({
     where: { unit: { slug: { startsWith: '__test__' } } },
   })
+  // O clique em canal do Lactare (RF07) é anônimo e não tem FK nem nome: o
+  // único marcador possível é a campanha de origem gravada pelo próprio teste.
+  await prisma.contactChannelClick.deleteMany({
+    where: {
+      sourceUtm: { path: ['utm_source'], equals: '__test__contact-click' },
+    },
+  })
   await prisma.contactIntent.deleteMany({
     where: { unit: { slug: { startsWith: '__test__' } } },
   })

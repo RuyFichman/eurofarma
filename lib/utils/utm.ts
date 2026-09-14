@@ -48,3 +48,23 @@ export function sanitizeSourceUtm(value: unknown): SourceUtm | null {
 
   return Object.keys(result).length > 0 ? result : null
 }
+
+/**
+ * Lê as UTMs de uma query string (`window.location.search` no cliente).
+ * Função pura para continuar testável fora do navegador; não toca em nenhum
+ * outro parâmetro da URL, então nada que a usuária tenha digitado — CEP,
+ * telefone, e-mail — sai daqui por engano.
+ */
+export function readUtmParams(search: string): SourceUtm {
+  const params = new URLSearchParams(search)
+  const result: SourceUtm = {}
+
+  for (const key of UTM_KEYS) {
+    const value = params.get(key)?.trim()
+    if (value) {
+      result[key] = value.slice(0, MAX_UTM_LENGTH)
+    }
+  }
+
+  return result
+}

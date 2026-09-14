@@ -85,7 +85,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 432 testes em 48 arquivos**: 362 unitários e 70 de integração. A migration do RF16 foi aplicada no Supabase cloud em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 454 testes em 52 arquivos**: 380 unitários e 74 de integração. A migration do RF07 foi aplicada no Supabase cloud em 14 de setembro de 2026 e a do RF16, em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -95,6 +95,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Resolução de CEP pelo ViaCEP em `POST /api/coverage`, seguida da comparação com a lista ativa de `service_municipalities`; o CEP não é persistido.
 - Resposta transparente para localização fora da lista, com encaminhamento ao diretório oficial externo da rBLH.
 - Contato direto após cobertura positiva, com WhatsApp `+55 (11) 96629-0681`, telefone `(11) 4144-9604` e horário de segunda a sexta, das 7h às 22h. Os canais foram conferidos no site oficial do Lactare em 14 de setembro de 2026; a interface mantém link para a fonte e não representa confirmação de atendimento ou coleta.
+- Tracking dos canais oficiais do Lactare (RF07): o clique no WhatsApp ou no telefone do cartão de contato grava um evento anônimo em `contact_channel_clicks` por `POST /api/contact-click`. O evento guarda canal, superfície, campanha de origem e horário; não referencia unidade legada, nutriz, CEP, IP nem referrer. A migration foi aplicada no Supabase cloud em 14 de setembro de 2026.
 - Cadastro opcional de nutriz com consentimento obrigatório no formulário.
 - Provisionamento da conta da nutriz no Supabase Auth.
 - Login, logout, recuperação e redefinição de senha da nutriz.
@@ -119,10 +120,10 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
 | RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
 | RF06 — lembretes opcionais | **Não implementado.** |
-| RF07 — tracking de contato | **Não implementado no fluxo atual.** O tracking antigo dependia de unidades e sua rota foi aposentada. O novo evento deve acompanhar o contato direto com o Lactare. |
+| RF07 — tracking de contato | **Implementado no escopo do registro.** O clique nos canais oficiais do Lactare é gravado como evento anônimo em `contact_channel_clicks`, sem unidade legada e sem CEP ou PII. O tracking antigo por unidade continua aposentado (`/api/track` responde 410). A leitura agregada desses cliques ainda não existe no painel e pertence ao RF10. |
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
 | RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
-| RF10 — indicadores do funil | **Parcial.** O dashboard resume municípios e nutrizes e já permite segmentar os cadastros por sub-região, estágio e origem de forma combinável. Ainda faltam alcance, funil completo, retenção e adesão a lembretes. |
+| RF10 — indicadores do funil | **Parcial.** O dashboard resume municípios e nutrizes e já permite segmentar os cadastros por sub-região, estágio e origem de forma combinável. Ainda faltam alcance, funil completo, retenção, adesão a lembretes e a agregação dos cliques em canais de contato já registrados pelo RF07. |
 | RF11 — chatbot completo | **Parcial.** Infraestrutura e simulação local existem; faltam FAQ, elegibilidade, cadastro, lembretes, pós-doação e ativação real na Meta. |
 | RF12 — cartão de impacto | **Não implementado.** |
 | RF13 — mensagem de indicação | **Não implementado.** |
@@ -156,7 +157,7 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Consentimento separado e job de lembretes.
 - Segmentos comportamentais que ainda não têm eventos próprios: recorrência, adesão a lembretes, indicação entre doadoras e velocidade até a primeira doação.
 - Definição da fonte legítima de confirmação de uma doação.
-- RLS para `nutriz_profiles` e `journey_status_history`; a autorização do RF16 já existe na aplicação, mas as tabelas continuam sem policies no Supabase.
+- RLS para `nutriz_profiles`, `journey_status_history` e `contact_channel_clicks`; a autorização do RF16 já existe na aplicação e o evento do RF07 é anônimo, mas as tabelas continuam sem policies no Supabase.
 - Notificação automática pelo WhatsApp após cada mudança válida de status.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
@@ -199,7 +200,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 432 passando em 48 arquivos: 362 unitários e 70 de integração contra o Supabase cloud |
+| Testes | Vitest | 454 passando em 52 arquivos: 380 unitários e 74 de integração contra o Supabase cloud |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -404,7 +405,7 @@ Não sugerir que o sistema está pronto para produção enquanto essas pendênci
 
 ### 9.3 Rate limiting e anti-spam
 
-Os limitadores atuais são em memória e por processo. Eles servem somente para o ambiente local/MVP. Não são suficientes em múltiplas instâncias.
+Os limitadores atuais são em memória e por processo. Eles servem somente para o ambiente local/MVP. Não são suficientes em múltiplas instâncias. Isso vale para todos os endpoints públicos, incluindo `POST /api/contact-click`, cujo IP serve apenas de chave efêmera do limitador e não é persistido.
 
 Turnstile foi dispensado no MVP anterior, mas a proteção anti-spam continua requisito antes de exposição pública. Não confundir “dispensado por ora” com “resolvido”.
 
@@ -517,6 +518,8 @@ Segmentos implementados no dashboard:
 - origem do cadastro, classificada somente quando existe `utm_source` explícita.
 
 Os três filtros vivem na URL (`region`, `stage` e `origin`), são combináveis e geram um único recorte compartilhado pelos cartões, pela evolução mensal e pelas distribuições. A região usa todos os municípios configurados, inclusive inativos, para que a desativação operacional de uma cidade não apague sua classificação histórica.
+
+O clique nos canais oficiais do Lactare tem evento próprio desde o RF07 (`contact_channel_clicks`, com canal, superfície e UTM), mas ainda não alimenta nenhum cartão do painel: transformá-lo em indicador é trabalho do RF10.
 
 Ainda não estão implementados os segmentos de adesão a lembretes, recorrência, indicação própria e velocidade até a primeira doação. O modelo do RF16 já existe, separado de `interestStatus`, está conectado ao painel e à área pessoal da nutriz, e sua migration está aplicada no Supabase cloud. O dashboard ainda usa `interestStatus`; os demais segmentos exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
 

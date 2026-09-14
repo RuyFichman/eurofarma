@@ -1,10 +1,19 @@
-import { ArrowUpRight, Clock3, MessageCircle, Phone } from 'lucide-react'
+import { ArrowUpRight, Clock3 } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { LactareContactActions } from '@/components/shared/lactare-contact-actions'
 import { LACTARE_CONTACT } from '@/lib/constants/lactare-contact'
 import { COVERAGE } from '@/lib/i18n/pt-br'
+import type { ContactClickSurface } from '@/lib/validators/contact-click'
 
-export function LactareContactCard() {
+type LactareContactCardProps = {
+  /**
+   * Tela que está exibindo o cartão. Obrigatório para o clique do RF07 nascer
+   * com a origem certa em vez de herdar a de outra superfície.
+   */
+  surface: ContactClickSurface
+}
+
+export function LactareContactCard({ surface }: LactareContactCardProps) {
   const copy = COVERAGE.eligible.contact
 
   return (
@@ -15,25 +24,7 @@ export function LactareContactCard() {
         {copy.description}
       </p>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-        <Button asChild>
-          <a
-            href={LACTARE_CONTACT.whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <MessageCircle aria-hidden="true" />
-            {copy.whatsapp}
-            <ArrowUpRight aria-hidden="true" />
-          </a>
-        </Button>
-        <Button asChild variant="outline">
-          <a href={LACTARE_CONTACT.phoneHref}>
-            <Phone aria-hidden="true" />
-            {copy.phone}
-          </a>
-        </Button>
-      </div>
+      <LactareContactActions surface={surface} />
 
       <dl className="bg-muted/50 mt-5 grid gap-4 rounded-xl border p-4 text-sm sm:grid-cols-2">
         <div>
