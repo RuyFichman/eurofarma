@@ -153,6 +153,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 - Rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública; o limitador atual é apenas local e em memória.
 - O status de exame é armazenado apenas como categoria simples, como “aguardando resultado”, “apta” ou “não apta”, depois da avaliação e da atualização manual por um profissional do Lactare. O NutriLink nunca armazena tipo de exame, valores, laudo ou motivo de reprovação e nunca toma decisão clínica.
 - O acesso ao status da jornada e ao seu histórico deve ser restrito por função e auditável; a redução do conteúdo clínico não elimina a necessidade de proteção desse dado pessoal.
+- O tracking de contato é anônimo: registra canal, tela de origem, campanha e horário, e não guarda CEP, telefone, e-mail, IP, referrer nem vínculo com o cadastro da nutriz.
 - Nenhum dado clínico dos bebês é tratado pelo NutriLink.
 - O produto ativo não mantém nem expõe um diretório próprio de outros bancos de leite. A base nacional existente permanece somente como legado técnico interno, isolada das interfaces e APIs ativas, até uma futura remoção segura e reversível.
 
@@ -183,6 +184,7 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - Resultado conservador: município ativo indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; triagem, modalidade, data, disponibilidade e uniformidade operacional ainda dependem de confirmação direta do Lactare.
 - Resposta para localização fora da lista com encaminhamento ao diretório oficial externo da rBLH.
 - Contato direto depois da cobertura positiva pelo WhatsApp `+55 (11) 96629-0681` ou telefone `(11) 4144-9604`, com o horário publicado de segunda a sexta, das 7h às 22h. Os dados foram conferidos no site oficial do Lactare em 14 de setembro de 2026, e a interface mantém acesso à fonte sem prometer atendimento ou coleta.
+- Tracking anônimo dos canais oficiais do Lactare (RF07): o clique no WhatsApp ou no telefone do cartão de contato grava canal, superfície, campanha de origem e horário em `contact_channel_clicks`, por `POST /api/contact-click`. O evento não depende das unidades legadas e não guarda CEP, telefone, IP nem referrer; a exibição agregada desses cliques ainda pertence ao RF10.
 - Dashboard adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte alimenta cartões, evolução mensal e distribuições agregadas.
 - Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes e do detalhe da jornada em `/admin/nutrizes/[id]`.
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
@@ -190,14 +192,14 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local. Somente o módulo legado de acompanhamento pós-encaminhamento está implementado e simulado; ele ainda precisa ser redimensionado para perguntar sobre o recebimento da visita de entrega do kit, conforme o Anexo A.9.
 - Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
 - RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration está aplicada no Supabase cloud. A notificação do RF17 continua pendente.
-- Suíte completa com 432 testes passando em 48 arquivos: 362 unitários e 70 de integração contra o Supabase cloud.
+- Suíte completa com 454 testes passando em 52 arquivos: 380 unitários e 74 de integração contra o Supabase cloud.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
 - **Elegibilidade operacional:** o produto verifica se o CEP ou município pertence à área configurada e indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; a confirmação da modalidade e da logística continua dependendo do Lactare.
 - **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
-- **Métricas:** a segmentação combinável por região, estágio e origem está implementada, mas o dashboard ainda não calcula o funil completo, retenção, adesão a lembretes, recorrência, indicação própria nem velocidade até a primeira doação.
-- **Tracking de contato:** o evento antigo, vinculado a unidades, foi aposentado. O novo tracking deve medir os canais diretos do Lactare sem depender do legado.
+- **Métricas:** a segmentação combinável por região, estágio e origem está implementada, e o clique em canal de contato já tem evento próprio, mas o dashboard ainda não calcula o funil completo, retenção, adesão a lembretes, recorrência, indicação própria nem velocidade até a primeira doação.
+- **Tracking de contato:** o evento novo mede os canais diretos do Lactare e já está gravando; o evento antigo, vinculado a unidades, continua aposentado. Falta transformar esses cliques em indicador no painel, junto com o restante do RF10.
 - **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
 - **Status da jornada:** o RF16 representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only, autorização administrativa, atualização transacional e controle de concorrência. A área pessoal já apresenta o status e uma linha do tempo reduzida à própria nutriz; correção ou reabertura ainda dependem de validação operacional do Lactare, e a notificação do RF17 continua pendente.
@@ -205,7 +207,6 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 ### 9.3 Funcionalidades ainda não implementadas
 
 - RF06: lembretes personalizados com opt-in separado e job agendado.
-- RF07: tracking dos canais atuais de contato com o Lactare.
 - RF12: cartão de impacto após confirmação legítima da doação.
 - RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimentos por status na área pessoal.

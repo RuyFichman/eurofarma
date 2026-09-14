@@ -62,6 +62,21 @@ enum ContactPreference {
   NONE
 }
 
+/// Canal oficial do Lactare clicado por uma visitante (RF07). Lista fechada
+/// porque cada valor corresponde a um canal publicado em
+/// `lib/constants/lactare-contact.ts` — não existe canal genérico.
+enum ContactChannel {
+  WHATSAPP
+  PHONE
+}
+
+/// Superfície do produto onde o clique aconteceu. Hoje só o resultado positivo
+/// da verificação de cobertura oferece os canais; novos pontos de contato
+/// entram aqui por migration, junto com a tela que os expõe.
+enum ContactChannelSurface {
+  COVERAGE_RESULT
+}
+
 enum AuditAction {
   CREATE
   UPDATE
@@ -267,6 +282,27 @@ model WhatsappClick {
 
   @@index([createdAt, unitId])
   @@map("whatsapp_clicks")
+}
+
+/// Clique em um canal oficial do Lactare (RF07).
+///
+/// Substitui o tracking legado de `WhatsappClick`, que dependia de `Unit` e da
+/// busca nacional aposentada. O evento é **anônimo e agregado**: não referencia
+/// nutriz, unidade, CEP, telefone, IP nem referrer — só o canal, a superfície
+/// que o exibiu e a campanha de origem, que é o mínimo para medir engajamento
+/// sem tratar dado pessoal.
+model ContactChannelClick {
+  id        String                @id @default(uuid())
+  channel   ContactChannel
+  surface   ContactChannelSurface
+  /// Somente as 5 chaves UTM, já sanitizadas por `sanitizeSourceUtm`. Serve à
+  /// atribuição de campanha do RF10 e nunca carrega a URL completa.
+  sourceUtm Json?                 @map("source_utm")
+  createdAt DateTime              @default(now()) @map("created_at")
+
+  @@index([createdAt, channel])
+  @@index([channel, surface, createdAt])
+  @@map("contact_channel_clicks")
 }
 
 /// Agendamento que a nutriz marcou **diretamente com a unidade** e depois

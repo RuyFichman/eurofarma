@@ -313,7 +313,7 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
                 <p className="text-muted-foreground mt-3 max-w-2xl leading-7">
                   {COVERAGE.eligible.description}
                 </p>
-                <LactareContactCard />
+                <LactareContactCard surface="coverage_result" />
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <Button asChild variant="outline">
                     <Link href="/cadastro">{COVERAGE.eligible.signup}</Link>

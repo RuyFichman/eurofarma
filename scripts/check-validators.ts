@@ -7,6 +7,7 @@ import {
 } from '../lib/validators/common'
 import { unitCreateSchema, unitCsvRowSchema } from '../lib/validators/unit'
 import { nutrizSignupSchema } from '../lib/validators/nutriz'
+import { contactClickSchema } from '../lib/validators/contact-click'
 import { generateSlug, generateSlugWithSuffix } from '../lib/utils/slug'
 
 type Case = { label: string; run: () => unknown; shouldFail: boolean }
@@ -161,6 +162,29 @@ const cases: Case[] = [
         state: 'SP',
         city: 'São Paulo',
         lgpdConsent: false,
+      }),
+    shouldFail: true,
+  },
+
+  // contato (RF07)
+  {
+    label: 'Clique em canal do Lactare valido',
+    run: () =>
+      contactClickSchema.parse({
+        event: 'lactare_contact_clicked',
+        channel: 'whatsapp',
+        surface: 'coverage_result',
+        source_utm: { utm_source: 'instagram' },
+      }),
+    shouldFail: false,
+  },
+  {
+    label: 'Clique em canal fora da lista oficial',
+    run: () =>
+      contactClickSchema.parse({
+        event: 'lactare_contact_clicked',
+        channel: 'email',
+        surface: 'coverage_result',
       }),
     shouldFail: true,
   },
