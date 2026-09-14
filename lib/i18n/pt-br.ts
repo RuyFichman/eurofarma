@@ -520,6 +520,21 @@ export const COVERAGE = {
     title: '{city} faz parte da área atendida',
     description:
       'Há possibilidade de coleta residencial nessa localização. Isso ainda não confirma a coleta: triagem, modalidade, data e disponibilidade são combinadas diretamente com a equipe do Lactare.',
+    contact: {
+      eyebrow: 'Próximo passo',
+      title: 'Fale diretamente com o Lactare',
+      description:
+        'Use um dos canais oficiais abaixo para iniciar o atendimento com a equipe responsável pela triagem e pelas orientações da doação.',
+      whatsapp: 'Chamar no WhatsApp',
+      phone: 'Ligar para o Lactare',
+      whatsappLabel: 'WhatsApp oficial',
+      phoneLabel: 'Telefone',
+      hours: 'Horário publicado pelo Lactare: segunda a sexta, das 7h às 22h.',
+      operationalNotice:
+        'A cobertura positiva não confirma coleta ou atendimento. Modalidade, triagem, data e disponibilidade são informadas diretamente pela equipe do Lactare.',
+      source: 'Canal conferido em {date} na fonte oficial: {source}',
+      sourceName: 'site do Lactare',
+    },
     signup: 'Quero criar meu cadastro',
     learnMore: 'Entender como funciona',
   },

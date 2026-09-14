@@ -11,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react'
 
+import { LactareContactCard } from '@/components/shared/lactare-contact-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -294,7 +295,7 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
               <span className="bg-primary text-primary-foreground flex size-11 shrink-0 items-center justify-center rounded-full">
                 <CheckCircle2 className="size-5" aria-hidden="true" />
               </span>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-primary text-sm font-semibold">
                   {COVERAGE.eligible.badge}
                 </p>
@@ -312,8 +313,9 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
                 <p className="text-muted-foreground mt-3 max-w-2xl leading-7">
                   {COVERAGE.eligible.description}
                 </p>
+                <LactareContactCard />
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                  <Button asChild>
+                  <Button asChild variant="outline">
                     <Link href="/cadastro">{COVERAGE.eligible.signup}</Link>
                   </Button>
                   <Button asChild variant="outline">

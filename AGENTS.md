@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 429 testes em 47 arquivos**: 359 unitários e 70 de integração. A migration do RF16 foi aplicada no Supabase cloud em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 432 testes em 48 arquivos**: 362 unitários e 70 de integração. A migration do RF16 foi aplicada no Supabase cloud em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -92,6 +92,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Página pública de verificação de cobertura por CEP ou município em `/verificar-cobertura`, com os 30 municípios do Lactare agrupados em seis sub-regiões.
 - Resolução de CEP pelo ViaCEP em `POST /api/coverage`, seguida da comparação com a lista ativa de `service_municipalities`; o CEP não é persistido.
 - Resposta transparente para localização fora da lista, com encaminhamento ao diretório oficial externo da rBLH.
+- Contato direto após cobertura positiva, com WhatsApp `+55 (11) 96629-0681`, telefone `(11) 4144-9604` e horário de segunda a sexta, das 7h às 22h. Os canais foram conferidos no site oficial do Lactare em 14 de setembro de 2026; a interface mantém link para a fonte e não representa confirmação de atendimento ou coleta.
 - Cadastro opcional de nutriz com consentimento obrigatório no formulário.
 - Provisionamento da conta da nutriz no Supabase Auth.
 - Login, logout, recuperação e redefinição de senha da nutriz.
@@ -162,7 +163,6 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 ### 3.5 Validações externas pendentes
 
 - Confirmar com o Lactare se a coleta domiciliar gratuita é uniforme nos 30 municípios ou se varia por logística.
-- Validar o canal oficial e as instruções de contato exibidas depois da confirmação de cobertura.
 - Definir quem registra uma doação como confirmada.
 - Validar com a equipe do Lactare quem atualiza cada status da jornada e se existe capacidade operacional para manter os registros consistentes.
 - Validar textos jurídicos e consentimentos.
@@ -197,7 +197,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 429 passando em 47 arquivos: 359 unitários e 70 de integração contra o Supabase cloud |
+| Testes | Vitest | 432 passando em 48 arquivos: 362 unitários e 70 de integração contra o Supabase cloud |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
