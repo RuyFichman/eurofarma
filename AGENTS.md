@@ -68,7 +68,7 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 ## 3. Estado atual do projeto
 
-**Referência desta seção:** 12 de setembro de 2026.
+**Referência desta seção:** 13 de setembro de 2026.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a suíte tem **391 testes passando**: 323 unitários e 68 de integração. A migration de `service_municipalities` já está aplicada no Supabase cloud, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, os **349 testes unitários passam**. A suíte completa tem 417 testes; 40 dos 68 testes de integração passam e 28 aguardam a aplicação da migration local do RF16 no Supabase cloud, pois o Prisma Client novo já consulta `journey_status`. A migration anterior de `service_municipalities` está aplicada no Supabase cloud, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -103,13 +103,14 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
 - Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
 - Webhook da WhatsApp Cloud API, verificação de assinatura e simulador local.
-- Máquina de estados local do chatbot para um fluxo limitado sobre tentativa de combinar visita.
+- Máquina de estados local do chatbot para um fluxo legado e limitado sobre tentativa de combinar visita. A arquitetura pode ser reaproveitada, mas a pergunta deve ser redimensionada para o recebimento da visita de entrega do kit.
+- Modelo local do RF16 com enum próprio `JourneyStatus`, status atual separado de `interestStatus`, histórico append-only vinculado à nutriz e ao administrador, observação administrativa limitada, regras explícitas de transição e migration SQL versionada. A migration ainda não foi aplicada no Supabase cloud e a edição no painel ainda não existe.
 
 ### 3.2 Situação dos requisitos funcionais
 
 | Requisito | Situação atual |
 |---|---|
-| RF01 — elegibilidade por CEP | **Implementado no escopo validável.** O ViaCEP resolve município e UF, e a lista ativa indica possibilidade de coleta residencial. A interface não promete confirmação logística. |
+| RF01 — elegibilidade por CEP | **Implementado no escopo validável.** O ViaCEP resolve município e UF, e a lista ativa indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite. A interface não promete confirmação logística; a uniformidade operacional nos 30 municípios ainda depende de validação do Lactare. |
 | RF02 — área atendida | **Implementado no escopo atualizado.** A interface exibe os 30 municípios atendidos; bancos de leite e pontos de coleta não são mais entidades públicas ou administrativas do produto. |
 | RF03 — fora da cobertura | **Implementado.** CEP ou município fora da lista recebe explicação e link oficial da rBLH. |
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
@@ -124,6 +125,8 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF13 — mensagem de indicação | **Não implementado.** |
 | RF14 — reconhecimentos | **Não implementado.** |
 | RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
+| RF16 — status da jornada | **Parcial.** O modelo local já separa `JourneyStatus` de `interestStatus`, mantém o status atual no perfil e define histórico imutável, autor, horário, observação administrativa e transições válidas. A migration ainda não foi aplicada no Supabase cloud e faltam a mutação transacional, a autorização e a interface administrativa. |
+| RF17 — aviso de mudança de status | **Não implementado.** Falta notificar automaticamente a nutriz pelo WhatsApp depois de uma atualização válida feita pelo Lactare. |
 
 ### 3.3 Código e dados legados que não definem mais o escopo
 
@@ -150,6 +153,8 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Consentimento separado e job de lembretes.
 - Segmentos comportamentais que ainda não têm eventos próprios: recorrência, adesão a lembretes, indicação entre doadoras e velocidade até a primeira doação.
 - Definição da fonte legítima de confirmação de uma doação.
+- Aplicação da migration do RF16 no Supabase cloud e implementação da atualização administrativa transacional e auditável do status categórico, sem armazenar tipo de exame, valores, laudo ou motivo clínico.
+- Notificação automática pelo WhatsApp após cada mudança válida de status.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
 - Política de Privacidade, Termos de Uso e RLS continuam obrigatórios antes de exposição pública, mas foram adiados pelo time para depois da entrega de municípios.
@@ -166,11 +171,12 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 ### 3.6 Próximas entregas recomendadas
 
 1. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro e encaminhamento ao Lactare.
-2. Implementar lembretes opcionais sem semântica de agendamento.
-3. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
-4. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
-5. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-6. Ativar a integração real com a Meta quando a infraestrutura externa existir.
+2. Aplicar a migration do RF16 no Supabase cloud, implementar a atualização transacional no painel e então o RF17 com notificação automática pelo WhatsApp.
+3. Implementar lembretes opcionais sem semântica de agendamento.
+4. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
+5. Publicar Privacidade e Termos, habilitar RLS e endurecer os controles contra abuso antes de qualquer exposição pública.
+6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+7. Ativar a integração real com a Meta quando a infraestrutura externa existir.
 
 ## 4. Stack
 
@@ -189,7 +195,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 381 passando: 314 unitários e 67 de integração |
+| Testes | Vitest | 349 unitários passando; integração cloud parcialmente bloqueada até aplicar a migration do RF16 |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -500,7 +506,7 @@ Segmentos implementados no dashboard:
 
 Os três filtros vivem na URL (`region`, `stage` e `origin`), são combináveis e geram um único recorte compartilhado pelos cartões, pela evolução mensal e pelas distribuições. A região usa todos os municípios configurados, inclusive inativos, para que a desativação operacional de uma cidade não apague sua classificação histórica.
 
-Ainda não estão implementados os segmentos de adesão a lembretes, recorrência, indicação própria e velocidade até a primeira doação. Eles exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
+Ainda não estão implementados os segmentos de adesão a lembretes, recorrência, indicação própria e velocidade até a primeira doação. O modelo local do RF16 já existe, separado de `interestStatus`, mas ainda não foi aplicado no Supabase cloud nem conectado ao painel. Esses segmentos exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
 
 ## 13. Regras de produto vigentes
 
