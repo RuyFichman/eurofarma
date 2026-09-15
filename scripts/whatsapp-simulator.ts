@@ -8,9 +8,10 @@
  *
  * Uso (com o `pnpm dev` rodando):
  *   pnpm whatsapp:sim --from 5511999998888 --text "oi"
- *   pnpm whatsapp:sim --from 5511999998888 --reply agendou_sim
- *   pnpm whatsapp:sim --from 5511999998888 --text "05/06 09:30"
- *   pnpm whatsapp:sim --from 5511999998888 --reply data_ok
+ *   pnpm whatsapp:sim --from 5511999998888 --reply menu_saber_mais
+ *   pnpm whatsapp:sim --from 5511999998888 --reply faq_como_funciona
+ *   pnpm whatsapp:sim --from 5511999998888 --reply menu_quero_doar
+ *   pnpm whatsapp:sim --from 5511999998888 --text "Osasco"
  *
  * O bot só responde de verdade se `WHATSAPP_ACCESS_TOKEN` estiver configurado;
  * sem ele o webhook grava normalmente e fica mudo, que é o esperado em local.

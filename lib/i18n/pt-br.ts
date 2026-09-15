@@ -1229,59 +1229,114 @@ export const APPOINTMENT = {
 } as const
 
 /**
- * Falas do chatbot do WhatsApp (Sprint 6.5).
+ * Falas do chatbot do WhatsApp (RF11).
  *
- * Copy visível como qualquer outra (Princípio 7), com duas restrições próprias
- * do canal: os títulos de botão da Meta têm **limite de 20 caracteres**, e o
- * tom precisa aguentar ser lido no meio da rotina de quem acabou de ter bebê
- * (Princípio 9). Nada aqui promete lembrete, confirmação ou remarcação — o bot
- * só registra o que ela conta.
+ * Os títulos respeitam os limites da Meta: 20 caracteres em botões e 24 em
+ * itens de lista. O bot informa e encaminha; não realiza triagem, não confirma
+ * atendimento ou coleta e não comunica impacto clínico individual.
  */
 export const WHATSAPP_BOT = {
-  askScheduled: {
-    body: 'Oi! Aqui é o NutriLink 💙\n\nVocê conseguiu agendar sua visita ao banco de leite?',
-    yes: 'Sim, consegui',
-    no: 'Ainda não',
+  menu: {
+    welcome:
+      'Oi! Aqui é o NutriLink, canal digital do Lactare, banco de leite humano da Eurofarma. 💙\n\nPosso explicar como funciona, verificar se sua cidade está na área atendida ou mostrar os canais oficiais do Lactare.\n\nComo posso ajudar?',
+    registeredWelcome:
+      'Oi, {name}! 💙\n\nSeu status atual no NutriLink é: {status}. Essa categoria foi registrada pela equipe do Lactare; o bot não realiza avaliação clínica.\n\n{guidance}\n\nComo posso ajudar agora?',
+    knowMore: 'Quero saber mais',
+    donate: 'Quero doar leite',
+    human: 'Falar com a equipe',
   },
-  askDate: {
-    body: 'Que notícia boa! 💙\n\nPara qual dia e horário ficou? Responda assim: DD/MM HH:MM\n\nPor exemplo: 05/06 09:30',
-  },
-  dateNotUnderstood: {
-    body: 'Não consegui entender a data. Pode escrever no formato DD/MM HH:MM?\n\nPor exemplo: 05/06 09:30',
-  },
-  confirmDate: {
-    // {date} e {time} são substituídos no servidor.
-    bodyTemplate: 'Anotei: {date}, às {time}.\n\nEstá certo?',
-    yes: 'Está certo',
-    no: 'Corrigir',
-  },
-  scheduledSaved: {
-    // {url} é a área da nutriz.
-    bodyTemplate:
-      'Prontinho, anotei 💙\n\nVocê pode ver os detalhes e as orientações para o dia aqui: {url}\n\nQualquer mudança, é só me contar por aqui.',
-  },
-  askFailureReason: {
-    body: 'Tudo bem, isso acontece e não é o fim da linha.\n\nO que aconteceu?',
-    button: 'Escolher motivo',
-    options: {
-      NO_ANSWER: 'Não atenderam',
-      NO_SLOT: 'Sem vaga',
-      TOO_FAR: 'Longe demais',
-      GAVE_UP: 'Deixei para depois',
-      OTHER: 'Outro motivo',
+  faq: {
+    body: 'Qual dúvida você quer esclarecer?',
+    button: 'Ver dúvidas',
+    questions: {
+      WHO_CAN_DONATE: 'Quem pode doar?',
+      HOW_IT_WORKS: 'Como funciona?',
+      STORAGE: 'Como guardar o leite?',
+      PAIN: 'Doar dói?',
+      FREQUENCY: 'Posso doar mais vezes?',
     },
+    answers: {
+      WHO_CAN_DONATE:
+        'Quem amamenta e tem leite excedente pode demonstrar interesse. A confirmação da aptidão é feita por profissionais do Lactare, depois do contato e da avaliação adequada. O NutriLink não avalia medicamentos nem condições de saúde.',
+      HOW_IT_WORKS:
+        'Primeiro você verifica se sua localização faz parte da área atendida. Depois, pode se cadastrar e falar diretamente com o Lactare. A equipe realiza a triagem profissional e combina modalidade, data e disponibilidade fora do NutriLink.',
+      STORAGE:
+        'O Lactare orienta como higienizar, identificar, congelar e entregar o leite com segurança. Confirme o passo a passo diretamente com a equipe antes de começar, porque o NutriLink não substitui a orientação profissional.',
+      PAIN: 'A doação considera somente o leite excedente, depois de alimentar o seu bebê. Se você sente dor ou tem uma dúvida sobre sua saúde, converse com um profissional e com a equipe do Lactare antes de doar.',
+      FREQUENCY:
+        'Pode existir continuidade enquanto houver leite excedente e o Lactare mantiver sua aptidão registrada. Cada novo contato e a logística são combinados diretamente com a equipe.',
+    },
+    afterAnswer: 'O que você gostaria de fazer agora?',
+    more: 'Outra dúvida',
+    donate: 'Quero doar',
+    site: 'Ver conteúdo',
+    siteBody:
+      'Você encontra os conteúdos educativos e o checklist do NutriLink em: {howItWorksUrl}',
   },
-  notScheduledSaved: {
-    bodyTemplate:
-      'Obrigada por contar 💙\n\nAnotei aqui. Se quiser tentar outra unidade, você encontra as mais próximas de você em: {url}\n\nQuando conseguir agendar, me avise por aqui.',
+  coverage: {
+    ask: 'Ótimo! Para verificar a área de atuação do Lactare, envie seu CEP com oito dígitos ou escreva o nome do município.\n\nO CEP será usado somente nesta consulta e não será salvo.',
+    invalid:
+      'Não consegui identificar esse CEP ou município. Envie um CEP no formato 00000-000 ou escreva o nome completo da cidade.',
+    unavailable:
+      'Não foi possível consultar a cobertura agora. Tente novamente em alguns instantes ou fale diretamente com o Lactare.',
+    eligibleAskConsent:
+      '{city} está na área configurada do Lactare segundo o Mapa do Leite. Isso indica elegibilidade geográfica, mas não confirma modalidade, data ou disponibilidade.\n\nSe quiser continuar, o cadastro é opcional.',
+    eligibleRegistered:
+      '{city} está na área configurada do Lactare segundo o Mapa do Leite. Isso não confirma atendimento ou coleta. Para combinar os próximos passos, fale diretamente com o Lactare: WhatsApp {whatsapp} ou telefone {phone}.',
+    outside:
+      'Essa localização não aparece na área configurada do Lactare. Para procurar atendimento em outra região, consulte o diretório oficial da Rede Brasileira de Bancos de Leite Humano: {directoryUrl}\n\nSe conhecer alguém que amamenta e mora na Grande São Paulo, você pode compartilhar: “O NutriLink verifica a área atendida pelo Lactare e orienta o contato para doação de leite humano: {coverageUrl}”.',
   },
-  unknownNumber: {
-    // Sem confirmar nem negar cadastro de ninguém — só convida.
-    bodyTemplate:
-      'Oi! Aqui é o NutriLink 💙\n\nPara acompanhar seu agendamento, crie sua conta em: {url}\n\nÉ rapidinho e você passa a ver tudo em um lugar só.',
+  registration: {
+    invalidName:
+      'Não consegui identificar o nome completo. Digite apenas seu nome, com no mínimo 3 e no máximo 120 caracteres.',
+    consent:
+      'Antes de pedir seu nome, preciso do seu consentimento: o NutriLink usará nome, número de WhatsApp, cidade e UF para acompanhar sua jornada e falar com você por este canal. O cadastro é opcional e não representa triagem ou coleta confirmada.\n\nLeia a Política de Privacidade em {privacyUrl}. Você concorda?',
+    askName: 'Obrigada pelo aceite. Qual é o seu nome completo?',
+    accept: 'Sim, concordo',
+    decline: 'Prefiro não',
+    success:
+      'Cadastro recebido, {name}! 💙\n\nA equipe do Lactare é responsável pela triagem e por combinar os próximos passos. Canais oficiais: WhatsApp {whatsapp} e telefone {phone}.',
+    declined:
+      'Sem problema. Nenhum cadastro foi criado. Você pode verificar a cobertura e consultar os conteúdos sem se cadastrar.',
+    unavailable:
+      'Não foi possível salvar o cadastro agora. Envie seu nome completo novamente para tentar de novo, ou escreva “menu” para sair.',
+  },
+  human: {
+    body: 'Sua dúvida precisa da equipe do Lactare. Este bot ainda não transfere a conversa automaticamente. Fale pelo WhatsApp {whatsapp} ou ligue para {phone}, de segunda a sexta, das 7h às 22h. Os canais foram conferidos em {verifiedAt}.',
   },
   fallback: {
-    body: 'Desculpa, não entendi 😕\n\nToque em um dos botões para eu conseguir te ajudar.',
+    first:
+      'Não consegui entender. Toque em uma das opções para eu seguir com você.',
+    second:
+      'Ainda não consegui entender. Para não te prender no bot, aqui estão os canais oficiais do Lactare: WhatsApp {whatsapp} ou telefone {phone}.',
+  },
+  journeyStatus: {
+    REGISTERED: 'Cadastrada',
+    FORM_RECEIVED: 'Ficha recebida',
+    EXAM_SCHEDULED: 'Exame agendado',
+    AWAITING_RESULT: 'Aguardando resultado',
+    ELIGIBLE: 'Apta',
+    NOT_ELIGIBLE: 'Não apta',
+    KIT_DELIVERED: 'Kit entregue',
+    RECURRING_DONATION_ELIGIBLE: 'Apta a doações recorrentes',
+  },
+  journeyGuidance: {
+    REGISTERED:
+      'As próximas etapas aparecem somente depois de serem registradas pelo Lactare.',
+    FORM_RECEIVED:
+      'Continue seguindo as orientações recebidas diretamente da equipe do Lactare.',
+    EXAM_SCHEDULED:
+      'Confirme data e instruções do exame diretamente com a equipe do Lactare.',
+    AWAITING_RESULT:
+      'Aguarde a orientação da equipe e não envie laudos ou resultados pelo bot.',
+    ELIGIBLE:
+      'Combine a entrega do kit diretamente com o Lactare; o bot não confirma data ou disponibilidade.',
+    NOT_ELIGIBLE:
+      'Se tiver dúvida sobre essa categoria, converse diretamente com a equipe do Lactare.',
+    KIT_DELIVERED:
+      'Siga as orientações de higiene, coleta e armazenamento fornecidas pelo Lactare.',
+    RECURRING_DONATION_ELIGIBLE:
+      'A continuidade e a logística são combinadas diretamente com a equipe do Lactare.',
   },
 } as const
 

@@ -85,7 +85,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 456 testes em 53 arquivos**: 382 unitários e 74 de integração. A migration do RF07 foi aplicada no Supabase cloud em 14 de setembro de 2026 e a do RF16, em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última suíte completa anterior à migration pendente do chatbot passou com **456 testes em 53 arquivos**: 382 unitários e 74 de integração. Nesta atualização, **470 testes em 56 arquivos** passam: 406 unitários e os 64 de integração que não dependem do novo schema. Os 10 testes de integração do estado conversacional aguardam a aplicação da migration `20260915170000_expand_whatsapp_conversation_flow` no Supabase cloud pelo MCP obrigatório. As migrations do RF07 e do RF16 continuam aplicadas, assim como a de `service_municipalities`, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -106,8 +106,8 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
 - Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
-- Webhook da WhatsApp Cloud API, verificação de assinatura e simulador local.
-- Máquina de estados local do chatbot para um fluxo legado e limitado sobre tentativa de combinar visita. A arquitetura pode ser reaproveitada, mas a pergunta deve ser redimensionada para o recebimento da visita de entrega do kit.
+- Webhook da WhatsApp Cloud API, verificação de assinatura, rate limiting local e simulador com exemplos do fluxo ativo.
+- Máquina de estados local do chatbot com apresentação e menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada de nutriz cadastrada pelo `JourneyStatus` e encaminhamento transparente aos canais oficiais do Lactare. O CEP não entra no contexto persistido; o cadastro mantém marketing e lembretes desligados. A migration que amplia `WhatsappConversation` foi gerada e revisada, mas ainda não foi aplicada no Supabase cloud.
 - RF16 no painel: `JourneyStatus` separado de `interestStatus`, status atual, detalhe da nutriz, histórico append-only com autor e horário, observação administrativa limitada e transições explícitas. A mudança usa o status anterior como condição de concorrência e atualiza perfil e histórico na mesma transação; falha no histórico reverte o status. A migration foi aplicada no Supabase cloud em 13 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; enum, coluna com default `REGISTERED`, índices, CHECKs, FKs `RESTRICT` e trigger de imutabilidade foram conferidos no banco.
 
 ### 3.2 Situação dos requisitos funcionais
@@ -124,7 +124,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
 | RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
 | RF10 — indicadores do funil | **Parcial.** O dashboard resume municípios e nutrizes, mede sinais observáveis de alcance, agrega os cliques anônimos de contato e apresenta o funil progressivo do `JourneyStatus`, sua conversão e os pontos sem avanço registrado. Os cadastros podem ser segmentados por sub-região, status atual e origem de forma combinável. “Sem avanço” não prova abandono definitivo, e “não apta” é uma saída legítima separada. Ainda faltam retenção, adesão a lembretes e os segmentos que dependem de confirmação legítima de doação e indicação própria. |
-| RF11 — chatbot completo | **Parcial.** Infraestrutura e simulação local existem; faltam FAQ, elegibilidade, cadastro, lembretes, pós-doação e ativação real na Meta. |
+| RF11 — chatbot completo | **Parcial.** Menu, FAQ, elegibilidade, orientação, cadastro opcional, retomada por status e contato com o Lactare estão implementados localmente. A ativação depende da migration conversacional no Supabase e da infraestrutura real da Meta. Continuam pendentes vídeo institucional oficial, opt-in e job de lembretes, avisos do RF17, handoff humano operacional e pós-doação baseado em confirmação legítima. |
 | RF12 — cartão de impacto | **Não implementado.** |
 | RF13 — mensagem de indicação | **Não implementado.** |
 | RF14 — reconhecimentos | **Não implementado.** |
@@ -146,7 +146,7 @@ A partir desta versão, a experiência de unidades está isolada do produto ativ
 - não reativar `/buscar`, `/banco-de-leite/*`, `/admin/unidades`, `/api/units` ou o tracking vinculado a unidades;
 - preservar os registros e o modelo `Unit` somente como legado interno até existir uma migration de remoção segura e reversível.
 
-Os modelos Appointment e WhatsappConversation também são legado técnico. Eles podem ser migrados ou reaproveitados para lembretes e continuidade da jornada, mas não autorizam linguagem de agendamento, confirmação de visita ou promessa logística. O acompanhamento autodeclarado pode perguntar se a nutriz recebeu a visita de entrega do kit, fato que somente ela conhece; nunca deve perguntar resultado de exame ou outro fato cuja fonte é o Lactare. A rota `/meu-agendamento` foi mantida por compatibilidade, mas sua interface ativa é “Minha área” e não exibe agendamento.
+O modelo `Appointment` e os estados/colunas antigos de `WhatsappConversation` são legado técnico. A migration do chatbot preserva esses dados, mas o webhook ativo não os lê nem cria novos agendamentos. Eles podem ser migrados ou reaproveitados para lembretes e continuidade da jornada, mas não autorizam linguagem de agendamento, confirmação de visita ou promessa logística. O acompanhamento autodeclarado pode perguntar se a nutriz recebeu a visita de entrega do kit, fato que somente ela conhece; nunca deve perguntar resultado de exame ou outro fato cuja fonte é o Lactare. A rota `/meu-agendamento` foi mantida por compatibilidade, mas sua interface ativa é “Minha área” e não exibe agendamento.
 
 Não criar preview estático com estado “confirmado” ou lembrete de coleta sem uma fonte operacional legítima. A home e a área da nutriz devem manter linguagem de cobertura e orientação, não de agendamento.
 
@@ -157,10 +157,11 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Consentimento separado e job de lembretes.
 - Segmentos comportamentais que ainda não têm eventos próprios: recorrência, adesão a lembretes, indicação entre doadoras e velocidade até a primeira doação.
 - Definição da fonte legítima de confirmação de uma doação.
-- RLS para `nutriz_profiles`, `journey_status_history` e `contact_channel_clicks`; a autorização do RF16 já existe na aplicação e o evento do RF07 é anônimo, mas as tabelas continuam sem policies no Supabase.
+- RLS para `nutriz_profiles`, `journey_status_history`, `contact_channel_clicks` e `whatsapp_conversations`; a autorização do RF16 já existe na aplicação e o evento do RF07 é anônimo, mas as tabelas continuam sem policies no Supabase. O contexto conversacional contém cidade durante o cadastro e o próprio registro identifica o número de WhatsApp, portanto deve ser tratado como PII. O nome só é solicitado e gravado no perfil depois do consentimento.
 - Notificação automática pelo WhatsApp após cada mudança válida de status.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
+- Aplicação e registro, pelo MCP do Supabase, da migration `20260915170000_expand_whatsapp_conversation_flow`; até isso ocorrer, o novo fluxo permanece somente local.
 - Política de Privacidade, Termos de Uso e RLS continuam obrigatórios antes de exposição pública, mas foram adiados pelo time para depois da entrega de municípios.
 
 ### 3.5 Validações externas pendentes
@@ -176,8 +177,8 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 1. Validar com o Lactare correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes; até lá, o painel mantém somente o fluxo progressivo já definido.
 2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-3. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
-4. Implementar lembretes opcionais sem semântica de agendamento.
+3. Aplicar pelo MCP do Supabase a migration conversacional já gerada e executar novamente a suíte completa de integração.
+4. Implementar lembretes opcionais sem semântica de agendamento e concluir o handoff humano operacional.
 5. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
 6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
 7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
@@ -200,7 +201,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 456 passando em 53 arquivos: 382 unitários e 74 de integração contra o Supabase cloud |
+| Testes | Vitest | Última suíte completa: 456 em 53 arquivos. Estado atual: 470 em 56 arquivos — 406 unitários e 64 de integração não dependentes; os 10 testes do novo estado conversacional aguardam a migration no Supabase. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -468,8 +469,12 @@ O webhook:
 - exige assinatura HMAC;
 - compara assinatura com timingSafeEqual;
 - ignora recibos que não sejam mensagens;
+- limita localmente o volume por número, usando-o somente como chave efêmera em memória;
 - usa a Cloud API diretamente, sem SDK;
-- associa telefones considerando variantes com e sem nono dígito.
+- associa telefones considerando variantes com e sem nono dígito;
+- aceita números novos, mantém estado mínimo e só cria o perfil depois do consentimento explícito;
+- resolve o CEP somente durante a consulta e persiste apenas cidade e UF;
+- reinicia no menu qualquer estado legado de agendamento, sem criar novos registros em `Appointment`.
 
 Teste local:
 
@@ -492,7 +497,7 @@ O fluxo completo deverá permitir:
 9. acompanhamento pós-doação;
 10. cartão, indicação e reconhecimento depois de uma confirmação legítima.
 
-A máquina de estados atual cobre somente um fluxo legado e limitado. Não chamar RF11 de concluído.
+A máquina de estados já cobre localmente os itens 1 a 6, inclusive retomada pelo status categórico registrado pelo Lactare. Os itens 7 a 10 permanecem pendentes, assim como o vídeo institucional, a transferência real para atendimento humano, a infraestrutura da Meta e a aplicação da migration conversacional no Supabase. Não chamar RF11 de concluído.
 
 Mensagens do bot devem vir de WHATSAPP_BOT em lib/i18n/pt-br.ts e responder em poucos segundos. O bot nunca executa triagem nem confirma agendamento. Pode comunicar um status já registrado pela equipe do Lactare, sem revelar detalhes clínicos.
 
