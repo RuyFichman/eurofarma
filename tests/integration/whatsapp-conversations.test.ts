@@ -51,27 +51,35 @@ describe('findNutrizByWhatsapp', () => {
 })
 
 describe('estado da conversa', () => {
-  it('número novo começa perguntando', async () => {
+  it('número novo começa no menu sem contexto', async () => {
     const state = await getConversationState(testWhatsapp('70000004'))
-    expect(state.step).toBe('ASKED_SCHEDULED')
-    expect(state.draftScheduledAt).toBeNull()
+    expect(state.step).toBe('MENU')
+    expect(state.context).toEqual({})
+    expect(state.misunderstoodCount).toBe(0)
+    expect(state.isNewConversation).toBe(true)
   })
 
-  it('grava e relê o passo com o rascunho', async () => {
+  it('grava e relê o passo com contexto mínimo', async () => {
     const phone = testWhatsapp('70000005')
     const nutriz = await createTestNutrizProfile({ phoneWhatsapp: phone })
-    const draft = new Date('2026-06-05T12:30:00.000Z')
 
     await saveConversationState({
       phoneWhatsapp: phone,
       nutrizProfileId: nutriz.id,
-      step: 'AWAITING_DATE_CONFIRMATION',
-      draftScheduledAt: draft,
+      step: 'AWAITING_CONSENT',
+      context: {
+        location: { city: 'Osasco', state: 'SP' },
+      },
+      misunderstoodCount: 1,
     })
 
     const state = await getConversationState(phone)
-    expect(state.step).toBe('AWAITING_DATE_CONFIRMATION')
-    expect(state.draftScheduledAt?.toISOString()).toBe(draft.toISOString())
+    expect(state.step).toBe('AWAITING_CONSENT')
+    expect(state.context).toEqual({
+      location: { city: 'Osasco', state: 'SP' },
+    })
+    expect(state.misunderstoodCount).toBe(1)
+    expect(state.isNewConversation).toBe(false)
   })
 
   it('atualiza a conversa existente em vez de duplicar', async () => {
@@ -81,14 +89,16 @@ describe('estado da conversa', () => {
     await saveConversationState({
       phoneWhatsapp: phone,
       nutrizProfileId: nutriz.id,
-      step: 'AWAITING_DATE',
-      draftScheduledAt: null,
+      step: 'AWAITING_COVERAGE',
+      context: {},
+      misunderstoodCount: 0,
     })
     await saveConversationState({
       phoneWhatsapp: phone,
       nutrizProfileId: nutriz.id,
-      step: 'FINISHED',
-      draftScheduledAt: null,
+      step: 'MENU',
+      context: {},
+      misunderstoodCount: 0,
     })
 
     expect(
@@ -96,7 +106,7 @@ describe('estado da conversa', () => {
         where: { phoneWhatsapp: phone },
       }),
     ).toBe(1)
-    expect((await getConversationState(phone)).step).toBe('FINISHED')
+    expect((await getConversationState(phone)).step).toBe('MENU')
   })
 })
 

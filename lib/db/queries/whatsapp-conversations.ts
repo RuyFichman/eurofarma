@@ -3,62 +3,96 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../prisma'
 import { buildBrazilianWhatsappCandidates } from '../../whatsapp/phone-candidates'
 import type {
+  ActiveConversationStep,
+  ConversationContext,
+  ConversationProfile,
   ConversationStep,
   FailureReason,
 } from '../../whatsapp/conversation'
 
-/**
- * Encontra a nutriz dona do número que mandou a mensagem.
- *
- * `deletedAt: null` faz parte da consulta, não é filtro opcional: quem pediu
- * exclusão não volta a ter agendamento gravado só porque mandou mensagem. É a
- * mesma regra do gate da área logada.
- */
+/** Encontra somente perfis ativos pelas variações brasileiras do número. */
 export async function findNutrizByWhatsapp(
   fromDigits: string,
-): Promise<{ id: string } | null> {
+): Promise<({ id: string } & ConversationProfile) | null> {
   const candidates = buildBrazilianWhatsappCandidates(fromDigits)
   if (candidates.length === 0) return null
 
   return prisma.nutrizProfile.findFirst({
     where: { phoneWhatsapp: { in: candidates }, deletedAt: null },
-    select: { id: true },
+    select: { id: true, fullName: true, journeyStatus: true },
   })
 }
 
 export type ConversationState = {
   step: ConversationStep
-  draftScheduledAt: Date | null
+  context: ConversationContext
+  misunderstoodCount: number
+  isNewConversation: boolean
+}
+
+function parseConversationContext(
+  value: Prisma.JsonValue | null,
+): ConversationContext {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+
+  const candidate = value as Record<string, Prisma.JsonValue>
+  const context: ConversationContext = {}
+
+  const location = candidate.location
+  if (location && typeof location === 'object' && !Array.isArray(location)) {
+    const locationRecord = location as Record<string, Prisma.JsonValue>
+    if (
+      typeof locationRecord.city === 'string' &&
+      locationRecord.city.length >= 2 &&
+      locationRecord.city.length <= 100 &&
+      typeof locationRecord.state === 'string' &&
+      /^[A-Z]{2}$/u.test(locationRecord.state)
+    ) {
+      context.location = {
+        city: locationRecord.city,
+        state: locationRecord.state,
+      }
+    }
+  }
+
+  return context
 }
 
 /**
- * Estado atual da conversa. Número novo começa em `ASKED_SCHEDULED`, que é o
- * mesmo passo do reinício — a primeira mensagem dela sempre recebe a pergunta.
+ * Estado atual da conversa. O contexto aceita apenas município/UF; nome, CEP e
+ * texto livre nunca são reidratados nem persistidos antes do cadastro.
  */
 export async function getConversationState(
   phoneWhatsapp: string,
 ): Promise<ConversationState> {
   const row = await prisma.whatsappConversation.findUnique({
     where: { phoneWhatsapp },
-    select: { step: true, draftScheduledAt: true },
+    select: { step: true, context: true, misunderstoodCount: true },
   })
 
   return {
-    step: row?.step ?? 'ASKED_SCHEDULED',
-    draftScheduledAt: row?.draftScheduledAt ?? null,
+    step: row?.step ?? 'MENU',
+    context: parseConversationContext(row?.context ?? null),
+    misunderstoodCount: row?.misunderstoodCount ?? 0,
+    isNewConversation: row === null,
   }
 }
 
-/** Grava o passo seguinte. `lastMessageAt` marca a atividade da conversa. */
+/** Grava somente o estado ativo e marca a última atividade da conversa. */
 export async function saveConversationState(params: {
   phoneWhatsapp: string
   nutrizProfileId: string | null
-  step: ConversationStep
-  draftScheduledAt: Date | null
+  step: ActiveConversationStep
+  context: ConversationContext
+  misunderstoodCount: number
 }): Promise<void> {
+  const context = Object.keys(params.context).length
+    ? (params.context as Prisma.InputJsonObject)
+    : Prisma.DbNull
   const data = {
     step: params.step,
-    draftScheduledAt: params.draftScheduledAt,
+    context,
+    misunderstoodCount: params.misunderstoodCount,
     lastMessageAt: new Date(),
     nutrizProfileId: params.nutrizProfileId,
   }
@@ -70,7 +104,48 @@ export async function saveConversationState(params: {
   })
 }
 
-/** `AGD-2026-04892` — ano corrente e cinco dígitos. */
+/**
+ * Cria o cadastro simplificado feito dentro do WhatsApp. O aceite acontece no
+ * passo imediatamente anterior; lembretes e marketing continuam desligados.
+ */
+export async function createWhatsappNutrizLead(params: {
+  phoneWhatsapp: string
+  fullName: string
+  city: string
+  state: string
+}): Promise<({ id: string } & ConversationProfile) | null> {
+  const existing = await findNutrizByWhatsapp(params.phoneWhatsapp)
+  if (existing) return existing
+
+  try {
+    return await prisma.nutrizProfile.create({
+      data: {
+        fullName: params.fullName,
+        phoneWhatsapp: params.phoneWhatsapp,
+        city: params.city,
+        state: params.state,
+        contactPreference: 'WHATSAPP',
+        interestStatus: 'INTERESTED',
+        lgpdConsentAt: new Date(),
+        marketingConsent: false,
+        sourceUtm: {
+          utm_source: 'whatsapp',
+          utm_medium: 'chatbot',
+        },
+      },
+      select: { id: true, fullName: true, journeyStatus: true },
+    })
+  } catch (error) {
+    const isDuplicate =
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    if (!isDuplicate) throw error
+
+    return findNutrizByWhatsapp(params.phoneWhatsapp)
+  }
+}
+
+/** `AGD-2026-04892` — ano corrente e cinco dígitos. Legado preservado. */
 function buildReference(now: Date): string {
   const year = now.getUTCFullYear()
   const random = Math.floor(Math.random() * 100_000)
@@ -79,14 +154,7 @@ function buildReference(now: Date): string {
   return `AGD-${year}-${random}`
 }
 
-/**
- * Cria o agendamento a partir do que a nutriz contou.
- *
- * A `reference` é sorteada e a coluna é `@unique`, então a colisão é resolvida
- * pelo banco (P2002) e não por um `SELECT` prévio — consultar antes de gravar
- * não elimina a corrida, só a torna mais rara. Três tentativas cobrem com folga
- * o espaço de 100 mil por ano nesta base.
- */
+/** Escrita legada, fora do fluxo ativo do webhook. */
 async function createAppointment(
   data: Omit<Prisma.AppointmentUncheckedCreateInput, 'reference'>,
 ): Promise<{ id: string; reference: string } | null> {
@@ -118,11 +186,6 @@ export async function createDeclaredAppointment(params: {
   })
 }
 
-/**
- * Registra que a nutriz **não** conseguiu agendar. Não é ausência de dado: é o
- * sinal de quem quis doar e travou, e é o que alimenta a fila de retomada do
- * painel (6.6).
- */
 export async function createNotScheduledAppointment(params: {
   nutrizProfileId: string
   reason: FailureReason

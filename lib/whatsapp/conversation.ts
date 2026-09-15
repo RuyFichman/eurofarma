@@ -1,26 +1,26 @@
 import { WHATSAPP_BOT } from '../i18n/pt-br'
-import { formatLongDate, formatTime } from '../utils/format-date'
-import { parseScheduleInput } from './parse-schedule'
+import type { JourneyStatusValue } from '../journey/status'
+import type { WhatsappCoverageResult } from './coverage'
 
-/**
- * Máquina de estados da conversa do chatbot.
- *
- * É uma **função pura**: recebe o passo atual, o rascunho e a mensagem, e
- * devolve o que responder, para onde ir e o que gravar. Quem grava e envia é o
- * route handler. Essa separação é o que torna o fluxo inteiro testável sem
- * Meta, sem rede e sem banco — e o fluxo é a parte que mais vai mudar quando o
- * time ouvir as primeiras conversas reais.
- *
- * Prisma-free: passo, status e motivo trafegam como string literal.
- */
+/** Estados ativos do RF11. */
+export type ActiveConversationStep =
+  | 'MENU'
+  | 'FAQ'
+  | 'AWAITING_COVERAGE'
+  | 'AWAITING_FULL_NAME'
+  | 'AWAITING_CONSENT'
 
-export type ConversationStep =
+/** Estados preservados apenas para ler conversas criadas pelo fluxo antigo. */
+export type LegacyConversationStep =
   | 'ASKED_SCHEDULED'
   | 'AWAITING_DATE'
   | 'AWAITING_DATE_CONFIRMATION'
   | 'AWAITING_FAILURE_REASON'
   | 'FINISHED'
 
+export type ConversationStep = ActiveConversationStep | LegacyConversationStep
+
+/** Mantido para as consultas do modelo `Appointment`, que agora é legado. */
 export type FailureReason =
   | 'NO_ANSWER'
   | 'NO_SLOT'
@@ -28,22 +28,31 @@ export type FailureReason =
   | 'GAVE_UP'
   | 'OTHER'
 
-/** Ids dos botões e itens de lista. Não são copy — a Meta os devolve crus. */
-export const REPLY_IDS = {
-  scheduledYes: 'agendou_sim',
-  scheduledNo: 'agendou_nao',
-  dateOk: 'data_ok',
-  dateFix: 'data_corrigir',
-  reasonPrefix: 'motivo_',
-} as const
-
-const REASON_BY_ID: Record<string, FailureReason> = {
-  [`${REPLY_IDS.reasonPrefix}nao_atendeu`]: 'NO_ANSWER',
-  [`${REPLY_IDS.reasonPrefix}sem_vaga`]: 'NO_SLOT',
-  [`${REPLY_IDS.reasonPrefix}longe`]: 'TOO_FAR',
-  [`${REPLY_IDS.reasonPrefix}depois`]: 'GAVE_UP',
-  [`${REPLY_IDS.reasonPrefix}outro`]: 'OTHER',
+export type ConversationContext = {
+  location?: { city: string; state: string }
 }
+
+export type ConversationProfile = {
+  fullName: string
+  journeyStatus: JourneyStatusValue
+}
+
+/** IDs estáveis devolvidos pela Meta; não são textos de interface. */
+export const REPLY_IDS = {
+  menuKnowMore: 'menu_saber_mais',
+  menuDonate: 'menu_quero_doar',
+  menuHuman: 'menu_falar_pessoa',
+  faqWhoCanDonate: 'faq_quem_pode',
+  faqHowItWorks: 'faq_como_funciona',
+  faqStorage: 'faq_armazenar',
+  faqPain: 'faq_dor',
+  faqFrequency: 'faq_frequencia',
+  faqMore: 'faq_mais_duvidas',
+  faqDonate: 'faq_quero_doar',
+  faqSite: 'faq_ver_site',
+  registrationAccept: 'cadastro_aceito',
+  registrationDecline: 'cadastro_recuso',
+} as const
 
 export type BotReply =
   | { type: 'text'; body: string }
@@ -61,196 +70,381 @@ export type BotReply =
 
 export type ConversationEffect =
   | { kind: 'none' }
-  | { kind: 'save_scheduled'; scheduledAt: Date }
-  | { kind: 'save_not_scheduled'; reason: FailureReason }
+  | {
+      kind: 'create_lead'
+      fullName: string
+      city: string
+      state: string
+    }
 
 export type ConversationOutcome = {
   reply: BotReply
-  nextStep: ConversationStep
-  draftScheduledAt: Date | null
+  nextStep: ActiveConversationStep
+  context: ConversationContext
+  misunderstoodCount: number
   effect: ConversationEffect
 }
 
-/** Pergunta inicial — também é o reinício depois de um fluxo concluído. */
-export function buildAskScheduledReply(): BotReply {
-  return {
-    type: 'buttons',
-    body: WHATSAPP_BOT.askScheduled.body,
-    buttons: [
-      { id: REPLY_IDS.scheduledYes, title: WHATSAPP_BOT.askScheduled.yes },
-      { id: REPLY_IDS.scheduledNo, title: WHATSAPP_BOT.askScheduled.no },
-    ],
-  }
-}
-
-/**
- * Lista (e não botões) porque são **cinco** motivos: a Meta aceita no máximo
- * três botões de resposta, e uma lista comporta até dez itens.
- */
-function buildAskReasonReply(): BotReply {
-  const options = WHATSAPP_BOT.askFailureReason.options
-  return {
-    type: 'list',
-    body: WHATSAPP_BOT.askFailureReason.body,
-    button: WHATSAPP_BOT.askFailureReason.button,
-    rows: [
-      { id: `${REPLY_IDS.reasonPrefix}nao_atendeu`, title: options.NO_ANSWER },
-      { id: `${REPLY_IDS.reasonPrefix}sem_vaga`, title: options.NO_SLOT },
-      { id: `${REPLY_IDS.reasonPrefix}longe`, title: options.TOO_FAR },
-      { id: `${REPLY_IDS.reasonPrefix}depois`, title: options.GAVE_UP },
-      { id: `${REPLY_IDS.reasonPrefix}outro`, title: options.OTHER },
-    ],
-  }
-}
-
-function buildConfirmDateReply(scheduledAt: Date): BotReply {
-  const body = WHATSAPP_BOT.confirmDate.bodyTemplate
-    .replace('{date}', formatLongDate(scheduledAt))
-    .replace('{time}', formatTime(scheduledAt))
-
-  return {
-    type: 'buttons',
-    body,
-    buttons: [
-      { id: REPLY_IDS.dateOk, title: WHATSAPP_BOT.confirmDate.yes },
-      { id: REPLY_IDS.dateFix, title: WHATSAPP_BOT.confirmDate.no },
-    ],
-  }
-}
-
-function askScheduledAgain(): ConversationOutcome {
-  return {
-    reply: buildAskScheduledReply(),
-    nextStep: 'ASKED_SCHEDULED',
-    draftScheduledAt: null,
-    effect: { kind: 'none' },
-  }
-}
-
-/**
- * Avança a conversa um passo.
- *
- * Regra que atravessa todos os ramos: resposta que não encaixa **repete a
- * pergunta** em vez de encerrar. Quem está do outro lado pode ter mandado um
- * áudio, uma figurinha ou um "oi" solto, e derrubar a conversa por isso a
- * obrigaria a recomeçar do zero.
- */
-export function advanceConversation(params: {
+type AdvanceConversationParams = {
   step: ConversationStep
-  draftScheduledAt: Date | null
+  context: ConversationContext
+  misunderstoodCount: number
   text: string | null
   replyId: string | null
-  now?: Date
+  coverage?: WhatsappCoverageResult
+  profile: ConversationProfile | null
+  isNewConversation?: boolean
+}
+
+const FAQ_ANSWER_BY_ID = {
+  [REPLY_IDS.faqWhoCanDonate]: WHATSAPP_BOT.faq.answers.WHO_CAN_DONATE,
+  [REPLY_IDS.faqHowItWorks]: WHATSAPP_BOT.faq.answers.HOW_IT_WORKS,
+  [REPLY_IDS.faqStorage]: WHATSAPP_BOT.faq.answers.STORAGE,
+  [REPLY_IDS.faqPain]: WHATSAPP_BOT.faq.answers.PAIN,
+  [REPLY_IDS.faqFrequency]: WHATSAPP_BOT.faq.answers.FREQUENCY,
+} as const
+
+const HEALTH_QUESTION_PATTERN =
+  /\b(posso\s+doar|rem[eé]dio|medicamento|doen[cç]a|febre|infec|[aá]lcool|fumo|cigarro|sa[uú]de|diagn[oó]stico|exame)\b/iu
+
+function emptyContext(): ConversationContext {
+  return {}
+}
+
+function menuButtons() {
+  return [
+    { id: REPLY_IDS.menuKnowMore, title: WHATSAPP_BOT.menu.knowMore },
+    { id: REPLY_IDS.menuDonate, title: WHATSAPP_BOT.menu.donate },
+    { id: REPLY_IDS.menuHuman, title: WHATSAPP_BOT.menu.human },
+  ] as const
+}
+
+function faqActionButtons() {
+  return [
+    { id: REPLY_IDS.faqMore, title: WHATSAPP_BOT.faq.more },
+    { id: REPLY_IDS.faqDonate, title: WHATSAPP_BOT.faq.donate },
+    { id: REPLY_IDS.faqSite, title: WHATSAPP_BOT.faq.site },
+  ] as const
+}
+
+function consentButtons() {
+  return [
+    {
+      id: REPLY_IDS.registrationAccept,
+      title: WHATSAPP_BOT.registration.accept,
+    },
+    {
+      id: REPLY_IDS.registrationDecline,
+      title: WHATSAPP_BOT.registration.decline,
+    },
+  ] as const
+}
+
+function outcome(params: {
+  reply: BotReply
+  nextStep: ActiveConversationStep
+  context?: ConversationContext
+  misunderstoodCount?: number
+  effect?: ConversationEffect
 }): ConversationOutcome {
-  const { step, draftScheduledAt, text, replyId } = params
-  const now = params.now ?? new Date()
-
-  switch (step) {
-    case 'ASKED_SCHEDULED': {
-      if (replyId === REPLY_IDS.scheduledYes) {
-        return {
-          reply: { type: 'text', body: WHATSAPP_BOT.askDate.body },
-          nextStep: 'AWAITING_DATE',
-          draftScheduledAt: null,
-          effect: { kind: 'none' },
-        }
-      }
-      if (replyId === REPLY_IDS.scheduledNo) {
-        return {
-          reply: buildAskReasonReply(),
-          nextStep: 'AWAITING_FAILURE_REASON',
-          draftScheduledAt: null,
-          effect: { kind: 'none' },
-        }
-      }
-      return askScheduledAgain()
-    }
-
-    case 'AWAITING_DATE': {
-      const parsed = text ? parseScheduleInput(text, now) : null
-      if (!parsed) {
-        return {
-          reply: { type: 'text', body: WHATSAPP_BOT.dateNotUnderstood.body },
-          nextStep: 'AWAITING_DATE',
-          draftScheduledAt: null,
-          effect: { kind: 'none' },
-        }
-      }
-      return {
-        reply: buildConfirmDateReply(parsed),
-        nextStep: 'AWAITING_DATE_CONFIRMATION',
-        draftScheduledAt: parsed,
-        effect: { kind: 'none' },
-      }
-    }
-
-    case 'AWAITING_DATE_CONFIRMATION': {
-      if (replyId === REPLY_IDS.dateFix) {
-        return {
-          reply: { type: 'text', body: WHATSAPP_BOT.askDate.body },
-          nextStep: 'AWAITING_DATE',
-          draftScheduledAt: null,
-          effect: { kind: 'none' },
-        }
-      }
-      if (replyId === REPLY_IDS.dateOk && draftScheduledAt) {
-        return {
-          // O corpo final depende da URL da área, que o handler injeta.
-          reply: {
-            type: 'text',
-            body: WHATSAPP_BOT.scheduledSaved.bodyTemplate,
-          },
-          nextStep: 'FINISHED',
-          draftScheduledAt: null,
-          effect: { kind: 'save_scheduled', scheduledAt: draftScheduledAt },
-        }
-      }
-      // Confirmou sem rascunho (estado impossível na prática, mas o banco é
-      // compartilhado com outro processo): volta a pedir a data em vez de gravar.
-      if (replyId === REPLY_IDS.dateOk) {
-        return {
-          reply: { type: 'text', body: WHATSAPP_BOT.askDate.body },
-          nextStep: 'AWAITING_DATE',
-          draftScheduledAt: null,
-          effect: { kind: 'none' },
-        }
-      }
-      return {
-        reply: draftScheduledAt
-          ? buildConfirmDateReply(draftScheduledAt)
-          : { type: 'text', body: WHATSAPP_BOT.askDate.body },
-        nextStep: draftScheduledAt
-          ? 'AWAITING_DATE_CONFIRMATION'
-          : 'AWAITING_DATE',
-        draftScheduledAt,
-        effect: { kind: 'none' },
-      }
-    }
-
-    case 'AWAITING_FAILURE_REASON': {
-      const reason = replyId ? REASON_BY_ID[replyId] : undefined
-      if (!reason) {
-        return {
-          reply: buildAskReasonReply(),
-          nextStep: 'AWAITING_FAILURE_REASON',
-          draftScheduledAt: null,
-          effect: { kind: 'none' },
-        }
-      }
-      return {
-        reply: {
-          type: 'text',
-          body: WHATSAPP_BOT.notScheduledSaved.bodyTemplate,
-        },
-        nextStep: 'FINISHED',
-        draftScheduledAt: null,
-        effect: { kind: 'save_not_scheduled', reason },
-      }
-    }
-
-    case 'FINISHED':
-      // Mensagem nova depois de concluído recomeça o fluxo: é assim que ela
-      // informa um agendamento seguinte, ou corrige o que contou antes.
-      return askScheduledAgain()
+  return {
+    reply: params.reply,
+    nextStep: params.nextStep,
+    context: params.context ?? emptyContext(),
+    misunderstoodCount: params.misunderstoodCount ?? 0,
+    effect: params.effect ?? { kind: 'none' },
   }
+}
+
+function mainMenuReply(body: string): ConversationOutcome {
+  return outcome({
+    reply: { type: 'buttons', body, buttons: menuButtons() },
+    nextStep: 'MENU',
+  })
+}
+
+function firstName(fullName: string): string {
+  return fullName.trim().split(/\s+/u)[0] ?? fullName.trim()
+}
+
+export function buildInitialConversationReply(
+  profile: ConversationProfile | null,
+): ConversationOutcome {
+  if (!profile) return mainMenuReply(WHATSAPP_BOT.menu.welcome)
+
+  return mainMenuReply(
+    WHATSAPP_BOT.menu.registeredWelcome
+      .replace('{name}', firstName(profile.fullName))
+      .replace('{status}', WHATSAPP_BOT.journeyStatus[profile.journeyStatus])
+      .replace(
+        '{guidance}',
+        WHATSAPP_BOT.journeyGuidance[profile.journeyStatus],
+      ),
+  )
+}
+
+function faqList(body = WHATSAPP_BOT.faq.body): ConversationOutcome {
+  return outcome({
+    reply: {
+      type: 'list',
+      body,
+      button: WHATSAPP_BOT.faq.button,
+      rows: [
+        {
+          id: REPLY_IDS.faqWhoCanDonate,
+          title: WHATSAPP_BOT.faq.questions.WHO_CAN_DONATE,
+        },
+        {
+          id: REPLY_IDS.faqHowItWorks,
+          title: WHATSAPP_BOT.faq.questions.HOW_IT_WORKS,
+        },
+        {
+          id: REPLY_IDS.faqStorage,
+          title: WHATSAPP_BOT.faq.questions.STORAGE,
+        },
+        {
+          id: REPLY_IDS.faqPain,
+          title: WHATSAPP_BOT.faq.questions.PAIN,
+        },
+        {
+          id: REPLY_IDS.faqFrequency,
+          title: WHATSAPP_BOT.faq.questions.FREQUENCY,
+        },
+      ],
+    },
+    nextStep: 'FAQ',
+  })
+}
+
+function humanContactReply(body: string = WHATSAPP_BOT.human.body) {
+  return mainMenuReply(body)
+}
+
+function askCoverage(): ConversationOutcome {
+  return outcome({
+    reply: { type: 'text', body: WHATSAPP_BOT.coverage.ask },
+    nextStep: 'AWAITING_COVERAGE',
+  })
+}
+
+function misunderstood(
+  params: AdvanceConversationParams,
+  repeat: () => ConversationOutcome,
+): ConversationOutcome {
+  const count = Math.min(2, params.misunderstoodCount + 1)
+  if (count >= 2) return humanContactReply(WHATSAPP_BOT.fallback.second)
+
+  const repeated = repeat()
+  return {
+    ...repeated,
+    reply: {
+      ...repeated.reply,
+      body: `${WHATSAPP_BOT.fallback.first}\n\n${repeated.reply.body}`,
+    },
+    misunderstoodCount: count,
+  }
+}
+
+function normalizeName(value: string | null): string | null {
+  if (!value) return null
+  const name = value.trim().replace(/\s+/gu, ' ')
+  if (name.length < 3 || name.length > 120 || !/\p{L}/u.test(name)) {
+    return null
+  }
+  return name
+}
+
+function consentReply(context: ConversationContext): ConversationOutcome {
+  if (!context.location) return askCoverage()
+
+  return outcome({
+    reply: {
+      type: 'buttons',
+      body: WHATSAPP_BOT.registration.consent,
+      buttons: consentButtons(),
+    },
+    nextStep: 'AWAITING_CONSENT',
+    context,
+  })
+}
+
+export function isConversationResetText(text: string | null): boolean {
+  if (!text) return false
+  return /^(oi|ol[aá]|menu|in[ií]cio|come[cç]ar)$/iu.test(text.trim())
+}
+
+/**
+ * Máquina de estados pura do fluxo ativo. Rede e banco ficam no handler; os
+ * únicos efeitos descritos aqui são aplicados depois da decisão conversacional.
+ */
+export function advanceConversation(
+  params: AdvanceConversationParams,
+): ConversationOutcome {
+  if (params.isNewConversation) {
+    return buildInitialConversationReply(params.profile)
+  }
+
+  if (isConversationResetText(params.text)) {
+    return buildInitialConversationReply(params.profile)
+  }
+
+  if (params.replyId === REPLY_IDS.menuKnowMore) return faqList()
+  if (
+    params.replyId === REPLY_IDS.menuDonate ||
+    params.replyId === REPLY_IDS.faqDonate
+  ) {
+    return askCoverage()
+  }
+  if (params.replyId === REPLY_IDS.menuHuman) return humanContactReply()
+
+  switch (params.step) {
+    case 'MENU':
+      return misunderstood(params, () =>
+        buildInitialConversationReply(params.profile),
+      )
+
+    case 'FAQ': {
+      if (params.replyId === REPLY_IDS.faqMore) return faqList()
+      if (params.replyId === REPLY_IDS.faqSite) {
+        return outcome({
+          reply: {
+            type: 'buttons',
+            body: WHATSAPP_BOT.faq.siteBody,
+            buttons: faqActionButtons(),
+          },
+          nextStep: 'FAQ',
+        })
+      }
+
+      if (params.text && HEALTH_QUESTION_PATTERN.test(params.text)) {
+        return humanContactReply()
+      }
+
+      const answer = params.replyId
+        ? FAQ_ANSWER_BY_ID[params.replyId as keyof typeof FAQ_ANSWER_BY_ID]
+        : undefined
+      if (answer) {
+        return outcome({
+          reply: {
+            type: 'buttons',
+            body: `${answer}\n\n${WHATSAPP_BOT.faq.afterAnswer}`,
+            buttons: faqActionButtons(),
+          },
+          nextStep: 'FAQ',
+        })
+      }
+
+      return misunderstood(params, () => faqList())
+    }
+
+    case 'AWAITING_COVERAGE': {
+      const coverage = params.coverage
+      if (!coverage || coverage.kind === 'invalid') {
+        return outcome({
+          reply: { type: 'text', body: WHATSAPP_BOT.coverage.invalid },
+          nextStep: 'AWAITING_COVERAGE',
+        })
+      }
+      if (coverage.kind === 'unavailable') {
+        return outcome({
+          reply: { type: 'text', body: WHATSAPP_BOT.coverage.unavailable },
+          nextStep: 'AWAITING_COVERAGE',
+        })
+      }
+      if (coverage.kind === 'outside') {
+        return mainMenuReply(WHATSAPP_BOT.coverage.outside)
+      }
+      if (params.profile) {
+        return mainMenuReply(
+          WHATSAPP_BOT.coverage.eligibleRegistered.replace(
+            '{city}',
+            coverage.city,
+          ),
+        )
+      }
+
+      return outcome({
+        reply: {
+          type: 'buttons',
+          body: `${WHATSAPP_BOT.coverage.eligibleAskConsent.replace(
+            '{city}',
+            coverage.city,
+          )}\n\n${WHATSAPP_BOT.registration.consent}`,
+          buttons: consentButtons(),
+        },
+        nextStep: 'AWAITING_CONSENT',
+        context: {
+          location: { city: coverage.city, state: coverage.state },
+        },
+      })
+    }
+
+    case 'AWAITING_FULL_NAME': {
+      const fullName = normalizeName(params.text)
+      if (!fullName) {
+        return outcome({
+          reply: { type: 'text', body: WHATSAPP_BOT.registration.invalidName },
+          nextStep: 'AWAITING_FULL_NAME',
+          context: params.context,
+        })
+      }
+
+      const { location } = params.context
+      if (!location) return askCoverage()
+
+      return outcome({
+        reply: {
+          type: 'buttons',
+          body: WHATSAPP_BOT.registration.success.replace(
+            '{name}',
+            firstName(fullName),
+          ),
+          buttons: menuButtons(),
+        },
+        nextStep: 'MENU',
+        effect: {
+          kind: 'create_lead',
+          fullName,
+          city: location.city,
+          state: location.state,
+        },
+      })
+    }
+
+    case 'AWAITING_CONSENT': {
+      if (params.replyId === REPLY_IDS.registrationDecline) {
+        return mainMenuReply(WHATSAPP_BOT.registration.declined)
+      }
+      if (params.replyId !== REPLY_IDS.registrationAccept) {
+        return consentReply(params.context)
+      }
+
+      if (!params.context.location) return askCoverage()
+
+      return outcome({
+        reply: { type: 'text', body: WHATSAPP_BOT.registration.askName },
+        nextStep: 'AWAITING_FULL_NAME',
+        context: params.context,
+      })
+    }
+
+    // Qualquer conversa do fluxo de agendamento antigo volta ao menu sem
+    // interpretar data ou motivo como informação válida no escopo atual.
+    case 'ASKED_SCHEDULED':
+    case 'AWAITING_DATE':
+    case 'AWAITING_DATE_CONFIRMATION':
+    case 'AWAITING_FAILURE_REASON':
+    case 'FINISHED':
+      return buildInitialConversationReply(params.profile)
+  }
+}
+
+export function buildRegistrationFailureOutcome(
+  context: ConversationContext,
+): ConversationOutcome {
+  return outcome({
+    reply: { type: 'text', body: WHATSAPP_BOT.registration.unavailable },
+    nextStep: 'AWAITING_FULL_NAME',
+    context: context.location ? { location: context.location } : {},
+  })
 }

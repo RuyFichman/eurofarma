@@ -107,6 +107,14 @@ enum AppointmentFailureReason {
 /// Passo da conversa do chatbot. O webhook é sem estado próprio: o passo atual
 /// mora no banco, indexado pelo número de WhatsApp.
 enum WhatsappConversationStep {
+  MENU
+  FAQ
+  AWAITING_COVERAGE
+  AWAITING_FULL_NAME
+  AWAITING_CONSENT
+
+  // Estados do fluxo antigo. Permanecem no enum para que a migration preserve
+  // os registros existentes; a aplicação os reinicia no menu quando reaparecem.
   ASKED_SCHEDULED
   AWAITING_DATE
   AWAITING_DATE_CONFIRMATION
@@ -334,15 +342,20 @@ model Appointment {
 /// `NutrizProfile` porque o bot também recebe mensagem de quem nunca se
 /// cadastrou — nesse caso `nutrizProfileId` é nulo.
 model WhatsappConversation {
-  id               String                   @id @default(uuid())
-  phoneWhatsapp    String                   @unique @map("phone_whatsapp")
-  nutrizProfileId  String?                  @map("nutriz_profile_id")
-  step             WhatsappConversationStep @default(ASKED_SCHEDULED)
+  id                 String                   @id @default(uuid())
+  phoneWhatsapp      String                   @unique @map("phone_whatsapp")
+  nutrizProfileId    String?                  @map("nutriz_profile_id")
+  step               WhatsappConversationStep @default(MENU)
+  /// Rascunho mínimo do fluxo: somente cidade/UF resolvidas. Nome e CEP nunca
+  /// entram aqui; o nome só é gravado no perfil depois do consentimento.
+  context            Json?
+  misunderstoodCount Int                      @default(0) @map("misunderstood_count")
   /// Data que a nutriz digitou e ainda não confirmou no passo seguinte.
-  draftScheduledAt DateTime?                @map("draft_scheduled_at")
-  lastMessageAt    DateTime                 @default(now()) @map("last_message_at")
-  createdAt        DateTime                 @default(now()) @map("created_at")
-  updatedAt        DateTime                 @updatedAt @map("updated_at")
+  /// Campo legado preservado até a remoção segura do modelo de agendamento.
+  draftScheduledAt   DateTime?                @map("draft_scheduled_at")
+  lastMessageAt      DateTime                 @default(now()) @map("last_message_at")
+  createdAt          DateTime                 @default(now()) @map("created_at")
+  updatedAt          DateTime                 @updatedAt @map("updated_at")
 
   nutrizProfile NutrizProfile? @relation(fields: [nutrizProfileId], references: [id])
 

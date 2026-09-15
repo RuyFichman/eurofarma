@@ -189,10 +189,10 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes e do detalhe da jornada em `/admin/nutrizes/[id]`.
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
-- Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, máquina de estados e simulador local. Somente o módulo legado de acompanhamento pós-encaminhamento está implementado e simulado; ele ainda precisa ser redimensionado para perguntar sobre o recebimento da visita de entrega do kit, conforme o Anexo A.9.
+- Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, rate limiting local, máquina de estados e simulador local. O fluxo ativo já oferece menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada pelo `JourneyStatus` e contato transparente com o Lactare. O consentimento vem antes da solicitação e gravação do nome; o CEP não é persistido, marketing e lembretes permanecem desligados, e o webhook não cria novos agendamentos. A migration conversacional foi gerada, mas ainda precisa ser aplicada no Supabase cloud pelo MCP obrigatório.
 - Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
 - RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration está aplicada no Supabase cloud. A notificação do RF17 continua pendente.
-- Suíte completa com 456 testes passando em 53 arquivos: 382 unitários e 74 de integração contra o Supabase cloud.
+- Última suíte completa, anterior à migration pendente do chatbot, com 456 testes passando em 53 arquivos: 382 unitários e 74 de integração contra o Supabase cloud. Nesta atualização, 470 testes passam em 56 arquivos: 406 unitários e 64 de integração não dependentes do novo schema. Os 10 testes de integração do estado conversacional aguardam a aplicação da migration.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -200,7 +200,7 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
 - **Métricas:** a segmentação combinável por região, status atual e origem, os sinais observáveis de alcance, os cliques por canal e o funil progressivo do `JourneyStatus` estão implementados. “Sem avanço” identifica o ponto atual entre etapas e não prova desistência. Ainda faltam retenção, adesão a lembretes, recorrência de doações confirmadas, indicação própria e velocidade até a primeira doação.
 - **Tracking de contato:** o evento novo mede os canais diretos do Lactare, já está gravando e alimenta total, janela de 30 dias e distribuição por canal no painel; o evento antigo, vinculado a unidades, continua aposentado. Como os eventos novos são anônimos, os números permanecem globais e não são segmentados por região ou status.
-- **Chatbot:** a infraestrutura e um fluxo local limitado existem, mas faltam menu principal, perguntas frequentes, elegibilidade, cadastro, opt-in de lembretes e pós-doação. Não há conta Meta, número, templates ou URL pública.
+- **Chatbot:** menu, perguntas frequentes, elegibilidade, orientação, cadastro opcional e retomada por status estão implementados localmente. Ainda faltam aplicar a migration no Supabase, vídeo institucional oficial, opt-in e job de lembretes, avisos automáticos do RF17, handoff humano operacional e pós-doação baseado em confirmação legítima. Não há conta Meta, número, templates ou URL pública.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
 - **Status da jornada:** o RF16 representa as etapas de ficha, exame e kit sem reutilizar `interestStatus`, com histórico append-only, autorização administrativa, atualização transacional e controle de concorrência. A área pessoal já apresenta o status e uma linha do tempo reduzida à própria nutriz; correção ou reabertura ainda dependem de validação operacional do Lactare, e a notificação do RF17 continua pendente.
 
@@ -212,6 +212,7 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - RF14: reconhecimentos por status na área pessoal.
 - RF15: atribuição específica de novos cadastros por indicação.
 - RF17: notificação automática por WhatsApp após cada atualização válida de status.
+- Aplicação e registro da migration `20260915170000_expand_whatsapp_conversation_flow` no Supabase cloud.
 - Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
 - RLS, rate limiting distribuído e proteção anti-spam, também adiados, mas ainda obrigatórios antes de exposição pública.
 - Validação operacional de e-mail e WhatsApp, caso exigida pelo Lactare.
@@ -227,8 +228,8 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 
 1. Validar com o Lactare correção ou reabertura de uma jornada, quem atualiza cada etapa e o significado de aptidão para doações recorrentes; até lá, o painel mantém somente o fluxo progressivo já definido.
 2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-3. Adaptar o chatbot para perguntas frequentes, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
-4. Implementar lembretes com opt-in separado e sem linguagem de agendamento.
+3. Aplicar pelo MCP do Supabase a migration conversacional já gerada e revalidar a suíte de integração.
+4. Implementar lembretes com opt-in separado e sem linguagem de agendamento, além do handoff humano operacional.
 5. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
 6. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
 7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.

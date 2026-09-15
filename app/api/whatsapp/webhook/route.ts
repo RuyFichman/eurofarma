@@ -1,41 +1,41 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-import { isValidWhatsappSignature } from '@/lib/whatsapp/signature'
-import { extractInboundMessage } from '@/lib/whatsapp/payload'
-import { advanceConversation, type BotReply } from '@/lib/whatsapp/conversation'
-import { sendWhatsappReply } from '@/lib/whatsapp/client'
 import {
-  createDeclaredAppointment,
-  createNotScheduledAppointment,
+  createWhatsappNutrizLead,
   findNutrizByWhatsapp,
   getConversationState,
   saveConversationState,
 } from '@/lib/db/queries/whatsapp-conversations'
-import { WHATSAPP_BOT } from '@/lib/i18n/pt-br'
+import { rateLimit } from '@/lib/security/rate-limit'
+import { sendWhatsappReply } from '@/lib/whatsapp/client'
+import {
+  advanceConversation,
+  buildRegistrationFailureOutcome,
+  isConversationResetText,
+} from '@/lib/whatsapp/conversation'
+import { resolveWhatsappCoverageInput } from '@/lib/whatsapp/coverage'
+import { extractInboundMessage } from '@/lib/whatsapp/payload'
+import { hydrateWhatsappReply } from '@/lib/whatsapp/reply'
+import { isValidWhatsappSignature } from '@/lib/whatsapp/signature'
 
 // Prisma não roda no Edge.
 export const runtime = 'nodejs'
 
-/** Base pública do site, para os links que o bot manda. */
+const RATE_LIMIT = { limit: 30, windowMs: 60_000 }
+
+/** Base pública do site para os links enviados pelo bot. */
 function getSiteUrl(request: NextRequest): string {
-  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/u, '')
   if (explicit) return explicit
   return request.nextUrl.origin
 }
 
-/**
- * `GET /api/whatsapp/webhook` — aperto de mão de verificação da Meta.
- *
- * Ela chama uma vez, no cadastro do webhook, e espera de volta o `hub.challenge`
- * **em texto puro**. Devolver JSON aqui faz a verificação falhar sem explicação
- * no painel da Meta.
- */
+/** Verificação inicial exigida pela Meta. */
 export function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams
   const mode = params.get('hub.mode')
   const token = params.get('hub.verify_token')
   const challenge = params.get('hub.challenge')
-
   const expected = process.env.WHATSAPP_VERIFY_TOKEN?.trim()
 
   if (!expected || mode !== 'subscribe' || token !== expected || !challenge) {
@@ -48,50 +48,15 @@ export function GET(request: NextRequest) {
   })
 }
 
-/** Injeta os links nos textos finais, que vêm do i18n com placeholder. */
-function withLinks(reply: BotReply, siteUrl: string): BotReply {
-  if (reply.type !== 'text') return reply
-
-  if (reply.body === WHATSAPP_BOT.scheduledSaved.bodyTemplate) {
-    return {
-      type: 'text',
-      body: reply.body.replace('{url}', `${siteUrl}/meu-agendamento`),
-    }
-  }
-  if (reply.body === WHATSAPP_BOT.notScheduledSaved.bodyTemplate) {
-    return {
-      type: 'text',
-      body: reply.body.replace('{url}', `${siteUrl}/verificar-cobertura`),
-    }
-  }
-  return reply
-}
-
 /**
- * `POST /api/whatsapp/webhook` — mensagens recebidas do chatbot (Sprint 6.5).
- *
- * O fluxo é: **assinatura → identificar a nutriz pelo número → avançar a
- * conversa → gravar → responder**. A decisão de qual resposta dar é toda de
- * `advanceConversation`, que é pura; aqui só há efeito colateral.
- *
- * **Sempre responde 200** depois da assinatura conferida, mesmo em erro
- * interno. A Meta reenvia o evento quando não recebe 2xx, e um reenvio faria o
- * bot responder em duplicata. Assinatura inválida é a única exceção — aí o 401
- * é o ponto.
- *
- * Idempotência: um reenvio chega com a conversa já em `FINISHED`, e o estado
- * `FINISHED` não grava nada — só recomeça a pergunta. Isso cobre o caso comum
- * (resposta lenta). Resta uma janela pequena entre gravar o agendamento e
- * gravar o passo; nela, um reenvio duplicaria o registro. Fechá-la exigiria
- * guardar o `messageId` já processado, o que é coluna nova — vale fazer se
- * aparecer duplicata na prática.
+ * Recebe uma mensagem, avança a máquina de estados, persiste o mínimo necessário
+ * e responde. Depois de uma assinatura válida, devolve 200 inclusive em falha
+ * interna para não provocar reenvios e respostas duplicadas pela Meta.
  */
 export async function POST(request: NextRequest) {
   const appSecret = process.env.WHATSAPP_APP_SECRET?.trim()
   const rawBody = await request.text()
 
-  // Sem segredo configurado o endpoint não tem como se defender: recusa tudo,
-  // em vez de aceitar qualquer corpo enquanto ninguém configurou o ambiente.
   if (
     !appSecret ||
     !isValidWhatsappSignature({
@@ -119,65 +84,74 @@ export async function POST(request: NextRequest) {
       return ok
     }
 
-    // Recibos de entrega e leitura chegam neste mesmo webhook, sem `messages`.
+    // Recibos de entrega e leitura chegam neste endpoint sem `messages`.
     const message = extractInboundMessage(payload)
     if (!message) return ok
 
-    const siteUrl = getSiteUrl(request)
-    const nutriz = await findNutrizByWhatsapp(message.from)
+    // O telefone é somente chave efêmera do limitador em memória; não vai a log.
+    if (!rateLimit(`whatsapp:${message.from}`, RATE_LIMIT).success) return ok
 
-    // Número sem cadastro: convida e não guarda conversa. A mensagem não
-    // confirma nem nega a existência de conta de ninguém.
-    if (!nutriz) {
-      await sendWhatsappReply({
-        to: message.from,
-        reply: {
-          type: 'text',
-          body: WHATSAPP_BOT.unknownNumber.bodyTemplate.replace(
-            '{url}',
-            `${siteUrl}/cadastro`,
-          ),
-        },
-      })
-      return ok
-    }
-
+    const profile = await findNutrizByWhatsapp(message.from)
     const state = await getConversationState(message.from)
-    const outcome = advanceConversation({
+    const coverage =
+      state.step === 'AWAITING_COVERAGE' &&
+      message.text &&
+      !isConversationResetText(message.text)
+        ? await resolveWhatsappCoverageInput(message.text)
+        : undefined
+
+    let outcome = advanceConversation({
       step: state.step,
-      draftScheduledAt: state.draftScheduledAt,
+      context: state.context,
+      misunderstoodCount: state.misunderstoodCount,
       text: message.text,
       replyId: message.replyId,
+      coverage,
+      profile,
+      isNewConversation: state.isNewConversation,
     })
 
-    if (outcome.effect.kind === 'save_scheduled') {
-      await createDeclaredAppointment({
-        nutrizProfileId: nutriz.id,
-        scheduledAt: outcome.effect.scheduledAt,
-      })
-    } else if (outcome.effect.kind === 'save_not_scheduled') {
-      await createNotScheduledAppointment({
-        nutrizProfileId: nutriz.id,
-        reason: outcome.effect.reason,
-      })
+    let nutrizProfileId = profile?.id ?? null
+    if (outcome.effect.kind === 'create_lead') {
+      let created: Awaited<ReturnType<typeof createWhatsappNutrizLead>> = null
+      try {
+        created = await createWhatsappNutrizLead({
+          phoneWhatsapp: message.from,
+          fullName: outcome.effect.fullName,
+          city: outcome.effect.city,
+          state: outcome.effect.state,
+        })
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          // O erro técnico não inclui os dados recebidos na mensagem.
+          console.error('[whatsapp] cadastro não gravado', error)
+        }
+      }
+
+      if (created) {
+        nutrizProfileId = created.id
+      } else {
+        outcome = buildRegistrationFailureOutcome(state.context)
+      }
     }
 
     await saveConversationState({
       phoneWhatsapp: message.from,
-      nutrizProfileId: nutriz.id,
+      nutrizProfileId,
       step: outcome.nextStep,
-      draftScheduledAt: outcome.draftScheduledAt,
+      context: outcome.context,
+      misunderstoodCount: outcome.misunderstoodCount,
     })
 
     await sendWhatsappReply({
       to: message.from,
-      reply: withLinks(outcome.reply, siteUrl),
+      reply: hydrateWhatsappReply(outcome.reply, getSiteUrl(request)),
     })
 
     return ok
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      // Só o erro técnico — nunca o corpo, que carrega o número e o texto dela.
+      // Só o erro técnico: nunca o corpo, número, nome, CEP ou texto recebido.
       console.error('[POST /api/whatsapp/webhook]', error)
     }
     return ok
