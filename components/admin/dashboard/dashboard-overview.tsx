@@ -1,8 +1,18 @@
 import type { ReactNode } from 'react'
-import { HeartHandshake, Map, MapPin, UserPlus } from 'lucide-react'
+import {
+  HeartHandshake,
+  Map,
+  MapPin,
+  MousePointerClick,
+  Radio,
+  TrendingUp,
+  UserPlus,
+} from 'lucide-react'
 
 import { AdminBreakdownList } from '@/components/admin/dashboard/admin-breakdown-list'
 import { AdminStatCard } from '@/components/admin/dashboard/admin-stat-card'
+import { JourneyFunnel } from '@/components/admin/dashboard/journey-funnel'
+import { getJourneyStatusLabel } from '@/lib/admin/nutrizes/journey-labels'
 import type { AdminDashboardMetrics } from '@/lib/db/queries/dashboard-metrics'
 import { ADMIN, COVERAGE } from '@/lib/i18n/pt-br'
 import { formatCount } from '@/lib/utils/format-number'
@@ -18,7 +28,8 @@ export function DashboardOverview({
   hasFilters: boolean
   children?: ReactNode
 }) {
-  const { municipalities, nutriz, periodDays } = metrics
+  const { municipalities, nutriz, periodDays, reach, contactClicks, journey } =
+    metrics
 
   return (
     <div className="space-y-6">
@@ -38,6 +49,25 @@ export function DashboardOverview({
             }
           />
           <AdminStatCard
+            icon={Radio}
+            label={COPY.metrics.reach.label}
+            value={reach.signalsInPeriod}
+            description={
+              reach.signalsInPeriod > 0
+                ? COPY.metrics.reach.description
+                    .replace(
+                      '{registrations}',
+                      formatCount(reach.registrationsInPeriod),
+                    )
+                    .replace(
+                      '{clicks}',
+                      formatCount(reach.contactClicksInPeriod),
+                    )
+                    .replace('{days}', String(periodDays))
+                : COPY.metrics.reach.empty.replace('{days}', String(periodDays))
+            }
+          />
+          <AdminStatCard
             icon={Map}
             label={COPY.metrics.regionsCovered.label}
             value={municipalities.regionsCovered}
@@ -45,6 +75,21 @@ export function DashboardOverview({
               municipalities.regionsCovered > 0
                 ? COPY.metrics.regionsCovered.description
                 : COPY.metrics.regionsCovered.empty
+            }
+          />
+          <AdminStatCard
+            icon={MousePointerClick}
+            label={COPY.metrics.contactClicks.label}
+            value={contactClicks.total}
+            description={
+              contactClicks.total > 0
+                ? COPY.metrics.contactClicks.description
+                    .replace(
+                      '{count}',
+                      formatCount(contactClicks.createdInPeriod),
+                    )
+                    .replace('{days}', String(periodDays))
+                : COPY.metrics.contactClicks.empty
             }
           />
           <AdminStatCard
@@ -79,10 +124,22 @@ export function DashboardOverview({
                   : COPY.metrics.newNutriz.empty
             }
           />
+          <AdminStatCard
+            icon={TrendingUp}
+            label={COPY.metrics.journeyConversion.label}
+            value={`${journey.overallConversion}%`}
+            description={
+              nutriz.total > 0
+                ? COPY.metrics.journeyConversion.description
+                : COPY.metrics.journeyConversion.empty
+            }
+          />
         </dl>
       </section>
 
       {children}
+
+      <JourneyFunnel funnel={journey} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <AdminBreakdownList
@@ -99,12 +156,22 @@ export function DashboardOverview({
           }))}
         />
         <AdminBreakdownList
+          title={COPY.contactClicksByChannel.title}
+          description={COPY.contactClicksByChannel.description}
+          emptyMessage={COPY.contactClicksByChannel.empty}
+          items={contactClicks.byChannel.map((row) => ({
+            id: row.key,
+            label: COPY.contactClicksByChannel.labels[row.key],
+            count: row.count,
+          }))}
+        />
+        <AdminBreakdownList
           title={COPY.nutrizByStage.title}
           description={COPY.nutrizByStage.description}
           emptyMessage={COPY.nutrizByStage.empty}
           items={nutriz.byStage.map((row) => ({
             id: row.key,
-            label: COPY.filters.stage.options[row.key],
+            label: getJourneyStatusLabel(row.key),
             count: row.count,
           }))}
         />

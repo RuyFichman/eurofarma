@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
   nutrizCount: vi.fn(),
   nutrizGroupBy: vi.fn(),
   nutrizFindMany: vi.fn(),
+  contactClickCount: vi.fn(),
+  contactClickGroupBy: vi.fn(),
   transaction: vi.fn(),
 }))
 
@@ -21,6 +23,10 @@ vi.mock('../../lib/db/prisma', () => ({
       count: mocks.nutrizCount,
       groupBy: mocks.nutrizGroupBy,
       findMany: mocks.nutrizFindMany,
+    },
+    contactChannelClick: {
+      count: mocks.contactClickCount,
+      groupBy: mocks.contactClickGroupBy,
     },
     $transaction: mocks.transaction,
   },
@@ -40,6 +46,8 @@ describe('métricas administrativas por município', () => {
     mocks.nutrizCount.mockReturnValue(undefined)
     mocks.nutrizGroupBy.mockReturnValue(undefined)
     mocks.nutrizFindMany.mockReturnValue(undefined)
+    mocks.contactClickCount.mockReturnValue(undefined)
+    mocks.contactClickGroupBy.mockReturnValue(undefined)
   })
 
   it('calcula ativos, inativos e preenche regiões sem registros com zero', async () => {
@@ -53,10 +61,17 @@ describe('métricas administrativas por município', () => {
       14,
       3,
       [
-        { interestStatus: 'INTERESTED', _count: { id: 8 } },
-        { interestStatus: 'CONTACTED', _count: { id: 3 } },
-        { interestStatus: 'DONATED', _count: { id: 2 } },
-        { interestStatus: 'UNKNOWN', _count: { id: 1 } },
+        { journeyStatus: 'REGISTERED', _count: { id: 4 } },
+        { journeyStatus: 'FORM_RECEIVED', _count: { id: 3 } },
+        { journeyStatus: 'EXAM_SCHEDULED', _count: { id: 2 } },
+        { journeyStatus: 'AWAITING_RESULT', _count: { id: 1 } },
+        { journeyStatus: 'ELIGIBLE', _count: { id: 1 } },
+        { journeyStatus: 'NOT_ELIGIBLE', _count: { id: 1 } },
+        { journeyStatus: 'KIT_DELIVERED', _count: { id: 1 } },
+        {
+          journeyStatus: 'RECURRING_DONATION_ELIGIBLE',
+          _count: { id: 1 },
+        },
       ],
       [
         { state: 'SP', city: 'Itapevi' },
@@ -66,6 +81,13 @@ describe('métricas administrativas por município', () => {
       [
         { state: 'SP', name: 'Itapevi', region: 'WEST' },
         { state: 'SP', name: 'Santo Andre', region: 'ABC' },
+      ],
+      5,
+      21,
+      7,
+      [
+        { channel: 'WHATSAPP', _count: { id: 15 } },
+        { channel: 'PHONE', _count: { id: 6 } },
       ],
     ])
 
@@ -102,16 +124,48 @@ describe('métricas administrativas por município', () => {
         { key: 'OUTSIDE_OR_UNMAPPED', count: 1 },
       ],
       byStage: [
-        { key: 'INTERESTED', count: 8 },
-        { key: 'CONTACTED', count: 3 },
-        { key: 'DONATED', count: 2 },
-        { key: 'UNKNOWN', count: 1 },
+        { key: 'REGISTERED', count: 4 },
+        { key: 'FORM_RECEIVED', count: 3 },
+        { key: 'EXAM_SCHEDULED', count: 2 },
+        { key: 'AWAITING_RESULT', count: 1 },
+        { key: 'ELIGIBLE', count: 1 },
+        { key: 'NOT_ELIGIBLE', count: 1 },
+        { key: 'KIT_DELIVERED', count: 1 },
+        { key: 'RECURRING_DONATION_ELIGIBLE', count: 1 },
       ],
     })
+    expect(metrics.reach).toEqual({
+      signalsInPeriod: 12,
+      registrationsInPeriod: 5,
+      contactClicksInPeriod: 7,
+    })
+    expect(metrics.contactClicks).toEqual({
+      total: 21,
+      createdInPeriod: 7,
+      byChannel: [
+        { key: 'WHATSAPP', count: 15 },
+        { key: 'PHONE', count: 6 },
+      ],
+    })
+    expect(metrics.journey.overallConversion).toBe(7)
+    expect(metrics.journey.notEligible).toBe(1)
   })
 
   it('consulta somente municípios ativos para o recorte regional', async () => {
-    mocks.transaction.mockResolvedValue([0, 0, [], 0, 0, [], [], []])
+    mocks.transaction.mockResolvedValue([
+      0,
+      0,
+      [],
+      0,
+      0,
+      [],
+      [],
+      [],
+      0,
+      0,
+      0,
+      [],
+    ])
 
     await getAdminDashboardMetrics()
 
@@ -121,17 +175,34 @@ describe('métricas administrativas por município', () => {
   })
 
   it('aplica o mesmo recorte aos indicadores e distribuições de nutrizes', async () => {
-    const scope = { interestStatus: 'DONATED', deletedAt: null } as const
-    mocks.transaction.mockResolvedValue([0, 0, [], 2, 1, [], [], []])
+    const scope = { journeyStatus: 'KIT_DELIVERED', deletedAt: null } as const
+    mocks.transaction.mockResolvedValue([
+      0,
+      0,
+      [],
+      2,
+      1,
+      [],
+      [],
+      [],
+      0,
+      0,
+      0,
+      [],
+    ])
 
     await getAdminDashboardMetrics(scope)
 
     expect(mocks.nutrizCount).toHaveBeenCalledWith({ where: scope })
     expect(mocks.nutrizGroupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ where: scope }),
+      expect.objectContaining({ by: ['journeyStatus'], where: scope }),
     )
     expect(mocks.nutrizFindMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: scope }),
     )
+    expect(mocks.contactClickGroupBy).toHaveBeenCalledWith({
+      by: ['channel'],
+      _count: { id: true },
+    })
   })
 })

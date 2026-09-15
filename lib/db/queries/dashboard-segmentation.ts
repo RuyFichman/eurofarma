@@ -1,4 +1,4 @@
-import type { InterestStatus, Prisma, ServiceRegion } from '@prisma/client'
+import type { JourneyStatus, Prisma, ServiceRegion } from '@prisma/client'
 
 import {
   buildDashboardLocationKey,
@@ -21,7 +21,7 @@ export async function buildDashboardNutrizScope(
   const where: DashboardNutrizScope = { deletedAt: null }
 
   if (filters.stage) {
-    where.interestStatus = filters.stage as InterestStatus
+    where.journeyStatus = filters.stage as JourneyStatus
   }
 
   let regionLocations: Set<string> | undefined

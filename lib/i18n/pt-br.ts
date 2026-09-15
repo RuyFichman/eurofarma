@@ -1416,20 +1416,24 @@ export const ADMIN = {
     filters: {
       title: 'Segmentação de nutrizes',
       description:
-        'Combine sub-região, estágio da jornada e origem. O recorte é aplicado aos indicadores e gráficos de nutrizes; a cobertura dos municípios permanece geral.',
+        'Combine sub-região, status atual da jornada e origem. O recorte é aplicado aos indicadores, gráficos e funil de nutrizes; cobertura, alcance geral e cliques anônimos permanecem globais.',
       label: 'Filtros combináveis do dashboard',
       region: {
         label: 'Sub-região da Grande SP',
         all: 'Todas as sub-regiões',
       },
       stage: {
-        label: 'Estágio da jornada',
-        all: 'Todos os estágios',
+        label: 'Status atual da jornada',
+        all: 'Todos os status',
         options: {
-          INTERESTED: 'Cadastrada / interessada',
-          CONTACTED: 'Em contato com o Lactare',
-          DONATED: 'Doação registrada',
-          UNKNOWN: 'Sem estágio definido',
+          REGISTERED: 'Cadastrada',
+          FORM_RECEIVED: 'Ficha recebida',
+          EXAM_SCHEDULED: 'Exame agendado',
+          AWAITING_RESULT: 'Aguardando resultado',
+          ELIGIBLE: 'Apta',
+          NOT_ELIGIBLE: 'Não apta',
+          KIT_DELIVERED: 'Kit entregue',
+          RECURRING_DONATION_ELIGIBLE: 'Apta a doações recorrentes',
         },
       },
       origin: {
@@ -1441,7 +1445,7 @@ export const ADMIN = {
         clear: 'Limpar',
       },
       limitations:
-        'Recorrência, adesão a lembretes, indicação e velocidade até a primeira doação ainda não aparecem como filtros: essas dimensões exigem eventos próprios e não são inferidas de dados incompletos.',
+        'Adesão a lembretes, indicação e velocidade até a primeira doação ainda não aparecem como filtros: essas dimensões exigem eventos próprios e não são inferidas de dados incompletos.',
     },
 
     /** Rótulo de janela temporal. `{days}` é substituído em tempo de render. */
@@ -1460,6 +1464,18 @@ export const ADMIN = {
         description: 'Regiões com ao menos um município ativo',
         empty: 'Nenhuma sub-região coberta até agora',
       },
+      reach: {
+        label: 'Sinais de alcance',
+        description:
+          '{registrations} cadastros + {clicks} cliques nos últimos {days} dias; são ações, não pessoas únicas',
+        empty: 'Nenhum cadastro ou clique nos últimos {days} dias',
+      },
+      contactClicks: {
+        label: 'Cliques de contato',
+        description:
+          '{count} nos últimos {days} dias · agregado anônimo global',
+        empty: 'Nenhum clique nos canais oficiais foi registrado',
+      },
       nutriz: {
         label: 'Nutrizes cadastradas',
         /** `{count}` = cadastros no período, `{days}` = tamanho da janela. */
@@ -1475,6 +1491,47 @@ export const ADMIN = {
         filteredDescription: 'No recorte · últimos {days} dias',
         empty: 'Nenhum cadastro novo no período',
         filteredEmpty: 'Nenhum cadastro novo no recorte e período',
+      },
+      journeyConversion: {
+        label: 'Conversão da jornada',
+        description:
+          'Do cadastro à aptidão para doações recorrentes no recorte; não confirma doação',
+        empty: 'Sem cadastros no recorte para calcular a conversão',
+      },
+    },
+
+    journeyFunnel: {
+      title: 'Funil da jornada',
+      description:
+        'Quantidade que alcançou cada etapa do fluxo progressivo registrado pelo Lactare.',
+      empty: 'Nenhuma jornada corresponde ao recorte selecionado.',
+      start: 'Início do funil',
+      conversionFromPrevious: '{percent}% da etapa anterior',
+      conversionFromStart: '{percent}% do início',
+      progressiveNote:
+        'O funil usa o status atual e as transições progressivas do RF16. “Apta a doações recorrentes” é uma categoria registrada pelo Lactare e não confirma uma doação.',
+      dropOff: {
+        title: 'Abandono entre etapas',
+        description:
+          'Cadastros sem avanço registrado entre duas etapas consecutivas.',
+        empty: 'Nenhuma jornada disponível para analisar avanço.',
+        transition: '{from} → {to}',
+        rate: '{percent}% da etapa anterior',
+        notEligibleLabel: 'Saída registrada como não apta',
+        notEligibleDescription:
+          'Decisão categórica do Lactare, separada de abandono.',
+        note: 'Sem um evento de desistência ou prazo operacional validado, “sem avanço” indica o ponto atual da jornada e não prova abandono definitivo.',
+      },
+    },
+
+    contactClicksByChannel: {
+      title: 'Cliques por canal',
+      description:
+        'Eventos anônimos desde o início do registro. Como não guardam nutriz nem localização, não respondem aos filtros de região ou status.',
+      empty: 'Nenhum clique em canal oficial foi registrado.',
+      labels: {
+        WHATSAPP: 'WhatsApp do Lactare',
+        PHONE: 'Telefone do Lactare',
       },
     },
 
@@ -1504,9 +1561,9 @@ export const ADMIN = {
     },
 
     nutrizByStage: {
-      title: 'Nutrizes por estágio',
+      title: 'Nutrizes por status atual',
       description:
-        'Situação administrativa atual do cadastro; não representa triagem clínica nem recorrência.',
+        'Categoria operacional atual registrada pelo Lactare; não representa triagem automática nem confirmação de doação.',
       empty: 'Nenhuma nutriz corresponde ao recorte selecionado.',
     },
   },

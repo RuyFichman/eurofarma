@@ -9,31 +9,31 @@ describe('segmentação combinável do dashboard', () => {
     const matching = await createTestNutrizProfile({
       state: 'SP',
       city: 'Itapevi',
-      interestStatus: 'DONATED',
+      journeyStatus: 'KIT_DELIVERED',
       sourceUtm: { utm_source: 'whatsapp' },
     })
     const otherRegion = await createTestNutrizProfile({
       state: 'SP',
       city: 'Santo André',
-      interestStatus: 'DONATED',
+      journeyStatus: 'KIT_DELIVERED',
       sourceUtm: { utm_source: 'whatsapp' },
     })
     const otherStage = await createTestNutrizProfile({
       state: 'SP',
       city: 'Itapevi',
-      interestStatus: 'CONTACTED',
+      journeyStatus: 'FORM_RECEIVED',
       sourceUtm: { utm_source: 'whatsapp' },
     })
     const otherOrigin = await createTestNutrizProfile({
       state: 'SP',
       city: 'Itapevi',
-      interestStatus: 'DONATED',
+      journeyStatus: 'KIT_DELIVERED',
       sourceUtm: { utm_source: 'site' },
     })
 
     const filteredScope = await buildDashboardNutrizScope({
       region: 'WEST',
-      stage: 'DONATED',
+      stage: 'KIT_DELIVERED',
       origin: 'whatsapp',
     })
     const fixtureIds = [
@@ -51,7 +51,8 @@ describe('segmentação combinável do dashboard', () => {
       metrics.nutriz.byRegion.find((item) => item.key === 'WEST')?.count,
     ).toBe(1)
     expect(
-      metrics.nutriz.byStage.find((item) => item.key === 'DONATED')?.count,
+      metrics.nutriz.byStage.find((item) => item.key === 'KIT_DELIVERED')
+        ?.count,
     ).toBe(1)
   })
 })
