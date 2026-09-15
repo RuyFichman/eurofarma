@@ -2,18 +2,17 @@ import {
   SERVICE_REGION_VALUES,
   type ServiceRegionValue,
 } from '../../constants/service-municipalities'
+import {
+  JOURNEY_STATUS_VALUES,
+  type JourneyStatusValue,
+} from '../../journey/status'
 import { ORIGIN_KEYS, type RegistrationOrigin } from './charts'
 
 export const ADMIN_DASHBOARD_PATH = '/admin/dashboard'
 
-export const DASHBOARD_STAGE_VALUES = [
-  'INTERESTED',
-  'CONTACTED',
-  'DONATED',
-  'UNKNOWN',
-] as const
+export const DASHBOARD_STAGE_VALUES = JOURNEY_STATUS_VALUES
 
-export type DashboardStage = (typeof DASHBOARD_STAGE_VALUES)[number]
+export type DashboardStage = JourneyStatusValue
 
 export type DashboardFilters = {
   region: ServiceRegionValue | ''

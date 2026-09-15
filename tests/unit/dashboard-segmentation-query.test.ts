@@ -36,7 +36,7 @@ describe('recorte de nutrizes do dashboard', () => {
 
     const scope = await buildDashboardNutrizScope({
       region: 'ABC',
-      stage: 'CONTACTED',
+      stage: 'FORM_RECEIVED',
       origin: '',
     })
 
@@ -45,12 +45,12 @@ describe('recorte de nutrizes do dashboard', () => {
       select: { name: true, state: true },
     })
     expect(mocks.nutrizFindMany).toHaveBeenCalledWith({
-      where: { deletedAt: null, interestStatus: 'CONTACTED' },
+      where: { deletedAt: null, journeyStatus: 'FORM_RECEIVED' },
       select: { id: true, state: true, city: true, sourceUtm: true },
     })
     expect(scope).toEqual({
       AND: [
-        { deletedAt: null, interestStatus: 'CONTACTED' },
+        { deletedAt: null, journeyStatus: 'FORM_RECEIVED' },
         { id: { in: ['match'] } },
       ],
     })
@@ -84,19 +84,19 @@ describe('recorte de nutrizes do dashboard', () => {
 
     const scope = await buildDashboardNutrizScope({
       region: 'WEST',
-      stage: 'INTERESTED',
+      stage: 'REGISTERED',
       origin: 'whatsapp',
     })
 
     expect(mocks.nutrizFindMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({ interestStatus: 'INTERESTED' }),
+      where: expect.objectContaining({ journeyStatus: 'REGISTERED' }),
       select: { id: true, state: true, city: true, sourceUtm: true },
     })
     expect(scope).toEqual({
       AND: [
         expect.objectContaining({
           deletedAt: null,
-          interestStatus: 'INTERESTED',
+          journeyStatus: 'REGISTERED',
         }),
         { id: { in: ['wa'] } },
       ],

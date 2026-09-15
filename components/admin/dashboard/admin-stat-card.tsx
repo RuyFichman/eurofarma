@@ -6,7 +6,7 @@ import { formatCount } from '@/lib/utils/format-number'
 type AdminStatCardProps = {
   /** Nome do indicador. Vira o `<dt>` do par nome/valor. */
   label: string
-  value: number
+  value: number | string
   /**
    * Linha de contexto abaixo do número. Quem compõe o cartão escolhe entre o
    * texto normal e o de estado vazio — um "0" sozinho parece bug, então todo
@@ -41,7 +41,7 @@ export function AdminStatCard({
         <dd className="space-y-1">
           {/* `tabular-nums` alinha os dígitos entre cartões vizinhos. */}
           <p className="text-foreground text-3xl font-semibold tabular-nums">
-            {formatCount(value)}
+            {typeof value === 'number' ? formatCount(value) : value}
           </p>
           <p className="text-muted-foreground text-sm text-pretty">
             {description}

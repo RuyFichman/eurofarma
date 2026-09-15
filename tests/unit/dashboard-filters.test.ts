@@ -10,13 +10,13 @@ describe('filtros combináveis do dashboard', () => {
   it('aceita região, estágio e origem simultaneamente', () => {
     const filters = parseDashboardFilters({
       region: 'abc',
-      stage: 'donated',
+      stage: 'kit_delivered',
       origin: 'WhatsApp',
     })
 
     expect(filters).toEqual({
       region: 'ABC',
-      stage: 'DONATED',
+      stage: 'KIT_DELIVERED',
       origin: 'whatsapp',
     })
     expect(hasActiveDashboardFilters(filters)).toBe(true)
@@ -25,7 +25,7 @@ describe('filtros combináveis do dashboard', () => {
   it('ignora valores desconhecidos e usa somente o primeiro valor da URL', () => {
     const filters = parseDashboardFilters({
       region: ['WEST', 'ABC'],
-      stage: 'RECURRENT',
+      stage: 'DONATED',
       origin: 'referral',
     })
 

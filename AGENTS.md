@@ -68,7 +68,7 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 ## 3. Estado atual do projeto
 
-**Referência desta seção:** 14 de setembro de 2026.
+**Referência desta seção:** 15 de setembro de 2026.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 454 testes em 52 arquivos**: 380 unitários e 74 de integração. A migration do RF07 foi aplicada no Supabase cloud em 14 de setembro de 2026 e a do RF16, em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atualização, a **suíte completa passa: 456 testes em 53 arquivos**: 382 unitários e 74 de integração. A migration do RF07 foi aplicada no Supabase cloud em 14 de setembro de 2026 e a do RF16, em 13 de setembro de 2026. A migration anterior de `service_municipalities` também está aplicada, com os 30 municípios conferidos.
 
 ### 3.1 O que está implementado
 
@@ -99,7 +99,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 - Login, logout, recuperação e redefinição de senha da nutriz.
 - Área autenticada da nutriz com status atual da jornada, linha do tempo de categorias e datas, orientações específicas para cada etapa, identificação da cidade cadastrada e acesso ao verificador de cobertura. A consulta da nutriz não seleciona observações administrativas, responsáveis ou detalhes clínicos.
 - Login, logout, middleware, autorização por role e shell administrativo.
-- Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, estágio administrativo da jornada e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal e às distribuições agregadas; dados pessoais não são exibidos.
+- Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, status atual de `JourneyStatus` e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal, às distribuições e ao funil progressivo da jornada; dados pessoais não são exibidos. O painel também apresenta sinais globais de alcance, cliques anônimos por canal, conversão acumulada e cadastros sem avanço registrado entre etapas. Como os cliques não referenciam nutriz nem localização, eles permanecem globais e não respondem aos filtros de região ou status.
 - Listagem de nutrizes com exposição reduzida de contato e acesso ao detalhe da jornada em `/admin/nutrizes/[id]`.
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
@@ -118,10 +118,10 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. Nesta atua
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
 | RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
 | RF06 — lembretes opcionais | **Não implementado.** |
-| RF07 — tracking de contato | **Implementado no escopo do registro.** O clique nos canais oficiais do Lactare é gravado como evento anônimo em `contact_channel_clicks`, sem unidade legada e sem CEP ou PII. O tracking antigo por unidade continua aposentado (`/api/track` responde 410). A leitura agregada desses cliques ainda não existe no painel e pertence ao RF10. |
+| RF07 — tracking de contato | **Implementado.** O clique nos canais oficiais do Lactare é gravado como evento anônimo em `contact_channel_clicks`, sem unidade legada e sem CEP ou PII. O tracking antigo por unidade continua aposentado (`/api/track` responde 410). O painel lê o total, a janela de 30 dias e a distribuição por canal. |
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
 | RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
-| RF10 — indicadores do funil | **Parcial.** O dashboard resume municípios e nutrizes e já permite segmentar os cadastros por sub-região, estágio e origem de forma combinável. Ainda faltam alcance, funil completo, retenção, adesão a lembretes e a agregação dos cliques em canais de contato já registrados pelo RF07. |
+| RF10 — indicadores do funil | **Parcial.** O dashboard resume municípios e nutrizes, mede sinais observáveis de alcance, agrega os cliques anônimos de contato e apresenta o funil progressivo do `JourneyStatus`, sua conversão e os pontos sem avanço registrado. Os cadastros podem ser segmentados por sub-região, status atual e origem de forma combinável. “Sem avanço” não prova abandono definitivo, e “não apta” é uma saída legítima separada. Ainda faltam retenção, adesão a lembretes e os segmentos que dependem de confirmação legítima de doação e indicação própria. |
 | RF11 — chatbot completo | **Parcial.** Infraestrutura e simulação local existem; faltam FAQ, elegibilidade, cadastro, lembretes, pós-doação e ativação real na Meta. |
 | RF12 — cartão de impacto | **Não implementado.** |
 | RF13 — mensagem de indicação | **Não implementado.** |
@@ -176,7 +176,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
 3. Adaptar o chatbot para menu, FAQ, elegibilidade, cadastro, encaminhamento ao Lactare e acompanhamento compatível com a fonte de cada informação.
 4. Implementar lembretes opcionais sem semântica de agendamento.
-5. Completar o dashboard com alcance, funil, retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação.
+5. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
 6. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
 7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
 8. Ativar a integração real com a Meta quando a infraestrutura externa existir.
@@ -198,7 +198,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | 454 passando em 52 arquivos: 380 unitários e 74 de integração contra o Supabase cloud |
+| Testes | Vitest | 456 passando em 53 arquivos: 382 unitários e 74 de integração contra o Supabase cloud |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -512,14 +512,14 @@ Sub-regiões:
 Segmentos implementados no dashboard:
 
 - sub-região da Grande São Paulo, relacionada pela cidade da nutriz e pela configuração de `ServiceMunicipality`;
-- estágio administrativo da jornada, a partir de `interestStatus` (`INTERESTED`, `CONTACTED`, `DONATED` ou `UNKNOWN`);
+- status atual da jornada, a partir de `JourneyStatus` (`REGISTERED`, `FORM_RECEIVED`, `EXAM_SCHEDULED`, `AWAITING_RESULT`, `ELIGIBLE`, `NOT_ELIGIBLE`, `KIT_DELIVERED` ou `RECURRING_DONATION_ELIGIBLE`);
 - origem do cadastro, classificada somente quando existe `utm_source` explícita.
 
 Os três filtros vivem na URL (`region`, `stage` e `origin`), são combináveis e geram um único recorte compartilhado pelos cartões, pela evolução mensal e pelas distribuições. A região usa todos os municípios configurados, inclusive inativos, para que a desativação operacional de uma cidade não apague sua classificação histórica.
 
-O clique nos canais oficiais do Lactare tem evento próprio desde o RF07 (`contact_channel_clicks`, com canal, superfície e UTM), mas ainda não alimenta nenhum cartão do painel: transformá-lo em indicador é trabalho do RF10.
+O clique nos canais oficiais do Lactare tem evento próprio desde o RF07 (`contact_channel_clicks`, com canal, superfície e UTM) e alimenta os cartões e a distribuição por canal. Como o evento é anônimo e não guarda nutriz nem localização, sua leitura é global e não responde aos filtros de região ou status. O indicador de alcance observável soma cadastros e cliques da janela de 30 dias como ações, não como pessoas únicas.
 
-Ainda não estão implementados os segmentos de adesão a lembretes, recorrência, indicação própria e velocidade até a primeira doação. O modelo do RF16 já existe, separado de `interestStatus`, está conectado ao painel e à área pessoal da nutriz, e sua migration está aplicada no Supabase cloud. O dashboard ainda usa `interestStatus`; os demais segmentos exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
+Ainda não estão implementados os segmentos de adesão a lembretes, recorrência de doações confirmadas, indicação própria e velocidade até a primeira doação. O modelo do RF16 está conectado ao painel, ao funil e à área pessoal da nutriz, separado do `interestStatus` legado, e sua migration está aplicada no Supabase cloud. O funil calcula alcance acumulado a partir do fluxo progressivo vigente; os pontos entre etapas significam apenas ausência de avanço registrado, porque ainda não existe evento de desistência nem prazo operacional validado. Os demais segmentos exigem eventos e campos específicos. Não os inferir de agendamentos legados, preferências de contato, UTMs ausentes ou outros sinais indiretos; não inventar valores nem derivar status clínico.
 
 ## 13. Regras de produto vigentes
 
