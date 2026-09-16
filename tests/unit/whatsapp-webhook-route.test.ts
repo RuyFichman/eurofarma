@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   resolveCoverage: vi.fn(),
   sendReply: vi.fn(),
   rateLimit: vi.fn(),
+  setReminderConsent: vi.fn(),
 }))
 
 vi.mock('../../lib/whatsapp/signature', () => ({
@@ -29,6 +30,9 @@ vi.mock('../../lib/whatsapp/client', () => ({
 }))
 vi.mock('../../lib/security/rate-limit', () => ({
   rateLimit: mocks.rateLimit,
+}))
+vi.mock('../../lib/db/queries/communication-consents', () => ({
+  setReminderConsent: mocks.setReminderConsent,
 }))
 
 import { POST } from '../../app/api/whatsapp/webhook/route'
@@ -56,6 +60,10 @@ describe('POST /api/whatsapp/webhook', () => {
     mocks.findNutriz.mockResolvedValue(null)
     mocks.saveState.mockResolvedValue(undefined)
     mocks.sendReply.mockResolvedValue(true)
+    mocks.setReminderConsent.mockResolvedValue({
+      status: 'UPDATED',
+      enabled: true,
+    })
   })
 
   afterEach(() => vi.unstubAllEnvs())
@@ -151,6 +159,7 @@ describe('POST /api/whatsapp/webhook', () => {
       id: 'profile-1',
       fullName: 'Maria da Silva',
       journeyStatus: 'REGISTERED',
+      reminderConsentEnabled: false,
     })
 
     await POST(
@@ -194,6 +203,47 @@ describe('POST /api/whatsapp/webhook', () => {
     )
     expect(mocks.sendReply.mock.calls[1]?.[0].reply.body).toContain(
       '+55 (11) 96629-0681',
+    )
+  })
+
+  it('registra opt-in de lembretes com o id da mensagem como idempotência', async () => {
+    mocks.findNutriz.mockResolvedValue({
+      id: 'profile-1',
+      fullName: 'Maria da Silva',
+      journeyStatus: 'FORM_RECEIVED',
+      reminderConsentEnabled: false,
+    })
+    mocks.getState.mockResolvedValue({
+      step: 'MENU',
+      context: {},
+      misunderstoodCount: 0,
+      isNewConversation: false,
+    })
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'wamid.reminder-1',
+          interactive: {
+            type: 'button_reply',
+            button_reply: {
+              id: 'lembretes_ativar',
+              title: 'Ativar lembretes',
+            },
+          },
+        }),
+      ),
+    )
+
+    expect(mocks.setReminderConsent).toHaveBeenCalledWith({
+      nutrizProfileId: 'profile-1',
+      enabled: true,
+      source: 'WHATSAPP',
+      sourceEventId: 'whatsapp:wamid.reminder-1',
+    })
+    expect(mocks.sendReply.mock.calls[0]?.[0].reply.body).toContain(
+      'Lembretes ativados',
     )
   })
 

@@ -8,10 +8,12 @@ import {
   NutrizJourneyGuidance,
   NutrizJourneyTimeline,
 } from '@/components/nutriz/nutriz-journey-status'
+import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { getNutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
+import { getReminderConsentPreference } from '@/lib/db/queries/communication-consents'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
@@ -22,8 +24,11 @@ export const metadata: Metadata = {
 
 export default async function NutrizAreaPage() {
   const nutriz = await requireNutrizUser()
-  const journey = await getNutrizJourneySnapshot(nutriz.id)
-  if (!journey) notFound()
+  const [journey, reminders] = await Promise.all([
+    getNutrizJourneySnapshot(nutriz.id),
+    getReminderConsentPreference(nutriz.id),
+  ])
+  if (!journey || !reminders) notFound()
 
   const copy = NUTRIZ_AUTH.area
 
@@ -51,6 +56,8 @@ export default async function NutrizAreaPage() {
         <div className="mt-6">
           <NutrizJourneyTimeline snapshot={journey} />
         </div>
+
+        <ReminderConsentCard enabled={reminders.enabled} />
 
         <Card className="mt-6">
           <CardHeader>

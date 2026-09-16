@@ -841,6 +841,11 @@ export const SIGNUP = {
         'Quero receber pelo WhatsApp avisos quando o Lactare atualizar minha etapa da jornada.',
       help: 'Opcional e separado dos lembretes. Não representa agendamento ou confirmação de coleta.',
     },
+    reminderWhatsappOptIn: {
+      label:
+        'Quero receber pelo WhatsApp lembretes de continuidade da minha jornada.',
+      help: 'Opcional e separado dos avisos de status. Os lembretes não agendam nem confirmam coleta e podem ser desativados a qualquer momento.',
+    },
   },
   actions: {
     submit: 'Criar minha conta',
@@ -996,6 +1001,23 @@ export const NUTRIZ_AUTH = {
     registeredLocation: 'Cidade informada no cadastro',
     coverageNotice:
       'A presença da cidade no seu cadastro não confirma cobertura. Consulte a lista atual antes de continuar.',
+    reminders: {
+      title: 'Lembretes pelo WhatsApp',
+      enabledLabel: 'Lembretes ativados',
+      disabledLabel: 'Lembretes desativados',
+      description:
+        'Você escolhe se quer receber lembretes de continuidade da jornada. Essa escolha é independente dos avisos de mudança de status.',
+      safetyNotice:
+        'Um lembrete não agenda nem confirma coleta, exame, visita ou atendimento. Essas combinações continuam sendo feitas diretamente com a equipe do Lactare.',
+      enableAction: 'Ativar lembretes',
+      disableAction: 'Desativar lembretes',
+      submitting: 'Salvando...',
+      enabledFeedback:
+        'Lembretes ativados. Sua escolha foi registrada e poderá ser cancelada quando quiser.',
+      disabledFeedback: 'Lembretes desativados. O cancelamento foi registrado.',
+      error:
+        'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
+    },
     journey: {
       current: {
         eyebrow: 'Sua etapa atual',
@@ -1297,6 +1319,8 @@ export const WHATSAPP_BOT = {
     knowMore: 'Quero saber mais',
     donate: 'Quero doar leite',
     human: 'Falar com a equipe',
+    reminders: 'Gerir lembretes',
+    button: 'Ver opções',
   },
   faq: {
     body: 'Qual dúvida você quer esclarecer?',
@@ -1353,6 +1377,27 @@ export const WHATSAPP_BOT = {
       'Sem problema. Nenhum cadastro foi criado. Você pode verificar a cobertura e consultar os conteúdos sem se cadastrar.',
     unavailable:
       'Não foi possível salvar o cadastro agora. Envie seu nome completo novamente para tentar de novo, ou escreva “menu” para sair.',
+  },
+  reminders: {
+    enabled:
+      'Seus lembretes de continuidade estão ativados. Eles são independentes dos avisos de status e não representam agendamento ou confirmação de coleta.',
+    disabled:
+      'Seus lembretes de continuidade estão desativados. Você pode ativá-los quando quiser. Eles não representam agendamento ou confirmação de coleta.',
+    registrationRequired:
+      'Para ativar lembretes, primeiro é necessário concluir o cadastro opcional. Você ainda pode consultar cobertura e conteúdos sem se cadastrar.',
+    enable: 'Ativar lembretes',
+    disable: 'Parar lembretes',
+    back: 'Voltar ao menu',
+    enabledSuccess:
+      'Lembretes ativados. Sua escolha foi registrada. O NutriLink não agenda nem confirma coleta, exame, visita ou atendimento.',
+    disabledSuccess:
+      'Lembretes desativados. O cancelamento foi registrado e nenhum novo lembrete deverá ser enviado enquanto essa escolha estiver vigente.',
+    alreadyEnabled:
+      'Seus lembretes já estavam ativados. Nenhuma nova alteração foi necessária.',
+    alreadyDisabled:
+      'Seus lembretes já estavam desativados. Nenhuma nova alteração foi necessária.',
+    unavailable:
+      'Não foi possível salvar sua escolha de lembretes agora. Tente novamente em instantes ou volte ao menu.',
   },
   human: {
     body: 'Sua dúvida precisa da equipe do Lactare. Este bot ainda não transfere a conversa automaticamente. Fale pelo WhatsApp {whatsapp} ou ligue para {phone}, de segunda a sexta, das 7h às 22h. Os canais foram conferidos em {verifiedAt}.',

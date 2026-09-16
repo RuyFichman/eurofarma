@@ -17,10 +17,29 @@ export async function findNutrizByWhatsapp(
   const candidates = buildBrazilianWhatsappCandidates(fromDigits)
   if (candidates.length === 0) return null
 
-  return prisma.nutrizProfile.findFirst({
+  const profile = await prisma.nutrizProfile.findFirst({
     where: { phoneWhatsapp: { in: candidates }, deletedAt: null },
-    select: { id: true, fullName: true, journeyStatus: true },
+    select: {
+      id: true,
+      fullName: true,
+      journeyStatus: true,
+      communicationConsents: {
+        where: { purpose: 'REMINDERS_WHATSAPP' },
+        orderBy: { sequence: 'desc' },
+        take: 1,
+        select: { decision: true },
+      },
+    },
   })
+  if (!profile) return null
+
+  return {
+    id: profile.id,
+    fullName: profile.fullName,
+    journeyStatus: profile.journeyStatus,
+    reminderConsentEnabled:
+      profile.communicationConsents[0]?.decision === 'GRANTED',
+  }
 }
 
 export type ConversationState = {
@@ -118,7 +137,7 @@ export async function createWhatsappNutrizLead(params: {
   if (existing) return existing
 
   try {
-    return await prisma.nutrizProfile.create({
+    const created = await prisma.nutrizProfile.create({
       data: {
         fullName: params.fullName,
         phoneWhatsapp: params.phoneWhatsapp,
@@ -135,6 +154,7 @@ export async function createWhatsappNutrizLead(params: {
       },
       select: { id: true, fullName: true, journeyStatus: true },
     })
+    return { ...created, reminderConsentEnabled: false }
   } catch (error) {
     const isDuplicate =
       error instanceof Prisma.PrismaClientKnownRequestError &&

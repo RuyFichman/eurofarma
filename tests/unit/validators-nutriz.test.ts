@@ -106,6 +106,18 @@ describe('nutrizSignupApiSchema', () => {
     ).toBe(true)
   })
 
+  it('mantém lembretes desligados por padrão e aceita opt-in separado', () => {
+    expect(
+      nutrizSignupApiSchema.parse(validApiSignup).reminderWhatsappOptIn,
+    ).toBe(false)
+    const parsed = nutrizSignupApiSchema.parse({
+      ...validApiSignup,
+      reminderWhatsappOptIn: true,
+    })
+    expect(parsed.reminderWhatsappOptIn).toBe(true)
+    expect(parsed.journeyStatusWhatsappOptIn).toBe(false)
+  })
+
   it('normaliza o e-mail para minúsculas', () => {
     expect(nutrizSignupApiSchema.parse(validApiSignup).email).toBe(
       'maria.silva@email.com',

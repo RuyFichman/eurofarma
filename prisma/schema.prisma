@@ -129,6 +129,7 @@ enum WhatsappConversationStep {
 /// Finalidade específica e independente dos demais consentimentos.
 enum CommunicationConsentPurpose {
   JOURNEY_STATUS_WHATSAPP
+  REMINDERS_WHATSAPP
 }
 
 enum CommunicationConsentDecision {

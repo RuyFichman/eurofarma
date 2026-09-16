@@ -23,6 +23,7 @@ vi.mock('../../lib/db/prisma', () => ({
 
 import {
   createWhatsappNutrizLead,
+  findNutrizByWhatsapp,
   getConversationState,
   saveConversationState,
 } from '../../lib/db/queries/whatsapp-conversations'
@@ -30,6 +31,34 @@ import {
 describe('persistência da conversa do WhatsApp', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('carrega somente a decisão mais recente de lembretes da nutriz', async () => {
+    mocks.nutrizFindFirst.mockResolvedValue({
+      id: 'profile-1',
+      fullName: 'Maria da Silva',
+      journeyStatus: 'REGISTERED',
+      communicationConsents: [{ decision: 'GRANTED' }],
+    })
+
+    await expect(findNutrizByWhatsapp('5511999998888')).resolves.toEqual({
+      id: 'profile-1',
+      fullName: 'Maria da Silva',
+      journeyStatus: 'REGISTERED',
+      reminderConsentEnabled: true,
+    })
+    expect(mocks.nutrizFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: expect.objectContaining({
+          communicationConsents: {
+            where: { purpose: 'REMINDERS_WHATSAPP' },
+            orderBy: { sequence: 'desc' },
+            take: 1,
+            select: { decision: true },
+          },
+        }),
+      }),
+    )
   })
 
   it('reidrata somente cidade e UF e descarta nome, CEP ou campos extras', async () => {
@@ -112,6 +141,7 @@ describe('persistência da conversa do WhatsApp', () => {
     })
 
     expect(created?.id).toBe('profile-1')
+    expect(created?.reminderConsentEnabled).toBe(false)
     expect(mocks.nutrizCreate).toHaveBeenCalledWith({
       data: expect.objectContaining({
         fullName: 'Maria da Silva',

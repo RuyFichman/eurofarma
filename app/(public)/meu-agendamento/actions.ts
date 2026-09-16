@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { createSupabaseServerClient } from '@/lib/auth/supabase-server'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { cancelNutrizAppointment } from '@/lib/db/queries/appointments'
+import { setReminderConsent } from '@/lib/db/queries/communication-consents'
 
 /**
  * Encerra a sessão da nutriz. O `signOut` limpa o cookie via SSR; o redirect
@@ -62,5 +63,35 @@ export async function cancelAppointmentAction(
       console.error('[cancelAppointmentAction]', error)
     }
     return { ok: false }
+  }
+}
+
+const reminderPreferenceSchema = z.boolean()
+
+/** Ativa ou retira o opt-in de lembretes da própria nutriz. */
+export async function setReminderConsentAction(
+  enabled: boolean,
+): Promise<{ ok: boolean; enabled: boolean }> {
+  const nutriz = await requireNutrizUser()
+  const parsed = reminderPreferenceSchema.safeParse(enabled)
+  if (!parsed.success) return { ok: false, enabled: !enabled }
+
+  try {
+    const result = await setReminderConsent({
+      nutrizProfileId: nutriz.id,
+      enabled: parsed.data,
+      source: 'WEB',
+    })
+    if (result.status === 'NOT_FOUND') {
+      return { ok: false, enabled: !parsed.data }
+    }
+
+    revalidatePath('/meu-agendamento')
+    return { ok: true, enabled: result.enabled }
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[setReminderConsentAction]', error)
+    }
+    return { ok: false, enabled: !parsed.data }
   }
 }

@@ -10,6 +10,7 @@ import { rateLimit } from '@/lib/security/rate-limit'
 import { createSupabaseAdminClient } from '@/lib/auth/supabase-admin'
 import { createSupabaseServerClient } from '@/lib/auth/supabase-server'
 import { JOURNEY_STATUS_WHATSAPP_CONSENT_VERSION } from '@/lib/consent/journey-status-notifications'
+import { REMINDER_WHATSAPP_CONSENT_VERSION } from '@/lib/consent/reminders'
 
 // Prisma roda melhor no Node runtime (não Edge).
 export const runtime = 'nodejs'
@@ -129,6 +130,7 @@ export async function POST(request: NextRequest) {
     state,
     city,
     journeyStatusWhatsappOptIn,
+    reminderWhatsappOptIn,
     sourceUtm,
   } = parsed.data
   const sanitizedUtm = sanitizeSourceUtm(sourceUtm)
@@ -237,6 +239,31 @@ export async function POST(request: NextRequest) {
             decision: 'GRANTED',
             source: 'WEB',
             policyVersion: JOURNEY_STATUS_WHATSAPP_CONSENT_VERSION,
+          },
+        })
+      }
+
+      const currentReminderConsent = existing
+        ? await transaction.communicationConsentEvent.findFirst({
+            where: {
+              nutrizProfileId: profile.id,
+              purpose: 'REMINDERS_WHATSAPP',
+            },
+            orderBy: { sequence: 'desc' },
+            select: { decision: true },
+          })
+        : null
+      const remindersWereEnabled =
+        currentReminderConsent?.decision === 'GRANTED'
+
+      if (reminderWhatsappOptIn !== remindersWereEnabled) {
+        await transaction.communicationConsentEvent.create({
+          data: {
+            nutrizProfileId: profile.id,
+            purpose: 'REMINDERS_WHATSAPP',
+            decision: reminderWhatsappOptIn ? 'GRANTED' : 'WITHDRAWN',
+            source: 'WEB',
+            policyVersion: REMINDER_WHATSAPP_CONSENT_VERSION,
           },
         })
       }

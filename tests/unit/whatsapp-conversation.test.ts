@@ -15,6 +15,7 @@ import { hydrateWhatsappReply } from '../../lib/whatsapp/reply'
 const PROFILE: ConversationProfile = {
   fullName: 'Maria da Silva',
   journeyStatus: 'FORM_RECEIVED',
+  reminderConsentEnabled: false,
 }
 
 function step(
@@ -61,6 +62,56 @@ describe('advanceConversation', () => {
     expect(result.reply.body).toContain('Ficha recebida')
     expect(result.reply.body).toContain('não realiza avaliação clínica')
     expect(result.reply.body).toContain('orientações recebidas diretamente')
+    expect(result.reply.type).toBe('list')
+  })
+
+  it('oferece opt-in de lembretes somente para perfil cadastrado', () => {
+    const registered = step('MENU', {
+      replyId: REPLY_IDS.menuReminders,
+      profile: PROFILE,
+    })
+    expect(registered.reply.body).toContain('desativados')
+    expect(registered.effect.kind).toBe('none')
+    if (registered.reply.type === 'buttons') {
+      expect(registered.reply.buttons[0]?.id).toBe(REPLY_IDS.remindersEnable)
+    }
+
+    const anonymous = step('MENU', {
+      replyId: REPLY_IDS.menuReminders,
+    })
+    expect(anonymous.reply.body).toContain('cadastro opcional')
+    expect(anonymous.effect.kind).toBe('none')
+  })
+
+  it('produz efeitos separados para ativar e cancelar lembretes', () => {
+    const enabled = step('MENU', {
+      replyId: REPLY_IDS.remindersEnable,
+      profile: PROFILE,
+    })
+    expect(enabled.effect).toEqual({
+      kind: 'set_reminder_consent',
+      enabled: true,
+    })
+    expect(enabled.reply.body).toContain('não agenda')
+
+    const disabled = step('MENU', {
+      replyId: REPLY_IDS.remindersDisable,
+      profile: { ...PROFILE, reminderConsentEnabled: true },
+    })
+    expect(disabled.effect).toEqual({
+      kind: 'set_reminder_consent',
+      enabled: false,
+    })
+    expect(disabled.reply.body).toContain('cancelamento foi registrado')
+
+    const disabledByText = step('MENU', {
+      text: 'não quero mais lembretes',
+      profile: { ...PROFILE, reminderConsentEnabled: true },
+    })
+    expect(disabledByText.effect).toEqual({
+      kind: 'set_reminder_consent',
+      enabled: false,
+    })
   })
 
   it('abre FAQ em lista com cinco perguntas', () => {
