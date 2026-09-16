@@ -85,7 +85,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa com **495 testes em 58 arquivos**: 421 unitários e 74 de integração, já incluindo os 10 testes do estado conversacional que dependiam da migration `20260915170000_expand_whatsapp_conversation_flow`, aplicada no Supabase cloud em 15 de setembro de 2026. As migrations do RF07 e do RF16 continuam aplicadas, assim como a de `service_municipalities`, com os 30 municípios conferidos. Os testes de integração dos quatro novos valores de `JourneyStatus` dependem da aplicação das migrations locais de 16 de setembro.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa com **498 testes em 58 arquivos**: 421 unitários e 77 de integração, já incluindo os 10 testes do estado conversacional que dependiam da migration `20260915170000_expand_whatsapp_conversation_flow`, aplicada no Supabase cloud em 15 de setembro de 2026. As migrations do RF07 e do RF16 continuam aplicadas, assim como a de `service_municipalities`, com os 30 municípios conferidos. As duas migrations que ampliam `JourneyStatus` foram aplicadas no Supabase cloud em 16 de setembro de 2026, e três testes de integração cobrem os novos valores contra o banco.
 
 ### 3.1 O que está implementado
 
@@ -109,7 +109,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 - Webhook da WhatsApp Cloud API, verificação de assinatura, rate limiting local e simulador com exemplos do fluxo ativo.
 - Máquina de estados local do chatbot com apresentação e menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada de nutriz cadastrada pelo `JourneyStatus` e encaminhamento transparente aos canais oficiais do Lactare. O CEP não entra no contexto persistido; o cadastro mantém marketing e lembretes desligados. A migration que amplia `WhatsappConversation` foi aplicada no Supabase cloud em 15 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; o enum com os dez estados, o default `MENU`, as colunas `context` e `misunderstood_count` e os dois CHECKs foram conferidos no banco. Como a tabela estava vazia, nenhuma conversa legada precisou ser convertida.
 - RF16 no painel: `JourneyStatus` separado de `interestStatus`, status atual, detalhe da nutriz, histórico append-only com autor e horário, observação administrativa limitada e transições explícitas. A mudança usa o status anterior como condição de concorrência e atualiza perfil e histórico na mesma transação; falha no histórico reverte o status. A migration foi aplicada no Supabase cloud em 13 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; enum, coluna com default `REGISTERED`, índices, CHECKs, FKs `RESTRICT` e trigger de imutabilidade foram conferidos no banco.
-- Extensão local do RF16 com quatro marcos adicionais, sem remover os oito anteriores: `DOCUMENT_SENT`, `EXAMS_COMPLETED`, `KIT_SENT` e `DONATION_CONFIRMED`. Somente `ADMIN` registra mudanças. As migrations locais preservam as transições antigas e acrescentam os novos caminhos; ainda precisam ser aplicadas e registradas no Supabase cloud antes de testes de integração com esses valores. A confirmação de doação é provisoriamente uma ação administrativa do Lactare, mas a evidência operacional que autoriza essa ação continua pendente e bloqueia funcionalidades derivadas de impacto, indicação e reconhecimento.
+- Extensão do RF16 com quatro marcos adicionais, sem remover os oito anteriores: `DOCUMENT_SENT`, `EXAMS_COMPLETED`, `KIT_SENT` e `DONATION_CONFIRMED`. Somente `ADMIN` registra mudanças. As migrations `20260916120000_expand_journey_status_values` e `20260916121000_expand_journey_status_transitions` foram aplicadas separadamente e em ordem no Supabase cloud em 16 de setembro de 2026 e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. O enum com os doze valores na ordem do schema e o novo CHECK de transições foram conferidos no banco; as sete transições antigas continuam aceitas, atalhos pelos novos marcos são rejeitados e os perfis existentes permaneceram inalterados (o histórico estava vazio). Os testes de integração percorrem o caminho completo pelos novos marcos, exercitam o CHECK diretamente e comparam o enum do banco com `JOURNEY_STATUS_VALUES`. A confirmação de doação é provisoriamente uma ação administrativa do Lactare, mas a evidência operacional que autoriza essa ação continua pendente e bloqueia funcionalidades derivadas de impacto, indicação e reconhecimento.
 
 ### 3.2 Situação dos requisitos funcionais
 
@@ -130,7 +130,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF13 — mensagem de indicação | **Não implementado.** |
 | RF14 — reconhecimentos | **Não implementado.** |
 | RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
-| RF16 — status da jornada | **Implementado para os oito estados originais; extensão local pendente no cloud.** O administrador acessa `/admin/nutrizes/[id]`, consulta status e histórico e registra somente a próxima transição válida. A mutação é autorizada por role `ADMIN`, condicional ao status anterior e atômica com o histórico. Quatro marcos adicionais foram acrescentados localmente sem remover os anteriores: documento enviado, exames feitos, kit enviado e doação confirmada. As migrations da extensão ainda precisam ser aplicadas no Supabase. Correção e reabertura continuam sob responsabilidade operacional do admin, sem fluxo específico nesta etapa. |
+| RF16 — status da jornada | **Implementado com doze estados.** O administrador acessa `/admin/nutrizes/[id]`, consulta status e histórico e registra somente a próxima transição válida. A mutação é autorizada por role `ADMIN`, condicional ao status anterior e atômica com o histórico. Quatro marcos adicionais foram acrescentados sem remover os anteriores: documento enviado, exames feitos, kit enviado e doação confirmada. As migrations da extensão estão aplicadas no Supabase cloud desde 16 de setembro de 2026; a doação confirmada continua dependente da definição da evidência operacional. Correção e reabertura continuam sob responsabilidade operacional do admin, sem fluxo específico nesta etapa. |
 | RF17 — aviso de mudança de status | **Não implementado.** Falta notificar automaticamente a nutriz pelo WhatsApp depois de uma atualização válida feita pelo Lactare. |
 
 ### 3.3 Código e dados legados que não definem mais o escopo
@@ -175,13 +175,12 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Aplicar e registrar no Supabase cloud as duas migrations que ampliam `JourneyStatus`, regenerar o Prisma Client e revalidar a suíte completa.
-2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-3. Implementar lembretes opcionais sem semântica de agendamento e concluir o handoff humano operacional.
-4. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
-5. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-6. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
-7. Ativar a integração real com a Meta quando a infraestrutura externa existir; o estado conversacional já está aplicado no Supabase e a suíte completa de integração voltou a rodar.
+1. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
+2. Implementar lembretes opcionais sem semântica de agendamento e concluir o handoff humano operacional.
+3. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
+4. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+6. Ativar a integração real com a Meta quando a infraestrutura externa existir; o estado conversacional já está aplicado no Supabase e a suíte completa de integração voltou a rodar.
 
 ## 4. Stack
 
@@ -200,7 +199,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Suíte completa: 495 em 58 arquivos — 421 unitários e 74 de integração, incluindo os 10 do estado conversacional. |
+| Testes | Vitest | Suíte completa: 498 em 58 arquivos — 421 unitários e 77 de integração, incluindo os 10 do estado conversacional e os 3 dos novos valores de `JourneyStatus`. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -521,7 +520,7 @@ Sub-regiões:
 Segmentos implementados no dashboard:
 
 - sub-região da Grande São Paulo, relacionada pela cidade da nutriz e pela configuração de `ServiceMunicipality`;
-- status atual da jornada, a partir de `JourneyStatus` (`REGISTERED`, `DOCUMENT_SENT`, `FORM_RECEIVED`, `EXAM_SCHEDULED`, `EXAMS_COMPLETED`, `AWAITING_RESULT`, `ELIGIBLE`, `NOT_ELIGIBLE`, `KIT_SENT`, `KIT_DELIVERED`, `DONATION_CONFIRMED` ou `RECURRING_DONATION_ELIGIBLE`); os quatro valores novos ainda dependem da aplicação das migrations locais no Supabase;
+- status atual da jornada, a partir de `JourneyStatus` (`REGISTERED`, `DOCUMENT_SENT`, `FORM_RECEIVED`, `EXAM_SCHEDULED`, `EXAMS_COMPLETED`, `AWAITING_RESULT`, `ELIGIBLE`, `NOT_ELIGIBLE`, `KIT_SENT`, `KIT_DELIVERED`, `DONATION_CONFIRMED` ou `RECURRING_DONATION_ELIGIBLE`);
 - origem do cadastro, classificada somente quando existe `utm_source` explícita.
 
 Os três filtros vivem na URL (`region`, `stage` e `origin`), são combináveis e geram um único recorte compartilhado pelos cartões, pela evolução mensal e pelas distribuições. A região usa todos os municípios configurados, inclusive inativos, para que a desativação operacional de uma cidade não apague sua classificação histórica.

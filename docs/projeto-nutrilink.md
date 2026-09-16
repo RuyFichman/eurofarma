@@ -191,8 +191,8 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, rate limiting local, máquina de estados e simulador local. O fluxo ativo já oferece menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada pelo `JourneyStatus` e contato transparente com o Lactare. O consentimento vem antes da solicitação e gravação do nome; o CEP não é persistido, marketing e lembretes permanecem desligados, e o webhook não cria novos agendamentos. A migration conversacional foi gerada, mas ainda precisa ser aplicada no Supabase cloud pelo MCP obrigatório.
 - Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
-- RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration original está aplicada no Supabase cloud. Quatro marcos adicionais foram acrescentados localmente sem remover os anteriores — documento enviado, exames feitos, kit enviado e doação confirmada — e suas migrations ainda precisam ser aplicadas. A notificação do RF17 continua pendente.
-- A suíte completa passa com 495 testes em 58 arquivos: 421 unitários e 74 de integração contra o Supabase cloud. Os testes de integração específicos dos quatro novos valores de `JourneyStatus` dependem da aplicação das duas migrations locais de 16 de setembro de 2026.
+- RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration original está aplicada no Supabase cloud. Quatro marcos adicionais foram acrescentados sem remover os anteriores — documento enviado, exames feitos, kit enviado e doação confirmada — e suas duas migrations foram aplicadas no Supabase cloud em 16 de setembro de 2026, preservando as transições antigas e os perfis existentes. A notificação do RF17 continua pendente.
+- A suíte completa passa com 498 testes em 58 arquivos: 421 unitários e 77 de integração contra o Supabase cloud, incluindo três testes dos quatro novos valores de `JourneyStatus`.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -226,14 +226,12 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 
 ### 9.5 Ordem recomendada de implementação
 
-1. Aplicar no Supabase cloud as migrations locais que acrescentam os quatro novos valores de `JourneyStatus` e suas transições, preservando os valores e históricos anteriores.
-2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-3. Aplicar pelo MCP do Supabase a migration conversacional já gerada e revalidar a suíte de integração.
-4. Implementar lembretes com opt-in separado e sem linguagem de agendamento, além do handoff humano operacional.
-5. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
-6. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
-7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
-8. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
+1. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
+2. Implementar lembretes com opt-in separado e sem linguagem de agendamento, além do handoff humano operacional.
+3. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
+4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
+5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
 ### 9.6 Risco de adoção do status da jornada
 
