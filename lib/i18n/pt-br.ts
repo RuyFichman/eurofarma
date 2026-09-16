@@ -1398,6 +1398,8 @@ export const WHATSAPP_BOT = {
       'Seus lembretes já estavam desativados. Nenhuma nova alteração foi necessária.',
     unavailable:
       'Não foi possível salvar sua escolha de lembretes agora. Tente novamente em instantes ou volte ao menu.',
+    jobBody:
+      'Este é um lembrete opcional de continuidade da sua jornada com o Lactare. Se você já recebeu a visita da equipe para entrega do kit, siga as orientações recebidas. Se precisar de ajuda, fale diretamente com o Lactare.\n\nConsulte sua área no NutriLink: {areaUrl}\n\nEste lembrete não agenda nem confirma coleta, visita ou atendimento.',
   },
   human: {
     body: 'Sua dúvida precisa da equipe do Lactare. Este bot ainda não transfere a conversa automaticamente. Fale pelo WhatsApp {whatsapp} ou ligue para {phone}, de segunda a sexta, das 7h às 22h. Os canais foram conferidos em {verifiedAt}.',

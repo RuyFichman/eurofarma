@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import type {
+  CommunicationConsentPurpose,
   NotificationDeliveryAttemptOutcome,
+  NotificationOutboxKind,
   NotificationOutboxStatus,
   Prisma,
 } from '@prisma/client'
@@ -13,9 +15,11 @@ export type ClaimedNotification = {
   id: string
   lockToken: string
   idempotencyKey: string
+  kind: NotificationOutboxKind
   attemptNumber: number
   maxAttempts: number
   toStatus: JourneyStatusValue | null
+  payload: Prisma.JsonValue | null
   phoneWhatsapp: string
   profileDeleted: boolean
   hasCurrentConsent: boolean
@@ -25,6 +29,8 @@ const CLAIM_SELECT = {
   id: true,
   lockToken: true,
   idempotencyKey: true,
+  kind: true,
+  payload: true,
   attemptCount: true,
   maxAttempts: true,
   journeyStatusHistory: { select: { toStatus: true } },
@@ -33,10 +39,13 @@ const CLAIM_SELECT = {
       phoneWhatsapp: true,
       deletedAt: true,
       communicationConsents: {
-        where: { purpose: 'JOURNEY_STATUS_WHATSAPP' },
+        where: {
+          purpose: {
+            in: ['JOURNEY_STATUS_WHATSAPP', 'REMINDERS_WHATSAPP'],
+          },
+        },
         orderBy: { sequence: 'desc' },
-        take: 1,
-        select: { decision: true },
+        select: { purpose: true, decision: true },
       },
     },
   },
@@ -99,18 +108,24 @@ export async function claimNextNotificationOutbox(
       where: { id: candidate.id },
       select: CLAIM_SELECT,
     })
-    const currentConsent = row.nutrizProfile.communicationConsents[0]
+    const consentPurpose: CommunicationConsentPurpose =
+      row.kind === 'REMINDER' ? 'REMINDERS_WHATSAPP' : 'JOURNEY_STATUS_WHATSAPP'
+    const currentConsent = row.nutrizProfile.communicationConsents.find(
+      (consent) => consent.purpose === consentPurpose,
+    )
 
     return {
       id: row.id,
       lockToken: row.lockToken!,
       idempotencyKey: row.idempotencyKey,
+      kind: row.kind,
       attemptNumber: row.attemptCount,
       maxAttempts: row.maxAttempts,
       toStatus:
         (row.journeyStatusHistory?.toStatus as
           | JourneyStatusValue
           | undefined) ?? null,
+      payload: row.payload,
       phoneWhatsapp: row.nutrizProfile.phoneWhatsapp,
       profileDeleted: row.nutrizProfile.deletedAt !== null,
       hasCurrentConsent: currentConsent?.decision === 'GRANTED',

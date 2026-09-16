@@ -144,6 +144,7 @@ enum CommunicationConsentSource {
 
 enum NotificationOutboxKind {
   JOURNEY_STATUS_CHANGED
+  REMINDER
 }
 
 enum NotificationOutboxStatus {
@@ -274,6 +275,9 @@ model NotificationOutbox {
   nutrizProfileId        String                   @map("nutriz_profile_id")
   journeyStatusHistoryId String?                  @unique(map: "notification_outbox_journey_status_history_id_key") @map("journey_status_history_id")
   consentEventId         String?                  @map("consent_event_id")
+  /// Payload operacional do tipo da mensagem. Para lembretes, guarda apenas
+  /// a categoria e a data de referência; não guarda PII nem o corpo da mensagem.
+  payload                Json?
   attemptCount           Int                      @default(0) @map("attempt_count")
   maxAttempts            Int                      @default(5) @map("max_attempts")
   availableAt            DateTime                 @default(now()) @map("available_at")

@@ -22,9 +22,11 @@ const claim = {
   id: 'outbox-1',
   lockToken: 'lock-1',
   idempotencyKey: 'journey-status:history-1',
+  kind: 'JOURNEY_STATUS_CHANGED' as const,
   attemptNumber: 1,
   maxAttempts: 5,
   toStatus: 'FORM_RECEIVED' as const,
+  payload: null,
   phoneWhatsapp: '5511999998888',
   profileDeleted: false,
   hasCurrentConsent: true,
@@ -154,6 +156,66 @@ describe('processador da outbox', () => {
         status: 'SUPPRESSED',
         outcome: 'SUPPRESSED',
         errorCode: 'CONSENT_NOT_GRANTED',
+      }),
+    )
+  })
+
+  it('processa lembrete sem exigir status de jornada no payload', async () => {
+    mocks.claim.mockReset()
+    mocks.claim
+      .mockResolvedValueOnce({
+        ...claim,
+        kind: 'REMINDER',
+        toStatus: null,
+        payload: {
+          reminderKind: 'KIT_DELIVERY_FOLLOW_UP',
+          sourceHistoryId: 'history-1',
+          referenceAt: '2026-09-14T15:00:00.000Z',
+        },
+      })
+      .mockResolvedValueOnce(null)
+    const fakeTransport = transport({
+      outcome: 'SENT',
+      providerMessageId: 'reminder-1',
+    })
+
+    await expect(
+      processNotificationOutbox({
+        transport: fakeTransport,
+        siteUrl: 'https://nutrilink.test/',
+        now: () => NOW,
+      }),
+    ).resolves.toMatchObject({ claimed: 1, sent: 1 })
+
+    expect(fakeTransport.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        idempotencyKey: 'journey-status:history-1',
+        body: expect.stringContaining('não agenda nem confirma'),
+      }),
+    )
+  })
+
+  it('falha item de lembrete com payload inválido sem transportar', async () => {
+    mocks.claim.mockReset()
+    mocks.claim
+      .mockResolvedValueOnce({ ...claim, kind: 'REMINDER', toStatus: null })
+      .mockResolvedValueOnce(null)
+    const fakeTransport = transport({
+      outcome: 'SENT',
+      providerMessageId: 'nao-deveria-enviar',
+    })
+
+    await processNotificationOutbox({
+      transport: fakeTransport,
+      siteUrl: 'https://nutrilink.test',
+      now: () => NOW,
+    })
+
+    expect(fakeTransport.send).not.toHaveBeenCalled()
+    expect(mocks.finalize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'FAILED',
+        errorCode: 'INVALID_REMINDER_PAYLOAD',
       }),
     )
   })

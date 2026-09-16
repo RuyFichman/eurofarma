@@ -8,6 +8,10 @@ import {
   type NotificationTransport,
   type NotificationTransportResult,
 } from './journey-status-notification'
+import {
+  buildReminderNotificationBody,
+  parseReminderPayload,
+} from './reminders'
 
 export type NotificationProcessingSummary = {
   claimed: number
@@ -72,12 +76,23 @@ export async function processNotificationOutbox(params: {
       continue
     }
 
-    if (!claim.toStatus) {
+    let body: string
+    if (claim.kind === 'JOURNEY_STATUS_CHANGED' && claim.toStatus) {
+      body = buildJourneyStatusNotificationBody(claim.toStatus, params.siteUrl)
+    } else if (
+      claim.kind === 'REMINDER' &&
+      parseReminderPayload(claim.payload)
+    ) {
+      body = buildReminderNotificationBody(params.siteUrl)
+    } else {
       await finalizeNotificationOutbox({
         claim,
         status: 'FAILED',
         outcome: 'FAILED',
-        errorCode: 'INVALID_JOURNEY_STATUS_PAYLOAD',
+        errorCode:
+          claim.kind === 'REMINDER'
+            ? 'INVALID_REMINDER_PAYLOAD'
+            : 'INVALID_JOURNEY_STATUS_PAYLOAD',
         now: now(),
       })
       summary.failed += 1
@@ -88,7 +103,7 @@ export async function processNotificationOutbox(params: {
       outboxId: claim.id,
       idempotencyKey: claim.idempotencyKey,
       to: claim.phoneWhatsapp,
-      body: buildJourneyStatusNotificationBody(claim.toStatus, params.siteUrl),
+      body,
     })
     const completedAt = now()
 

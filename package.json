@@ -21,6 +21,7 @@
     "check:validators": "tsx scripts/check-validators.ts",
     "whatsapp:sim": "dotenv -e .env.local -- tsx scripts/whatsapp-simulator.ts",
     "whatsapp:outbox:sim": "dotenv -e .env.local -- tsx scripts/whatsapp-outbox-simulator.ts",
+    "whatsapp:reminders:job": "dotenv -e .env.local -- tsx scripts/whatsapp-reminders-job.ts",
     "test": "dotenv -e .env.local -- vitest run",
     "test:watch": "dotenv -e .env.local -- vitest",
     "test:unit": "dotenv -e .env.local -- vitest run tests/unit",
