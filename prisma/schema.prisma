@@ -126,6 +126,41 @@ enum WhatsappConversationStep {
   FINISHED
 }
 
+/// Finalidade específica e independente dos demais consentimentos.
+enum CommunicationConsentPurpose {
+  JOURNEY_STATUS_WHATSAPP
+}
+
+enum CommunicationConsentDecision {
+  GRANTED
+  WITHDRAWN
+}
+
+enum CommunicationConsentSource {
+  WEB
+  WHATSAPP
+}
+
+enum NotificationOutboxKind {
+  JOURNEY_STATUS_CHANGED
+}
+
+enum NotificationOutboxStatus {
+  PENDING
+  PROCESSING
+  RETRY_SCHEDULED
+  SENT
+  FAILED
+  SUPPRESSED
+}
+
+enum NotificationDeliveryAttemptOutcome {
+  SENT
+  RETRY_SCHEDULED
+  FAILED
+  SUPPRESSED
+}
+
 model User {
   id          String    @id @default(uuid())
   email       String    @unique
@@ -171,11 +206,13 @@ model NutrizProfile {
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
 
-  contactIntents ContactIntent[]
-  whatsappClicks WhatsappClick[]
-  appointments   Appointment[]
-  conversations  WhatsappConversation[]
-  journeyHistory JourneyStatusHistory[]
+  contactIntents        ContactIntent[]
+  whatsappClicks        WhatsappClick[]
+  appointments          Appointment[]
+  conversations         WhatsappConversation[]
+  journeyHistory        JourneyStatusHistory[]
+  communicationConsents CommunicationConsentEvent[]
+  notificationOutbox    NotificationOutbox[]
 
   @@index([state, city, createdAt])
   @@index([journeyStatus, createdAt])
@@ -196,12 +233,84 @@ model JourneyStatusHistory {
   administrativeNote String?       @map("administrative_note") @db.VarChar(500)
   changedAt          DateTime      @default(now()) @map("changed_at")
 
-  nutrizProfile NutrizProfile @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)
-  changedByUser User          @relation("JourneyStatusChangedBy", fields: [changedByUserId], references: [id], onDelete: Restrict)
+  nutrizProfile NutrizProfile       @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)
+  changedByUser User                @relation("JourneyStatusChangedBy", fields: [changedByUserId], references: [id], onDelete: Restrict)
+  notification  NotificationOutbox?
 
   @@index([nutrizProfileId, changedAt])
   @@index([changedByUserId, changedAt])
   @@map("journey_status_history")
+}
+
+/// Registro append-only de uma concessão ou retirada de consentimento. A
+/// ausência de GRANTED vigente significa que nenhum aviso pode ser enviado.
+model CommunicationConsentEvent {
+  id              String                       @id @default(uuid())
+  sequence        BigInt                       @unique(map: "communication_consent_events_sequence_key") @default(autoincrement())
+  nutrizProfileId String                       @map("nutriz_profile_id")
+  purpose         CommunicationConsentPurpose
+  decision        CommunicationConsentDecision
+  source          CommunicationConsentSource
+  policyVersion   String                       @map("policy_version") @db.VarChar(32)
+  /// Identificador externo opcional para tornar eventos do webhook idempotentes.
+  sourceEventId   String?                      @unique(map: "communication_consent_events_source_event_id_key") @map("source_event_id") @db.VarChar(255)
+  recordedAt      DateTime                     @default(now()) @map("recorded_at")
+
+  nutrizProfile      NutrizProfile        @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)
+  notificationOutbox NotificationOutbox[] @relation("NotificationConsentSnapshot")
+
+  @@index([nutrizProfileId, purpose, sequence], map: "communication_consent_events_profile_purpose_sequence_idx")
+  @@map("communication_consent_events")
+}
+
+/// Fila transacional de mensagens. Não duplica telefone nem nome: o destino é
+/// lido do perfil somente quando um worker assume o item.
+model NotificationOutbox {
+  id                     String                   @id @default(uuid())
+  idempotencyKey         String                   @unique(map: "notification_outbox_idempotency_key_key") @map("idempotency_key") @db.VarChar(255)
+  kind                   NotificationOutboxKind
+  status                 NotificationOutboxStatus @default(PENDING)
+  nutrizProfileId        String                   @map("nutriz_profile_id")
+  journeyStatusHistoryId String?                  @unique(map: "notification_outbox_journey_status_history_id_key") @map("journey_status_history_id")
+  consentEventId         String?                  @map("consent_event_id")
+  attemptCount           Int                      @default(0) @map("attempt_count")
+  maxAttempts            Int                      @default(5) @map("max_attempts")
+  availableAt            DateTime                 @default(now()) @map("available_at")
+  lockedAt               DateTime?                @map("locked_at")
+  lockToken              String?                  @unique(map: "notification_outbox_lock_token_key") @map("lock_token") @db.VarChar(64)
+  sentAt                 DateTime?                @map("sent_at")
+  failedAt               DateTime?                @map("failed_at")
+  providerMessageId      String?                  @map("provider_message_id") @db.VarChar(255)
+  lastErrorCode          String?                  @map("last_error_code") @db.VarChar(64)
+  lastErrorAt            DateTime?                @map("last_error_at")
+  createdAt              DateTime                 @default(now()) @map("created_at")
+  updatedAt              DateTime                 @updatedAt @map("updated_at")
+
+  nutrizProfile        NutrizProfile                 @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)
+  journeyStatusHistory JourneyStatusHistory?         @relation(fields: [journeyStatusHistoryId], references: [id], onDelete: Restrict)
+  consentEvent         CommunicationConsentEvent?    @relation("NotificationConsentSnapshot", fields: [consentEventId], references: [id], onDelete: Restrict)
+  attempts             NotificationDeliveryAttempt[]
+
+  @@index([status, availableAt, createdAt], map: "notification_outbox_status_available_created_idx")
+  @@index([nutrizProfileId, createdAt], map: "notification_outbox_nutriz_profile_id_created_at_idx")
+  @@map("notification_outbox")
+}
+
+/// Auditoria append-only de cada tentativa efetiva do worker.
+model NotificationDeliveryAttempt {
+  id                String                             @id @default(uuid())
+  outboxId          String                             @map("outbox_id")
+  attemptNumber     Int                                @map("attempt_number")
+  outcome           NotificationDeliveryAttemptOutcome
+  providerMessageId String?                            @map("provider_message_id") @db.VarChar(255)
+  errorCode         String?                            @map("error_code") @db.VarChar(64)
+  attemptedAt       DateTime                           @default(now()) @map("attempted_at")
+
+  outbox NotificationOutbox @relation(fields: [outboxId], references: [id], onDelete: Restrict)
+
+  @@unique([outboxId, attemptNumber], map: "notification_delivery_attempts_outbox_attempt_key")
+  @@index([outcome, attemptedAt], map: "notification_delivery_attempts_outcome_attempted_at_idx")
+  @@map("notification_delivery_attempts")
 }
 
 model Unit {

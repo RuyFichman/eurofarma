@@ -171,7 +171,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 ## 9. Estado Atual e Roadmap
 
-Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
+Esta seção descreve o repositório em 16 de setembro de 2026. Ela prevalece sobre menções históricas a funcionalidades “prontas”.
 
 ### 9.1 Funcionalidades implementadas e verificadas
 
@@ -189,10 +189,11 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - Listagem, cadastro e edição administrativa dos municípios atendidos em `/admin/municipios`, além da listagem de nutrizes e do detalhe da jornada em `/admin/nutrizes/[id]`.
 - Migration Prisma de `service_municipalities` com carga inicial dos 30 municípios, gerada, versionada e aplicada no Supabase cloud.
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
-- Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, rate limiting local, máquina de estados e simulador local. O fluxo ativo já oferece menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada pelo `JourneyStatus` e contato transparente com o Lactare. O consentimento vem antes da solicitação e gravação do nome; o CEP não é persistido, marketing e lembretes permanecem desligados, e o webhook não cria novos agendamentos. A migration conversacional foi gerada, mas ainda precisa ser aplicada no Supabase cloud pelo MCP obrigatório.
+- Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, rate limiting local, máquina de estados e simulador local. O fluxo ativo já oferece menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada pelo `JourneyStatus` e contato transparente com o Lactare. O consentimento vem antes da solicitação e gravação do nome; o CEP não é persistido, marketing e lembretes permanecem desligados, e o webhook não cria novos agendamentos. A migration conversacional está aplicada no Supabase cloud.
 - Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
-- RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration original está aplicada no Supabase cloud. Quatro marcos adicionais foram acrescentados sem remover os anteriores — documento enviado, exames feitos, kit enviado e doação confirmada — e suas duas migrations foram aplicadas no Supabase cloud em 16 de setembro de 2026, preservando as transições antigas e os perfis existentes. A notificação do RF17 continua pendente.
-- A suíte completa passa com 498 testes em 58 arquivos: 421 unitários e 77 de integração contra o Supabase cloud, incluindo três testes dos quatro novos valores de `JourneyStatus`.
+- RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration original está aplicada no Supabase cloud. Quatro marcos adicionais foram acrescentados sem remover os anteriores — documento enviado, exames feitos, kit enviado e doação confirmada — e suas duas migrations foram aplicadas no Supabase cloud em 16 de setembro de 2026, preservando as transições antigas e os perfis existentes.
+- Base local do RF17 com opt-in específico para avisos de status no cadastro web, separado dos lembretes. A mesma transação que altera o `JourneyStatus` e grava o histórico também cria a outbox; cada histórico aceita no máximo um aviso por chave idempotente. Sem consentimento vigente, o item nasce suprimido. O processador usa claim concorrente com lock recuperável, revalida consentimento e exclusão lógica, aplica backoff e limite de tentativas e mantém auditoria append-only de cada resultado. O simulador exercita sucesso, falha transitória e falha permanente sem chamar a Meta nem imprimir PII. A migration `20260916180000_add_notification_outbox` ainda precisa ser aplicada no Supabase cloud.
+- A última suíte completa validada contra o Supabase cloud passa com 498 testes em 58 arquivos: 421 unitários e 77 de integração. Com o RF17 local, os 438 testes unitários em 51 arquivos passam; os testes de integração novos dependem da aplicação da migration da outbox.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -200,9 +201,9 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
 - **Métricas:** a segmentação combinável por região, status atual e origem, os sinais observáveis de alcance, os cliques por canal e o funil progressivo do `JourneyStatus` estão implementados. “Sem avanço” identifica o ponto atual entre etapas e não prova desistência. Ainda faltam retenção, adesão a lembretes, recorrência de doações confirmadas, indicação própria e velocidade até a primeira doação.
 - **Tracking de contato:** o evento novo mede os canais diretos do Lactare, já está gravando e alimenta total, janela de 30 dias e distribuição por canal no painel; o evento antigo, vinculado a unidades, continua aposentado. Como os eventos novos são anônimos, os números permanecem globais e não são segmentados por região ou status.
-- **Chatbot:** menu, perguntas frequentes, elegibilidade, orientação, cadastro opcional e retomada por status estão implementados localmente. Para o handoff futuro, a nutriz deverá pedi-lo explicitamente, a conversa continuará no mesmo chat, o bot será pausado e um atendente do Lactare assumirá entre 9h e 18h, de segunda a sábado; fila, prazo e tratamento fora do horário ainda serão detalhados. Avisos de status e lembretes terão opt-ins opcionais separados. Ainda faltam vídeo institucional oficial, implementação dos dois opt-ins, job de lembretes, avisos automáticos do RF17, handoff humano operacional e pós-doação baseado em confirmação legítima. Não há conta Meta, número, templates ou URL pública.
+- **Chatbot:** menu, perguntas frequentes, elegibilidade, orientação, cadastro opcional e retomada por status estão implementados localmente. Para o handoff futuro, a nutriz deverá pedi-lo explicitamente, a conversa continuará no mesmo chat, o bot será pausado e um atendente do Lactare assumirá entre 9h e 18h, de segunda a sábado; fila, prazo e tratamento fora do horário ainda serão detalhados. Avisos de status e lembretes têm consentimentos opcionais separados; o opt-in web dos avisos de status e sua outbox já existem localmente, mas retirada e reconcessão pelo chatbot e pela área autenticada continuam pendentes. Ainda faltam vídeo institucional oficial, opt-in e job de lembretes, handoff humano operacional e pós-doação baseado em confirmação legítima. Não há conta Meta, número, templates ou URL pública para a entrega real do RF17.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
-- **Status da jornada:** o RF16 representa as etapas de documento, ficha, exame, kit e confirmação administrativa de doação sem reutilizar `interestStatus`, com histórico append-only, autorização exclusiva para `ADMIN`, atualização transacional e controle de concorrência. A área pessoal apresenta o status e uma linha do tempo reduzida à própria nutriz. A evidência operacional que autoriza a confirmação da doação ainda será definida; até lá, esse marco não autoriza métricas de impacto, indicação ou reconhecimento. Correção ou reabertura continuam sem fluxo específico, e a notificação do RF17 permanece pendente.
+- **Status da jornada:** o RF16 representa as etapas de documento, ficha, exame, kit e confirmação administrativa de doação sem reutilizar `interestStatus`, com histórico append-only, autorização exclusiva para `ADMIN`, atualização transacional e controle de concorrência. A área pessoal apresenta o status e uma linha do tempo reduzida à própria nutriz. A mudança também cria localmente a outbox do RF17 na mesma transação, condicionada ao consentimento específico. A evidência operacional que autoriza a confirmação da doação ainda será definida; até lá, esse marco não autoriza métricas de impacto, indicação ou reconhecimento. Correção ou reabertura continuam sem fluxo específico.
 
 ### 9.3 Funcionalidades ainda não implementadas
 
@@ -211,8 +212,7 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 - RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimentos por status na área pessoal.
 - RF15: atribuição específica de novos cadastros por indicação.
-- RF17: notificação automática por WhatsApp após cada atualização válida de status.
-- Aplicação e registro da migration `20260915170000_expand_whatsapp_conversation_flow` no Supabase cloud.
+- RF17: aplicação da migration da outbox, retirada e reconcessão do opt-in e entrega real por template aprovado da Meta. A base transacional, o processador e o simulador estão implementados localmente.
 - Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
 - RLS, rate limiting distribuído e proteção anti-spam, também adiados, mas ainda obrigatórios antes de exposição pública.
 - Validação operacional de e-mail e WhatsApp, caso exigida pelo Lactare.
@@ -226,12 +226,13 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 
 ### 9.5 Ordem recomendada de implementação
 
-1. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-2. Implementar lembretes com opt-in separado e sem linguagem de agendamento, além do handoff humano operacional.
-3. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
-4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
-5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
-6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
+1. Aplicar e registrar a migration `20260916180000_add_notification_outbox` no Supabase, executar os testes de integração do RF17 e conferir constraints, triggers e índices.
+2. Implementar retirada e reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
+3. Implementar lembretes com opt-in separado e sem linguagem de agendamento, além do handoff humano operacional.
+4. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
+5. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
+6. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+7. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
 ### 9.6 Risco de adoção do status da jornada
 

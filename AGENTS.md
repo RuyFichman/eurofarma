@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa com **498 testes em 58 arquivos**: 421 unitários e 77 de integração, já incluindo os 10 testes do estado conversacional que dependiam da migration `20260915170000_expand_whatsapp_conversation_flow`, aplicada no Supabase cloud em 15 de setembro de 2026. As migrations do RF07 e do RF16 continuam aplicadas, assim como a de `service_municipalities`, com os 30 municípios conferidos. As duas migrations que ampliam `JourneyStatus` foram aplicadas no Supabase cloud em 16 de setembro de 2026, e três testes de integração cobrem os novos valores contra o banco.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última suíte completa validada no Supabase passa com **498 testes em 58 arquivos**: 421 unitários e 77 de integração. A implementação local do RF17 elevou a suíte unitária para **438 testes em 51 arquivos**, todos passando; os testes de integração novos dependem da aplicação da migration `20260916180000_add_notification_outbox` no Supabase cloud. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
@@ -108,6 +108,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 - Máquina de estados local do chatbot com apresentação e menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada de nutriz cadastrada pelo `JourneyStatus` e encaminhamento transparente aos canais oficiais do Lactare. O CEP não entra no contexto persistido; o cadastro mantém marketing e lembretes desligados. A migration que amplia `WhatsappConversation` foi aplicada no Supabase cloud em 15 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; o enum com os dez estados, o default `MENU`, as colunas `context` e `misunderstood_count` e os dois CHECKs foram conferidos no banco. Como a tabela estava vazia, nenhuma conversa legada precisou ser convertida.
 - RF16 no painel: `JourneyStatus` separado de `interestStatus`, status atual, detalhe da nutriz, histórico append-only com autor e horário, observação administrativa limitada e transições explícitas. A mudança usa o status anterior como condição de concorrência e atualiza perfil e histórico na mesma transação; falha no histórico reverte o status. A migration foi aplicada no Supabase cloud em 13 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; enum, coluna com default `REGISTERED`, índices, CHECKs, FKs `RESTRICT` e trigger de imutabilidade foram conferidos no banco.
 - Extensão do RF16 com quatro marcos adicionais, sem remover os oito anteriores: `DOCUMENT_SENT`, `EXAMS_COMPLETED`, `KIT_SENT` e `DONATION_CONFIRMED`. Somente `ADMIN` registra mudanças. As migrations `20260916120000_expand_journey_status_values` e `20260916121000_expand_journey_status_transitions` foram aplicadas separadamente e em ordem no Supabase cloud em 16 de setembro de 2026 e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. O enum com os doze valores na ordem do schema e o novo CHECK de transições foram conferidos no banco; as sete transições antigas continuam aceitas, atalhos pelos novos marcos são rejeitados e os perfis existentes permaneceram inalterados (o histórico estava vazio). Os testes de integração percorrem o caminho completo pelos novos marcos, exercitam o CHECK diretamente e comparam o enum do banco com `JOURNEY_STATUS_VALUES`. A confirmação de doação é provisoriamente uma ação administrativa do Lactare, mas a evidência operacional que autoriza essa ação continua pendente e bloqueia funcionalidades derivadas de impacto, indicação e reconhecimento.
+- Base local do RF17 com consentimento específico para avisos de status no cadastro web e outbox criada na mesma transação da mudança de jornada. Cada histórico gera no máximo um item por chave idempotente; sem opt-in vigente, ele nasce `SUPPRESSED`. O processador usa claim concorrente com lock recuperável, revalida consentimento e soft delete antes do envio, aplica backoff, limita tentativas e grava auditoria append-only de sucesso, nova tentativa, falha ou supressão. `pnpm whatsapp:outbox:sim` exercita sucesso e falhas sem chamar a Meta nem imprimir PII. A migration `20260916180000_add_notification_outbox` ainda precisa ser aplicada e registrada no Supabase; até isso ocorrer, RF17 não funciona contra o banco cloud.
 
 ### 3.2 Situação dos requisitos funcionais
 
@@ -129,7 +130,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF14 — reconhecimentos | **Não implementado.** |
 | RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
 | RF16 — status da jornada | **Implementado com doze estados.** O administrador acessa `/admin/nutrizes/[id]`, consulta status e histórico e registra somente a próxima transição válida. A mutação é autorizada por role `ADMIN`, condicional ao status anterior e atômica com o histórico. Quatro marcos adicionais foram acrescentados sem remover os anteriores: documento enviado, exames feitos, kit enviado e doação confirmada. As migrations da extensão estão aplicadas no Supabase cloud desde 16 de setembro de 2026; a doação confirmada continua dependente da definição da evidência operacional. Correção e reabertura continuam sob responsabilidade operacional do admin, sem fluxo específico nesta etapa. |
-| RF17 — aviso de mudança de status | **Não implementado.** Falta notificar automaticamente a nutriz pelo WhatsApp depois de uma atualização válida feita pelo Lactare. |
+| RF17 — aviso de mudança de status | **Parcial, implementado localmente.** A mudança válida de status cria histórico e outbox atomicamente, com idempotência, consentimento específico, tentativas, backoff, auditoria e simulador local. A migration da outbox ainda precisa ser aplicada no Supabase, e a entrega real depende de infraestrutura e templates da Meta. |
 
 ### 3.3 Código e dados legados que não definem mais o escopo
 
@@ -156,8 +157,8 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Consentimento separado e job de lembretes.
 - Segmentos comportamentais que ainda não têm eventos próprios: recorrência, adesão a lembretes, indicação entre doadoras e velocidade até a primeira doação.
 - Definição da evidência operacional que autoriza o admin do Lactare a registrar uma doação como confirmada.
-- RLS para `nutriz_profiles`, `journey_status_history`, `contact_channel_clicks` e `whatsapp_conversations`; a autorização do RF16 já existe na aplicação e o evento do RF07 é anônimo, mas as tabelas continuam sem policies no Supabase. O contexto conversacional contém cidade durante o cadastro e o próprio registro identifica o número de WhatsApp, portanto deve ser tratado como PII. O nome só é solicitado e gravado no perfil depois do consentimento.
-- Notificação automática pelo WhatsApp após cada mudança válida de status.
+- RLS para `nutriz_profiles`, `journey_status_history`, `contact_channel_clicks`, `whatsapp_conversations` e, depois da migration do RF17, `communication_consent_events`, `notification_outbox` e `notification_delivery_attempts`; a autorização do RF16 já existe na aplicação e o evento do RF07 é anônimo, mas as tabelas continuam sem policies no Supabase. O contexto conversacional contém cidade durante o cadastro e o próprio registro identifica o número de WhatsApp, portanto deve ser tratado como PII. O nome só é solicitado e gravado no perfil depois do consentimento.
+- Aplicação e registro da migration da outbox; integração real do processador com templates aprovados da Meta.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
 - Política de Privacidade, Termos de Uso e RLS continuam obrigatórios antes de exposição pública, mas foram adiados pelo time para depois da entrega de municípios.
@@ -173,12 +174,13 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### 3.6 Próximas entregas recomendadas
 
-1. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-2. Implementar lembretes opcionais sem semântica de agendamento e concluir o handoff humano operacional.
-3. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
-4. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
-5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
-6. Ativar a integração real com a Meta quando a infraestrutura externa existir; o estado conversacional já está aplicado no Supabase e a suíte completa de integração voltou a rodar.
+1. Aplicar e registrar a migration `20260916180000_add_notification_outbox` no Supabase, executar os testes de integração do RF17 e conferir constraints, triggers e índices.
+2. Implementar retirada/reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
+3. Implementar lembretes opcionais sem semântica de agendamento e concluir o handoff humano operacional.
+4. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
+5. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
+6. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+7. Ativar a integração real com a Meta quando a infraestrutura externa existir; o estado conversacional já está aplicado no Supabase e a suíte completa de integração voltou a rodar.
 
 ## 4. Stack
 
@@ -197,7 +199,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Suíte completa: 498 em 58 arquivos — 421 unitários e 77 de integração, incluindo os 10 do estado conversacional e os 3 dos novos valores de `JourneyStatus`. |
+| Testes | Vitest | Última suíte completa no cloud: 498 em 58 arquivos. Com o RF17 local: 438 unitários em 51 arquivos; integração nova pendente da migration da outbox. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -477,6 +479,7 @@ Teste local:
 
 ~~~bash
 pnpm whatsapp:sim
+pnpm whatsapp:outbox:sim
 ~~~
 
 ### 11.2 Fluxo-alvo

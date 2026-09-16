@@ -836,6 +836,11 @@ export const SIGNUP = {
       terms: 'Termos de Uso',
       tail: 'e autorizo o contato sobre doação de leite humano.',
     },
+    journeyStatusWhatsappOptIn: {
+      label:
+        'Quero receber pelo WhatsApp avisos quando o Lactare atualizar minha etapa da jornada.',
+      help: 'Opcional e separado dos lembretes. Não representa agendamento ou confirmação de coleta.',
+    },
   },
   actions: {
     submit: 'Criar minha conta',
@@ -1357,6 +1362,9 @@ export const WHATSAPP_BOT = {
       'Não consegui entender. Toque em uma das opções para eu seguir com você.',
     second:
       'Ainda não consegui entender. Para não te prender no bot, aqui estão os canais oficiais do Lactare: WhatsApp {whatsapp} ou telefone {phone}.',
+  },
+  statusNotification: {
+    body: 'O Lactare atualizou uma etapa da sua jornada para: {status}.\n\nConsulte sua área no NutriLink: {areaUrl}\n\nEste aviso não representa agendamento, confirmação de coleta ou avaliação feita pelo NutriLink.',
   },
   journeyStatus: {
     REGISTERED: 'Cadastrada',
@@ -2257,7 +2265,8 @@ export const ADMIN = {
         'Registre apenas contexto administrativo, sem laudo, diagnóstico, exame específico ou motivo clínico.',
     },
     mutations: {
-      success: 'Status atualizado e registrado no histórico.',
+      success:
+        'Status atualizado, registrado no histórico e tratado para aviso conforme o consentimento da nutriz.',
       validationGeneric: 'Revise os campos destacados.',
       conflict:
         'O status foi alterado em outra aba. Atualize a página antes de tentar novamente.',

@@ -107,6 +107,7 @@ export function SignupForm() {
       password: '',
       passwordConfirm: '',
       lgpdConsent: false,
+      journeyStatusWhatsappOptIn: false,
     },
   })
 
@@ -126,6 +127,7 @@ export function SignupForm() {
           state: values.state,
           city: values.city,
           lgpdConsent: values.lgpdConsent,
+          journeyStatusWhatsappOptIn: values.journeyStatusWhatsappOptIn,
           sourceUtm: getCurrentUtmParams(),
         }),
       })
@@ -439,6 +441,41 @@ export function SignupForm() {
             id="signup-consent-error"
             message={errors.lgpdConsent?.message}
           />
+        </div>
+
+        {/* Opt-in independente para avisos de status (não pré-marcado). */}
+        <div className="bg-secondary/20 space-y-2 rounded-xl border p-4">
+          <div className="flex items-start gap-3.5">
+            <Controller
+              control={form.control}
+              name="journeyStatusWhatsappOptIn"
+              render={({ field }) => (
+                <Checkbox
+                  id="signup-journey-status-opt-in"
+                  className="mt-0.5 size-5 rounded-md"
+                  checked={field.value}
+                  onCheckedChange={(checked) =>
+                    field.onChange(checked === true)
+                  }
+                  aria-describedby="signup-journey-status-opt-in-help"
+                />
+              )}
+            />
+            <div className="min-w-0 flex-1">
+              <Label
+                htmlFor="signup-journey-status-opt-in"
+                className="block text-sm leading-relaxed font-normal"
+              >
+                {COPY.fields.journeyStatusWhatsappOptIn.label}
+              </Label>
+              <p
+                id="signup-journey-status-opt-in-help"
+                className="text-muted-foreground mt-1 text-xs leading-5"
+              >
+                {COPY.fields.journeyStatusWhatsappOptIn.help}
+              </p>
+            </div>
+          </div>
         </div>
 
         {submitError ? (

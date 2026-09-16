@@ -60,6 +60,8 @@ export const signupFormSchema = z
     lgpdConsent: z.boolean().refine((value) => value === true, {
       message: V.consentRequired,
     }),
+    // Opt-in independente, opcional e nunca pré-marcado (RF17).
+    journeyStatusWhatsappOptIn: z.boolean(),
   })
   // A confirmação existe só no cliente: o servidor recebe uma senha só. O erro
   // aponta para o campo de confirmação, que é onde a pessoa consegue corrigir.

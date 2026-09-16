@@ -120,6 +120,62 @@ describe('atualização transacional da jornada', () => {
           administrativeNote: 'Ficha recebida pela equipe.',
         },
       ])
+
+      const outbox = await transaction.notificationOutbox.findMany({
+        where: { nutrizProfileId: nutrizId },
+        select: {
+          status: true,
+          kind: true,
+          journeyStatusHistoryId: true,
+          lastErrorCode: true,
+        },
+      })
+      expect(outbox).toEqual([
+        {
+          status: 'SUPPRESSED',
+          kind: 'JOURNEY_STATUS_CHANGED',
+          journeyStatusHistoryId: expect.any(String),
+          lastErrorCode: 'CONSENT_NOT_GRANTED',
+        },
+      ])
+    })
+  })
+
+  it('enfileira exatamente um aviso quando há opt-in específico vigente', async () => {
+    await withRolledBackJourney(async (transaction, { nutrizId, adminId }) => {
+      const consent = await transaction.communicationConsentEvent.create({
+        data: {
+          nutrizProfileId: nutrizId,
+          purpose: 'JOURNEY_STATUS_WHATSAPP',
+          decision: 'GRANTED',
+          source: 'WEB',
+          policyVersion: 'test.v1',
+        },
+      })
+
+      await applyAdminNutrizJourneyStatusTransition(transaction, {
+        nutrizProfileId: nutrizId,
+        fromStatus: 'REGISTERED',
+        toStatus: 'FORM_RECEIVED',
+        changedByUserId: adminId,
+      })
+
+      const outbox = await transaction.notificationOutbox.findMany({
+        where: { nutrizProfileId: nutrizId },
+        select: {
+          idempotencyKey: true,
+          status: true,
+          consentEventId: true,
+          journeyStatusHistoryId: true,
+        },
+      })
+      expect(outbox).toHaveLength(1)
+      expect(outbox[0]).toEqual({
+        idempotencyKey: `journey-status:${outbox[0]?.journeyStatusHistoryId}`,
+        status: 'PENDING',
+        consentEventId: consent.id,
+        journeyStatusHistoryId: expect.any(String),
+      })
     })
   })
 

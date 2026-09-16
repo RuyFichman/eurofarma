@@ -50,7 +50,10 @@ export async function getAdminNutrizJourneyDetail(
 
 type JourneyWriteClient = Pick<
   Prisma.TransactionClient,
-  'nutrizProfile' | 'journeyStatusHistory'
+  | 'nutrizProfile'
+  | 'journeyStatusHistory'
+  | 'communicationConsentEvent'
+  | 'notificationOutbox'
 >
 
 export type AdminJourneyStatusMutationInput = AdminJourneyStatusUpdate & {
@@ -88,7 +91,7 @@ export async function applyAdminNutrizJourneyStatusTransition(
     return current ? { status: 'CONFLICT' } : { status: 'NOT_FOUND' }
   }
 
-  await client.journeyStatusHistory.create({
+  const history = await client.journeyStatusHistory.create({
     data: {
       nutrizProfileId: input.nutrizProfileId,
       fromStatus: input.fromStatus,
@@ -96,15 +99,40 @@ export async function applyAdminNutrizJourneyStatusTransition(
       changedByUserId: input.changedByUserId,
       administrativeNote: input.administrativeNote ?? null,
     },
+    select: { id: true },
+  })
+
+  const consent = await client.communicationConsentEvent.findFirst({
+    where: {
+      nutrizProfileId: input.nutrizProfileId,
+      purpose: 'JOURNEY_STATUS_WHATSAPP',
+    },
+    orderBy: { sequence: 'desc' },
+    select: { id: true, decision: true },
+  })
+  const hasConsent = consent?.decision === 'GRANTED'
+
+  await client.notificationOutbox.create({
+    data: {
+      idempotencyKey: `journey-status:${history.id}`,
+      kind: 'JOURNEY_STATUS_CHANGED',
+      status: hasConsent ? 'PENDING' : 'SUPPRESSED',
+      nutrizProfileId: input.nutrizProfileId,
+      journeyStatusHistoryId: history.id,
+      consentEventId: consent?.id ?? null,
+      lastErrorCode: hasConsent ? null : 'CONSENT_NOT_GRANTED',
+      lastErrorAt: hasConsent ? null : new Date(),
+    },
   })
 
   return { status: 'UPDATED' }
 }
 
 /**
- * Atualiza o estado atual e acrescenta o histórico na mesma transação. O
- * `updateMany` inclui o estado anterior no WHERE: duas abas concorrentes não
- * podem avançar a mesma versão da jornada nem criar histórico divergente.
+ * Atualiza o estado atual, acrescenta o histórico e cria a outbox do RF17 na
+ * mesma transação. O `updateMany` inclui o estado anterior no WHERE: duas abas
+ * concorrentes não podem avançar a mesma versão da jornada, duplicar histórico
+ * nem enfileirar dois avisos para a mesma mudança.
  */
 export async function transitionAdminNutrizJourneyStatus(
   input: AdminJourneyStatusMutationInput,

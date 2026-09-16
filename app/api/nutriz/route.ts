@@ -9,6 +9,7 @@ import { getClientIp } from '@/lib/security/client-ip'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { createSupabaseAdminClient } from '@/lib/auth/supabase-admin'
 import { createSupabaseServerClient } from '@/lib/auth/supabase-server'
+import { JOURNEY_STATUS_WHATSAPP_CONSENT_VERSION } from '@/lib/consent/journey-status-notifications'
 
 // Prisma roda melhor no Node runtime (não Edge).
 export const runtime = 'nodejs'
@@ -120,8 +121,16 @@ export async function POST(request: NextRequest) {
 
   // 3. Normalizar (o Zod já entregou `phoneWhatsapp` com DDI 55, `state` em UF
   //    maiúscula e `email` em minúsculas).
-  const { fullName, email, password, phoneWhatsapp, state, city, sourceUtm } =
-    parsed.data
+  const {
+    fullName,
+    email,
+    password,
+    phoneWhatsapp,
+    state,
+    city,
+    journeyStatusWhatsappOptIn,
+    sourceUtm,
+  } = parsed.data
   const sanitizedUtm = sanitizeSourceUtm(sourceUtm)
   const utmValue: Prisma.InputJsonValue | undefined = sanitizedUtm
     ? (sanitizedUtm as Prisma.InputJsonValue)
@@ -198,26 +207,40 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    if (existing) {
-      await prisma.nutrizProfile.update({
-        where: { id: existing.id },
-        data: {
-          ...profileData,
-          // Novo interesse reativa um cadastro removido (soft delete).
-          deletedAt: null,
-          // Só sobrescreve a atribuição se vier UTM nova (preserva o first-touch).
-          ...(utmValue !== undefined ? { sourceUtm: utmValue } : {}),
-        },
-      })
-    } else {
-      await prisma.nutrizProfile.create({
-        data: {
-          ...profileData,
-          phoneWhatsapp,
-          sourceUtm: utmValue ?? Prisma.JsonNull,
-        },
-      })
-    }
+    await prisma.$transaction(async (transaction) => {
+      const profile = existing
+        ? await transaction.nutrizProfile.update({
+            where: { id: existing.id },
+            data: {
+              ...profileData,
+              // Novo interesse reativa um cadastro removido (soft delete).
+              deletedAt: null,
+              // Só sobrescreve a atribuição se vier UTM nova (preserva o first-touch).
+              ...(utmValue !== undefined ? { sourceUtm: utmValue } : {}),
+            },
+            select: { id: true },
+          })
+        : await transaction.nutrizProfile.create({
+            data: {
+              ...profileData,
+              phoneWhatsapp,
+              sourceUtm: utmValue ?? Prisma.JsonNull,
+            },
+            select: { id: true },
+          })
+
+      if (journeyStatusWhatsappOptIn) {
+        await transaction.communicationConsentEvent.create({
+          data: {
+            nutrizProfileId: profile.id,
+            purpose: 'JOURNEY_STATUS_WHATSAPP',
+            decision: 'GRANTED',
+            source: 'WEB',
+            policyVersion: JOURNEY_STATUS_WHATSAPP_CONSENT_VERSION,
+          },
+        })
+      }
+    })
   } catch (error) {
     // Rollback best-effort: se ele também falhar, a resposta continua sendo o
     // 500 honesto e a conta órfã fica para limpeza manual.
