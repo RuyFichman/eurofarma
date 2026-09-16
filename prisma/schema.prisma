@@ -164,6 +164,14 @@ enum NotificationDeliveryAttemptOutcome {
   SUPPRESSED
 }
 
+/// Opções mínimas e não clínicas de como a nutriz se sentiu ao registrar um
+/// momento de bem-estar. Não é diário de saúde nem avaliação terapêutica.
+enum WellbeingFeeling {
+  GOOD
+  OK
+  TIRED
+}
+
 model User {
   id          String    @id @default(uuid())
   email       String    @unique
@@ -216,10 +224,43 @@ model NutrizProfile {
   journeyHistory        JourneyStatusHistory[]
   communicationConsents CommunicationConsentEvent[]
   notificationOutbox    NotificationOutbox[]
+  extractionLogs         ExtractionLog[]
+  wellbeingEntries       WellbeingEntry[]
 
   @@index([state, city, createdAt])
   @@index([journeyStatus, createdAt])
   @@map("nutriz_profiles")
+}
+
+/// Registro pessoal da nutriz. Não representa doação, coleta ou agendamento.
+/// A nutriz pode remover seus próprios registros.
+model ExtractionLog {
+  id              String   @id @default(uuid())
+  nutrizProfileId String   @map("nutriz_profile_id")
+  recordedAt      DateTime @map("recorded_at")
+  volumeMl        Int      @map("volume_ml")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  nutrizProfile NutrizProfile @relation(fields: [nutrizProfileId], references: [id], onDelete: Cascade)
+
+  @@index([nutrizProfileId, recordedAt])
+  @@map("extraction_logs")
+}
+
+/// Registro opcional, mínimo e não clínico de bem-estar após uma doação.
+model WellbeingEntry {
+  id              String           @id @default(uuid())
+  nutrizProfileId String           @map("nutriz_profile_id")
+  feeling         WellbeingFeeling
+  recordedAt      DateTime         @map("recorded_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  nutrizProfile NutrizProfile @relation(fields: [nutrizProfileId], references: [id], onDelete: Cascade)
+
+  @@index([nutrizProfileId, recordedAt])
+  @@map("wellbeing_entries")
 }
 
 /// Registro append-only de uma mudança de status feita por um administrador.

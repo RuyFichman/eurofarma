@@ -1018,6 +1018,97 @@ export const NUTRIZ_AUTH = {
       error:
         'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
     },
+    personal: {
+      validation: {
+        recordedAtInvalid: 'Informe uma data e hora válidas.',
+        volumeInvalid: 'Informe o volume em mililitros.',
+        volumeInteger: 'Use um número inteiro de mililitros.',
+        volumeMin: 'Informe pelo menos 1 ml.',
+        volumeMax: 'Informe no máximo 5.000 ml por registro.',
+        future: 'A data e hora não podem estar no futuro.',
+        idInvalid: 'Registro inválido.',
+      },
+      extraction: {
+        title: 'Meu registro de extrações',
+        description:
+          'Anote sessões de extração ou ordenha para sua própria organização. Este registro não aciona nem confirma coleta.',
+        dateLabel: 'Data e hora',
+        volumeLabel: 'Volume (ml)',
+        datePlaceholder: 'Selecione data e hora',
+        volumePlaceholder: 'Ex.: 50',
+        volumeUnit: 'ml',
+        separator: '·',
+        addAction: 'Adicionar registro',
+        submitting: 'Salvando...',
+        addedFeedback: 'Registro adicionado.',
+        total: 'Total registrado',
+        sessions: '{count} registros',
+        empty: 'Você ainda não adicionou uma sessão.',
+        historyTitle: 'Registros recentes',
+        deleteAction: 'Excluir registro de {date}',
+        deleteConfirm: 'Excluir este registro pessoal?',
+        deletedFeedback: 'Registro excluído.',
+        suggestion:
+          'Se quiser compartilhar uma atualização com a equipe, fale diretamente com o Lactare. O registro acima continua sendo apenas pessoal.',
+        error: 'Não foi possível salvar o registro agora. Tente novamente.',
+      },
+      wellbeing: {
+        title: 'Como você está se sentindo?',
+        description:
+          'Depois de uma doação, se quiser, registre uma opção simples para seu próprio acompanhamento. Isso não é uma avaliação de saúde.',
+        optional: 'Opcional',
+        choices: {
+          GOOD: 'Bem',
+          OK: 'Tudo bem',
+          TIRED: 'Cansada',
+        },
+        saveAction: 'Salvar como registro pessoal',
+        submitting: 'Salvando...',
+        savedFeedback: 'Seu registro pessoal foi salvo.',
+        latestTitle: 'Registros recentes',
+        recordedAt: 'Registrado em {date}',
+        timeSeparator: 'às',
+        deleteAction: 'Excluir registro de {date}',
+        deleteConfirm: 'Excluir este registro pessoal?',
+        deletedFeedback: 'Registro excluído.',
+        empty: 'Nenhum registro de bem-estar foi feito.',
+        error: 'Não foi possível salvar agora. Tente novamente.',
+      },
+      history: {
+        title: 'Seu histórico para baixar',
+        description:
+          'Baixe uma cópia dos status categóricos da sua jornada e dos seus registros pessoais. O arquivo não inclui observações internas nem detalhes clínicos.',
+        action: 'Baixar histórico em PDF',
+        hint: 'O PDF contém somente dados da sua própria área.',
+        pdf: {
+          title: 'Histórico pessoal da jornada',
+          generatedAt: 'Gerado em {date}.',
+          name: 'Nutriz: {name}',
+          journeyTitle: 'Jornada registrada pelo Lactare',
+          registered: 'Cadastro criado em {date}',
+          status: '{label} — {date}',
+          extractionTitle: 'Registros pessoais de extração/ordenha',
+          extraction: '{date} — {volume} ml',
+          wellbeingTitle: 'Registros pessoais de bem-estar',
+          wellbeing: '{feeling} — {date}',
+          noRecords: 'Nenhum registro nesta seção.',
+          privacyNote:
+            'Este documento reúne somente dados da sua própria área. Registros pessoais não confirmam coleta nem substituem orientações do Lactare.',
+        },
+      },
+      education: {
+        title: 'Conteúdos para esta etapa',
+        description:
+          'Informações educativas relacionadas ao estágio registrado pelo Lactare.',
+        empty:
+          'Ainda não há conteúdo específico publicado para esta etapa. Veja o guia geral de como funciona a doação.',
+        fallbackTitle: 'Como funciona a doação',
+        fallbackDescription:
+          'Confira o passo a passo geral, os cuidados e as dúvidas frequentes no conteúdo público do NutriLink.',
+        fallbackAction: 'Ver conteúdo educativo',
+        readMore: 'Conteúdo sugerido',
+      },
+    },
     journey: {
       current: {
         eyebrow: 'Sua etapa atual',

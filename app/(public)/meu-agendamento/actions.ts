@@ -8,6 +8,19 @@ import { createSupabaseServerClient } from '@/lib/auth/supabase-server'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { cancelNutrizAppointment } from '@/lib/db/queries/appointments'
 import { setReminderConsent } from '@/lib/db/queries/communication-consents'
+import {
+  createNutrizExtractionLog,
+  createNutrizWellbeingEntry,
+  deleteNutrizExtractionLog,
+  deleteNutrizWellbeingEntry,
+} from '@/lib/db/queries/nutriz-personal-area'
+import {
+  extractionLogSchema,
+  personalRecordIdSchema,
+  wellbeingEntrySchema,
+} from '@/lib/validators/nutriz-personal-area'
+import { localDateTimeToDate } from '@/lib/utils/local-date-time'
+import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 
 /**
  * Encerra a sessão da nutriz. O `signOut` limpa o cookie via SSR; o redirect
@@ -93,5 +106,137 @@ export async function setReminderConsentAction(
       console.error('[setReminderConsentAction]', error)
     }
     return { ok: false, enabled: !parsed.data }
+  }
+}
+
+type PersonalAreaActionFailure = {
+  ok: false
+  code: 'VALIDATION_ERROR' | 'NOT_FOUND' | 'DATABASE_ERROR'
+  fields?: Record<string, string>
+}
+
+type PersonalAreaActionSuccess = { ok: true }
+
+type PersonalAreaActionResult =
+  | PersonalAreaActionFailure
+  | PersonalAreaActionSuccess
+
+function getFieldErrors(error: {
+  issues: Array<{ path: PropertyKey[]; message: string }>
+}): Record<string, string> {
+  const fields: Record<string, string> = {}
+  for (const issue of error.issues) {
+    const field = issue.path[0]
+    if (typeof field === 'string' && !(field in fields)) {
+      fields[field] = issue.message
+    }
+  }
+  return fields
+}
+
+/** Registra uma sessão pessoal sem criar qualquer evento operacional. */
+export async function createExtractionLogAction(
+  input: unknown,
+): Promise<PersonalAreaActionResult> {
+  const nutriz = await requireNutrizUser()
+  const parsed = extractionLogSchema.safeParse(input)
+  if (!parsed.success) {
+    return {
+      ok: false,
+      code: 'VALIDATION_ERROR',
+      fields: getFieldErrors(parsed.error),
+    }
+  }
+
+  const recordedAt = localDateTimeToDate(parsed.data.recordedAt)
+  if (!recordedAt || recordedAt > new Date()) {
+    return {
+      ok: false,
+      code: 'VALIDATION_ERROR',
+      fields: { recordedAt: NUTRIZ_AUTH.area.personal.validation.future },
+    }
+  }
+
+  try {
+    const created = await createNutrizExtractionLog({
+      nutrizProfileId: nutriz.id,
+      recordedAt,
+      volumeMl: parsed.data.volumeMl,
+    })
+    if (!created) return { ok: false, code: 'NOT_FOUND' }
+    revalidatePath('/meu-agendamento')
+    return { ok: true }
+  } catch {
+    return { ok: false, code: 'DATABASE_ERROR' }
+  }
+}
+
+/** Remove apenas o registro pessoal que pertence à nutriz autenticada. */
+export async function deleteExtractionLogAction(
+  extractionLogId: string,
+): Promise<PersonalAreaActionResult> {
+  const nutriz = await requireNutrizUser()
+  const parsed = personalRecordIdSchema.safeParse(extractionLogId)
+  if (!parsed.success) return { ok: false, code: 'VALIDATION_ERROR' }
+
+  try {
+    const deleted = await deleteNutrizExtractionLog({
+      nutrizProfileId: nutriz.id,
+      extractionLogId: parsed.data,
+    })
+    if (!deleted) return { ok: false, code: 'NOT_FOUND' }
+    revalidatePath('/meu-agendamento')
+    return { ok: true }
+  } catch {
+    return { ok: false, code: 'DATABASE_ERROR' }
+  }
+}
+
+/** Registra bem-estar somente como uma opção simples e não clínica. */
+export async function createWellbeingEntryAction(
+  input: unknown,
+): Promise<PersonalAreaActionResult> {
+  const nutriz = await requireNutrizUser()
+  const parsed = wellbeingEntrySchema.safeParse(input)
+  if (!parsed.success) {
+    return {
+      ok: false,
+      code: 'VALIDATION_ERROR',
+      fields: getFieldErrors(parsed.error),
+    }
+  }
+
+  try {
+    const created = await createNutrizWellbeingEntry({
+      nutrizProfileId: nutriz.id,
+      feeling: parsed.data.feeling,
+      recordedAt: new Date(),
+    })
+    if (!created) return { ok: false, code: 'NOT_FOUND' }
+    revalidatePath('/meu-agendamento')
+    return { ok: true }
+  } catch {
+    return { ok: false, code: 'DATABASE_ERROR' }
+  }
+}
+
+/** Remove somente um registro de bem-estar da própria nutriz. */
+export async function deleteWellbeingEntryAction(
+  wellbeingEntryId: string,
+): Promise<PersonalAreaActionResult> {
+  const nutriz = await requireNutrizUser()
+  const parsed = personalRecordIdSchema.safeParse(wellbeingEntryId)
+  if (!parsed.success) return { ok: false, code: 'VALIDATION_ERROR' }
+
+  try {
+    const deleted = await deleteNutrizWellbeingEntry({
+      nutrizProfileId: nutriz.id,
+      wellbeingEntryId: parsed.data,
+    })
+    if (!deleted) return { ok: false, code: 'NOT_FOUND' }
+    revalidatePath('/meu-agendamento')
+    return { ok: true }
+  } catch {
+    return { ok: false, code: 'DATABASE_ERROR' }
   }
 }
