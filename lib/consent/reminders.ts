@@ -1,0 +1,1 @@
+export const REMINDER_WHATSAPP_CONSENT_VERSION = '2026-09-16.reminders.v1'

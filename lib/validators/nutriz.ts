@@ -53,6 +53,8 @@ export const nutrizSignupApiSchema = z.object({
   lgpdConsent: z.literal(true, {
     message: 'E necessario aceitar a Politica de Privacidade para continuar.',
   }),
+  journeyStatusWhatsappOptIn: z.boolean().optional().default(false),
+  reminderWhatsappOptIn: z.boolean().optional().default(false),
   sourceUtm: z.unknown().optional(),
 })
 

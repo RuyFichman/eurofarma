@@ -20,13 +20,24 @@ import {
 function makeClient() {
   const updateMany = vi.fn()
   const findFirst = vi.fn()
-  const create = vi.fn()
+  const historyCreate = vi.fn()
+  const consentFindFirst = vi.fn()
+  const outboxCreate = vi.fn()
   const client = {
     nutrizProfile: { updateMany, findFirst },
-    journeyStatusHistory: { create },
+    journeyStatusHistory: { create: historyCreate },
+    communicationConsentEvent: { findFirst: consentFindFirst },
+    notificationOutbox: { create: outboxCreate },
   } as unknown as Parameters<typeof applyAdminNutrizJourneyStatusTransition>[0]
 
-  return { client, updateMany, findFirst, create }
+  return {
+    client,
+    updateMany,
+    findFirst,
+    historyCreate,
+    consentFindFirst,
+    outboxCreate,
+  }
 }
 
 const input = {
@@ -69,9 +80,20 @@ describe('consulta administrativa da jornada', () => {
 
 describe('mutação administrativa da jornada', () => {
   it('atualiza pelo estado esperado e acrescenta o histórico', async () => {
-    const { client, updateMany, findFirst, create } = makeClient()
+    const {
+      client,
+      updateMany,
+      findFirst,
+      historyCreate,
+      consentFindFirst,
+      outboxCreate,
+    } = makeClient()
     updateMany.mockResolvedValue({ count: 1 })
-    create.mockResolvedValue({ id: 'history-1' })
+    historyCreate.mockResolvedValue({ id: 'history-1' })
+    consentFindFirst.mockResolvedValue({
+      id: 'consent-1',
+      decision: 'GRANTED',
+    })
 
     await expect(
       applyAdminNutrizJourneyStatusTransition(client, input),
@@ -85,7 +107,7 @@ describe('mutação administrativa da jornada', () => {
       },
       data: { journeyStatus: input.toStatus },
     })
-    expect(create).toHaveBeenCalledWith({
+    expect(historyCreate).toHaveBeenCalledWith({
       data: {
         nutrizProfileId: input.nutrizProfileId,
         fromStatus: input.fromStatus,
@@ -93,29 +115,68 @@ describe('mutação administrativa da jornada', () => {
         changedByUserId: input.changedByUserId,
         administrativeNote: input.administrativeNote,
       },
+      select: { id: true },
+    })
+    expect(outboxCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        idempotencyKey: 'journey-status:history-1',
+        kind: 'JOURNEY_STATUS_CHANGED',
+        status: 'PENDING',
+        consentEventId: 'consent-1',
+      }),
     })
     expect(findFirst).not.toHaveBeenCalled()
   })
 
+  it('audita como suprimido quando o opt-in específico foi retirado', async () => {
+    const {
+      client,
+      updateMany,
+      historyCreate,
+      consentFindFirst,
+      outboxCreate,
+    } = makeClient()
+    updateMany.mockResolvedValue({ count: 1 })
+    historyCreate.mockResolvedValue({ id: 'history-2' })
+    consentFindFirst.mockResolvedValue({
+      id: 'consent-withdrawn-1',
+      decision: 'WITHDRAWN',
+    })
+
+    await applyAdminNutrizJourneyStatusTransition(client, input)
+
+    expect(outboxCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        status: 'SUPPRESSED',
+        consentEventId: 'consent-withdrawn-1',
+        lastErrorCode: 'CONSENT_NOT_GRANTED',
+      }),
+    })
+  })
+
   it('detecta concorrência e não acrescenta histórico divergente', async () => {
-    const { client, updateMany, findFirst, create } = makeClient()
+    const { client, updateMany, findFirst, historyCreate, outboxCreate } =
+      makeClient()
     updateMany.mockResolvedValue({ count: 0 })
     findFirst.mockResolvedValue({ id: input.nutrizProfileId })
 
     await expect(
       applyAdminNutrizJourneyStatusTransition(client, input),
     ).resolves.toEqual({ status: 'CONFLICT' })
-    expect(create).not.toHaveBeenCalled()
+    expect(historyCreate).not.toHaveBeenCalled()
+    expect(outboxCreate).not.toHaveBeenCalled()
   })
 
   it('diferencia perfil removido ou inexistente de conflito', async () => {
-    const { client, updateMany, findFirst, create } = makeClient()
+    const { client, updateMany, findFirst, historyCreate, outboxCreate } =
+      makeClient()
     updateMany.mockResolvedValue({ count: 0 })
     findFirst.mockResolvedValue(null)
 
     await expect(
       applyAdminNutrizJourneyStatusTransition(client, input),
     ).resolves.toEqual({ status: 'NOT_FOUND' })
-    expect(create).not.toHaveBeenCalled()
+    expect(historyCreate).not.toHaveBeenCalled()
+    expect(outboxCreate).not.toHaveBeenCalled()
   })
 })

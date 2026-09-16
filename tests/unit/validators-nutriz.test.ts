@@ -91,6 +91,33 @@ describe('nutrizSignupApiSchema', () => {
     expect(nutrizSignupApiSchema.safeParse(validApiSignup).success).toBe(true)
   })
 
+  it('mantém avisos de status desligados sem opt-in explícito', () => {
+    expect(
+      nutrizSignupApiSchema.parse(validApiSignup).journeyStatusWhatsappOptIn,
+    ).toBe(false)
+  })
+
+  it('aceita opt-in explícito para avisos de status', () => {
+    expect(
+      nutrizSignupApiSchema.parse({
+        ...validApiSignup,
+        journeyStatusWhatsappOptIn: true,
+      }).journeyStatusWhatsappOptIn,
+    ).toBe(true)
+  })
+
+  it('mantém lembretes desligados por padrão e aceita opt-in separado', () => {
+    expect(
+      nutrizSignupApiSchema.parse(validApiSignup).reminderWhatsappOptIn,
+    ).toBe(false)
+    const parsed = nutrizSignupApiSchema.parse({
+      ...validApiSignup,
+      reminderWhatsappOptIn: true,
+    })
+    expect(parsed.reminderWhatsappOptIn).toBe(true)
+    expect(parsed.journeyStatusWhatsappOptIn).toBe(false)
+  })
+
   it('normaliza o e-mail para minúsculas', () => {
     expect(nutrizSignupApiSchema.parse(validApiSignup).email).toBe(
       'maria.silva@email.com',

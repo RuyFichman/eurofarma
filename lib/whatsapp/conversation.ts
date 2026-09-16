@@ -35,6 +35,7 @@ export type ConversationContext = {
 export type ConversationProfile = {
   fullName: string
   journeyStatus: JourneyStatusValue
+  reminderConsentEnabled: boolean
 }
 
 /** IDs estáveis devolvidos pela Meta; não são textos de interface. */
@@ -42,6 +43,7 @@ export const REPLY_IDS = {
   menuKnowMore: 'menu_saber_mais',
   menuDonate: 'menu_quero_doar',
   menuHuman: 'menu_falar_pessoa',
+  menuReminders: 'menu_lembretes',
   faqWhoCanDonate: 'faq_quem_pode',
   faqHowItWorks: 'faq_como_funciona',
   faqStorage: 'faq_armazenar',
@@ -52,6 +54,9 @@ export const REPLY_IDS = {
   faqSite: 'faq_ver_site',
   registrationAccept: 'cadastro_aceito',
   registrationDecline: 'cadastro_recuso',
+  remindersEnable: 'lembretes_ativar',
+  remindersDisable: 'lembretes_desativar',
+  remindersBack: 'lembretes_voltar',
 } as const
 
 export type BotReply =
@@ -76,6 +81,7 @@ export type ConversationEffect =
       city: string
       state: string
     }
+  | { kind: 'set_reminder_consent'; enabled: boolean }
 
 export type ConversationOutcome = {
   reply: BotReply
@@ -115,6 +121,15 @@ function menuButtons() {
   return [
     { id: REPLY_IDS.menuKnowMore, title: WHATSAPP_BOT.menu.knowMore },
     { id: REPLY_IDS.menuDonate, title: WHATSAPP_BOT.menu.donate },
+    { id: REPLY_IDS.menuHuman, title: WHATSAPP_BOT.menu.human },
+  ] as const
+}
+
+function registeredMenuRows() {
+  return [
+    { id: REPLY_IDS.menuKnowMore, title: WHATSAPP_BOT.menu.knowMore },
+    { id: REPLY_IDS.menuDonate, title: WHATSAPP_BOT.menu.donate },
+    { id: REPLY_IDS.menuReminders, title: WHATSAPP_BOT.menu.reminders },
     { id: REPLY_IDS.menuHuman, title: WHATSAPP_BOT.menu.human },
   ] as const
 }
@@ -163,6 +178,18 @@ function mainMenuReply(body: string): ConversationOutcome {
   })
 }
 
+function registeredMenuReply(body: string): ConversationOutcome {
+  return outcome({
+    reply: {
+      type: 'list',
+      body,
+      button: WHATSAPP_BOT.menu.button,
+      rows: registeredMenuRows(),
+    },
+    nextStep: 'MENU',
+  })
+}
+
 function firstName(fullName: string): string {
   return fullName.trim().split(/\s+/u)[0] ?? fullName.trim()
 }
@@ -172,7 +199,7 @@ export function buildInitialConversationReply(
 ): ConversationOutcome {
   if (!profile) return mainMenuReply(WHATSAPP_BOT.menu.welcome)
 
-  return mainMenuReply(
+  return registeredMenuReply(
     WHATSAPP_BOT.menu.registeredWelcome
       .replace('{name}', firstName(profile.fullName))
       .replace('{status}', WHATSAPP_BOT.journeyStatus[profile.journeyStatus])
@@ -181,6 +208,77 @@ export function buildInitialConversationReply(
         WHATSAPP_BOT.journeyGuidance[profile.journeyStatus],
       ),
   )
+}
+
+function reminderPreferenceReply(
+  profile: ConversationProfile | null,
+  body?: string,
+): ConversationOutcome {
+  if (!profile) {
+    return mainMenuReply(WHATSAPP_BOT.reminders.registrationRequired)
+  }
+
+  const enabled = profile.reminderConsentEnabled
+  return outcome({
+    reply: {
+      type: 'buttons',
+      body:
+        body ??
+        (enabled
+          ? WHATSAPP_BOT.reminders.enabled
+          : WHATSAPP_BOT.reminders.disabled),
+      buttons: [
+        {
+          id: enabled ? REPLY_IDS.remindersDisable : REPLY_IDS.remindersEnable,
+          title: enabled
+            ? WHATSAPP_BOT.reminders.disable
+            : WHATSAPP_BOT.reminders.enable,
+        },
+        {
+          id: REPLY_IDS.remindersBack,
+          title: WHATSAPP_BOT.reminders.back,
+        },
+      ],
+    },
+    nextStep: 'MENU',
+  })
+}
+
+export function buildReminderConsentResultOutcome(
+  enabled: boolean,
+): ConversationOutcome {
+  return registeredMenuReply(
+    enabled
+      ? WHATSAPP_BOT.reminders.enabledSuccess
+      : WHATSAPP_BOT.reminders.disabledSuccess,
+  )
+}
+
+export function buildReminderConsentFailureOutcome(
+  profile: ConversationProfile,
+): ConversationOutcome {
+  return reminderPreferenceReply(profile, WHATSAPP_BOT.reminders.unavailable)
+}
+
+function reminderConsentDecisionOutcome(
+  profile: ConversationProfile | null,
+  enabled: boolean,
+): ConversationOutcome {
+  if (!profile) {
+    return mainMenuReply(WHATSAPP_BOT.reminders.registrationRequired)
+  }
+  if (enabled === profile.reminderConsentEnabled) {
+    return registeredMenuReply(
+      enabled
+        ? WHATSAPP_BOT.reminders.alreadyEnabled
+        : WHATSAPP_BOT.reminders.alreadyDisabled,
+    )
+  }
+
+  return {
+    ...buildReminderConsentResultOutcome(enabled),
+    effect: { kind: 'set_reminder_consent', enabled },
+  }
 }
 
 function faqList(body = WHATSAPP_BOT.faq.body): ConversationOutcome {
@@ -289,6 +387,33 @@ export function advanceConversation(
   }
 
   if (params.replyId === REPLY_IDS.menuKnowMore) return faqList()
+  if (
+    params.replyId === REPLY_IDS.menuReminders ||
+    /^lembretes$/iu.test(params.text?.trim() ?? '')
+  ) {
+    return reminderPreferenceReply(params.profile)
+  }
+  if (params.replyId === REPLY_IDS.remindersBack) {
+    return buildInitialConversationReply(params.profile)
+  }
+  const reminderText = params.text?.trim() ?? ''
+  if (/^(ativar|quero|receber)\s+lembretes$/iu.test(reminderText)) {
+    return reminderConsentDecisionOutcome(params.profile, true)
+  }
+  if (
+    /^(?:(?:parar|cancelar|desativar)\s+(?:os\s+)?lembretes|n[aã]o\s+quero\s+(?:mais\s+)?lembretes)$/iu.test(
+      reminderText,
+    )
+  ) {
+    return reminderConsentDecisionOutcome(params.profile, false)
+  }
+  if (
+    params.replyId === REPLY_IDS.remindersEnable ||
+    params.replyId === REPLY_IDS.remindersDisable
+  ) {
+    const enabled = params.replyId === REPLY_IDS.remindersEnable
+    return reminderConsentDecisionOutcome(params.profile, enabled)
+  }
   if (
     params.replyId === REPLY_IDS.menuDonate ||
     params.replyId === REPLY_IDS.faqDonate

@@ -10,9 +10,12 @@ import { rateLimit } from '@/lib/security/rate-limit'
 import { sendWhatsappReply } from '@/lib/whatsapp/client'
 import {
   advanceConversation,
+  buildReminderConsentFailureOutcome,
+  buildReminderConsentResultOutcome,
   buildRegistrationFailureOutcome,
   isConversationResetText,
 } from '@/lib/whatsapp/conversation'
+import { setReminderConsent } from '@/lib/db/queries/communication-consents'
 import { resolveWhatsappCoverageInput } from '@/lib/whatsapp/coverage'
 import { extractInboundMessage } from '@/lib/whatsapp/payload'
 import { hydrateWhatsappReply } from '@/lib/whatsapp/reply'
@@ -132,6 +135,26 @@ export async function POST(request: NextRequest) {
         nutrizProfileId = created.id
       } else {
         outcome = buildRegistrationFailureOutcome(state.context)
+      }
+    }
+
+    if (outcome.effect.kind === 'set_reminder_consent' && profile) {
+      try {
+        const consent = await setReminderConsent({
+          nutrizProfileId: profile.id,
+          enabled: outcome.effect.enabled,
+          source: 'WHATSAPP',
+          sourceEventId: `whatsapp:${message.messageId}`,
+        })
+        outcome =
+          consent.status === 'NOT_FOUND'
+            ? buildReminderConsentFailureOutcome(profile)
+            : buildReminderConsentResultOutcome(consent.enabled)
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[whatsapp] consentimento não gravado', error)
+        }
+        outcome = buildReminderConsentFailureOutcome(profile)
       }
     }
 
