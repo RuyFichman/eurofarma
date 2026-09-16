@@ -35,6 +35,8 @@ O produto tem três frentes:
 2. **Plataforma web:** conteúdo educativo, elegibilidade por CEP ou município, cadastro, login e área pessoal.
 3. **Dashboard administrativo:** gestão da área atendida, atualização categórica da jornada das nutrizes e indicadores de alcance, engajamento, conversão, retenção e adesão a lembretes.
 
+A área pessoal também é o núcleo de relacionamento contínuo previsto no produto: deve evoluir para contemplar histórico de doações, diário pessoal de extração/ordenha, exportação em PDF, reconhecimentos simbólicos, gestão de lembretes, bem-estar opcional e conteúdo educativo sugerido por estágio.
+
 ### 2.1 Limites obrigatórios
 
 O NutriLink:
@@ -44,6 +46,7 @@ O NutriLink:
 - trata apenas dados necessários à jornada da nutriz, incluindo status categóricos informados pelo Lactare, sem detalhes clínicos;
 - usa lembretes opcionais, com consentimento separado;
 - pode registrar origem por indicação sem oferecer recompensa material.
+- pode oferecer registros pessoais de extração e bem-estar, desde que opcionais, minimizados e não clínicos.
 
 O NutriLink não é:
 
@@ -98,6 +101,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 - Provisionamento da conta da nutriz no Supabase Auth.
 - Login, logout, recuperação e redefinição de senha da nutriz.
 - Área autenticada da nutriz com status atual da jornada, linha do tempo de categorias e datas, orientações específicas para cada etapa, identificação da cidade cadastrada e acesso ao verificador de cobertura. A consulta da nutriz não seleciona observações administrativas, responsáveis ou detalhes clínicos.
+- RF19–RF22 ainda não estão implementados: o escopo prevê diário pessoal de extração/ordenha, exportação do histórico em PDF, registro opcional de bem-estar e conteúdo educativo sugerido por estágio. Esses recursos não podem ser simulados como concluídos nem devem coletar dados clínicos.
 - Login, logout, middleware, autorização por role e shell administrativo.
 - Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, status atual de `JourneyStatus` e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal, às distribuições e ao funil progressivo da jornada; dados pessoais não são exibidos. O painel também apresenta sinais globais de alcance, cliques anônimos por canal, conversão acumulada e cadastros sem avanço registrado entre etapas. Como os cliques não referenciam nutriz nem localização, eles permanecem globais e não respondem aos filtros de região ou status.
 - Listagem de nutrizes com exposição reduzida de contato e acesso ao detalhe da jornada em `/admin/nutrizes/[id]`.
@@ -132,6 +136,10 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
 | RF16 — status da jornada | **Implementado com doze estados.** O administrador acessa `/admin/nutrizes/[id]`, consulta status e histórico e registra somente a próxima transição válida. A mutação é autorizada por role `ADMIN`, condicional ao status anterior e atômica com o histórico. Quatro marcos adicionais foram acrescentados sem remover os anteriores: documento enviado, exames feitos, kit enviado e doação confirmada. As migrations da extensão estão aplicadas no Supabase cloud desde 16 de setembro de 2026; a doação confirmada continua dependente da definição da evidência operacional. Correção e reabertura continuam sob responsabilidade operacional do admin, sem fluxo específico nesta etapa. |
 | RF17 — aviso de mudança de status | **Parcial.** A mudança válida de status cria histórico e outbox atomicamente, com idempotência, consentimento específico, tentativas, backoff, auditoria e simulador local. A migration da outbox está aplicada no Supabase cloud; a entrega real depende de infraestrutura e templates da Meta. |
+| RF19 — diário pessoal de extração | **Não implementado.** O escopo prevê data, hora e volume para uso da própria nutriz, sem acionar ou confirmar coleta. |
+| RF20 — exportação do histórico em PDF | **Não implementado.** Deve exportar somente o histórico pertencente à própria nutriz. |
+| RF21 — bem-estar pós-doação | **Não implementado.** Deve ser opcional, mínimo e não clínico; não pode virar diário de saúde ou ferramenta terapêutica. |
+| RF22 — conteúdo por estágio | **Não implementado.** O conteúdo deve ser educativo e coerente com o status categórico registrado, sem inferir condição clínica. |
 
 ### 3.3 Código e dados legados que não definem mais o escopo
 
@@ -180,6 +188,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 4. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
 6. Ativar a integração real com a Meta quando a infraestrutura externa existir; o estado conversacional já está aplicado no Supabase e a suíte completa de integração voltou a rodar.
+7. Em sprint posterior, avaliar RF19–RF22: diário pessoal de extração/ordenha, exportação em PDF, bem-estar opcional e conteúdo educativo por estágio, sempre sem transformar a Minha Área em prontuário ou fonte de decisão clínica.
 
 ### Atualização do job de lembretes (16 de setembro de 2026)
 
@@ -551,6 +560,7 @@ Estas decisões substituem decisões antigas conflitantes:
 8. **Compartilhamento sem recompensa material:** cartão, mensagem e reconhecimento são simbólicos.
 9. **Impacto verificável:** não calcular “bebês salvos” nem alegações clínicas individuais.
 10. **Segurança antes de exposição:** RLS, textos legais e proteção contra abuso são bloqueadores.
+11. **Minha Área sem coleta clínica:** registros de extração, bem-estar e conteúdo sugerido são opcionais e não podem substituir informações ou decisões do Lactare.
 
 ## 14. Git e entrega
 

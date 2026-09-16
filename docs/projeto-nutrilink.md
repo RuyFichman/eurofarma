@@ -4,9 +4,9 @@
 
 **Desafio:** Challenge FIAP 2026 — 3º ano, Sistemas de Informação — Projeto Lactare
 
-**Versão:** 2.3
+**Versão:** 2.0
 
-**Última atualização:** 14 de setembro de 2026
+**Última atualização:** 16 de setembro de 2026
 
 **Equipe:** [preencher nomes do squad]
 
@@ -79,6 +79,7 @@ O motivo para concentrar o canal conversacional no WhatsApp está no Anexo A.1.
 - Conteúdo educativo: “Como funciona”, perguntas frequentes, checklist e vídeos.
 - Verificador de elegibilidade por CEP ou município, acompanhado da visualização da área de atuação do Lactare: o CEP é resolvido pelo ViaCEP e o município resultante é comparado com a lista ativa administrada pelo Lactare.
 - Cadastro, login e área pessoal, com acompanhamento seguro do status da jornada e lembretes quando ativados.
+- Minha Área como núcleo de relacionamento contínuo: status visual da jornada, histórico de doações, registro pessoal de extrações/ordenhas, exportação do histórico em PDF, selos simbólicos, gestão de lembretes, registro opcional de bem-estar, conteúdo sugerido conforme o estágio da jornada, cartão de impacto, mensagem de compartilhamento e gestão dos próprios dados e consentimentos.
 - Painel administrativo; ver seção 4.3.
 
 O motivo para manter o site junto ao chatbot está no Anexo A.2.
@@ -88,7 +89,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 - Indicadores de alcance, engajamento, conversão e retenção.
 - Segmentação combinável por sub-região da Grande São Paulo e perfil da doadora; ver Anexo A.7.
 - Indicação de elegibilidade: dentro ou fora da área de atuação do Lactare.
-- Adesão à funcionalidade de lembretes.
+- Adesão à funcionalidade de lembretes e, quando houver eventos suficientes, sinais de retenção e recorrência.
 - Atualização manual do status da jornada de cada nutriz pela equipe do Lactare: ficha de saúde, exame agendado, resultado aprovado ou não aprovado, kit entregue e aptidão para doações recorrentes. O NutriLink guarda somente categorias, sem detalhes clínicos; ver Anexo A.9.
 - Notificação automática pelo WhatsApp sempre que o administrador atualizar o status da jornada; ver Anexo A.9.
 - Gestão da lista de municípios atendidos pelo Lactare.
@@ -105,7 +106,9 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 7. Se estiver apta, a equipe do Lactare entra em contato para combinar a entrega do kit. A presença da nutriz é obrigatória nessa primeira visita, quando recebe orientações de higiene, coleta e armazenamento.
 8. As coletas seguintes são recorrentes e acontecem na residência dentro da janela operacional do Lactare, sem exigir a presença da nutriz.
 9. A nutriz pode ativar ou cancelar lembretes opcionais.
-10. O NutriLink apoia o acompanhamento e o pós-doação.
+10. A nutriz pode registrar, para uso próprio, sessões de extração/ordenha e bem-estar após a doação.
+11. A nutriz pode consultar e exportar seu histórico de doações em PDF, além de receber conteúdo sugerido conforme o estágio da jornada.
+12. O NutriLink apoia o acompanhamento, o compartilhamento simbólico e o pós-doação.
 
 ## 5. Requisitos
 
@@ -130,6 +133,10 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 | RF15 | Registrar quando um cadastro novo se origina de uma indicação, para fins de métrica, sem vincular a recompensa material. |
 | RF16 | Permitir que o administrador atualize o status categórico da jornada da nutriz — ficha preenchida, exame agendado, aguardando resultado, apta ou não apta, kit entregue e apta a doações recorrentes — sem armazenar detalhes clínicos. |
 | RF17 | Notificar automaticamente a nutriz pelo WhatsApp sempre que o administrador atualizar seu status de jornada. |
+| RF19 | Permitir que a nutriz registre suas sessões de extração de leite, com data, hora e volume, para uso pessoal. |
+| RF20 | Permitir que a nutriz exporte seu histórico de doações em PDF. |
+| RF21 | Permitir o registro opcional de bem-estar após cada doação, sem torná-lo obrigatório nem clínico. |
+| RF22 | Sugerir conteúdo educativo à nutriz conforme o estágio atual de sua jornada. |
 
 ### 5.2 Requisitos Não Funcionais
 
@@ -191,6 +198,7 @@ Esta seção descreve o repositório em 16 de setembro de 2026. Ela prevalece so
 - Isolamento da experiência nacional legada: `/buscar`, `/banco-de-leite/*` e `/admin/unidades*` redirecionam para o novo fluxo; `/api/units` e `/api/track` respondem `410 Gone`.
 - Infraestrutura de webhook da WhatsApp Cloud API, validação de assinatura, rate limiting local, máquina de estados e simulador local. O fluxo ativo já oferece menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada pelo `JourneyStatus` e contato transparente com o Lactare. O consentimento vem antes da solicitação e gravação do nome; o CEP não é persistido, marketing permanece desligado, lembretes começam desligados e só mudam por escolha explícita, e o webhook não cria novos agendamentos. A migration conversacional está aplicada no Supabase cloud.
 - Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
+- RF19–RF22 ainda não estão implementados. A evolução prevista da área pessoal inclui diário de extração/ordenha para uso próprio, exportação do histórico de doações em PDF, registro opcional de bem-estar e conteúdo educativo sugerido conforme o estágio da jornada. Nenhum desses recursos deve coletar ou inferir dados clínicos.
 - RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration original está aplicada no Supabase cloud. Quatro marcos adicionais foram acrescentados sem remover os anteriores — documento enviado, exames feitos, kit enviado e doação confirmada — e suas duas migrations foram aplicadas no Supabase cloud em 16 de setembro de 2026, preservando as transições antigas e os perfis existentes.
 - Base do RF17 com opt-in específico para avisos de status no cadastro web, separado dos lembretes. A mesma transação que altera o `JourneyStatus` e grava o histórico também cria a outbox; cada histórico aceita no máximo um aviso por chave idempotente. Sem consentimento vigente, o item nasce suprimido. O processador usa claim concorrente com lock recuperável, revalida consentimento e exclusão lógica, aplica backoff e limite de tentativas e mantém auditoria append-only de cada resultado. O simulador exercita sucesso, falha transitória e falha permanente sem chamar a Meta nem imprimir PII. A migration `20260916180000_add_notification_outbox` foi aplicada no Supabase cloud em 16 de setembro de 2026.
 - Consentimento de lembretes separado dos avisos de status, com opt-in no cadastro e ativação ou cancelamento posterior na área autenticada e no chatbot. Cada mudança acrescenta um evento auditável ao ledger append-only, e reentregas do WhatsApp são idempotentes pelo id da mensagem. O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, enquanto essa etapa continua atual e o opt-in está vigente, cria um único lembrete de continuidade com payload mínimo e chave idempotente, sem representar agendamento ou confirmação. A finalidade vem da migration `20260916190000_add_reminder_consent_purpose`, aplicada no Supabase cloud em 16 de setembro de 2026; as migrations do item `REMINDER` também foram aplicadas no mesmo dia.
@@ -222,6 +230,10 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 - RF14: reconhecimentos por status na área pessoal.
 - RF15: atribuição específica de novos cadastros por indicação.
 - RF17: retirada e reconcessão do opt-in e entrega real por template aprovado da Meta. A base transacional, o processador e o simulador estão implementados, e a migration da outbox está aplicada no Supabase cloud.
+- RF19: registro pessoal de sessões de extração/ordenha com data, hora e volume, sem acionar coleta.
+- RF20: exportação do histórico de doações em PDF, limitada aos dados da própria nutriz.
+- RF21: registro opcional e não clínico de bem-estar após a doação.
+- RF22: recomendação de conteúdo educativo conforme o estágio categórico da jornada.
 - Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
 - RLS, rate limiting distribuído e proteção anti-spam, também adiados, mas ainda obrigatórios antes de exposição pública.
 - Validação operacional de e-mail e WhatsApp, caso exigida pelo Lactare.
@@ -385,6 +397,17 @@ O módulo local de acompanhamento hoje pergunta se a nutriz conseguiu agendar um
 
 Essa funcionalidade depende de disciplina operacional: sem atualização consistente dos status pela equipe do Lactare, a nutriz não recebe os avisos e o produto reproduz a falta de acompanhamento que pretende resolver.
 
+### A.10 Funcionalidades da Minha Área inspiradas em apps de maternidade
+
+As funcionalidades abaixo foram incluídas como evolução de menor prioridade que elegibilidade, status e lembretes. A inspiração vem de aplicativos de amamentação e maternidade, mas o NutriLink mantém o foco na jornada de doação e nos limites operacionais do Lactare:
+
+1. **Registro pessoal de extração/ordenha:** a nutriz pode registrar data, hora e volume para uso próprio. Um volume acumulado pode gerar uma sugestão informativa para avisar a equipe do Lactare; nunca aciona ou confirma uma coleta.
+2. **Exportação do histórico em PDF:** a nutriz pode baixar seu histórico de doações como registro pessoal. O arquivo deve conter somente dados pertencentes à própria nutriz.
+3. **Registro opcional de bem-estar:** após uma doação, a nutriz pode registrar como se sentiu usando opções simples. Esse registro não é diário clínico, avaliação de saúde nem ferramenta terapêutica.
+4. **Conteúdo educativo por estágio:** a Minha Área pode destacar conteúdos adequados ao status atual, como orientações para quem aguarda resultado ou para quem já está em doações recorrentes. A sugestão não pode inferir diagnóstico ou substituir orientação do Lactare.
+
+Esses recursos não alteram a decisão de não oferecer agendamento. Datas e volumes são registros da nutriz ou referências informativas; qualquer coleta, visita ou atendimento continua sendo combinado diretamente com a equipe do Lactare.
+
 ## Anexo B — Casos de Uso e Casos de Teste
 
 ### B.1 Casos de Uso
@@ -409,6 +432,10 @@ Essa funcionalidade depende de disciplina operacional: sem atualização consist
 | UC16 | Administrador | Atualizar o status categórico da jornada da nutriz, incluindo ficha, exame e kit. |
 | UC17 | Sistema | Notificar a nutriz pelo WhatsApp quando seu status de jornada for atualizado. |
 | UC18 | Nutriz | Informar se recebeu a visita da equipe para entrega do kit, fato que somente ela pode confirmar. |
+| UC19 | Nutriz | Registrar uma sessão de extração de leite, com data, hora e volume. |
+| UC20 | Nutriz | Exportar seu histórico de doações em PDF. |
+| UC21 | Nutriz | Registrar como se sentiu após uma doação, de forma opcional e não clínica. |
+| UC22 | Sistema | Sugerir conteúdo educativo conforme o estágio da jornada da nutriz. |
 
 ### B.2 Casos de Teste
 
@@ -429,6 +456,10 @@ Essa funcionalidade depende de disciplina operacional: sem atualização consist
 | CT13 | UC13 | Doação confirmada por fonte autorizada | O cartão é gerado e oferecido para compartilhamento, sem recompensa material nem alegação clínica individual não comprovada. |
 | CT14 | UC16 e UC17 | Administrador marca a nutriz como “apta” | O sistema registra a mudança e dispara a notificação pelo WhatsApp sem expor detalhes clínicos. |
 | CT15 | UC18 | O sistema formula uma pergunta à nutriz | Nunca pergunta um fato cuja fonte é exclusivamente o Lactare, como resultado de exame ou entrega registrada do kit. |
+| CT16 | UC19 | Volume acumulado de extrações atinge um patamar relevante | O sistema exibe uma sugestão informativa para avisar a equipe, sem acionar ou confirmar coleta automaticamente. |
+| CT17 | UC20 | Nutriz solicita seu histórico | O sistema gera um PDF somente com os dados da própria nutriz. |
+| CT18 | UC21 | Nutriz não quer registrar bem-estar | O sistema permite seguir sem registro e não trata a ausência como problema ou dado clínico. |
+| CT19 | UC22 | Status categórico muda de etapa | O conteúdo sugerido corresponde ao estágio registrado, sem inferir condição clínica. |
 
 ## Anexo C — Glossário
 
@@ -443,6 +474,8 @@ Essa funcionalidade depende de disciplina operacional: sem atualização consist
 - **MVP:** versão mínima funcional de um produto.
 - **LGPD:** Lei Geral de Proteção de Dados Pessoais, Lei nº 13.709/2018.
 - **Opt-in:** funcionalidade ativada somente por ação voluntária do usuário.
+- **Registro de extração/ordenha:** anotação pessoal de data, hora e volume; não é ordem, reserva ou confirmação de coleta.
+- **Bem-estar:** registro opcional e não clínico sobre como a nutriz se sentiu após uma doação.
 - **NutriLink:** produto digital desenvolvido para apoiar a jornada da doadora e a operação de relacionamento do Lactare.
 - **Lactare:** banco de leite humano da Eurofarma e operação atendida pelo NutriLink.
 
