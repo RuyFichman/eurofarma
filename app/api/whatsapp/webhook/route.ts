@@ -96,6 +96,14 @@ export async function POST(request: NextRequest) {
 
     const profile = await findNutrizByWhatsapp(message.from)
     const state = await getConversationState(message.from)
+    if (
+      state.step === 'HUMAN_HANDOFF' &&
+      !isConversationResetText(message.text)
+    ) {
+      // A conversa continua no mesmo WhatsApp, mas o bot fica pausado enquanto
+      // a equipe do Lactare assume. "menu" é a saída explícita da nutriz.
+      return ok
+    }
     const coverage =
       state.step === 'AWAITING_COVERAGE' &&
       message.text &&

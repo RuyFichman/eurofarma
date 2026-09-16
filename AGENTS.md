@@ -125,7 +125,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
 | RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
 | RF10 — indicadores do funil | **Parcial.** O dashboard resume municípios e nutrizes, mede sinais observáveis de alcance, agrega os cliques anônimos de contato e apresenta o funil progressivo do `JourneyStatus`, sua conversão e os pontos sem avanço registrado. Os cadastros podem ser segmentados por sub-região, status atual e origem de forma combinável. “Sem avanço” não prova abandono definitivo, e “não apta” é uma saída legítima separada. Ainda faltam retenção, adesão a lembretes e os segmentos que dependem de confirmação legítima de doação e indicação própria. |
-| RF11 — chatbot completo | **Parcial.** Menu, FAQ, elegibilidade, orientação, cadastro opcional, retomada por status, contato com o Lactare e gestão do opt-in de lembretes estão implementados localmente. A ativação depende da infraestrutura real da Meta. Continuam pendentes vídeo institucional oficial, job e envio de lembretes, entrega real do RF17, handoff humano operacional e pós-doação baseado em confirmação legítima. |
+| RF11 — chatbot completo | **Parcial.** Menu, FAQ, elegibilidade, orientação, cadastro opcional, retomada por status, contato com o Lactare, gestão do opt-in de lembretes e handoff humano local estão implementados. O handoff é solicitado explicitamente, mantém o mesmo chat, pausa o bot e considera atendimento de segunda a sábado, das 9h às 18h, no horário de Brasília; fora da janela, a conversa fica aguardando o próximo expediente, sem prazo de resposta prometido. A ativação e a entrega dependem da infraestrutura real da Meta. Continuam pendentes vídeo institucional oficial, entrega real do RF17 e pós-doação baseado em confirmação legítima. |
 | RF12 — cartão de impacto | **Não implementado.** |
 | RF13 — mensagem de indicação | **Não implementado.** |
 | RF14 — reconhecimentos | **Não implementado.** |
@@ -175,7 +175,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 ### 3.6 Próximas entregas recomendadas
 
 1. Implementar retirada/reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
-2. Ligar a entrega real dos lembretes e concluir o handoff humano operacional.
+2. Ligar a entrega real dos lembretes e a operação humana do handoff à infraestrutura da Meta.
 3. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
 4. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
@@ -184,6 +184,10 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 ### Atualização do job de lembretes (16 de setembro de 2026)
 
 O job de lembretes foi implementado sobre a mesma outbox do RF17. Ele enfileira uma única mensagem de continuidade dois dias após `KIT_SENT`, somente se esse ainda for o status atual e houver opt-in vigente. A data é apenas referência temporal; a mensagem não cria nem confirma agendamento. O item `REMINDER` usa payload mínimo, chave idempotente e o processador, retentativas e auditoria existentes. As migrations `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas separadamente e nessa ordem no Supabase cloud em 16 de setembro de 2026 e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. A separação garante que o valor `REMINDER` seja confirmado antes de aparecer no CHECK. No banco foram conferidos o enum, a coluna `payload` JSONB opcional e o novo `notification_outbox_payload_check`: aviso de status exige histórico e nenhum payload; lembrete exige payload e nenhum histórico.
+
+### Atualização do handoff humano (16 de setembro de 2026)
+
+O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para falar com a equipe do Lactare. O mesmo chat do WhatsApp é mantido, o bot fica pausado e a resposta diferencia atendimento dentro e fora da janela de segunda a sábado, das 9h às 18h, no horário de Brasília. “Menu” é a saída explícita para retomar o autoatendimento. A migration `20260916200000_add_human_handoff_step` foi gerada localmente e ainda precisa ser aplicada e registrada no Supabase cloud. A integração do atendente e a infraestrutura real da Meta continuam pendentes.
 
 ## 4. Stack
 
@@ -500,9 +504,9 @@ O fluxo completo deverá permitir:
 9. acompanhamento pós-doação;
 10. cartão, indicação e reconhecimento depois de uma confirmação legítima.
 
-A máquina de estados já cobre localmente os itens 1 a 7, inclusive retomada pelo status categórico registrado pelo Lactare e ativação ou cancelamento de lembretes por uma nutriz cadastrada. O item 8 tem base local de outbox, mas ainda não entrega pela Meta; os itens 9 e 10 permanecem pendentes, assim como o vídeo institucional, a transferência real para atendimento humano e a infraestrutura da Meta. As migrations conversacional, da outbox e da finalidade de lembretes estão aplicadas no Supabase. Não chamar RF11 de concluído.
+A máquina de estados já cobre localmente os itens 1 a 7, inclusive retomada pelo status categórico registrado pelo Lactare e ativação ou cancelamento de lembretes por uma nutriz cadastrada. O handoff humano local também está implementado: pedido explícito, mesmo chat, pausa do bot e resposta distinta dentro ou fora do expediente. O item 8 tem base local de outbox, mas ainda não entrega pela Meta; os itens 9 e 10 permanecem pendentes, assim como o vídeo institucional, a operação humana conectada à infraestrutura real da Meta e a própria infraestrutura da Meta. As migrations conversacional, da outbox e da finalidade de lembretes estão aplicadas no Supabase; a migration `20260916200000_add_human_handoff_step` ainda precisa ser aplicada e registrada. Não chamar RF11 de concluído.
 
-Decisões operacionais de 16 de setembro de 2026 para o handoff ainda não implementado: ele ocorre somente quando a nutriz pede para falar com alguém, continua no mesmo chat e pausa o bot enquanto um atendente do Lactare assume a conversa. A janela inicial informada pelo time é de segunda a sábado, das 9h às 18h; fila, prazo de resposta e tratamento fora desse horário ainda serão detalhados. O alerta ao atendente pode usar e-mail, mas a resposta deve continuar pelo WhatsApp. O opt-in de avisos de status e o opt-in de lembretes são escolhas separadas da nutriz. Nenhuma dessas mensagens cria ou confirma agendamento, que permanece integralmente fora do NutriLink.
+Decisões operacionais de 16 de setembro de 2026 para o handoff: ele ocorre somente quando a nutriz pede para falar com alguém, continua no mesmo chat e pausa o bot enquanto um atendente do Lactare assume a conversa. A janela é de segunda a sábado, das 9h às 18h, no horário de Brasília. Fora desse horário, o pedido fica registrado no estado pausado para a próxima janela, sem fila ou prazo de resposta exibidos e sem alerta automático ao atendente nesta etapa. A resposta deve continuar pelo WhatsApp. O opt-in de avisos de status e o opt-in de lembretes são escolhas separadas da nutriz. Nenhuma dessas mensagens cria ou confirma agendamento, que permanece integralmente fora do NutriLink.
 
 Mensagens do bot devem vir de WHATSAPP_BOT em lib/i18n/pt-br.ts e responder em poucos segundos. O bot nunca executa triagem nem confirma agendamento. Pode comunicar um status já registrado pela equipe do Lactare, sem revelar detalhes clínicos.
 

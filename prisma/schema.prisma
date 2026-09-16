@@ -116,6 +116,7 @@ enum WhatsappConversationStep {
   AWAITING_COVERAGE
   AWAITING_FULL_NAME
   AWAITING_CONSENT
+  HUMAN_HANDOFF
 
   // Estados do fluxo antigo. Permanecem no enum para que a migration preserve
   // os registros existentes; a aplicação os reinicia no menu quando reaparecem.

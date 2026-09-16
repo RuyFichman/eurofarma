@@ -1403,6 +1403,10 @@ export const WHATSAPP_BOT = {
   },
   human: {
     body: 'Sua dúvida precisa da equipe do Lactare. Este bot ainda não transfere a conversa automaticamente. Fale pelo WhatsApp {whatsapp} ou ligue para {phone}, de segunda a sexta, das 7h às 22h. Os canais foram conferidos em {verifiedAt}.',
+    handoffOpen:
+      'Seu pedido para falar com a equipe do Lactare foi registrado. Um atendente assumirá este mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília. Enquanto isso, o bot ficará pausado. Não há prazo de resposta confirmado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
+    handoffOutsideHours:
+      'Seu pedido para falar com a equipe do Lactare foi registrado. O atendimento humano acontece neste mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília. Como estamos fora dessa janela, a solicitação ficará aguardando a próxima janela de atendimento e o bot ficará pausado. Não há prazo de resposta confirmado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
   },
   fallback: {
     first:
