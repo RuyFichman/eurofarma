@@ -1031,6 +1031,43 @@ export const NUTRIZ_AUTH = {
       error:
         'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
     },
+    recognitions: {
+      title: 'Reconhecimentos da sua jornada',
+      description:
+        'São reconhecimentos simbólicos atribuídos conforme as etapas registradas pelo Lactare.',
+      symbolic: 'Simbólico',
+      assignedAt: 'Registrado em {date}',
+      empty:
+        'Os primeiros reconhecimentos aparecerão conforme sua jornada avançar.',
+      safetyNotice:
+        'Eles não representam recompensa material, avaliação clínica ou confirmação de coleta futura.',
+      items: {
+        JOURNEY_STARTED: {
+          title: 'Jornada iniciada',
+          description: 'Seu cadastro marcou o início da jornada no NutriLink.',
+        },
+        READY_FOR_DONATION: {
+          title: 'Pronta para seguir',
+          description:
+            'O Lactare registrou a categoria apta para a próxima etapa operacional.',
+        },
+        KIT_RECEIVED: {
+          title: 'Kit recebido',
+          description:
+            'O Lactare registrou a entrega do kit para continuidade da jornada.',
+        },
+        FIRST_DONATION: {
+          title: 'Primeira doação registrada',
+          description:
+            'O Lactare registrou administrativamente uma primeira doação confirmada.',
+        },
+        CONTINUITY_RECOGNIZED: {
+          title: 'Jornada de continuidade',
+          description:
+            'O Lactare registrou a aptidão para seguir em doações recorrentes.',
+        },
+      },
+    },
     personal: {
       validation: {
         recordedAtInvalid: 'Informe uma data e hora válidas.',

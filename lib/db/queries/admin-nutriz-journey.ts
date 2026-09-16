@@ -4,6 +4,7 @@ import {
   nutrizProfileIdSchema,
   type AdminJourneyStatusUpdate,
 } from '../../validators/journey-status'
+import { getRecognitionRulesForStatus } from '../../journey/recognitions'
 import { prisma } from '../prisma'
 
 const ADMIN_NUTRIZ_JOURNEY_SELECT = {
@@ -54,6 +55,7 @@ type JourneyWriteClient = Pick<
   | 'journeyStatusHistory'
   | 'communicationConsentEvent'
   | 'notificationOutbox'
+  | 'nutrizRecognition'
 >
 
 export type AdminJourneyStatusMutationInput = AdminJourneyStatusUpdate & {
@@ -101,6 +103,18 @@ export async function applyAdminNutrizJourneyStatusTransition(
     },
     select: { id: true },
   })
+
+  const recognitionRules = getRecognitionRulesForStatus(input.toStatus)
+  if (recognitionRules.length > 0) {
+    await client.nutrizRecognition.createMany({
+      data: recognitionRules.map((rule) => ({
+        nutrizProfileId: input.nutrizProfileId,
+        kind: rule.kind,
+        journeyStatus: rule.status,
+      })),
+      skipDuplicates: true,
+    })
+  }
 
   const consent = await client.communicationConsentEvent.findFirst({
     where: {
