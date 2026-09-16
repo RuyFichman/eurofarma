@@ -16,6 +16,7 @@ import {
   isConversationResetText,
 } from '@/lib/whatsapp/conversation'
 import { setReminderConsent } from '@/lib/db/queries/communication-consents'
+import { localDateToDate } from '@/lib/utils/local-date-time'
 import { resolveWhatsappCoverageInput } from '@/lib/whatsapp/coverage'
 import { extractInboundMessage } from '@/lib/whatsapp/payload'
 import { hydrateWhatsappReply } from '@/lib/whatsapp/reply'
@@ -153,6 +154,9 @@ export async function POST(request: NextRequest) {
           enabled: outcome.effect.enabled,
           source: 'WHATSAPP',
           sourceEventId: `whatsapp:${message.messageId}`,
+          referenceDate: outcome.effect.referenceDate
+            ? (localDateToDate(outcome.effect.referenceDate) ?? undefined)
+            : undefined,
         })
         outcome =
           consent.status === 'NOT_FOUND'

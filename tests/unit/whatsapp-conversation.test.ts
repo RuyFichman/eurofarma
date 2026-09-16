@@ -90,11 +90,21 @@ describe('advanceConversation', () => {
       replyId: REPLY_IDS.remindersEnable,
       profile: PROFILE,
     })
-    expect(enabled.effect).toEqual({
+    expect(enabled.effect).toEqual({ kind: 'none' })
+    expect(enabled.nextStep).toBe('AWAITING_REMINDER_REFERENCE')
+    expect(enabled.reply.body).toContain('data')
+
+    const enabledWithReference = step('AWAITING_REMINDER_REFERENCE', {
+      text: '15/09/2026',
+      profile: PROFILE,
+      now: new Date('2026-09-16T15:00:00.000Z'),
+    })
+    expect(enabledWithReference.effect).toEqual({
       kind: 'set_reminder_consent',
       enabled: true,
+      referenceDate: '2026-09-15',
     })
-    expect(enabled.reply.body).toContain('não agenda')
+    expect(enabledWithReference.reply.body).toContain('não agenda')
 
     const disabled = step('MENU', {
       replyId: REPLY_IDS.remindersDisable,

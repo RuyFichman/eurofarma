@@ -44,6 +44,7 @@ const FORM_FIELD_KEYS = [
   'state',
   'city',
   'password',
+  'reminderReferenceDate',
 ] as const satisfies ReadonlyArray<keyof SignupFormInput>
 
 /** Lê os UTMs da URL atual (sem dado pessoal). Chaves vazias são omitidas. */
@@ -109,6 +110,7 @@ export function SignupForm() {
       lgpdConsent: false,
       journeyStatusWhatsappOptIn: false,
       reminderWhatsappOptIn: false,
+      reminderReferenceDate: '',
     },
   })
 
@@ -130,6 +132,7 @@ export function SignupForm() {
           lgpdConsent: values.lgpdConsent,
           journeyStatusWhatsappOptIn: values.journeyStatusWhatsappOptIn,
           reminderWhatsappOptIn: values.reminderWhatsappOptIn,
+          reminderReferenceDate: values.reminderReferenceDate,
           sourceUtm: getCurrentUtmParams(),
         }),
       })
@@ -513,6 +516,30 @@ export function SignupForm() {
               </p>
             </div>
           </div>
+          {form.watch('reminderWhatsappOptIn') ? (
+            <div className="space-y-2 pt-2">
+              <Label htmlFor="signup-reminder-reference-date">
+                {COPY.fields.reminderWhatsappOptIn.referenceDateLabel}
+              </Label>
+              <Input
+                id="signup-reminder-reference-date"
+                type="date"
+                max={new Date().toISOString().slice(0, 10)}
+                {...form.register('reminderReferenceDate')}
+                aria-describedby="signup-reminder-reference-date-help"
+              />
+              <p
+                id="signup-reminder-reference-date-help"
+                className="text-muted-foreground text-xs leading-5"
+              >
+                {COPY.fields.reminderWhatsappOptIn.referenceDateHelp}
+              </p>
+              <FieldError
+                id="signup-reminder-reference-date-error"
+                message={form.formState.errors.reminderReferenceDate?.message}
+              />
+            </div>
+          ) : null}
         </div>
 
         {submitError ? (

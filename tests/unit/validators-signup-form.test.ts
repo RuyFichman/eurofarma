@@ -83,6 +83,7 @@ describe('signupFormSchema', () => {
       ...validForm,
       journeyStatusWhatsappOptIn: false,
       reminderWhatsappOptIn: true,
+      reminderReferenceDate: '2026-09-16',
     })
     expect(parsed.reminderWhatsappOptIn).toBe(true)
     expect(parsed.journeyStatusWhatsappOptIn).toBe(false)

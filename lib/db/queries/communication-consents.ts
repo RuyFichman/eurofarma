@@ -7,6 +7,7 @@ import { prisma } from '../prisma'
 export type ReminderConsentPreference = {
   enabled: boolean
   recordedAt: Date | null
+  referenceDate: Date | null
 }
 
 export async function getReminderConsentPreference(
@@ -22,7 +23,7 @@ export async function getReminderConsentPreference(
         where: { purpose: 'REMINDERS_WHATSAPP' },
         orderBy: { sequence: 'desc' },
         take: 1,
-        select: { decision: true, recordedAt: true },
+        select: { decision: true, recordedAt: true, referenceDate: true },
       },
     },
   })
@@ -32,6 +33,7 @@ export async function getReminderConsentPreference(
   return {
     enabled: latest?.decision === 'GRANTED',
     recordedAt: latest?.recordedAt ?? null,
+    referenceDate: latest?.referenceDate ?? null,
   }
 }
 
@@ -40,6 +42,7 @@ type SetReminderConsentInput = {
   enabled: boolean
   source: 'WEB' | 'WHATSAPP'
   sourceEventId?: string
+  referenceDate?: Date
 }
 
 export type SetReminderConsentResult =
@@ -92,14 +95,19 @@ export async function setReminderConsent(
         where: { purpose: 'REMINDERS_WHATSAPP' },
         orderBy: { sequence: 'desc' },
         take: 1,
-        select: { decision: true },
+        select: { decision: true, referenceDate: true },
       },
     },
   })
   if (!profile) return { status: 'NOT_FOUND', enabled: false }
 
-  const enabled = profile.communicationConsents[0]?.decision === 'GRANTED'
-  if (enabled === input.enabled) {
+  const latest = profile.communicationConsents[0]
+  const enabled = latest?.decision === 'GRANTED'
+  const sameReferenceDate =
+    !input.enabled ||
+    (latest?.referenceDate?.getTime() ?? null) ===
+      (input.referenceDate?.getTime() ?? null)
+  if (enabled === input.enabled && sameReferenceDate) {
     return { status: 'UNCHANGED', enabled }
   }
 
@@ -112,6 +120,7 @@ export async function setReminderConsent(
         source: input.source,
         policyVersion: REMINDER_WHATSAPP_CONSENT_VERSION,
         sourceEventId,
+        referenceDate: input.enabled ? (input.referenceDate ?? null) : null,
       },
       select: { id: true },
     })

@@ -69,7 +69,10 @@ export default async function NutrizAreaPage() {
           <NutrizJourneyTimeline snapshot={journey} />
         </div>
 
-        <ReminderConsentCard enabled={reminders.enabled} />
+        <ReminderConsentCard
+          enabled={reminders.enabled}
+          referenceDate={reminders.referenceDate}
+        />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
           <PersonalExtractionCard

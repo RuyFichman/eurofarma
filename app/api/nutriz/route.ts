@@ -11,6 +11,7 @@ import { createSupabaseAdminClient } from '@/lib/auth/supabase-admin'
 import { createSupabaseServerClient } from '@/lib/auth/supabase-server'
 import { JOURNEY_STATUS_WHATSAPP_CONSENT_VERSION } from '@/lib/consent/journey-status-notifications'
 import { REMINDER_WHATSAPP_CONSENT_VERSION } from '@/lib/consent/reminders'
+import { localDateToDate } from '@/lib/utils/local-date-time'
 
 // Prisma roda melhor no Node runtime (não Edge).
 export const runtime = 'nodejs'
@@ -131,8 +132,12 @@ export async function POST(request: NextRequest) {
     city,
     journeyStatusWhatsappOptIn,
     reminderWhatsappOptIn,
+    reminderReferenceDate,
     sourceUtm,
   } = parsed.data
+  const reminderReferenceDateValue = reminderReferenceDate
+    ? localDateToDate(reminderReferenceDate)
+    : null
   const sanitizedUtm = sanitizeSourceUtm(sourceUtm)
   const utmValue: Prisma.InputJsonValue | undefined = sanitizedUtm
     ? (sanitizedUtm as Prisma.InputJsonValue)
@@ -264,6 +269,9 @@ export async function POST(request: NextRequest) {
             decision: reminderWhatsappOptIn ? 'GRANTED' : 'WITHDRAWN',
             source: 'WEB',
             policyVersion: REMINDER_WHATSAPP_CONSENT_VERSION,
+            referenceDate: reminderWhatsappOptIn
+              ? reminderReferenceDateValue
+              : null,
           },
         })
       }
