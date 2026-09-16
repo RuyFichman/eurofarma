@@ -220,14 +220,14 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 - **Tracking de contato:** o evento novo mede os canais diretos do Lactare, já está gravando e alimenta total, janela de 30 dias e distribuição por canal no painel; o evento antigo, vinculado a unidades, continua aposentado. Como os eventos novos são anônimos, os números permanecem globais e não são segmentados por região ou status.
 - **Chatbot:** menu, perguntas frequentes, elegibilidade, orientação, cadastro opcional, retomada por status, ativação ou cancelamento de lembretes e handoff humano local estão implementados. O handoff exige pedido explícito, continua no mesmo chat, pausa o bot e direciona para a equipe do Lactare de segunda a sábado, das 9h às 18h, no horário de Brasília; fora desse horário, o pedido permanece registrado para a próxima janela, sem prazo de resposta prometido. Avisos de status e lembretes têm consentimentos opcionais separados. O job local de enfileiramento dos lembretes está implementado sem linguagem de agendamento; ainda faltam envio real, vídeo institucional oficial, retirada e reconcessão dos avisos de status, operação humana conectada à infraestrutura da Meta e pós-doação baseado em confirmação legítima. Não há conta Meta, número, templates ou URL pública para a entrega real.
 - **Origem do cadastro:** UTMs genéricas são persistidas, mas não existe identificador próprio de indicação nem vínculo de atribuição entre doadoras.
-- **Status da jornada:** o RF16 representa as etapas de documento, ficha, exame, kit e confirmação administrativa de doação sem reutilizar `interestStatus`, com histórico append-only, autorização exclusiva para `ADMIN`, atualização transacional e controle de concorrência. A área pessoal apresenta o status e uma linha do tempo reduzida à própria nutriz. A mudança também cria localmente a outbox do RF17 na mesma transação, condicionada ao consentimento específico. A evidência operacional que autoriza a confirmação da doação ainda será definida; até lá, esse marco não autoriza métricas de impacto, indicação ou reconhecimento. Correção ou reabertura continuam sem fluxo específico.
+- **Status da jornada:** o RF16 representa as etapas de documento, ficha, exame, kit e confirmação administrativa de doação sem reutilizar `interestStatus`, com histórico append-only, autorização exclusiva para `ADMIN`, atualização transacional e controle de concorrência. A área pessoal apresenta o status, uma linha do tempo reduzida à própria nutriz e reconhecimentos simbólicos cumulativos derivados de estados objetivos. A mudança também cria localmente a outbox do RF17 na mesma transação, condicionada ao consentimento específico. O reconhecimento de primeira doação depende exclusivamente do status administrativo `DONATION_CONFIRMED`, sem métricas de impacto, alegação clínica ou reconhecimento de indicação. Correção ou reabertura continuam sem fluxo específico.
 
 ### 9.3 Funcionalidades ainda não implementadas
 
 - RF06: entrega real pela Meta. Opt-in, cancelamento e regra do job de enfileiramento já estão implementados; o job não cria nem confirma agendamento.
 - RF12: cartão de impacto após confirmação legítima da doação.
 - RF13: mensagem pronta de encaminhamento com link de indicação.
-- RF14: reconhecimentos por status na área pessoal.
+- RF14: reconhecimento por status na área pessoal. Reconhecimentos objetivos já estão implementados; ainda não há reconhecimento derivado de indicação.
 - RF15: atribuição específica de novos cadastros por indicação.
 - RF17: retirada e reconcessão do opt-in e entrega real por template aprovado da Meta. A base transacional, o processador e o simulador estão implementados, e a migration da outbox está aplicada no Supabase cloud.
 - Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
@@ -246,7 +246,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 1. Implementar retirada e reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
 2. Ligar a entrega real dos lembretes e a operação humana do handoff à infraestrutura da Meta.
 3. Evoluir o dashboard com eventos de entrega/adesão efetiva, recorrência e os segmentos que dependem de indicação e confirmação legítima de doação. Retorno observável, adesão vigente, alcance, cliques de contato e funil do `JourneyStatus` já estão implementados.
-4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
+4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimento derivado de indicação. Os reconhecimentos por status já estão implementados com base categórica e sem alegação clínica.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
 6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 

@@ -4,6 +4,8 @@ import { Prisma } from '@prisma/client'
 const mocks = vi.hoisted(() => ({
   nutrizFindFirst: vi.fn(),
   nutrizCreate: vi.fn(),
+  recognitionCreate: vi.fn(),
+  transaction: vi.fn(),
   conversationFindUnique: vi.fn(),
   conversationUpsert: vi.fn(),
 }))
@@ -14,6 +16,8 @@ vi.mock('../../lib/db/prisma', () => ({
       findFirst: mocks.nutrizFindFirst,
       create: mocks.nutrizCreate,
     },
+    nutrizRecognition: { create: mocks.recognitionCreate },
+    $transaction: mocks.transaction,
     whatsappConversation: {
       findUnique: mocks.conversationFindUnique,
       upsert: mocks.conversationUpsert,
@@ -31,6 +35,13 @@ import {
 describe('persistência da conversa do WhatsApp', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mocks.transaction.mockImplementation(
+      async (callback: (client: unknown) => Promise<unknown>) =>
+        callback({
+          nutrizProfile: { create: mocks.nutrizCreate },
+          nutrizRecognition: { create: mocks.recognitionCreate },
+        }),
+    )
   })
 
   it('carrega somente a decisão mais recente de lembretes da nutriz', async () => {
@@ -132,6 +143,7 @@ describe('persistência da conversa do WhatsApp', () => {
       fullName: 'Maria da Silva',
       journeyStatus: 'REGISTERED',
     })
+    mocks.recognitionCreate.mockResolvedValue({ id: 'recognition-1' })
 
     const created = await createWhatsappNutrizLead({
       phoneWhatsapp: '5511999998888',

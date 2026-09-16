@@ -60,6 +60,14 @@ enum JourneyStatus {
   RECURRING_DONATION_ELIGIBLE
 }
 
+enum NutrizRecognitionKind {
+  JOURNEY_STARTED
+  READY_FOR_DONATION
+  KIT_RECEIVED
+  FIRST_DONATION
+  CONTINUITY_RECOGNIZED
+}
+
 enum ContactPreference {
   WHATSAPP
   EMAIL
@@ -227,6 +235,7 @@ model NutrizProfile {
   notificationOutbox    NotificationOutbox[]
   extractionLogs         ExtractionLog[]
   wellbeingEntries       WellbeingEntry[]
+  recognitions           NutrizRecognition[]
 
   @@index([state, city, createdAt])
   @@index([journeyStatus, createdAt])
@@ -262,6 +271,21 @@ model WellbeingEntry {
 
   @@index([nutrizProfileId, recordedAt])
   @@map("wellbeing_entries")
+}
+
+/// Reconhecimento simbólico, cumulativo e derivado somente do status da jornada.
+model NutrizRecognition {
+  id              String                @id @default(uuid())
+  nutrizProfileId String                @map("nutriz_profile_id")
+  kind            NutrizRecognitionKind
+  journeyStatus   JourneyStatus         @map("journey_status")
+  assignedAt      DateTime              @default(now()) @map("assigned_at")
+
+  nutrizProfile NutrizProfile @relation(fields: [nutrizProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([nutrizProfileId, kind], map: "nutriz_recognitions_profile_kind_key")
+  @@index([nutrizProfileId, assignedAt], map: "nutriz_recognitions_profile_assigned_idx")
+  @@map("nutriz_recognitions")
 }
 
 /// Registro append-only de uma mudança de status feita por um administrador.

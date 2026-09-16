@@ -236,6 +236,17 @@ export async function POST(request: NextRequest) {
             select: { id: true },
           })
 
+      if (!existing) {
+        await transaction.nutrizRecognition.create({
+          data: {
+            nutrizProfileId: profile.id,
+            kind: 'JOURNEY_STARTED',
+            journeyStatus: 'REGISTERED',
+          },
+          select: { id: true },
+        })
+      }
+
       if (journeyStatusWhatsappOptIn) {
         await transaction.communicationConsentEvent.create({
           data: {

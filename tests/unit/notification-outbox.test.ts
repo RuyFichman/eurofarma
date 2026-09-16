@@ -160,6 +160,43 @@ describe('processador da outbox', () => {
     )
   })
 
+  it('nunca envia lembrete quando não há opt-in vigente', async () => {
+    mocks.claim.mockReset()
+    mocks.claim
+      .mockResolvedValueOnce({
+        ...claim,
+        kind: 'REMINDER',
+        toStatus: null,
+        payload: {
+          reminderKind: 'KIT_DELIVERY_FOLLOW_UP',
+          sourceHistoryId: 'history-1',
+          referenceAt: '2026-09-14T15:00:00.000Z',
+        },
+        hasCurrentConsent: false,
+      })
+      .mockResolvedValueOnce(null)
+    const fakeTransport = transport({
+      outcome: 'SENT',
+      providerMessageId: 'nao-deveria-enviar',
+    })
+
+    await expect(
+      processNotificationOutbox({
+        transport: fakeTransport,
+        siteUrl: 'https://nutrilink.test',
+        now: () => NOW,
+      }),
+    ).resolves.toMatchObject({ claimed: 1, sent: 0, suppressed: 1 })
+
+    expect(fakeTransport.send).not.toHaveBeenCalled()
+    expect(mocks.finalize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'SUPPRESSED',
+        errorCode: 'CONSENT_NOT_GRANTED',
+      }),
+    )
+  })
+
   it('processa lembrete sem exigir status de jornada no payload', async () => {
     mocks.claim.mockReset()
     mocks.claim

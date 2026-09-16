@@ -12,6 +12,7 @@ import { EducationalSuggestions } from '@/components/nutriz/educational-suggesti
 import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-card'
 import { PersonalHistoryCard } from '@/components/nutriz/personal-history-card'
 import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
+import { NutrizRecognitionsCard } from '@/components/nutriz/nutriz-recognitions-card'
 import { WellbeingCard } from '@/components/nutriz/wellbeing-card'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -73,6 +74,8 @@ export default async function NutrizAreaPage() {
           enabled={reminders.enabled}
           referenceDate={reminders.referenceDate}
         />
+
+        <NutrizRecognitionsCard recognitions={personal.recognitions} />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
           <PersonalExtractionCard

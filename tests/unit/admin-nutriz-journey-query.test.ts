@@ -23,11 +23,13 @@ function makeClient() {
   const historyCreate = vi.fn()
   const consentFindFirst = vi.fn()
   const outboxCreate = vi.fn()
+  const recognitionCreateMany = vi.fn()
   const client = {
     nutrizProfile: { updateMany, findFirst },
     journeyStatusHistory: { create: historyCreate },
     communicationConsentEvent: { findFirst: consentFindFirst },
     notificationOutbox: { create: outboxCreate },
+    nutrizRecognition: { createMany: recognitionCreateMany },
   } as unknown as Parameters<typeof applyAdminNutrizJourneyStatusTransition>[0]
 
   return {
@@ -37,6 +39,7 @@ function makeClient() {
     historyCreate,
     consentFindFirst,
     outboxCreate,
+    recognitionCreateMany,
   }
 }
 
@@ -152,6 +155,39 @@ describe('mutação administrativa da jornada', () => {
         lastErrorCode: 'CONSENT_NOT_GRANTED',
       }),
     })
+  })
+
+  it('atribui o reconhecimento correspondente ao status confirmado', async () => {
+    const {
+      client,
+      updateMany,
+      historyCreate,
+      consentFindFirst,
+      outboxCreate,
+      recognitionCreateMany,
+    } = makeClient()
+    updateMany.mockResolvedValue({ count: 1 })
+    historyCreate.mockResolvedValue({ id: 'history-donation' })
+    consentFindFirst.mockResolvedValue(null)
+    recognitionCreateMany.mockResolvedValue({ count: 1 })
+
+    await applyAdminNutrizJourneyStatusTransition(client, {
+      ...input,
+      fromStatus: 'KIT_DELIVERED',
+      toStatus: 'DONATION_CONFIRMED',
+    })
+
+    expect(recognitionCreateMany).toHaveBeenCalledWith({
+      data: [
+        {
+          nutrizProfileId: input.nutrizProfileId,
+          kind: 'FIRST_DONATION',
+          journeyStatus: 'DONATION_CONFIRMED',
+        },
+      ],
+      skipDuplicates: true,
+    })
+    expect(outboxCreate).toHaveBeenCalledOnce()
   })
 
   it('detecta concorrência e não acrescenta histórico divergente', async () => {

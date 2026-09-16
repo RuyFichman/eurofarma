@@ -28,6 +28,13 @@ const CONTENT_SELECT = {
   category: true,
 } as const satisfies Prisma.EducationalContentSelect
 
+const RECOGNITION_SELECT = {
+  id: true,
+  kind: true,
+  journeyStatus: true,
+  assignedAt: true,
+} as const satisfies Prisma.NutrizRecognitionSelect
+
 export type NutrizPersonalAreaData = {
   extractionLogs: Array<
     Prisma.ExtractionLogGetPayload<{ select: typeof EXTRACTION_SELECT }>
@@ -39,6 +46,9 @@ export type NutrizPersonalAreaData = {
   >
   educationalContents: Array<
     Prisma.EducationalContentGetPayload<{ select: typeof CONTENT_SELECT }>
+  >
+  recognitions: Array<
+    Prisma.NutrizRecognitionGetPayload<{ select: typeof RECOGNITION_SELECT }>
   >
 }
 
@@ -95,6 +105,7 @@ export async function getNutrizPersonalAreaData(
     extractionSummary,
     wellbeingEntries,
     educationalContents,
+    recognitions,
   ] = await Promise.all([
     prisma.extractionLog.findMany({
       where: { nutrizProfileId: id },
@@ -122,6 +133,11 @@ export async function getNutrizPersonalAreaData(
       orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
       take: 3,
     }),
+    prisma.nutrizRecognition.findMany({
+      where: { nutrizProfileId: id },
+      select: RECOGNITION_SELECT,
+      orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
+    }),
   ])
 
   return {
@@ -130,6 +146,7 @@ export async function getNutrizPersonalAreaData(
     extractionCount: extractionSummary._count._all,
     wellbeingEntries,
     educationalContents,
+    recognitions,
   }
 }
 

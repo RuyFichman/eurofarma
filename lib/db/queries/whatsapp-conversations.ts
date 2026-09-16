@@ -137,22 +137,33 @@ export async function createWhatsappNutrizLead(params: {
   if (existing) return existing
 
   try {
-    const created = await prisma.nutrizProfile.create({
-      data: {
-        fullName: params.fullName,
-        phoneWhatsapp: params.phoneWhatsapp,
-        city: params.city,
-        state: params.state,
-        contactPreference: 'WHATSAPP',
-        interestStatus: 'INTERESTED',
-        lgpdConsentAt: new Date(),
-        marketingConsent: false,
-        sourceUtm: {
-          utm_source: 'whatsapp',
-          utm_medium: 'chatbot',
+    const created = await prisma.$transaction(async (transaction) => {
+      const profile = await transaction.nutrizProfile.create({
+        data: {
+          fullName: params.fullName,
+          phoneWhatsapp: params.phoneWhatsapp,
+          city: params.city,
+          state: params.state,
+          contactPreference: 'WHATSAPP',
+          interestStatus: 'INTERESTED',
+          lgpdConsentAt: new Date(),
+          marketingConsent: false,
+          sourceUtm: {
+            utm_source: 'whatsapp',
+            utm_medium: 'chatbot',
+          },
         },
-      },
-      select: { id: true, fullName: true, journeyStatus: true },
+        select: { id: true, fullName: true, journeyStatus: true },
+      })
+      await transaction.nutrizRecognition.create({
+        data: {
+          nutrizProfileId: profile.id,
+          kind: 'JOURNEY_STARTED',
+          journeyStatus: 'REGISTERED',
+        },
+        select: { id: true },
+      })
+      return profile
     })
     return { ...created, reminderConsentEnabled: false }
   } catch (error) {
