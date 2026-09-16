@@ -184,7 +184,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### Atualização do job de lembretes (16 de setembro de 2026)
 
-O job de lembretes foi implementado sobre a mesma outbox do RF17. Ele enfileira uma única mensagem de continuidade dois dias após `KIT_SENT`, somente se esse ainda for o status atual e houver opt-in vigente. A data é apenas referência temporal; a mensagem não cria nem confirma agendamento. O item `REMINDER` usa payload mínimo, chave idempotente e o processador, retentativas e auditoria existentes. A migration `20260916193000_add_reminder_outbox_kind_payload` foi gerada localmente, mas ainda precisa ser aplicada e registrada no Supabase cloud.
+O job de lembretes foi implementado sobre a mesma outbox do RF17. Ele enfileira uma única mensagem de continuidade dois dias após `KIT_SENT`, somente se esse ainda for o status atual e houver opt-in vigente. A data é apenas referência temporal; a mensagem não cria nem confirma agendamento. O item `REMINDER` usa payload mínimo, chave idempotente e o processador, retentativas e auditoria existentes. As migrations `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram geradas localmente, mas ainda precisam ser aplicadas e registradas no Supabase cloud, nessa ordem.
 
 ## 4. Stack
 

@@ -1,6 +1,4 @@
--- RF06: itens de lembrete reutilizam a outbox, sem semântica de agendamento.
-ALTER TYPE "NotificationOutboxKind" ADD VALUE IF NOT EXISTS 'REMINDER';
-
+-- RF06: payload dos lembretes na outbox, sem semântica de agendamento.
 ALTER TABLE "notification_outbox"
     ADD COLUMN "payload" JSONB;
 

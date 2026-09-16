@@ -198,7 +198,7 @@ Esta seção descreve o repositório em 16 de setembro de 2026. Ela prevalece so
 
 ### Atualização de 16 de setembro de 2026 — job de lembretes
 
-O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, enquanto essa etapa continua atual e o opt-in de lembretes está vigente, cria um único item `REMINDER` com payload mínimo e chave idempotente. A data é somente referência temporal; a mensagem não representa agendamento ou confirmação. A migration do novo tipo ainda precisa ser aplicada no Supabase cloud, e a entrega real continua dependendo da infraestrutura e dos templates da Meta.
+O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, enquanto essa etapa continua atual e o opt-in de lembretes está vigente, cria um único item `REMINDER` com payload mínimo e chave idempotente. A data é somente referência temporal; a mensagem não representa agendamento ou confirmação. As migrations `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` ainda precisam ser aplicadas no Supabase cloud, nessa ordem; a entrega real continua dependendo da infraestrutura e dos templates da Meta.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -212,7 +212,7 @@ O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, 
 
 ### 9.3 Funcionalidades ainda não implementadas
 
-- RF06: aplicação da migration do item `REMINDER` e entrega real pela Meta. Opt-in, cancelamento e regra do job de enfileiramento já estão implementados; o job não cria nem confirma agendamento.
+- RF06: aplicação das migrations do item `REMINDER` e entrega real pela Meta. Opt-in, cancelamento e regra do job de enfileiramento já estão implementados; o job não cria nem confirma agendamento.
 - RF12: cartão de impacto após confirmação legítima da doação.
 - RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimentos por status na área pessoal.
