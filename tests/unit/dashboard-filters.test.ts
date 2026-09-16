@@ -32,6 +32,12 @@ describe('filtros combináveis do dashboard', () => {
     expect(filters).toEqual({ region: 'WEST', stage: '', origin: '' })
   })
 
+  it('aceita os novos marcos da jornada', () => {
+    expect(parseDashboardFilters({ stage: 'donation_confirmed' }).stage).toBe(
+      'DONATION_CONFIRMED',
+    )
+  })
+
   it('reconhece o recorte vazio', () => {
     expect(hasActiveDashboardFilters(parseDashboardFilters({}))).toBe(false)
   })

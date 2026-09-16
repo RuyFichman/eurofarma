@@ -1025,6 +1025,18 @@ export const NUTRIZ_AUTH = {
             'As próximas etapas aparecem aqui somente depois de serem registradas pela equipe do Lactare.',
           ],
         },
+        DOCUMENT_SENT: {
+          label: 'Documento enviado',
+          title: 'O envio do documento foi registrado',
+          description:
+            'A equipe do Lactare registrou que o documento foi enviado pela nutriz fora do NutriLink. O conteúdo do documento não é armazenado aqui.',
+          timelineDescription:
+            'O Lactare registrou o envio do documento pela nutriz.',
+          guidance: [
+            'Continue seguindo as orientações fornecidas diretamente pela equipe do Lactare.',
+            'Não envie documentos ou informações de saúde pelo NutriLink.',
+          ],
+        },
         FORM_RECEIVED: {
           label: 'Ficha recebida',
           title: 'O recebimento da ficha foi registrado',
@@ -1047,6 +1059,18 @@ export const NUTRIZ_AUTH = {
           guidance: [
             'Confirme data e orientações pelo mesmo canal utilizado no atendimento com o Lactare.',
             'O NutriLink não agenda exames nem altera a combinação feita com a equipe.',
+          ],
+        },
+        EXAMS_COMPLETED: {
+          label: 'Exames feitos',
+          title: 'A realização dos exames foi registrada',
+          description:
+            'O Lactare registrou somente que os exames foram realizados. O NutriLink não recebe, consulta ou interpreta resultados.',
+          timelineDescription:
+            'A equipe do Lactare registrou a conclusão da etapa de realização dos exames.',
+          guidance: [
+            'Aguarde a próxima orientação fornecida diretamente pela equipe do Lactare.',
+            'Não envie laudos, valores ou resultados de exame pelo NutriLink.',
           ],
         },
         AWAITING_RESULT: {
@@ -1085,6 +1109,18 @@ export const NUTRIZ_AUTH = {
             'Não envie laudos ou informações de saúde pelo NutriLink.',
           ],
         },
+        KIT_SENT: {
+          label: 'Kit enviado',
+          title: 'O envio do kit foi registrado',
+          description:
+            'O Lactare registrou o envio do kit. Esta etapa não confirma a entrega, uma coleta futura nem uma doação realizada.',
+          timelineDescription:
+            'A equipe do Lactare registrou que o kit foi enviado.',
+          guidance: [
+            'A entrega e qualquer orientação logística continuam sob responsabilidade da equipe do Lactare.',
+            'O NutriLink não confirma data, horário ou disponibilidade de visita.',
+          ],
+        },
         KIT_DELIVERED: {
           label: 'Kit entregue',
           title: 'A entrega do kit foi registrada',
@@ -1095,6 +1131,18 @@ export const NUTRIZ_AUTH = {
           guidance: [
             'Siga as orientações de higiene, coleta e armazenamento recebidas da equipe do Lactare.',
             'As coletas seguintes dependem da operação e da combinação direta com o Lactare.',
+          ],
+        },
+        DONATION_CONFIRMED: {
+          label: 'Doação confirmada',
+          title: 'A confirmação da doação foi registrada',
+          description:
+            'Um administrador do Lactare registrou a doação como confirmada. O NutriLink não calcula impacto clínico nem confirma coletas futuras.',
+          timelineDescription:
+            'A equipe do Lactare registrou administrativamente a confirmação da doação.',
+          guidance: [
+            'Continue seguindo as orientações fornecidas diretamente pela equipe do Lactare.',
+            'Cada nova etapa logística deve ser combinada com a equipe; o NutriLink não realiza agendamentos.',
           ],
         },
         RECURRING_DONATION_ELIGIBLE: {
@@ -1312,29 +1360,41 @@ export const WHATSAPP_BOT = {
   },
   journeyStatus: {
     REGISTERED: 'Cadastrada',
+    DOCUMENT_SENT: 'Documento enviado',
     FORM_RECEIVED: 'Ficha recebida',
     EXAM_SCHEDULED: 'Exame agendado',
+    EXAMS_COMPLETED: 'Exames feitos',
     AWAITING_RESULT: 'Aguardando resultado',
     ELIGIBLE: 'Apta',
     NOT_ELIGIBLE: 'Não apta',
+    KIT_SENT: 'Kit enviado',
     KIT_DELIVERED: 'Kit entregue',
+    DONATION_CONFIRMED: 'Doação confirmada',
     RECURRING_DONATION_ELIGIBLE: 'Apta a doações recorrentes',
   },
   journeyGuidance: {
     REGISTERED:
       'As próximas etapas aparecem somente depois de serem registradas pelo Lactare.',
+    DOCUMENT_SENT:
+      'O conteúdo do documento permanece fora do NutriLink; siga as orientações recebidas do Lactare.',
     FORM_RECEIVED:
       'Continue seguindo as orientações recebidas diretamente da equipe do Lactare.',
     EXAM_SCHEDULED:
       'Confirme data e instruções do exame diretamente com a equipe do Lactare.',
+    EXAMS_COMPLETED:
+      'Aguarde a orientação da equipe e não envie laudos ou resultados pelo bot.',
     AWAITING_RESULT:
       'Aguarde a orientação da equipe e não envie laudos ou resultados pelo bot.',
     ELIGIBLE:
       'Combine a entrega do kit diretamente com o Lactare; o bot não confirma data ou disponibilidade.',
     NOT_ELIGIBLE:
       'Se tiver dúvida sobre essa categoria, converse diretamente com a equipe do Lactare.',
+    KIT_SENT:
+      'A entrega e a logística são tratadas diretamente com a equipe do Lactare.',
     KIT_DELIVERED:
       'Siga as orientações de higiene, coleta e armazenamento fornecidas pelo Lactare.',
+    DONATION_CONFIRMED:
+      'A confirmação foi registrada pelo Lactare; novas etapas continuam sendo combinadas diretamente com a equipe.',
     RECURRING_DONATION_ELIGIBLE:
       'A continuidade e a logística são combinadas diretamente com a equipe do Lactare.',
   },
@@ -1482,12 +1542,16 @@ export const ADMIN = {
         all: 'Todos os status',
         options: {
           REGISTERED: 'Cadastrada',
+          DOCUMENT_SENT: 'Documento enviado',
           FORM_RECEIVED: 'Ficha recebida',
           EXAM_SCHEDULED: 'Exame agendado',
+          EXAMS_COMPLETED: 'Exames feitos',
           AWAITING_RESULT: 'Aguardando resultado',
           ELIGIBLE: 'Apta',
           NOT_ELIGIBLE: 'Não apta',
+          KIT_SENT: 'Kit enviado',
           KIT_DELIVERED: 'Kit entregue',
+          DONATION_CONFIRMED: 'Doação confirmada',
           RECURRING_DONATION_ELIGIBLE: 'Apta a doações recorrentes',
         },
       },
@@ -2172,12 +2236,16 @@ export const ADMIN = {
     },
     status: {
       REGISTERED: 'Cadastrada',
+      DOCUMENT_SENT: 'Documento enviado',
       FORM_RECEIVED: 'Ficha recebida',
       EXAM_SCHEDULED: 'Exame agendado',
+      EXAMS_COMPLETED: 'Exames feitos',
       AWAITING_RESULT: 'Aguardando resultado',
       ELIGIBLE: 'Apta',
       NOT_ELIGIBLE: 'Não apta',
+      KIT_SENT: 'Kit enviado',
       KIT_DELIVERED: 'Kit entregue',
+      DONATION_CONFIRMED: 'Doação confirmada',
       RECURRING_DONATION_ELIGIBLE: 'Apta a doações recorrentes',
     },
     validation: {

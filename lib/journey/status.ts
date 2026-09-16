@@ -7,12 +7,16 @@
  */
 export const JOURNEY_STATUS_VALUES = [
   'REGISTERED',
+  'DOCUMENT_SENT',
   'FORM_RECEIVED',
   'EXAM_SCHEDULED',
+  'EXAMS_COMPLETED',
   'AWAITING_RESULT',
   'ELIGIBLE',
   'NOT_ELIGIBLE',
+  'KIT_SENT',
   'KIT_DELIVERED',
+  'DONATION_CONFIRMED',
   'RECURRING_DONATION_ELIGIBLE',
 ] as const
 
@@ -23,17 +27,23 @@ export type JourneyStatusValue = (typeof JOURNEY_STATUS_VALUES)[number]
  * jornada e qualquer atalho exigem uma decisão operacional explícita do
  * Lactare; por isso não são inferidos aqui.
  *
- * `RECURRING_DONATION_ELIGIBLE` significa aptidão registrada pelo Lactare, não
- * confirmação de uma ou mais doações. Essa confirmação continua fora do RF16.
+ * `DONATION_CONFIRMED` é um registro administrativo manual do Lactare. Até a
+ * evidência operacional ser definida, ele não autoriza inferir impacto,
+ * recorrência ou qualquer detalhe clínico. `RECURRING_DONATION_ELIGIBLE`
+ * continua significando somente aptidão registrada para recorrência.
  */
 export const JOURNEY_STATUS_TRANSITIONS = {
-  REGISTERED: ['FORM_RECEIVED'],
+  REGISTERED: ['DOCUMENT_SENT', 'FORM_RECEIVED'],
+  DOCUMENT_SENT: ['FORM_RECEIVED'],
   FORM_RECEIVED: ['EXAM_SCHEDULED'],
-  EXAM_SCHEDULED: ['AWAITING_RESULT'],
+  EXAM_SCHEDULED: ['EXAMS_COMPLETED', 'AWAITING_RESULT'],
+  EXAMS_COMPLETED: ['AWAITING_RESULT'],
   AWAITING_RESULT: ['ELIGIBLE', 'NOT_ELIGIBLE'],
-  ELIGIBLE: ['KIT_DELIVERED'],
+  ELIGIBLE: ['KIT_SENT', 'KIT_DELIVERED'],
   NOT_ELIGIBLE: [],
-  KIT_DELIVERED: ['RECURRING_DONATION_ELIGIBLE'],
+  KIT_SENT: ['KIT_DELIVERED'],
+  KIT_DELIVERED: ['DONATION_CONFIRMED', 'RECURRING_DONATION_ELIGIBLE'],
+  DONATION_CONFIRMED: ['RECURRING_DONATION_ELIGIBLE'],
   RECURRING_DONATION_ELIGIBLE: [],
 } as const satisfies Record<JourneyStatusValue, readonly JourneyStatusValue[]>
 

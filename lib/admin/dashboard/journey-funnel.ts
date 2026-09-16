@@ -7,7 +7,9 @@ import { percentOf } from '../../utils/format-number'
 /**
  * Caminho progressivo principal da jornada. `NOT_ELIGIBLE` e uma saida
  * legitima da avaliacao feita pelo Lactare, portanto aparece separadamente e
- * nunca e contabilizada como abandono.
+ * nunca e contabilizada como abandono. Os novos marcos opcionais permanecem
+ * na distribuicao por status e contam para a etapa consolidada imediatamente
+ * anterior, sem inferir que um marco opcional nao registrado foi alcancado.
  */
 export const JOURNEY_FUNNEL_STAGE_VALUES = [
   'REGISTERED',
@@ -49,29 +51,47 @@ const REACHED_BY_STATUS = {
   FORM_RECEIVED: [
     'FORM_RECEIVED',
     'EXAM_SCHEDULED',
+    'EXAMS_COMPLETED',
     'AWAITING_RESULT',
     'ELIGIBLE',
     'NOT_ELIGIBLE',
+    'KIT_SENT',
     'KIT_DELIVERED',
+    'DONATION_CONFIRMED',
     'RECURRING_DONATION_ELIGIBLE',
   ],
   EXAM_SCHEDULED: [
     'EXAM_SCHEDULED',
+    'EXAMS_COMPLETED',
     'AWAITING_RESULT',
     'ELIGIBLE',
     'NOT_ELIGIBLE',
+    'KIT_SENT',
     'KIT_DELIVERED',
+    'DONATION_CONFIRMED',
     'RECURRING_DONATION_ELIGIBLE',
   ],
   AWAITING_RESULT: [
     'AWAITING_RESULT',
     'ELIGIBLE',
     'NOT_ELIGIBLE',
+    'KIT_SENT',
     'KIT_DELIVERED',
+    'DONATION_CONFIRMED',
     'RECURRING_DONATION_ELIGIBLE',
   ],
-  ELIGIBLE: ['ELIGIBLE', 'KIT_DELIVERED', 'RECURRING_DONATION_ELIGIBLE'],
-  KIT_DELIVERED: ['KIT_DELIVERED', 'RECURRING_DONATION_ELIGIBLE'],
+  ELIGIBLE: [
+    'ELIGIBLE',
+    'KIT_SENT',
+    'KIT_DELIVERED',
+    'DONATION_CONFIRMED',
+    'RECURRING_DONATION_ELIGIBLE',
+  ],
+  KIT_DELIVERED: [
+    'KIT_DELIVERED',
+    'DONATION_CONFIRMED',
+    'RECURRING_DONATION_ELIGIBLE',
+  ],
   RECURRING_DONATION_ELIGIBLE: ['RECURRING_DONATION_ELIGIBLE'],
 } as const satisfies Record<JourneyFunnelStage, readonly JourneyStatusValue[]>
 

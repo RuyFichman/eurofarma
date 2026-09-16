@@ -9,18 +9,26 @@ export function getJourneyStatusLabel(status: JourneyStatusValue): string {
   switch (status) {
     case 'REGISTERED':
       return ADMIN.nutrizJourney.status.REGISTERED
+    case 'DOCUMENT_SENT':
+      return ADMIN.nutrizJourney.status.DOCUMENT_SENT
     case 'FORM_RECEIVED':
       return ADMIN.nutrizJourney.status.FORM_RECEIVED
     case 'EXAM_SCHEDULED':
       return ADMIN.nutrizJourney.status.EXAM_SCHEDULED
+    case 'EXAMS_COMPLETED':
+      return ADMIN.nutrizJourney.status.EXAMS_COMPLETED
     case 'AWAITING_RESULT':
       return ADMIN.nutrizJourney.status.AWAITING_RESULT
     case 'ELIGIBLE':
       return ADMIN.nutrizJourney.status.ELIGIBLE
     case 'NOT_ELIGIBLE':
       return ADMIN.nutrizJourney.status.NOT_ELIGIBLE
+    case 'KIT_SENT':
+      return ADMIN.nutrizJourney.status.KIT_SENT
     case 'KIT_DELIVERED':
       return ADMIN.nutrizJourney.status.KIT_DELIVERED
+    case 'DONATION_CONFIRMED':
+      return ADMIN.nutrizJourney.status.DONATION_CONFIRMED
     case 'RECURRING_DONATION_ELIGIBLE':
       return ADMIN.nutrizJourney.status.RECURRING_DONATION_ELIGIBLE
   }
