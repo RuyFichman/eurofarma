@@ -1098,8 +1098,11 @@ export const NUTRIZ_AUTH = {
         deleteAction: 'Excluir sessão de {date}',
         deleteConfirm: 'Excluir este registro pessoal?',
         deletedFeedback: 'Registro excluído.',
-        suggestion:
-          'Se quiser compartilhar uma atualização com a equipe, fale diretamente com o Lactare. O registro acima continua sendo apenas pessoal.',
+        thresholdSuggestion: {
+          title: 'Seu volume registrado já é relevante',
+          description:
+            'Você registrou {volume} ml no total. Se quiser alinhar os próximos passos, fale diretamente com a equipe do Lactare. Este aviso não envia uma solicitação nem confirma coleta.',
+        },
         error: 'Não foi possível salvar o registro agora. Tente novamente.',
       },
       wellbeing: {

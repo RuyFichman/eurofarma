@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useState, useTransition } from 'react'
-import { Droplets, Trash2 } from 'lucide-react'
+import { CircleAlert, Droplets, Trash2 } from 'lucide-react'
 
 import {
   createExtractionLogAction,
@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { NutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
+import { shouldShowExtractionContactSuggestion } from '@/lib/nutriz/extraction-guidance'
 import { formatLongDate, formatTime } from '@/lib/utils/format-date'
 import { formatCount } from '@/lib/utils/format-number'
 
@@ -199,10 +200,24 @@ export function PersonalExtractionCard({
           )}
         </div>
 
-        {data.extractionCount > 0 ? (
-          <p className="text-muted-foreground mt-5 text-xs leading-5">
-            {copy.suggestion}
-          </p>
+        {shouldShowExtractionContactSuggestion(data.extractionTotalMl) ? (
+          <aside className="bg-secondary/30 mt-5 flex gap-3 rounded-xl border p-4">
+            <CircleAlert
+              className="text-primary mt-0.5 size-4 shrink-0"
+              aria-hidden="true"
+            />
+            <div>
+              <h3 className="text-sm font-medium">
+                {copy.thresholdSuggestion.title}
+              </h3>
+              <p className="text-muted-foreground mt-1 text-xs leading-5">
+                {copy.thresholdSuggestion.description.replace(
+                  '{volume}',
+                  formatCount(data.extractionTotalMl),
+                )}
+              </p>
+            </div>
+          </aside>
         ) : null}
       </CardContent>
     </Card>
