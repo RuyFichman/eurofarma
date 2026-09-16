@@ -226,14 +226,12 @@ Esta seção descreve o repositório em 14 de setembro de 2026. Ela prevalece so
 
 ### 9.5 Ordem recomendada de implementação
 
-1. Aplicar no Supabase cloud as migrations locais que acrescentam os quatro novos valores de `JourneyStatus` e suas transições, preservando os valores e históricos anteriores.
-2. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
-3. Aplicar pelo MCP do Supabase a migration conversacional já gerada e revalidar a suíte de integração.
-4. Implementar lembretes com opt-in separado e sem linguagem de agendamento, além do handoff humano operacional.
-5. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
-6. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
-7. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
-8. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
+1. Implementar o RF17 com uma outbox criada na mesma transação da mudança de status, inicialmente integrada ao simulador local do WhatsApp.
+2. Implementar lembretes com opt-in separado e sem linguagem de agendamento, além do handoff humano operacional.
+3. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
+4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
+5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
 ### 9.6 Risco de adoção do status da jornada
 
