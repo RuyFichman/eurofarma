@@ -193,12 +193,12 @@ Esta seção descreve o repositório em 16 de setembro de 2026. Ela prevalece so
 - Área pessoal com status atual da jornada, linha do tempo de categorias e datas e orientações específicas para cada etapa, além da cidade cadastrada e do acesso ao verificador de cobertura. A consulta não seleciona observações administrativas, responsáveis ou detalhes clínicos e não apresenta agendamento ou confirmação de coleta.
 - RF16 implementado no painel com `JourneyStatus` separado de `interestStatus`, status atual no perfil, histórico append-only com autor e horário, observação administrativa limitada e regras explícitas de transição. A atualização é condicional ao status anterior e grava perfil e histórico na mesma transação; falha no histórico reverte o status. A migration original está aplicada no Supabase cloud. Quatro marcos adicionais foram acrescentados sem remover os anteriores — documento enviado, exames feitos, kit enviado e doação confirmada — e suas duas migrations foram aplicadas no Supabase cloud em 16 de setembro de 2026, preservando as transições antigas e os perfis existentes.
 - Base do RF17 com opt-in específico para avisos de status no cadastro web, separado dos lembretes. A mesma transação que altera o `JourneyStatus` e grava o histórico também cria a outbox; cada histórico aceita no máximo um aviso por chave idempotente. Sem consentimento vigente, o item nasce suprimido. O processador usa claim concorrente com lock recuperável, revalida consentimento e exclusão lógica, aplica backoff e limite de tentativas e mantém auditoria append-only de cada resultado. O simulador exercita sucesso, falha transitória e falha permanente sem chamar a Meta nem imprimir PII. A migration `20260916180000_add_notification_outbox` foi aplicada no Supabase cloud em 16 de setembro de 2026.
-- Consentimento de lembretes separado dos avisos de status, com opt-in no cadastro e ativação ou cancelamento posterior na área autenticada e no chatbot. Cada mudança acrescenta um evento auditável ao ledger append-only, e reentregas do WhatsApp são idempotentes pelo id da mensagem. O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, enquanto essa etapa continua atual e o opt-in está vigente, cria um único lembrete de continuidade com payload mínimo e chave idempotente, sem representar agendamento ou confirmação. A finalidade vem da migration `20260916190000_add_reminder_consent_purpose`, aplicada no Supabase cloud em 16 de setembro de 2026; a migration do item `REMINDER` ainda precisa ser aplicada.
-- A suíte completa passa contra o Supabase cloud com 533 testes em 65 arquivos: 453 unitários e 80 de integração, incluindo os testes da outbox e do consentimento de lembretes.
+- Consentimento de lembretes separado dos avisos de status, com opt-in no cadastro e ativação ou cancelamento posterior na área autenticada e no chatbot. Cada mudança acrescenta um evento auditável ao ledger append-only, e reentregas do WhatsApp são idempotentes pelo id da mensagem. O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, enquanto essa etapa continua atual e o opt-in está vigente, cria um único lembrete de continuidade com payload mínimo e chave idempotente, sem representar agendamento ou confirmação. A finalidade vem da migration `20260916190000_add_reminder_consent_purpose`, aplicada no Supabase cloud em 16 de setembro de 2026; as migrations do item `REMINDER` também foram aplicadas no mesmo dia.
+- A suíte completa passa contra o Supabase cloud com 539 testes em 67 arquivos: 459 unitários e 80 de integração, incluindo os testes da outbox e do consentimento de lembretes.
 
 ### Atualização de 16 de setembro de 2026 — job de lembretes
 
-O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, enquanto essa etapa continua atual e o opt-in de lembretes está vigente, cria um único item `REMINDER` com payload mínimo e chave idempotente. A data é somente referência temporal; a mensagem não representa agendamento ou confirmação. As migrations `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` ainda precisam ser aplicadas no Supabase cloud, nessa ordem; a entrega real continua dependendo da infraestrutura e dos templates da Meta.
+O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, enquanto essa etapa continua atual e o opt-in de lembretes está vigente, cria um único item `REMINDER` com payload mínimo e chave idempotente. A data é somente referência temporal; a mensagem não representa agendamento ou confirmação. As migrations `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, separadamente e nessa ordem; a entrega real continua dependendo da infraestrutura e dos templates da Meta.
 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
@@ -212,7 +212,7 @@ O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, 
 
 ### 9.3 Funcionalidades ainda não implementadas
 
-- RF06: aplicação das migrations do item `REMINDER` e entrega real pela Meta. Opt-in, cancelamento e regra do job de enfileiramento já estão implementados; o job não cria nem confirma agendamento.
+- RF06: entrega real pela Meta. Opt-in, cancelamento e regra do job de enfileiramento já estão implementados; o job não cria nem confirma agendamento.
 - RF12: cartão de impacto após confirmação legítima da doação.
 - RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimentos por status na área pessoal.
@@ -232,7 +232,7 @@ O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, 
 ### 9.5 Ordem recomendada de implementação
 
 1. Implementar retirada e reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
-2. Aplicar a migration do item `REMINDER`, ligar a entrega real dos lembretes e concluir o handoff humano operacional.
+2. Ligar a entrega real dos lembretes e concluir o handoff humano operacional.
 3. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
 4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.

@@ -83,7 +83,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **533 testes em 65 arquivos**: 453 unitários e 80 de integração. As migrations `20260916180000_add_notification_outbox` e `20260916190000_add_reminder_consent_purpose` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **539 testes em 67 arquivos**: 459 unitários e 80 de integração. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
@@ -120,7 +120,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF03 — fora da cobertura | **Implementado.** CEP ou município fora da lista recebe explicação e link oficial da rBLH. |
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
 | RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
-| RF06 — lembretes opcionais | **Parcial, consentimento implementado.** Opt-in e cancelamento são separados, opcionais e auditáveis no cadastro, na área autenticada e no chatbot. A migration da finalidade está aplicada no Supabase cloud; o job e o envio dos lembretes continuam pendentes. |
+| RF06 — lembretes opcionais | **Parcial, consentimento implementado.** Opt-in e cancelamento são separados, opcionais e auditáveis no cadastro, na área autenticada e no chatbot. As migrations da finalidade e do item `REMINDER` da outbox estão aplicadas no Supabase cloud, e o job de enfileiramento está implementado; a entrega real dos lembretes depende da Meta. |
 | RF07 — tracking de contato | **Implementado.** O clique nos canais oficiais do Lactare é gravado como evento anônimo em `contact_channel_clicks`, sem unidade legada e sem CEP ou PII. O tracking antigo por unidade continua aposentado (`/api/track` responde 410). O painel lê o total, a janela de 30 dias e a distribuição por canal. |
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
 | RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
@@ -155,7 +155,6 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 
 - Rate limiting distribuído.
 - Proteção anti-spam nos formulários públicos.
-- Aplicação e registro da migration do tipo `REMINDER` da outbox.
 - Segmentos comportamentais ainda incompletos: o ledger agora registra adesão a lembretes, mas o dashboard ainda não a agrega; recorrência, indicação entre doadoras e velocidade até a primeira doação continuam sem eventos próprios completos.
 - Definição da evidência operacional que autoriza o admin do Lactare a registrar uma doação como confirmada.
 - RLS para `nutriz_profiles`, `journey_status_history`, `contact_channel_clicks`, `whatsapp_conversations`, `communication_consent_events`, `notification_outbox` e `notification_delivery_attempts`; a autorização do RF16 já existe na aplicação e o evento do RF07 é anônimo, mas as tabelas continuam sem policies no Supabase. O contexto conversacional contém cidade durante o cadastro e o próprio registro identifica o número de WhatsApp, portanto deve ser tratado como PII. O nome só é solicitado e gravado no perfil depois do consentimento.
@@ -176,7 +175,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 ### 3.6 Próximas entregas recomendadas
 
 1. Implementar retirada/reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
-2. Aplicar a migration do item `REMINDER`, ligar a entrega real dos lembretes e concluir o handoff humano operacional.
+2. Ligar a entrega real dos lembretes e concluir o handoff humano operacional.
 3. Completar o dashboard com retenção e os segmentos comportamentais que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
 4. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
@@ -184,7 +183,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 
 ### Atualização do job de lembretes (16 de setembro de 2026)
 
-O job de lembretes foi implementado sobre a mesma outbox do RF17. Ele enfileira uma única mensagem de continuidade dois dias após `KIT_SENT`, somente se esse ainda for o status atual e houver opt-in vigente. A data é apenas referência temporal; a mensagem não cria nem confirma agendamento. O item `REMINDER` usa payload mínimo, chave idempotente e o processador, retentativas e auditoria existentes. As migrations `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram geradas localmente, mas ainda precisam ser aplicadas e registradas no Supabase cloud, nessa ordem.
+O job de lembretes foi implementado sobre a mesma outbox do RF17. Ele enfileira uma única mensagem de continuidade dois dias após `KIT_SENT`, somente se esse ainda for o status atual e houver opt-in vigente. A data é apenas referência temporal; a mensagem não cria nem confirma agendamento. O item `REMINDER` usa payload mínimo, chave idempotente e o processador, retentativas e auditoria existentes. As migrations `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas separadamente e nessa ordem no Supabase cloud em 16 de setembro de 2026 e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. A separação garante que o valor `REMINDER` seja confirmado antes de aparecer no CHECK. No banco foram conferidos o enum, a coluna `payload` JSONB opcional e o novo `notification_outbox_payload_check`: aviso de status exige histórico e nenhum payload; lembrete exige payload e nenhum histórico.
 
 ## 4. Stack
 
@@ -203,7 +202,7 @@ O job de lembretes foi implementado sobre a mesma outbox do RF17. Ele enfileira 
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Suíte completa no cloud: 533 em 65 arquivos — 453 unitários e 80 de integração. |
+| Testes | Vitest | Suíte completa no cloud: 539 em 67 arquivos — 459 unitários e 80 de integração. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
