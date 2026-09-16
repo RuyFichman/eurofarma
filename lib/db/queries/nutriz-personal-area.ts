@@ -1,9 +1,6 @@
 import type { Prisma } from '@prisma/client'
 
-import {
-  JOURNEY_STATUS_VALUES,
-  type JourneyStatusValue,
-} from '../../journey/status'
+import type { JourneyStatusValue } from '../../journey/status'
 import { personalRecordIdSchema } from '../../validators/nutriz-personal-area'
 import { nutrizProfileIdSchema } from '../../validators/journey-status'
 import { prisma } from '../prisma'
@@ -19,14 +16,6 @@ const WELLBEING_SELECT = {
   feeling: true,
   recordedAt: true,
 } as const satisfies Prisma.WellbeingEntrySelect
-
-const CONTENT_SELECT = {
-  id: true,
-  slug: true,
-  title: true,
-  bodyMarkdown: true,
-  category: true,
-} as const satisfies Prisma.EducationalContentSelect
 
 const RECOGNITION_SELECT = {
   id: true,
@@ -44,9 +33,6 @@ export type NutrizPersonalAreaData = {
   wellbeingEntries: Array<
     Prisma.WellbeingEntryGetPayload<{ select: typeof WELLBEING_SELECT }>
   >
-  educationalContents: Array<
-    Prisma.EducationalContentGetPayload<{ select: typeof CONTENT_SELECT }>
-  >
   recognitions: Array<
     Prisma.NutrizRecognitionGetPayload<{ select: typeof RECOGNITION_SELECT }>
   >
@@ -62,21 +48,6 @@ type JourneyExportSnapshot = {
   }>
 }
 
-const CATEGORY_BY_STATUS: Record<JourneyStatusValue, string[]> = {
-  REGISTERED: ['journey-start', 'journey'],
-  DOCUMENT_SENT: ['document', 'journey'],
-  FORM_RECEIVED: ['form', 'journey'],
-  EXAM_SCHEDULED: ['exam', 'journey'],
-  EXAMS_COMPLETED: ['exam', 'journey'],
-  AWAITING_RESULT: ['exam', 'journey'],
-  ELIGIBLE: ['kit', 'journey'],
-  NOT_ELIGIBLE: ['support', 'journey'],
-  KIT_SENT: ['kit', 'journey'],
-  KIT_DELIVERED: ['donation', 'journey'],
-  DONATION_CONFIRMED: ['donation', 'journey'],
-  RECURRING_DONATION_ELIGIBLE: ['donation', 'journey'],
-}
-
 function validProfileId(value: string): string | null {
   const id = value.trim()
   return nutrizProfileIdSchema.safeParse(id).success ? id : null
@@ -89,10 +60,9 @@ function validProfileId(value: string): string | null {
  */
 export async function getNutrizPersonalAreaData(
   nutrizProfileId: string,
-  journeyStatus: JourneyStatusValue,
 ): Promise<NutrizPersonalAreaData | null> {
   const id = validProfileId(nutrizProfileId)
-  if (!id || !JOURNEY_STATUS_VALUES.includes(journeyStatus)) return null
+  if (!id) return null
 
   const profile = await prisma.nutrizProfile.findFirst({
     where: { id, deletedAt: null },
@@ -100,52 +70,37 @@ export async function getNutrizPersonalAreaData(
   })
   if (!profile) return null
 
-  const [
-    extractionLogs,
-    extractionSummary,
-    wellbeingEntries,
-    educationalContents,
-    recognitions,
-  ] = await Promise.all([
-    prisma.extractionLog.findMany({
-      where: { nutrizProfileId: id },
-      select: EXTRACTION_SELECT,
-      orderBy: [{ recordedAt: 'desc' }, { id: 'desc' }],
-      take: 50,
-    }),
-    prisma.extractionLog.aggregate({
-      where: { nutrizProfileId: id },
-      _sum: { volumeMl: true },
-      _count: { _all: true },
-    }),
-    prisma.wellbeingEntry.findMany({
-      where: { nutrizProfileId: id },
-      select: WELLBEING_SELECT,
-      orderBy: [{ recordedAt: 'desc' }, { id: 'desc' }],
-      take: 12,
-    }),
-    prisma.educationalContent.findMany({
-      where: {
-        isPublished: true,
-        category: { in: CATEGORY_BY_STATUS[journeyStatus] },
-      },
-      select: CONTENT_SELECT,
-      orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
-      take: 3,
-    }),
-    prisma.nutrizRecognition.findMany({
-      where: { nutrizProfileId: id },
-      select: RECOGNITION_SELECT,
-      orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
-    }),
-  ])
+  const [extractionLogs, extractionSummary, wellbeingEntries, recognitions] =
+    await Promise.all([
+      prisma.extractionLog.findMany({
+        where: { nutrizProfileId: id },
+        select: EXTRACTION_SELECT,
+        orderBy: [{ recordedAt: 'desc' }, { id: 'desc' }],
+        take: 50,
+      }),
+      prisma.extractionLog.aggregate({
+        where: { nutrizProfileId: id },
+        _sum: { volumeMl: true },
+        _count: { _all: true },
+      }),
+      prisma.wellbeingEntry.findMany({
+        where: { nutrizProfileId: id },
+        select: WELLBEING_SELECT,
+        orderBy: [{ recordedAt: 'desc' }, { id: 'desc' }],
+        take: 12,
+      }),
+      prisma.nutrizRecognition.findMany({
+        where: { nutrizProfileId: id },
+        select: RECOGNITION_SELECT,
+        orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
+      }),
+    ])
 
   return {
     extractionLogs,
     extractionTotalMl: extractionSummary._sum.volumeMl ?? 0,
     extractionCount: extractionSummary._count._all,
     wellbeingEntries,
-    educationalContents,
     recognitions,
   }
 }

@@ -8,25 +8,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import type { NutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
-
-function excerpt(markdown: string): string {
-  const plain = markdown
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/[#*_>`~-]/g, '')
-    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
-    .replace(/\s+/g, ' ')
-    .trim()
-  return plain.length > 180 ? `${plain.slice(0, 177)}...` : plain
-}
+import {
+  getEducationalSuggestionIds,
+  type EducationalSuggestionId,
+} from '@/lib/journey/educational-suggestions'
+import type { JourneyStatusValue } from '@/lib/journey/status'
 
 export function EducationalSuggestions({
-  contents,
+  status,
 }: {
-  contents: NutrizPersonalAreaData['educationalContents']
+  status: JourneyStatusValue
 }) {
   const copy = NUTRIZ_AUTH.area.personal.education
+  const suggestions = getEducationalSuggestionIds(status).map((id) => ({
+    id,
+    ...copy.suggestions[id],
+  }))
 
   return (
     <Card>
@@ -40,43 +38,35 @@ export function EducationalSuggestions({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {contents.length === 0 ? (
-          <div className="bg-muted/50 rounded-xl border p-4">
-            <p className="text-sm leading-6">{copy.empty}</p>
-            <h3 className="mt-4 font-medium">{copy.fallbackTitle}</h3>
-            <p className="text-muted-foreground mt-2 text-sm leading-6">
-              {copy.fallbackDescription}
-            </p>
-            <ButtonLink href="/como-funciona" label={copy.fallbackAction} />
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-3">
-            {contents.map((content) => (
-              <article
-                key={content.id}
-                className="bg-muted/30 flex flex-col rounded-xl border p-4"
-              >
-                <p className="text-primary text-xs font-semibold">
-                  {copy.readMore}
-                </p>
-                <h3 className="mt-2 font-medium">{content.title}</h3>
-                <p className="text-muted-foreground mt-2 line-clamp-4 text-sm leading-6">
-                  {excerpt(content.bodyMarkdown)}
-                </p>
-                <ButtonLink
-                  href={`/como-funciona#${content.slug}`}
-                  label={copy.fallbackAction}
-                />
-              </article>
-            ))}
-          </div>
-        )}
+        <div className="grid gap-4 md:grid-cols-2">
+          {suggestions.map((suggestion) => (
+            <article
+              key={suggestion.id}
+              className="bg-muted/30 flex flex-col rounded-xl border p-4"
+            >
+              <p className="text-primary text-xs font-semibold">
+                {copy.readMore}
+              </p>
+              <h3 className="mt-2 font-medium">{suggestion.title}</h3>
+              <p className="text-muted-foreground mt-2 text-sm leading-6">
+                {suggestion.description}
+              </p>
+              <ButtonLink href={suggestion.href} label={copy.openAction} />
+            </article>
+          ))}
+        </div>
       </CardContent>
     </Card>
   )
 }
 
-function ButtonLink({ href, label }: { href: string; label: string }) {
+function ButtonLink({
+  href,
+  label,
+}: {
+  href: (typeof NUTRIZ_AUTH.area.personal.education.suggestions)[EducationalSuggestionId]['href']
+  label: string
+}) {
   return (
     <Link
       href={href}

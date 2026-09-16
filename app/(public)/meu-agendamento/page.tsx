@@ -37,10 +37,7 @@ export default async function NutrizAreaPage() {
   ])
   if (!journey || !reminders) notFound()
 
-  const personal = await getNutrizPersonalAreaData(
-    nutriz.id,
-    journey.journeyStatus,
-  )
+  const personal = await getNutrizPersonalAreaData(nutriz.id)
   if (!personal) notFound()
 
   const copy = NUTRIZ_AUTH.area
@@ -86,7 +83,7 @@ export default async function NutrizAreaPage() {
         </div>
 
         <div className="mt-6">
-          <EducationalSuggestions contents={personal.educationalContents} />
+          <EducationalSuggestions status={journey.journeyStatus} />
         </div>
 
         {journey.journeyStatus === 'DONATION_CONFIRMED' ||

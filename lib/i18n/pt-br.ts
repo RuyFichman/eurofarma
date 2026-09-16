@@ -1147,15 +1147,30 @@ export const NUTRIZ_AUTH = {
         },
       },
       education: {
+        openAction: 'Abrir conteúdo educativo',
+        suggestions: {
+          DONATION_PATH: {
+            title: 'Entenda o caminho da doação',
+            description:
+              'Veja como a jornada funciona e quais etapas são acompanhadas diretamente pelo Lactare.',
+            href: '/como-funciona#caminho-da-doacao',
+          },
+          FAQ: {
+            title: 'Consulte dúvidas frequentes',
+            description:
+              'Encontre orientações gerais e os canais para falar diretamente com a equipe do Lactare quando precisar.',
+            href: '/como-funciona#duvidas-frequentes',
+          },
+          PRACTICAL_GUIDES: {
+            title: 'Veja os guias práticos',
+            description:
+              'Acesse materiais educativos sobre extração, armazenamento e amamentação na prática.',
+            href: '/como-funciona#amamentacao-na-pratica',
+          },
+        },
         title: 'Conteúdos para esta etapa',
         description:
           'Informações educativas relacionadas ao estágio registrado pelo Lactare.',
-        empty:
-          'Ainda não há conteúdo específico publicado para esta etapa. Veja o guia geral de como funciona a doação.',
-        fallbackTitle: 'Como funciona a doação',
-        fallbackDescription:
-          'Confira o passo a passo geral, os cuidados e as dúvidas frequentes no conteúdo público do NutriLink.',
-        fallbackAction: 'Ver conteúdo educativo',
         readMore: 'Conteúdo sugerido',
       },
     },
