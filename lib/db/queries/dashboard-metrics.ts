@@ -21,8 +21,10 @@ import {
 import { JOURNEY_STATUS_VALUES } from '../../journey/status'
 import { prisma } from '../prisma'
 import type { DashboardNutrizScope } from './dashboard-segmentation'
+import { percentOf } from '../../utils/format-number'
 
 export const DASHBOARD_PERIOD_DAYS = 30
+export const DASHBOARD_RETENTION_DAYS = 30
 export const MUNICIPALITY_STATUS_KEYS = ['ACTIVE', 'INACTIVE'] as const
 export const CONTACT_CHANNEL_KEYS = ['WHATSAPP', 'PHONE'] as const
 export const NUTRIZ_REGION_KEYS = [
@@ -65,6 +67,18 @@ export type AdminDashboardMetrics = {
     byChannel: DashboardBreakdown<ContactChannelKey>[]
   }
   journey: JourneyFunnel
+  retention: {
+    cohortProfiles: number
+    retainedProfiles: number
+    rate: number
+  }
+  reminders: {
+    eligibleProfiles: number
+    enabledProfiles: number
+    adoptionRate: number
+    activatedInPeriod: number
+    withdrawnInPeriod: number
+  }
 }
 
 function subtractDays(from: Date, days: number): Date {
@@ -78,6 +92,7 @@ export async function getAdminDashboardMetrics(
   now = new Date(),
 ): Promise<AdminDashboardMetrics> {
   const since = subtractDays(now, DASHBOARD_PERIOD_DAYS)
+  const retentionSince = subtractDays(now, DASHBOARD_RETENTION_DAYS)
 
   const [
     municipalitiesTotal,
@@ -92,6 +107,7 @@ export async function getAdminDashboardMetrics(
     contactClicksTotal,
     contactClicksCreatedInPeriod,
     contactClicksByChannel,
+    retentionCohortProfiles,
   ] = await prisma.$transaction([
     prisma.serviceMunicipality.count(),
     prisma.serviceMunicipality.count({ where: { isActive: true } }),
@@ -127,6 +143,36 @@ export async function getAdminDashboardMetrics(
       by: ['channel'],
       _count: { id: true },
     }),
+    prisma.nutrizProfile.count({
+      where: {
+        AND: [nutrizScope, { createdAt: { lte: retentionSince } }],
+      },
+    }),
+  ])
+
+  const [reminderConsentEvents, journeyHistoryEvents] = await Promise.all([
+    prisma.communicationConsentEvent.findMany({
+      where: {
+        purpose: 'REMINDERS_WHATSAPP',
+        nutrizProfile: nutrizScope,
+      },
+      select: {
+        nutrizProfileId: true,
+        decision: true,
+        sequence: true,
+        recordedAt: true,
+        nutrizProfile: { select: { createdAt: true } },
+      },
+      orderBy: { sequence: 'desc' },
+    }),
+    prisma.journeyStatusHistory.findMany({
+      where: { nutrizProfile: nutrizScope, changedAt: { lte: now } },
+      select: {
+        nutrizProfileId: true,
+        changedAt: true,
+        nutrizProfile: { select: { createdAt: true } },
+      },
+    }),
   ])
 
   const regionCounts = new Map<ServiceRegion, number>(
@@ -158,6 +204,46 @@ export async function getAdminDashboardMetrics(
     )
     const key: NutrizRegionKey = region ?? 'OUTSIDE_OR_UNMAPPED'
     nutrizRegionCounts.set(key, (nutrizRegionCounts.get(key) ?? 0) + 1)
+  }
+
+  const latestReminderDecision = new Map<
+    string,
+    (typeof reminderConsentEvents)[number]['decision']
+  >()
+  let activatedInPeriod = 0
+  let withdrawnInPeriod = 0
+
+  for (const event of reminderConsentEvents) {
+    if (!latestReminderDecision.has(event.nutrizProfileId)) {
+      latestReminderDecision.set(event.nutrizProfileId, event.decision)
+    }
+    if (event.recordedAt >= since && event.recordedAt <= now) {
+      if (event.decision === 'GRANTED') activatedInPeriod += 1
+      if (event.decision === 'WITHDRAWN') withdrawnInPeriod += 1
+    }
+  }
+
+  const enabledProfiles = [...latestReminderDecision.values()].filter(
+    (decision) => decision === 'GRANTED',
+  ).length
+  const retainedProfileIds = new Set<string>()
+
+  for (const event of journeyHistoryEvents) {
+    if (
+      event.nutrizProfile.createdAt <= retentionSince &&
+      event.changedAt > event.nutrizProfile.createdAt
+    ) {
+      retainedProfileIds.add(event.nutrizProfileId)
+    }
+  }
+
+  for (const event of reminderConsentEvents) {
+    if (
+      event.nutrizProfile.createdAt <= retentionSince &&
+      event.recordedAt > event.nutrizProfile.createdAt
+    ) {
+      retainedProfileIds.add(event.nutrizProfileId)
+    }
   }
 
   return {
@@ -204,5 +290,17 @@ export async function getAdminDashboardMetrics(
       })),
     },
     journey: buildJourneyFunnel(journeyStatusCounts),
+    retention: {
+      cohortProfiles: retentionCohortProfiles,
+      retainedProfiles: retainedProfileIds.size,
+      rate: percentOf(retainedProfileIds.size, retentionCohortProfiles),
+    },
+    reminders: {
+      eligibleProfiles: nutrizTotal,
+      enabledProfiles,
+      adoptionRate: percentOf(enabledProfiles, nutrizTotal),
+      activatedInPeriod,
+      withdrawnInPeriod,
+    },
   }
 }

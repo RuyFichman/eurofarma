@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import {
   HeartHandshake,
+  History,
+  BellRing,
   Map,
   MapPin,
   MousePointerClick,
@@ -28,8 +30,16 @@ export function DashboardOverview({
   hasFilters: boolean
   children?: ReactNode
 }) {
-  const { municipalities, nutriz, periodDays, reach, contactClicks, journey } =
-    metrics
+  const {
+    municipalities,
+    nutriz,
+    periodDays,
+    reach,
+    contactClicks,
+    journey,
+    retention,
+    reminders,
+  } = metrics
 
   return (
     <div className="space-y-6">
@@ -134,7 +144,47 @@ export function DashboardOverview({
                 : COPY.metrics.journeyConversion.empty
             }
           />
+          <AdminStatCard
+            icon={History}
+            label={COPY.metrics.retention.label}
+            value={`${retention.rate}%`}
+            description={
+              retention.cohortProfiles > 0
+                ? COPY.metrics.retention.description
+                    .replace(
+                      '{retained}',
+                      formatCount(retention.retainedProfiles),
+                    )
+                    .replace('{cohort}', formatCount(retention.cohortProfiles))
+                : COPY.metrics.retention.empty
+            }
+          />
+          <AdminStatCard
+            icon={BellRing}
+            label={COPY.metrics.reminders.label}
+            value={`${reminders.adoptionRate}%`}
+            description={
+              reminders.eligibleProfiles > 0
+                ? COPY.metrics.reminders.description
+                    .replace(
+                      '{enabled}',
+                      formatCount(reminders.enabledProfiles),
+                    )
+                    .replace(
+                      '{eligible}',
+                      formatCount(reminders.eligibleProfiles),
+                    )
+                : COPY.metrics.reminders.empty
+            }
+          />
         </dl>
+        <p className="text-muted-foreground mt-3 text-sm">
+          {COPY.metrics.retention.note} {COPY.metrics.reminders.note}{' '}
+          {COPY.metrics.reminders.activity
+            .replace('{activated}', formatCount(reminders.activatedInPeriod))
+            .replace('{withdrawn}', formatCount(reminders.withdrawnInPeriod))
+            .replace('{days}', String(periodDays))}
+        </p>
       </section>
 
       {children}

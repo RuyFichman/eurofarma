@@ -1767,6 +1767,22 @@ export const ADMIN = {
           'Do cadastro à aptidão para doações recorrentes no recorte; não confirma doação',
         empty: 'Sem cadastros no recorte para calcular a conversão',
       },
+
+      retention: {
+        label: 'Retorno observável',
+        description:
+          '{retained} de {cohort} cadastros com 30+ dias tiveram algum avanço ou decisão de lembrete registrada',
+        empty: 'Ainda não há cadastros com 30 dias para esta leitura',
+        note: 'Leitura conservadora de retorno: considera histórico da jornada ou mudança de consentimento posterior ao cadastro; não prova retenção definitiva nem abandono.',
+      },
+      reminders: {
+        label: 'Adesão a lembretes',
+        description: '{enabled} de {eligible} cadastros com opt-in vigente',
+        empty: 'Nenhum cadastro disponível para calcular a adesão',
+        activity:
+          '{activated} ativações e {withdrawn} retiradas nos últimos {days} dias',
+        note: 'O indicador mede consentimento vigente, não mensagens entregues. A entrega real pelo WhatsApp depende da integração com a Meta.',
+      },
     },
 
     journeyFunnel: {
