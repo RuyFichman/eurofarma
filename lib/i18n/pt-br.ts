@@ -1490,7 +1490,7 @@ export const WHATSAPP_BOT = {
     unavailable:
       'Não foi possível salvar sua escolha de lembretes agora. Tente novamente em instantes ou volte ao menu.',
     jobBody:
-      'Este é um lembrete opcional de continuidade da sua jornada com o Lactare. Se você já recebeu a visita da equipe para entrega do kit, siga as orientações recebidas. Se precisar de ajuda, fale diretamente com o Lactare.\n\nConsulte sua área no NutriLink: {areaUrl}\n\nEste lembrete não agenda nem confirma coleta, visita ou atendimento.',
+      'Este é um lembrete opcional de continuidade da sua jornada com o Lactare. Se a entrega do kit já foi registrada pelo Lactare, siga as orientações recebidas. Se precisar de ajuda, fale diretamente com o Lactare.\n\nConsulte sua área no NutriLink: {areaUrl}\n\nEste lembrete não agenda nem confirma coleta, visita ou atendimento.',
   },
   human: {
     body: 'Sua dúvida precisa da equipe do Lactare. Este bot ainda não transfere a conversa automaticamente. Fale pelo WhatsApp {whatsapp} ou ligue para {phone}, de segunda a sexta, das 7h às 22h. Os canais foram conferidos em {verifiedAt}.',
@@ -2384,6 +2384,23 @@ export const ADMIN = {
       },
       submit: 'Registrar mudança de status',
       submitting: 'Registrando mudança...',
+    },
+    kitDelivery: {
+      title: 'Registrar entrega do kit',
+      description:
+        'Use esta ação somente depois que a equipe do Lactare confirmar a entrega. O registro será feito por você no painel e a nutriz apenas visualizará o status; ela não precisa confirmar nada.',
+      nextStatus: {
+        label: 'Etapa confirmada pela equipe',
+        placeholder: 'Kit entregue',
+      },
+      note: {
+        label: 'Observação administrativa (opcional)',
+        placeholder: 'Ex.: entrega confirmada pela equipe do Lactare',
+        helper:
+          'Até 500 caracteres. Não registre informações clínicas ou resultados de exame.',
+      },
+      submit: 'Registrar entrega do kit',
+      submitting: 'Registrando entrega...',
     },
     terminal: {
       title: 'Sem próxima etapa definida',

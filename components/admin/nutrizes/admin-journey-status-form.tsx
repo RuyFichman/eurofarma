@@ -38,6 +38,11 @@ export function AdminJourneyStatusForm({
 }) {
   const copy = ADMIN.nutrizJourney
   const allowedStatuses = getAllowedJourneyTransitions(currentStatus)
+  const isKitDeliveryConfirmation =
+    currentStatus === 'KIT_SENT' &&
+    allowedStatuses.length === 1 &&
+    allowedStatuses[0] === 'KIT_DELIVERED'
+  const formCopy = isKitDeliveryConfirmation ? copy.kitDelivery : copy.form
   const [submitError, setSubmitError] = useState<string | null>(null)
   const form = useForm<
     JourneyStatusTransitionInput,
@@ -79,9 +84,9 @@ export function AdminJourneyStatusForm({
       noValidate
     >
       <div>
-        <h2 className="text-lg font-semibold">{copy.form.title}</h2>
+        <h2 className="text-lg font-semibold">{formCopy.title}</h2>
         <p className="text-muted-foreground mt-1 text-sm leading-6">
-          {copy.form.description}
+          {formCopy.description}
         </p>
       </div>
 
@@ -94,9 +99,7 @@ export function AdminJourneyStatusForm({
       ) : null}
 
       <div className="space-y-2">
-        <Label htmlFor="journey-next-status">
-          {copy.form.nextStatus.label}
-        </Label>
+        <Label htmlFor="journey-next-status">{formCopy.nextStatus.label}</Label>
         <Controller
           name="toStatus"
           control={form.control}
@@ -114,7 +117,7 @@ export function AdminJourneyStatusForm({
                   errors.toStatus ? 'journey-next-status-error' : undefined
                 }
               >
-                <SelectValue placeholder={copy.form.nextStatus.placeholder} />
+                <SelectValue placeholder={formCopy.nextStatus.placeholder} />
               </SelectTrigger>
               <SelectContent>
                 {allowedStatuses.map((status) => (
@@ -139,12 +142,12 @@ export function AdminJourneyStatusForm({
 
       <div className="space-y-2">
         <Label htmlFor="journey-administrative-note">
-          {copy.form.note.label}
+          {formCopy.note.label}
         </Label>
         <Textarea
           id="journey-administrative-note"
           rows={4}
-          placeholder={copy.form.note.placeholder}
+          placeholder={formCopy.note.placeholder}
           aria-invalid={Boolean(errors.administrativeNote)}
           aria-describedby={
             errors.administrativeNote
@@ -158,7 +161,7 @@ export function AdminJourneyStatusForm({
           id="journey-administrative-note-hint"
           className="text-muted-foreground text-xs leading-5"
         >
-          {copy.form.note.helper}
+          {formCopy.note.helper}
         </p>
         {errors.administrativeNote ? (
           <p
@@ -172,7 +175,7 @@ export function AdminJourneyStatusForm({
       </div>
 
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? copy.form.submitting : copy.form.submit}
+        {isSubmitting ? formCopy.submitting : formCopy.submit}
       </Button>
     </form>
   )

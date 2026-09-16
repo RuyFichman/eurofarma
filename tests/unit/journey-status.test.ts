@@ -68,6 +68,7 @@ describe('regras de transição do status da jornada', () => {
       'ELIGIBLE',
       'NOT_ELIGIBLE',
     ])
+    expect(getAllowedJourneyTransitions('KIT_SENT')).toEqual(['KIT_DELIVERED'])
     expect(getAllowedJourneyTransitions('NOT_ELIGIBLE')).toEqual([])
   })
 })
