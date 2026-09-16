@@ -47,12 +47,16 @@ enum InterestStatus {
 /// não representa triagem automática e não carrega detalhes clínicos.
 enum JourneyStatus {
   REGISTERED
+  DOCUMENT_SENT
   FORM_RECEIVED
   EXAM_SCHEDULED
+  EXAMS_COMPLETED
   AWAITING_RESULT
   ELIGIBLE
   NOT_ELIGIBLE
+  KIT_SENT
   KIT_DELIVERED
+  DONATION_CONFIRMED
   RECURRING_DONATION_ELIGIBLE
 }
 

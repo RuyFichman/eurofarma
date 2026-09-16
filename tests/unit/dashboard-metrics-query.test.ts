@@ -125,12 +125,16 @@ describe('métricas administrativas por município', () => {
       ],
       byStage: [
         { key: 'REGISTERED', count: 4 },
+        { key: 'DOCUMENT_SENT', count: 0 },
         { key: 'FORM_RECEIVED', count: 3 },
         { key: 'EXAM_SCHEDULED', count: 2 },
+        { key: 'EXAMS_COMPLETED', count: 0 },
         { key: 'AWAITING_RESULT', count: 1 },
         { key: 'ELIGIBLE', count: 1 },
         { key: 'NOT_ELIGIBLE', count: 1 },
+        { key: 'KIT_SENT', count: 0 },
         { key: 'KIT_DELIVERED', count: 1 },
+        { key: 'DONATION_CONFIRMED', count: 0 },
         { key: 'RECURRING_DONATION_ELIGIBLE', count: 1 },
       ],
     })
