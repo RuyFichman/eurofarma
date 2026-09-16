@@ -246,7 +246,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 
 1. Implementar retirada e reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
 2. Ligar a entrega real dos lembretes e a operação humana do handoff à infraestrutura da Meta.
-3. Completar o dashboard com retenção e os segmentos que dependem de lembretes, indicação e confirmação legítima de doação. Alcance observável, cliques de contato e funil do `JourneyStatus` já estão implementados.
+3. Evoluir o dashboard com eventos de entrega/adesão efetiva, recorrência e os segmentos que dependem de indicação e confirmação legítima de doação. Retorno observável, adesão vigente, alcance, cliques de contato e funil do `JourneyStatus` já estão implementados.
 4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimentos.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
 6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
@@ -352,7 +352,7 @@ O RF16 amplia o estágio administrativo com categorias operacionais explícitas:
 
 A sub-região é obtida relacionando a UF e a cidade cadastradas pela nutriz com `service_municipalities`. A relação considera também municípios inativos, preservando a classificação histórica caso uma cidade deixe de fazer parte da cobertura operacional. Cadastros de outras localidades aparecem apenas no agregado “fora da Grande SP ou sem correspondência”; o painel não expõe a cidade individual nesse bloco.
 
-Os seguintes recortes continuam planejados porque ainda não há eventos ou campos próprios que permitam calculá-los com segurança:
+O dashboard já apresenta a adesão vigente a lembretes e as ativações/retiradas dos últimos 30 dias, a partir do último evento de consentimento por nutriz. Esse indicador mede consentimento, não entrega efetiva pelo WhatsApp. Os seguintes recortes continuam planejados porque ainda não há eventos ou campos próprios que permitam calculá-los com segurança:
 
 | Campo | Exemplos de valor |
 |---|---|

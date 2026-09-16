@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   nutrizFindMany: vi.fn(),
   contactClickCount: vi.fn(),
   contactClickGroupBy: vi.fn(),
+  consentFindMany: vi.fn(),
+  journeyHistoryFindMany: vi.fn(),
   transaction: vi.fn(),
 }))
 
@@ -27,6 +29,12 @@ vi.mock('../../lib/db/prisma', () => ({
     contactChannelClick: {
       count: mocks.contactClickCount,
       groupBy: mocks.contactClickGroupBy,
+    },
+    communicationConsentEvent: {
+      findMany: mocks.consentFindMany,
+    },
+    journeyStatusHistory: {
+      findMany: mocks.journeyHistoryFindMany,
     },
     $transaction: mocks.transaction,
   },
@@ -48,6 +56,8 @@ describe('métricas administrativas por município', () => {
     mocks.nutrizFindMany.mockReturnValue(undefined)
     mocks.contactClickCount.mockReturnValue(undefined)
     mocks.contactClickGroupBy.mockReturnValue(undefined)
+    mocks.consentFindMany.mockResolvedValue([])
+    mocks.journeyHistoryFindMany.mockResolvedValue([])
   })
 
   it('calcula ativos, inativos e preenche regiões sem registros com zero', async () => {
@@ -89,6 +99,7 @@ describe('métricas administrativas por município', () => {
         { channel: 'WHATSAPP', _count: { id: 15 } },
         { channel: 'PHONE', _count: { id: 6 } },
       ],
+      0,
     ])
 
     const metrics = await getAdminDashboardMetrics()
@@ -153,6 +164,98 @@ describe('métricas administrativas por município', () => {
     })
     expect(metrics.journey.overallConversion).toBe(7)
     expect(metrics.journey.notEligible).toBe(1)
+    expect(metrics.retention).toEqual({
+      cohortProfiles: 0,
+      retainedProfiles: 0,
+      rate: 0,
+    })
+    expect(metrics.reminders).toEqual({
+      eligibleProfiles: 14,
+      enabledProfiles: 0,
+      adoptionRate: 0,
+      activatedInPeriod: 0,
+      withdrawnInPeriod: 0,
+    })
+  })
+
+  it('calcula retorno observavel e adesao pelo consentimento mais recente', async () => {
+    const now = new Date('2026-09-16T12:00:00.000Z')
+    const oldProfile = new Date('2026-07-01T12:00:00.000Z')
+    const recentProfile = new Date('2026-09-01T12:00:00.000Z')
+    const eventDate = new Date('2026-09-10T12:00:00.000Z')
+
+    mocks.transaction.mockResolvedValue([
+      0,
+      0,
+      [],
+      3,
+      0,
+      [],
+      [],
+      [],
+      0,
+      0,
+      0,
+      [],
+      2,
+    ])
+    mocks.consentFindMany.mockResolvedValue([
+      {
+        nutrizProfileId: 'profile-2',
+        decision: 'WITHDRAWN',
+        sequence: 4n,
+        recordedAt: eventDate,
+        nutrizProfile: { createdAt: oldProfile },
+      },
+      {
+        nutrizProfileId: 'profile-3',
+        decision: 'GRANTED',
+        sequence: 3n,
+        recordedAt: eventDate,
+        nutrizProfile: { createdAt: recentProfile },
+      },
+      {
+        nutrizProfileId: 'profile-1',
+        decision: 'GRANTED',
+        sequence: 2n,
+        recordedAt: eventDate,
+        nutrizProfile: { createdAt: oldProfile },
+      },
+      {
+        nutrizProfileId: 'profile-1',
+        decision: 'WITHDRAWN',
+        sequence: 1n,
+        recordedAt: eventDate,
+        nutrizProfile: { createdAt: oldProfile },
+      },
+    ])
+    mocks.journeyHistoryFindMany.mockResolvedValue([
+      {
+        nutrizProfileId: 'profile-1',
+        changedAt: eventDate,
+        nutrizProfile: { createdAt: oldProfile },
+      },
+      {
+        nutrizProfileId: 'profile-2',
+        changedAt: eventDate,
+        nutrizProfile: { createdAt: oldProfile },
+      },
+    ])
+
+    const metrics = await getAdminDashboardMetrics({ deletedAt: null }, now)
+
+    expect(metrics.retention).toEqual({
+      cohortProfiles: 2,
+      retainedProfiles: 2,
+      rate: 100,
+    })
+    expect(metrics.reminders).toEqual({
+      eligibleProfiles: 3,
+      enabledProfiles: 2,
+      adoptionRate: 67,
+      activatedInPeriod: 2,
+      withdrawnInPeriod: 2,
+    })
   })
 
   it('consulta somente municípios ativos para o recorte regional', async () => {
@@ -169,6 +272,7 @@ describe('métricas administrativas por município', () => {
       0,
       0,
       [],
+      0,
     ])
 
     await getAdminDashboardMetrics()
@@ -193,6 +297,7 @@ describe('métricas administrativas por município', () => {
       0,
       0,
       [],
+      0,
     ])
 
     await getAdminDashboardMetrics(scope)
