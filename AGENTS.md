@@ -101,7 +101,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 - Provisionamento da conta da nutriz no Supabase Auth.
 - Login, logout, recuperação e redefinição de senha da nutriz.
 - Área autenticada da nutriz com status atual da jornada, linha do tempo de categorias e datas, orientações específicas para cada etapa, identificação da cidade cadastrada e acesso ao verificador de cobertura. A consulta da nutriz não seleciona observações administrativas, responsáveis ou detalhes clínicos.
-- RF19–RF22 ainda não estão implementados: o escopo prevê diário pessoal de extração/ordenha, exportação do histórico em PDF, registro opcional de bem-estar e conteúdo educativo sugerido por estágio. Esses recursos não podem ser simulados como concluídos nem devem coletar dados clínicos.
+- UC06 ampliado localmente com diário pessoal de extração/ordenha, soma e exclusão de registros, exportação do histórico próprio em PDF, conteúdo educativo filtrado pelo estágio e registro opcional de bem-estar após doação confirmada. Os registros pessoais não acionam coleta, não substituem orientações do Lactare e não contêm detalhes clínicos. A migration `20260916210000_add_nutriz_personal_area` ainda precisa ser aplicada e registrada no Supabase cloud.
 - Login, logout, middleware, autorização por role e shell administrativo.
 - Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, status atual de `JourneyStatus` e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal, às distribuições e ao funil progressivo da jornada; dados pessoais não são exibidos. O painel também apresenta sinais globais de alcance, cliques anônimos por canal, conversão acumulada e cadastros sem avanço registrado entre etapas. Como os cliques não referenciam nutriz nem localização, eles permanecem globais e não respondem aos filtros de região ou status.
 - Listagem de nutrizes com exposição reduzida de contato e acesso ao detalhe da jornada em `/admin/nutrizes/[id]`.
@@ -136,10 +136,10 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF15 — atribuição por indicação | **Parcial.** UTMs genéricas existem, mas não há identificador nem vínculo próprio de indicação. |
 | RF16 — status da jornada | **Implementado com doze estados.** O administrador acessa `/admin/nutrizes/[id]`, consulta status e histórico e registra somente a próxima transição válida. A mutação é autorizada por role `ADMIN`, condicional ao status anterior e atômica com o histórico. Quatro marcos adicionais foram acrescentados sem remover os anteriores: documento enviado, exames feitos, kit enviado e doação confirmada. As migrations da extensão estão aplicadas no Supabase cloud desde 16 de setembro de 2026; a doação confirmada continua dependente da definição da evidência operacional. Correção e reabertura continuam sob responsabilidade operacional do admin, sem fluxo específico nesta etapa. |
 | RF17 — aviso de mudança de status | **Parcial.** A mudança válida de status cria histórico e outbox atomicamente, com idempotência, consentimento específico, tentativas, backoff, auditoria e simulador local. A migration da outbox está aplicada no Supabase cloud; a entrega real depende de infraestrutura e templates da Meta. |
-| RF19 — diário pessoal de extração | **Não implementado.** O escopo prevê data, hora e volume para uso da própria nutriz, sem acionar ou confirmar coleta. |
-| RF20 — exportação do histórico em PDF | **Não implementado.** Deve exportar somente o histórico pertencente à própria nutriz. |
-| RF21 — bem-estar pós-doação | **Não implementado.** Deve ser opcional, mínimo e não clínico; não pode virar diário de saúde ou ferramenta terapêutica. |
-| RF22 — conteúdo por estágio | **Não implementado.** O conteúdo deve ser educativo e coerente com o status categórico registrado, sem inferir condição clínica. |
+| RF19 — diário pessoal de extração | **Implementado localmente.** A nutriz registra data, hora e volume, consulta soma e sessões recentes e exclui seus próprios registros; nada aciona ou confirma coleta. A migration da área pessoal ainda precisa ser aplicada no Supabase cloud. |
+| RF20 — exportação do histórico em PDF | **Implementado localmente.** O download é gerado no servidor após o gate da nutriz e inclui somente seu status categórico e seus registros pessoais. A migration da área pessoal ainda precisa ser aplicada no Supabase cloud. |
+| RF21 — bem-estar pós-doação | **Implementado localmente.** Após `DONATION_CONFIRMED` ou `RECURRING_DONATION_ELIGIBLE`, a nutriz pode registrar uma opção simples, sem texto livre, e excluir o registro. A migration da área pessoal ainda precisa ser aplicada no Supabase cloud. |
+| RF22 — conteúdo por estágio | **Implementado localmente.** A área consulta apenas conteúdo publicado categorizado para o estágio atual e oferece guia geral quando não houver conteúdo específico; não infere condição clínica. |
 
 ### 3.3 Código e dados legados que não definem mais o escopo
 
@@ -169,7 +169,7 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Integração real do processador da outbox com templates aprovados da Meta.
 - Cartão de impacto, indicação e reconhecimentos.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
-- Política de Privacidade, Termos de Uso e RLS continuam obrigatórios antes de exposição pública, mas foram adiados pelo time para depois da entrega de municípios.
+- Política de Privacidade, Termos de Uso e RLS das tabelas existentes continuam obrigatórios antes de exposição pública, mas foram adiados pelo time para depois da entrega de municípios. A nova migration da área pessoal já contém RLS das tabelas pessoais, mas ainda precisa ser aplicada no cloud.
 
 ### 3.5 Validações externas pendentes
 
@@ -188,7 +188,7 @@ Até essas respostas existirem, prefira linguagem conservadora. Estar na área d
 4. Implementar confirmação de doação, cartão de impacto, indicação e reconhecimentos somente após definir uma fonte operacional legítima.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
 6. Ativar a integração real com a Meta quando a infraestrutura externa existir; o estado conversacional já está aplicado no Supabase e a suíte completa de integração voltou a rodar.
-7. Em sprint posterior, avaliar RF19–RF22: diário pessoal de extração/ordenha, exportação em PDF, bem-estar opcional e conteúdo educativo por estágio, sempre sem transformar a Minha Área em prontuário ou fonte de decisão clínica.
+7. Aplicar e registrar no Supabase cloud a migration `20260916210000_add_nutriz_personal_area` antes de usar os novos blocos da Minha Área no ambiente compartilhado.
 
 ### Atualização do job de lembretes (16 de setembro de 2026)
 
