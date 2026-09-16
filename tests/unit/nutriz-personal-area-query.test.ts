@@ -6,6 +6,8 @@ const mocks = vi.hoisted(() => ({
   extractionAggregate: vi.fn(),
   extractionCreate: vi.fn(),
   wellbeingFindMany: vi.fn(),
+  wellbeingCreate: vi.fn(),
+  wellbeingDeleteMany: vi.fn(),
   contentFindMany: vi.fn(),
   recognitionFindMany: vi.fn(),
   extractionDeleteMany: vi.fn(),
@@ -20,7 +22,11 @@ vi.mock('../../lib/db/prisma', () => ({
       create: mocks.extractionCreate,
       deleteMany: mocks.extractionDeleteMany,
     },
-    wellbeingEntry: { findMany: mocks.wellbeingFindMany },
+    wellbeingEntry: {
+      findMany: mocks.wellbeingFindMany,
+      create: mocks.wellbeingCreate,
+      deleteMany: mocks.wellbeingDeleteMany,
+    },
     educationalContent: { findMany: mocks.contentFindMany },
     nutrizRecognition: { findMany: mocks.recognitionFindMany },
   },
@@ -28,7 +34,9 @@ vi.mock('../../lib/db/prisma', () => ({
 
 import {
   createNutrizExtractionLog,
+  createNutrizWellbeingEntry,
   deleteNutrizExtractionLog,
+  deleteNutrizWellbeingEntry,
   getNutrizPersonalAreaData,
 } from '../../lib/db/queries/nutriz-personal-area'
 
@@ -98,6 +106,68 @@ describe('consulta dos registros pessoais', () => {
         volumeMl: 60,
       },
       select: { id: true },
+    })
+  })
+
+  it('não registra bem-estar antes de uma doação confirmada', async () => {
+    mocks.profileFindFirst.mockResolvedValue({
+      id: profileId,
+      journeyStatus: 'KIT_DELIVERED',
+    })
+
+    await expect(
+      createNutrizWellbeingEntry({
+        nutrizProfileId: profileId,
+        feeling: 'GOOD',
+        recordedAt: new Date('2026-09-16T13:30:00.000Z'),
+      }),
+    ).resolves.toBe(false)
+
+    expect(mocks.wellbeingCreate).not.toHaveBeenCalled()
+  })
+
+  it('registra somente uma opção simples após doação confirmada', async () => {
+    const recordedAt = new Date('2026-09-16T13:30:00.000Z')
+    mocks.profileFindFirst.mockResolvedValue({
+      id: profileId,
+      journeyStatus: 'DONATION_CONFIRMED',
+    })
+    mocks.wellbeingCreate.mockResolvedValue({ id: recordId })
+
+    await expect(
+      createNutrizWellbeingEntry({
+        nutrizProfileId: profileId,
+        feeling: 'TIRED',
+        recordedAt,
+      }),
+    ).resolves.toBe(true)
+
+    expect(mocks.wellbeingCreate).toHaveBeenCalledWith({
+      data: {
+        nutrizProfileId: profileId,
+        feeling: 'TIRED',
+        recordedAt,
+      },
+      select: { id: true },
+    })
+  })
+
+  it('filtra exclusão pelo id do registro de bem-estar e pelo perfil dono', async () => {
+    mocks.wellbeingDeleteMany.mockResolvedValue({ count: 1 })
+
+    await expect(
+      deleteNutrizWellbeingEntry({
+        nutrizProfileId: profileId,
+        wellbeingEntryId: recordId,
+      }),
+    ).resolves.toBe(true)
+
+    expect(mocks.wellbeingDeleteMany).toHaveBeenCalledWith({
+      where: {
+        id: recordId,
+        nutrizProfileId: profileId,
+        nutrizProfile: { deletedAt: null },
+      },
     })
   })
 })
