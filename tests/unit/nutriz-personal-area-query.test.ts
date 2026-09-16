@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   profileFindFirst: vi.fn(),
   extractionFindMany: vi.fn(),
   extractionAggregate: vi.fn(),
+  extractionCreate: vi.fn(),
   wellbeingFindMany: vi.fn(),
   contentFindMany: vi.fn(),
   extractionDeleteMany: vi.fn(),
@@ -15,6 +16,7 @@ vi.mock('../../lib/db/prisma', () => ({
     extractionLog: {
       findMany: mocks.extractionFindMany,
       aggregate: mocks.extractionAggregate,
+      create: mocks.extractionCreate,
       deleteMany: mocks.extractionDeleteMany,
     },
     wellbeingEntry: { findMany: mocks.wellbeingFindMany },
@@ -23,6 +25,7 @@ vi.mock('../../lib/db/prisma', () => ({
 }))
 
 import {
+  createNutrizExtractionLog,
   deleteNutrizExtractionLog,
   getNutrizPersonalAreaData,
 } from '../../lib/db/queries/nutriz-personal-area'
@@ -66,6 +69,32 @@ describe('consulta dos registros pessoais', () => {
         nutrizProfileId: profileId,
         nutrizProfile: { deletedAt: null },
       },
+    })
+  })
+
+  it('registra uma sessao somente no perfil ativo informado', async () => {
+    const recordedAt = new Date('2026-09-16T13:30:00.000Z')
+    mocks.extractionCreate.mockResolvedValue({ id: recordId })
+
+    await expect(
+      createNutrizExtractionLog({
+        nutrizProfileId: profileId,
+        recordedAt,
+        volumeMl: 60,
+      }),
+    ).resolves.toBe(true)
+
+    expect(mocks.profileFindFirst).toHaveBeenCalledWith({
+      where: { id: profileId, deletedAt: null },
+      select: { id: true },
+    })
+    expect(mocks.extractionCreate).toHaveBeenCalledWith({
+      data: {
+        nutrizProfileId: profileId,
+        recordedAt,
+        volumeMl: 60,
+      },
+      select: { id: true },
     })
   })
 })
