@@ -278,6 +278,60 @@ describe('POST /api/whatsapp/webhook', () => {
     )
   })
 
+  it('registra o pedido explícito e pausa a conversa no mesmo chat', async () => {
+    mocks.getState.mockResolvedValue({
+      step: 'MENU',
+      context: {},
+      misunderstoodCount: 0,
+      isNewConversation: false,
+    })
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'handoff-request-1',
+          interactive: {
+            type: 'button_reply',
+            button_reply: {
+              id: 'menu_falar_pessoa',
+              title: 'Falar com a equipe',
+            },
+          },
+        }),
+      ),
+    )
+
+    expect(mocks.saveState).toHaveBeenCalledWith(
+      expect.objectContaining({ step: 'HUMAN_HANDOFF' }),
+    )
+    expect(mocks.sendReply.mock.calls[0]?.[0].reply.body).toContain(
+      'mesmo chat',
+    )
+  })
+
+  it('pausa o bot depois de solicitar atendimento humano', async () => {
+    mocks.getState.mockResolvedValue({
+      step: 'HUMAN_HANDOFF',
+      context: {},
+      misunderstoodCount: 0,
+      isNewConversation: false,
+    })
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'handoff-1',
+          text: { body: 'oi, preciso de ajuda' },
+        }),
+      ),
+    )
+
+    expect(mocks.sendReply).not.toHaveBeenCalled()
+    expect(mocks.saveState).not.toHaveBeenCalled()
+  })
+
   it('ignora recibos e excesso de mensagens sem produzir efeitos', async () => {
     await POST(
       request({ entry: [{ changes: [{ value: { statuses: [{}] } }] }] }),

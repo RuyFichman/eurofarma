@@ -1,4 +1,5 @@
 import { WHATSAPP_BOT } from '../i18n/pt-br'
+import { isLactareHandoffOpen } from '../constants/lactare-handoff'
 import type { JourneyStatusValue } from '../journey/status'
 import type { WhatsappCoverageResult } from './coverage'
 
@@ -9,6 +10,7 @@ export type ActiveConversationStep =
   | 'AWAITING_COVERAGE'
   | 'AWAITING_FULL_NAME'
   | 'AWAITING_CONSENT'
+  | 'HUMAN_HANDOFF'
 
 /** Estados preservados apenas para ler conversas criadas pelo fluxo antigo. */
 export type LegacyConversationStep =
@@ -100,6 +102,7 @@ type AdvanceConversationParams = {
   coverage?: WhatsappCoverageResult
   profile: ConversationProfile | null
   isNewConversation?: boolean
+  now?: Date
 }
 
 const FAQ_ANSWER_BY_ID = {
@@ -318,6 +321,24 @@ function humanContactReply(body: string = WHATSAPP_BOT.human.body) {
   return mainMenuReply(body)
 }
 
+function humanHandoffReply(now: Date = new Date()): ConversationOutcome {
+  return outcome({
+    reply: {
+      type: 'text',
+      body: isLactareHandoffOpen(now)
+        ? WHATSAPP_BOT.human.handoffOpen
+        : WHATSAPP_BOT.human.handoffOutsideHours,
+    },
+    nextStep: 'HUMAN_HANDOFF',
+  })
+}
+
+function isHumanHandoffRequest(text: string | null): boolean {
+  return /(?:falar com (?:a )?(?:equipe|algu[eé]m|uma pessoa|atendente|humano)|atendimento humano|falar com o Lactare)/iu.test(
+    text?.trim() ?? '',
+  )
+}
+
 function askCoverage(): ConversationOutcome {
   return outcome({
     reply: { type: 'text', body: WHATSAPP_BOT.coverage.ask },
@@ -386,6 +407,13 @@ export function advanceConversation(
     return buildInitialConversationReply(params.profile)
   }
 
+  if (
+    params.replyId === REPLY_IDS.menuHuman ||
+    isHumanHandoffRequest(params.text)
+  ) {
+    return humanHandoffReply(params.now)
+  }
+
   if (params.replyId === REPLY_IDS.menuKnowMore) return faqList()
   if (
     params.replyId === REPLY_IDS.menuReminders ||
@@ -420,8 +448,6 @@ export function advanceConversation(
   ) {
     return askCoverage()
   }
-  if (params.replyId === REPLY_IDS.menuHuman) return humanContactReply()
-
   switch (params.step) {
     case 'MENU':
       return misunderstood(params, () =>
@@ -552,6 +578,12 @@ export function advanceConversation(
         context: params.context,
       })
     }
+
+    // O bot permanece pausado até a equipe assumir. A rota não chama esta
+    // máquina para novas mensagens nesse estado, exceto quando a nutriz pede
+    // explicitamente "menu" para voltar ao autoatendimento.
+    case 'HUMAN_HANDOFF':
+      return humanHandoffReply()
 
     // Qualquer conversa do fluxo de agendamento antigo volta ao menu sem
     // interpretar data ou motivo como informação válida no escopo atual.

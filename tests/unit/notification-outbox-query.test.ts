@@ -49,7 +49,9 @@ describe('persistência da outbox do RF17', () => {
       nutrizProfile: {
         phoneWhatsapp: '5511999998888',
         deletedAt: null,
-        communicationConsents: [{ decision: 'GRANTED' }],
+        communicationConsents: [
+          { purpose: 'JOURNEY_STATUS_WHATSAPP', decision: 'GRANTED' },
+        ],
       },
     })
 
@@ -81,7 +83,6 @@ describe('persistência da outbox do RF17', () => {
             select: expect.objectContaining({
               communicationConsents: expect.objectContaining({
                 orderBy: { sequence: 'desc' },
-                take: 1,
               }),
             }),
           }),
@@ -104,6 +105,48 @@ describe('persistência da outbox do RF17', () => {
 
     await expect(claimNextNotificationOutbox(NOW)).resolves.toBeNull()
     expect(mocks.findUniqueOrThrow).not.toHaveBeenCalled()
+  })
+
+  it('revalida a finalidade correta para um lembrete', async () => {
+    mocks.findMany.mockResolvedValue([
+      {
+        id: 'outbox-reminder-1',
+        status: 'PENDING',
+        attemptCount: 0,
+        maxAttempts: 5,
+        lockToken: null,
+      },
+    ])
+    mocks.updateMany.mockResolvedValue({ count: 1 })
+    mocks.findUniqueOrThrow.mockResolvedValue({
+      id: 'outbox-reminder-1',
+      lockToken: 'generated-lock',
+      idempotencyKey: 'reminder:history-1',
+      kind: 'REMINDER',
+      payload: {
+        reminderKind: 'KIT_DELIVERY_FOLLOW_UP',
+        sourceHistoryId: 'history-1',
+        referenceAt: '2026-09-13T15:00:00.000Z',
+      },
+      attemptCount: 1,
+      maxAttempts: 5,
+      journeyStatusHistory: null,
+      nutrizProfile: {
+        phoneWhatsapp: '5511999998888',
+        deletedAt: null,
+        communicationConsents: [
+          { purpose: 'JOURNEY_STATUS_WHATSAPP', decision: 'WITHDRAWN' },
+          { purpose: 'REMINDERS_WHATSAPP', decision: 'GRANTED' },
+        ],
+      },
+    })
+
+    await expect(claimNextNotificationOutbox(NOW)).resolves.toEqual(
+      expect.objectContaining({
+        kind: 'REMINDER',
+        hasCurrentConsent: true,
+      }),
+    )
   })
 
   it('finaliza a fila e a auditoria na mesma transação', async () => {

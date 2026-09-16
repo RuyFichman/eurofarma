@@ -28,6 +28,7 @@ function step(
     coverage?: WhatsappCoverageResult
     profile?: ConversationProfile | null
     isNewConversation?: boolean
+    now?: Date
   } = {},
 ) {
   return advanceConversation({
@@ -39,6 +40,7 @@ function step(
     coverage: input.coverage,
     profile: input.profile ?? null,
     isNewConversation: input.isNewConversation,
+    now: input.now,
   })
 }
 
@@ -112,6 +114,24 @@ describe('advanceConversation', () => {
       kind: 'set_reminder_consent',
       enabled: false,
     })
+  })
+
+  it('pausa o bot e registra o pedido explícito de atendimento humano', () => {
+    const open = step('MENU', {
+      replyId: REPLY_IDS.menuHuman,
+      now: new Date('2026-09-16T13:00:00.000Z'),
+    })
+    expect(open.nextStep).toBe('HUMAN_HANDOFF')
+    expect(open.reply.body).toContain('mesmo chat')
+    expect(open.reply.body).toContain('bot ficará pausado')
+    expect(open.reply.body).toContain('Não há prazo de resposta confirmado')
+
+    const outsideHours = step('MENU', {
+      text: 'quero falar com a equipe',
+      now: new Date('2026-09-16T21:00:00.000Z'),
+    })
+    expect(outsideHours.nextStep).toBe('HUMAN_HANDOFF')
+    expect(outsideHours.reply.body).toContain('próxima janela')
   })
 
   it('abre FAQ em lista com cinco perguntas', () => {

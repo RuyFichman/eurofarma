@@ -20,9 +20,7 @@ describe('migration da outbox do RF17', () => {
     expect(migrationSql).toContain(
       'CREATE TABLE "communication_consent_events"',
     )
-    expect(migrationSql).toContain(
-      '"sequence" BIGSERIAL NOT NULL',
-    )
+    expect(migrationSql).toContain('"sequence" BIGSERIAL NOT NULL')
     expect(migrationSql).toContain(
       '"communication_consent_events_profile_purpose_sequence_idx"',
     )
