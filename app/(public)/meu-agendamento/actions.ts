@@ -19,7 +19,12 @@ import {
   personalRecordIdSchema,
   wellbeingEntrySchema,
 } from '@/lib/validators/nutriz-personal-area'
-import { localDateTimeToDate } from '@/lib/utils/local-date-time'
+import {
+  isValidLocalDate,
+  formatLocalDate,
+  localDateTimeToDate,
+  localDateToDate,
+} from '@/lib/utils/local-date-time'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 
 /**
@@ -79,24 +84,40 @@ export async function cancelAppointmentAction(
   }
 }
 
-const reminderPreferenceSchema = z.boolean()
+const reminderPreferenceSchema = z.object({
+  enabled: z.boolean(),
+  referenceDate: z.string().optional(),
+})
 
 /** Ativa ou retira o opt-in de lembretes da própria nutriz. */
-export async function setReminderConsentAction(
-  enabled: boolean,
-): Promise<{ ok: boolean; enabled: boolean }> {
+export async function setReminderConsentAction(input: {
+  enabled: boolean
+  referenceDate?: string
+}): Promise<{ ok: boolean; enabled: boolean }> {
   const nutriz = await requireNutrizUser()
-  const parsed = reminderPreferenceSchema.safeParse(enabled)
-  if (!parsed.success) return { ok: false, enabled: !enabled }
+  const parsed = reminderPreferenceSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, enabled: false }
+
+  const referenceDate = parsed.data.referenceDate?.trim() ?? ''
+  if (
+    parsed.data.enabled &&
+    (!isValidLocalDate(referenceDate) ||
+      referenceDate > formatLocalDate(new Date()))
+  ) {
+    return { ok: false, enabled: false }
+  }
 
   try {
     const result = await setReminderConsent({
       nutrizProfileId: nutriz.id,
-      enabled: parsed.data,
+      enabled: parsed.data.enabled,
       source: 'WEB',
+      referenceDate: parsed.data.enabled
+        ? (localDateToDate(referenceDate) ?? undefined)
+        : undefined,
     })
     if (result.status === 'NOT_FOUND') {
-      return { ok: false, enabled: !parsed.data }
+      return { ok: false, enabled: !parsed.data.enabled }
     }
 
     revalidatePath('/meu-agendamento')
@@ -105,7 +126,7 @@ export async function setReminderConsentAction(
     if (process.env.NODE_ENV === 'development') {
       console.error('[setReminderConsentAction]', error)
     }
-    return { ok: false, enabled: !parsed.data }
+    return { ok: false, enabled: !parsed.data.enabled }
   }
 }
 

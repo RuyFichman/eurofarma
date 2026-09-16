@@ -32,6 +32,7 @@ describe('consentimento auditável de lembretes', () => {
     await expect(getReminderConsentPreference(PROFILE_ID)).resolves.toEqual({
       enabled: false,
       recordedAt: null,
+      referenceDate: null,
     })
     expect(mocks.profileFindFirst).toHaveBeenCalledWith({
       where: { id: PROFILE_ID, deletedAt: null },
@@ -40,7 +41,11 @@ describe('consentimento auditável de lembretes', () => {
           where: { purpose: 'REMINDERS_WHATSAPP' },
           orderBy: { sequence: 'desc' },
           take: 1,
-          select: { decision: true, recordedAt: true },
+          select: {
+            decision: true,
+            recordedAt: true,
+            referenceDate: true,
+          },
         },
       },
     })
@@ -59,6 +64,7 @@ describe('consentimento auditável de lembretes', () => {
         nutrizProfileId: PROFILE_ID,
         enabled: true,
         source: 'WEB',
+        referenceDate: new Date('2026-09-16T12:00:00.000Z'),
       }),
     ).resolves.toEqual({ status: 'UPDATED', enabled: true })
     await expect(
@@ -77,6 +83,7 @@ describe('consentimento auditável de lembretes', () => {
         source: 'WEB',
         policyVersion: '2026-09-16.reminders.v1',
         sourceEventId: undefined,
+        referenceDate: new Date('2026-09-16T12:00:00.000Z'),
       },
       select: { id: true },
     })

@@ -116,6 +116,7 @@ enum WhatsappConversationStep {
   AWAITING_COVERAGE
   AWAITING_FULL_NAME
   AWAITING_CONSENT
+  AWAITING_REMINDER_REFERENCE
   HUMAN_HANDOFF
 
   // Estados do fluxo antigo. Permanecem no enum para que a migration preserve
@@ -298,6 +299,8 @@ model CommunicationConsentEvent {
   policyVersion   String                       @map("policy_version") @db.VarChar(32)
   /// Identificador externo opcional para tornar eventos do webhook idempotentes.
   sourceEventId   String?                      @unique(map: "communication_consent_events_source_event_id_key") @map("source_event_id") @db.VarChar(255)
+  /// Data de calendário informada pela nutriz somente como referência do lembrete.
+  referenceDate   DateTime?                    @map("reference_date") @db.Date
   recordedAt      DateTime                     @default(now()) @map("recorded_at")
 
   nutrizProfile      NutrizProfile        @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)

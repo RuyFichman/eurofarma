@@ -236,13 +236,35 @@ describe('POST /api/whatsapp/webhook', () => {
       ),
     )
 
+    mocks.getState.mockResolvedValueOnce({
+      step: 'AWAITING_REMINDER_REFERENCE',
+      context: {},
+      misunderstoodCount: 0,
+      isNewConversation: false,
+    })
+    mocks.setReminderConsent.mockResolvedValue({
+      status: 'UPDATED',
+      enabled: true,
+    })
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'wamid.reminder-2',
+          text: { body: '15/09/2026' },
+        }),
+      ),
+    )
+
     expect(mocks.setReminderConsent).toHaveBeenCalledWith({
       nutrizProfileId: 'profile-1',
       enabled: true,
       source: 'WHATSAPP',
-      sourceEventId: 'whatsapp:wamid.reminder-1',
+      sourceEventId: 'whatsapp:wamid.reminder-2',
+      referenceDate: new Date('2026-09-15T12:00:00.000Z'),
     })
-    expect(mocks.sendReply.mock.calls[0]?.[0].reply.body).toContain(
+    expect(mocks.sendReply.mock.calls[1]?.[0].reply.body).toContain(
       'Lembretes ativados',
     )
   })

@@ -845,6 +845,9 @@ export const SIGNUP = {
       label:
         'Quero receber pelo WhatsApp lembretes de continuidade da minha jornada.',
       help: 'Opcional e separado dos avisos de status. Os lembretes não agendam nem confirmam coleta e podem ser desativados a qualquer momento.',
+      referenceDateLabel: 'Data de referência do lembrete',
+      referenceDateHelp:
+        'Informe uma data apenas para orientar a continuidade. Ela não cria nem confirma agendamento.',
     },
   },
   actions: {
@@ -873,6 +876,10 @@ export const SIGNUP = {
     cityMax: 'Cidade inválida.',
     consentRequired:
       'É necessário aceitar a Política de Privacidade para continuar.',
+    referenceDateRequired:
+      'Informe uma data de referência para ativar o lembrete.',
+    referenceDateInvalid:
+      'Informe uma data de referência válida, que não esteja no futuro.',
   },
   legal: {
     lead: 'Ao se cadastrar, você concorda com os',
@@ -1015,6 +1022,12 @@ export const NUTRIZ_AUTH = {
       enabledFeedback:
         'Lembretes ativados. Sua escolha foi registrada e poderá ser cancelada quando quiser.',
       disabledFeedback: 'Lembretes desativados. O cancelamento foi registrado.',
+      referenceDateLabel: 'Data de referência do lembrete',
+      referenceDateHelp:
+        'Esta data é apenas uma referência para a continuidade da jornada; não é agendamento.',
+      referenceDateStatus: 'Data de referência registrada: {date}',
+      referenceDateRequired:
+        'Informe uma data de referência para ativar o lembrete.',
       error:
         'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
     },
@@ -1479,6 +1492,10 @@ export const WHATSAPP_BOT = {
     enable: 'Ativar lembretes',
     disable: 'Parar lembretes',
     back: 'Voltar ao menu',
+    askReferenceDate:
+      'Qual data você quer usar como referência para esse lembrete? Responda no formato DD/MM/AAAA. Essa data é apenas uma referência e não cria nem confirma agendamento.',
+    invalidReferenceDate:
+      'Não reconheci essa data. Informe uma data válida no formato DD/MM/AAAA, sem escolher um dia futuro. Essa data não cria nem confirma agendamento.',
     enabledSuccess:
       'Lembretes ativados. Sua escolha foi registrada. O NutriLink não agenda nem confirma coleta, exame, visita ou atendimento.',
     disabledSuccess:

@@ -23,6 +23,7 @@ type ReminderCandidate = {
     communicationConsents: Array<{
       id: string
       decision: 'GRANTED' | 'WITHDRAWN'
+      referenceDate: Date | null
     }>
   }
 }
@@ -37,7 +38,7 @@ const REMINDER_CANDIDATE_SELECT = {
         where: { purpose: 'REMINDERS_WHATSAPP' },
         orderBy: { sequence: 'desc' },
         take: 1,
-        select: { id: true, decision: true },
+        select: { id: true, decision: true, referenceDate: true },
       },
     },
   },
@@ -92,7 +93,7 @@ export async function enqueueDueReminderOutbox(params?: {
         consentEventId: consent.id,
         payload: buildReminderPayload({
           sourceHistoryId: candidate.id,
-          referenceAt: candidate.changedAt,
+          referenceAt: consent.referenceDate ?? candidate.changedAt,
         }),
         availableAt: now,
       },

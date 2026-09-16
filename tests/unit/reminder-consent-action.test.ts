@@ -34,7 +34,12 @@ describe('ação da preferência de lembretes', () => {
       enabled: true,
     })
 
-    await expect(setReminderConsentAction(true)).resolves.toEqual({
+    await expect(
+      setReminderConsentAction({
+        enabled: true,
+        referenceDate: '2026-09-16',
+      }),
+    ).resolves.toEqual({
       ok: true,
       enabled: true,
     })
@@ -43,6 +48,7 @@ describe('ação da preferência de lembretes', () => {
       nutrizProfileId: 'profile-1',
       enabled: true,
       source: 'WEB',
+      referenceDate: new Date('2026-09-16T12:00:00.000Z'),
     })
     expect(mocks.revalidatePath).toHaveBeenCalledWith('/meu-agendamento')
   })
@@ -53,10 +59,12 @@ describe('ação da preferência de lembretes', () => {
       enabled: false,
     })
 
-    await expect(setReminderConsentAction(false)).resolves.toEqual({
-      ok: true,
-      enabled: false,
-    })
+    await expect(setReminderConsentAction({ enabled: false })).resolves.toEqual(
+      {
+        ok: true,
+        enabled: false,
+      },
+    )
     expect(mocks.setReminderConsent).toHaveBeenCalledWith(
       expect.objectContaining({ enabled: false }),
     )
@@ -68,7 +76,12 @@ describe('ação da preferência de lembretes', () => {
       enabled: false,
     })
 
-    await expect(setReminderConsentAction(true)).resolves.toEqual({
+    await expect(
+      setReminderConsentAction({
+        enabled: true,
+        referenceDate: '2026-09-16',
+      }),
+    ).resolves.toEqual({
       ok: false,
       enabled: false,
     })

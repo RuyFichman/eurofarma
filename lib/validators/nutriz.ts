@@ -6,6 +6,7 @@ import {
   ufSchema,
   emailSchema,
 } from './common'
+import { formatLocalDate, isValidLocalDate } from '../utils/local-date-time'
 
 /**
  * Formulario publico de cadastro da nutriz (Sprint 4).
@@ -31,32 +32,52 @@ export const nutrizSignupSchema = z.object({
  * Observação de escopo: o `turnstileToken` previsto no LCT-4.3 foi **dispensado**
  * a pedido do time (MVP sem anti-spam por ora — ver TODO no route handler).
  */
-export const nutrizSignupApiSchema = z.object({
-  fullName: stringNotEmptySchema
-    .min(3, 'Informe seu nome completo.')
-    .max(120, 'Nome muito longo.'),
-  // Sprint 6.2: e-mail e senha passaram a ser obrigatórios porque o cadastro
-  // cria uma conta no Supabase Auth, não só um lead. A **coluna** `email`
-  // continua nullable no banco de propósito — perfis criados antes da 6.2 são
-  // leads legítimos sem conta, e inventar um e-mail para eles seria pior que
-  // deixar o campo vazio.
-  email: emailSchema.max(254, 'E-mail muito longo.'),
-  password: z
-    .string()
-    .min(8, 'A senha deve ter pelo menos 8 caracteres.')
-    .max(128, 'A senha deve ter no máximo 128 caracteres.'),
-  phoneWhatsapp: whatsappSchema,
-  state: z.string().trim().toUpperCase().pipe(ufSchema),
-  city: stringNotEmptySchema
-    .min(2, 'Informe sua cidade.')
-    .max(100, 'Cidade invalida.'),
-  lgpdConsent: z.literal(true, {
-    message: 'E necessario aceitar a Politica de Privacidade para continuar.',
-  }),
-  journeyStatusWhatsappOptIn: z.boolean().optional().default(false),
-  reminderWhatsappOptIn: z.boolean().optional().default(false),
-  sourceUtm: z.unknown().optional(),
-})
+export const nutrizSignupApiSchema = z
+  .object({
+    fullName: stringNotEmptySchema
+      .min(3, 'Informe seu nome completo.')
+      .max(120, 'Nome muito longo.'),
+    // Sprint 6.2: e-mail e senha passaram a ser obrigatórios porque o cadastro
+    // cria uma conta no Supabase Auth, não só um lead. A **coluna** `email`
+    // continua nullable no banco de propósito — perfis criados antes da 6.2 são
+    // leads legítimos sem conta, e inventar um e-mail para eles seria pior que
+    // deixar o campo vazio.
+    email: emailSchema.max(254, 'E-mail muito longo.'),
+    password: z
+      .string()
+      .min(8, 'A senha deve ter pelo menos 8 caracteres.')
+      .max(128, 'A senha deve ter no máximo 128 caracteres.'),
+    phoneWhatsapp: whatsappSchema,
+    state: z.string().trim().toUpperCase().pipe(ufSchema),
+    city: stringNotEmptySchema
+      .min(2, 'Informe sua cidade.')
+      .max(100, 'Cidade invalida.'),
+    lgpdConsent: z.literal(true, {
+      message: 'E necessario aceitar a Politica de Privacidade para continuar.',
+    }),
+    journeyStatusWhatsappOptIn: z.boolean().optional().default(false),
+    reminderWhatsappOptIn: z.boolean().optional().default(false),
+    reminderReferenceDate: z.string().optional(),
+    sourceUtm: z.unknown().optional(),
+  })
+  .superRefine((values, context) => {
+    if (!values.reminderWhatsappOptIn) return
+    const date = values.reminderReferenceDate?.trim() ?? ''
+    if (!date) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['reminderReferenceDate'],
+        message: 'Informe uma data de referência para ativar o lembrete.',
+      })
+    } else if (!isValidLocalDate(date) || date > formatLocalDate(new Date())) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['reminderReferenceDate'],
+        message:
+          'Informe uma data de referência válida, que não esteja no futuro.',
+      })
+    }
+  })
 
 export type NutrizSignupApiInput = z.infer<typeof nutrizSignupApiSchema>
 

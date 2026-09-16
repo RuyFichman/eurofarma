@@ -2,6 +2,7 @@ import { WHATSAPP_BOT } from '../i18n/pt-br'
 import { isLactareHandoffOpen } from '../constants/lactare-handoff'
 import type { JourneyStatusValue } from '../journey/status'
 import type { WhatsappCoverageResult } from './coverage'
+import { formatLocalDate, isValidLocalDate } from '../utils/local-date-time'
 
 /** Estados ativos do RF11. */
 export type ActiveConversationStep =
@@ -10,6 +11,7 @@ export type ActiveConversationStep =
   | 'AWAITING_COVERAGE'
   | 'AWAITING_FULL_NAME'
   | 'AWAITING_CONSENT'
+  | 'AWAITING_REMINDER_REFERENCE'
   | 'HUMAN_HANDOFF'
 
 /** Estados preservados apenas para ler conversas criadas pelo fluxo antigo. */
@@ -83,7 +85,11 @@ export type ConversationEffect =
       city: string
       state: string
     }
-  | { kind: 'set_reminder_consent'; enabled: boolean }
+  | {
+      kind: 'set_reminder_consent'
+      enabled: boolean
+      referenceDate?: string
+    }
 
 export type ConversationOutcome = {
   reply: BotReply
@@ -278,10 +284,32 @@ function reminderConsentDecisionOutcome(
     )
   }
 
+  if (enabled) {
+    return outcome({
+      reply: { type: 'text', body: WHATSAPP_BOT.reminders.askReferenceDate },
+      nextStep: 'AWAITING_REMINDER_REFERENCE',
+    })
+  }
+
   return {
     ...buildReminderConsentResultOutcome(enabled),
     effect: { kind: 'set_reminder_consent', enabled },
   }
+}
+
+function parseReminderReferenceDate(
+  value: string | null,
+  now: Date = new Date(),
+): string | null {
+  const text = value?.trim() ?? ''
+  const normalized = /^(\d{2})\/(\d{2})\/(\d{4})$/u.exec(text)
+    ? (() => {
+        const match = /^(\d{2})\/(\d{2})\/(\d{4})$/u.exec(text)
+        return match ? `${match[3]}-${match[2]}-${match[1]}` : ''
+      })()
+    : text
+  if (!isValidLocalDate(normalized)) return null
+  return normalized <= formatLocalDate(now) ? normalized : null
 }
 
 function faqList(body = WHATSAPP_BOT.faq.body): ConversationOutcome {
@@ -423,6 +451,27 @@ export function advanceConversation(
   }
   if (params.replyId === REPLY_IDS.remindersBack) {
     return buildInitialConversationReply(params.profile)
+  }
+  if (params.step === 'AWAITING_REMINDER_REFERENCE') {
+    const referenceDate = parseReminderReferenceDate(params.text, params.now)
+    if (!referenceDate) {
+      return outcome({
+        reply: {
+          type: 'text',
+          body: WHATSAPP_BOT.reminders.invalidReferenceDate,
+        },
+        nextStep: 'AWAITING_REMINDER_REFERENCE',
+      })
+    }
+
+    return {
+      ...buildReminderConsentResultOutcome(true),
+      effect: {
+        kind: 'set_reminder_consent',
+        enabled: true,
+        referenceDate,
+      },
+    }
   }
   const reminderText = params.text?.trim() ?? ''
   if (/^(ativar|quero|receber)\s+lembretes$/iu.test(reminderText)) {
