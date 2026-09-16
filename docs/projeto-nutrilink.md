@@ -386,11 +386,11 @@ O caminho do dado é explícito:
 3. Depois da avaliação, a equipe registra manualmente no painel somente uma categoria de status, como “aguardando resultado”, “apta” ou “não apta”.
 4. O NutriLink registra a mudança de forma auditável e envia automaticamente uma notificação pelo WhatsApp, sem expor detalhes clínicos.
 
-Cada fato do processo tem um responsável. Fatos que somente o Lactare conhece — ficha recebida, exame agendado, resultado avaliado, contato realizado ou kit entregue — são atualizados pela equipe no painel e não devem ser perguntados à nutriz. Fatos que somente a nutriz conhece — se recebeu a visita para entrega do kit, se tem leite disponível ou se quer ativar lembretes — podem ser perguntados diretamente a ela.
+Cada fato do processo tem um responsável. Fatos que somente o Lactare conhece — ficha recebida, exame agendado, resultado avaliado, contato realizado ou kit entregue — são atualizados pela equipe no painel e não devem ser perguntados à nutriz. Fatos que somente a nutriz conhece — se tem leite disponível ou se quer ativar lembretes — podem ser perguntados diretamente a ela.
 
 O sistema guarda apenas o status categórico necessário para dar transparência à jornada. Não guarda tipo de exame, valores, laudo, diagnóstico ou motivo de reprovação. Se uma nutriz marcada como “não apta” quiser compreender o motivo, o atendimento acontece diretamente com a equipe médica do Lactare.
 
-O módulo local de acompanhamento hoje pergunta se a nutriz conseguiu agendar uma visita. Essa pergunta deve ser redimensionada para verificar se ela recebeu a visita da equipe para entrega do kit. A arquitetura de máquina de estados e registro autodeclarado pode ser reaproveitada, mas o texto e a semântica precisam respeitar quem é a fonte de cada informação.
+A entrega do kit é confirmada exclusivamente pela equipe do Lactare no painel administrativo, avançando o status de `KIT_SENT` para `KIT_DELIVERED`. A nutriz não recebe uma pergunta nem altera esse status; na área pessoal, ela apenas visualiza a categoria e a data registradas pelo Lactare. A arquitetura de máquina de estados, histórico append-only e aviso opcional de status é reaproveitada, sempre respeitando a fonte operacional do fato.
 
 Essa funcionalidade depende de disciplina operacional: sem atualização consistente dos status pela equipe do Lactare, a nutriz não recebe os avisos e o produto reproduz a falta de acompanhamento que pretende resolver.
 
@@ -428,7 +428,7 @@ Esses recursos não alteram a decisão de não oferecer agendamento. Datas e vol
 | UC15 | Sistema | Atribuir reconhecimento conforme a jornada avança. |
 | UC16 | Administrador | Atualizar o status categórico da jornada da nutriz, incluindo ficha, exame e kit. |
 | UC17 | Sistema | Notificar a nutriz pelo WhatsApp quando seu status de jornada for atualizado. |
-| UC18 | Nutriz | Informar se recebeu a visita da equipe para entrega do kit, fato que somente ela pode confirmar. |
+| UC18 | Administrador | Registrar no painel a entrega do kit, avançando `KIT_SENT` para `KIT_DELIVERED`; a nutriz apenas visualiza o status registrado. |
 | UC19 | Nutriz | Registrar uma sessão de extração de leite, com data, hora e volume. |
 | UC20 | Nutriz | Exportar seu histórico de doações em PDF. |
 | UC21 | Nutriz | Registrar como se sentiu após uma doação, de forma opcional e não clínica. |
@@ -452,7 +452,7 @@ Esses recursos não alteram a decisão de não oferecer agendamento. Datas e vol
 | CT12 | UC12 | Nutriz sem lembrete ativado | Não recebe mensagem de lembrete. |
 | CT13 | UC13 | Doação confirmada por fonte autorizada | O cartão é gerado e oferecido para compartilhamento, sem recompensa material nem alegação clínica individual não comprovada. |
 | CT14 | UC16 e UC17 | Administrador marca a nutriz como “apta” | O sistema registra a mudança e dispara a notificação pelo WhatsApp sem expor detalhes clínicos. |
-| CT15 | UC18 | O sistema formula uma pergunta à nutriz | Nunca pergunta um fato cuja fonte é exclusivamente o Lactare, como resultado de exame ou entrega registrada do kit. |
+| CT15 | UC18 | Administrador registra a entrega do kit no painel | O sistema aceita somente a transição administrativa válida, grava histórico e exibe `Kit entregue` para a nutriz; nenhuma pergunta ou confirmação é feita pela nutriz. |
 | CT16 | UC19 | Volume acumulado de extrações atinge um patamar relevante | O sistema exibe uma sugestão informativa para avisar a equipe, sem acionar ou confirmar coleta automaticamente. |
 | CT17 | UC20 | Nutriz solicita seu histórico | O sistema gera um PDF somente com os dados da própria nutriz. |
 | CT18 | UC21 | Nutriz não quer registrar bem-estar | O sistema permite seguir sem registro e não trata a ausência como problema ou dado clínico. |
