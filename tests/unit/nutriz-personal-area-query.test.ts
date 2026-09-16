@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
   wellbeingFindMany: vi.fn(),
   wellbeingCreate: vi.fn(),
   wellbeingDeleteMany: vi.fn(),
-  contentFindMany: vi.fn(),
   recognitionFindMany: vi.fn(),
   extractionDeleteMany: vi.fn(),
 }))
@@ -27,7 +26,6 @@ vi.mock('../../lib/db/prisma', () => ({
       create: mocks.wellbeingCreate,
       deleteMany: mocks.wellbeingDeleteMany,
     },
-    educationalContent: { findMany: mocks.contentFindMany },
     nutrizRecognition: { findMany: mocks.recognitionFindMany },
   },
 }))
@@ -53,14 +51,11 @@ describe('consulta dos registros pessoais', () => {
       _count: { _all: 0 },
     })
     mocks.wellbeingFindMany.mockResolvedValue([])
-    mocks.contentFindMany.mockResolvedValue([])
     mocks.recognitionFindMany.mockResolvedValue([])
   })
 
   it('não consulta nem expõe registros com perfil inválido', async () => {
-    await expect(
-      getNutrizPersonalAreaData('não-é-uuid', 'REGISTERED'),
-    ).resolves.toBeNull()
+    await expect(getNutrizPersonalAreaData('não-é-uuid')).resolves.toBeNull()
     expect(mocks.profileFindFirst).not.toHaveBeenCalled()
   })
 
