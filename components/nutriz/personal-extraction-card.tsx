@@ -7,7 +7,7 @@ import { CircleAlert, Droplets, Trash2 } from 'lucide-react'
 import {
   createExtractionLogAction,
   deleteExtractionLogAction,
-} from '@/app/(public)/meu-agendamento/actions'
+} from '@/app/(nutriz)/meu-agendamento/actions'
 import { Button } from '@/components/ui/button'
 import {
   Card,
