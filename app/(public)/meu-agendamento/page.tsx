@@ -13,6 +13,7 @@ import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-
 import { PersonalHistoryCard } from '@/components/nutriz/personal-history-card'
 import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
 import { NutrizRecognitionsCard } from '@/components/nutriz/nutriz-recognitions-card'
+import { NutrizReferralCard } from '@/components/nutriz/nutriz-referral-card'
 import { WellbeingCard } from '@/components/nutriz/wellbeing-card'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,6 +21,7 @@ import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { getNutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
 import { getReminderConsentPreference } from '@/lib/db/queries/communication-consents'
 import { getNutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
+import { getOrCreateNutrizReferralLink } from '@/lib/db/queries/referral-links'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 import { formatDateTimeLocal } from '@/lib/utils/local-date-time'
 
@@ -37,8 +39,11 @@ export default async function NutrizAreaPage() {
   ])
   if (!journey || !reminders) notFound()
 
-  const personal = await getNutrizPersonalAreaData(nutriz.id)
-  if (!personal) notFound()
+  const [personal, referralLink] = await Promise.all([
+    getNutrizPersonalAreaData(nutriz.id),
+    getOrCreateNutrizReferralLink(nutriz.id),
+  ])
+  if (!personal || !referralLink) notFound()
 
   const copy = NUTRIZ_AUTH.area
 
@@ -73,6 +78,8 @@ export default async function NutrizAreaPage() {
         />
 
         <NutrizRecognitionsCard recognitions={personal.recognitions} />
+
+        <NutrizReferralCard code={referralLink.code} />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
           <PersonalExtractionCard

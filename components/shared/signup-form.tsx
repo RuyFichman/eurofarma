@@ -64,6 +64,11 @@ function getCurrentUtmParams(): Record<string, string> {
   return utm
 }
 
+/** Código opaco de indicação; a validação e a atribuição acontecem no servidor. */
+function getCurrentReferralCode(): string | null {
+  return new URLSearchParams(window.location.search).get('indicacao')
+}
+
 /** Extrai `error.fields` (mensagens por campo) de uma resposta de erro da API. */
 function getErrorFields(data: unknown): Record<string, string> | null {
   if (!data || typeof data !== 'object' || !('error' in data)) return null
@@ -133,6 +138,7 @@ export function SignupForm() {
           journeyStatusWhatsappOptIn: values.journeyStatusWhatsappOptIn,
           reminderWhatsappOptIn: values.reminderWhatsappOptIn,
           reminderReferenceDate: values.reminderReferenceDate,
+          referralCode: getCurrentReferralCode(),
           sourceUtm: getCurrentUtmParams(),
         }),
       })

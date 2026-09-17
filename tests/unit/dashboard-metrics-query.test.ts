@@ -70,6 +70,8 @@ describe('métricas administrativas por município', () => {
       ],
       14,
       3,
+      4,
+      2,
       [
         { journeyStatus: 'REGISTERED', _count: { id: 4 } },
         { journeyStatus: 'FORM_RECEIVED', _count: { id: 3 } },
@@ -154,6 +156,10 @@ describe('métricas administrativas por município', () => {
       registrationsInPeriod: 5,
       contactClicksInPeriod: 7,
     })
+    expect(metrics.referrals).toEqual({
+      attributedProfiles: 4,
+      attributedInPeriod: 2,
+    })
     expect(metrics.contactClicks).toEqual({
       total: 21,
       createdInPeriod: 7,
@@ -190,6 +196,8 @@ describe('métricas administrativas por município', () => {
       [],
       3,
       0,
+      1,
+      1,
       [],
       [],
       [],
@@ -256,6 +264,10 @@ describe('métricas administrativas por município', () => {
       activatedInPeriod: 2,
       withdrawnInPeriod: 2,
     })
+    expect(metrics.referrals).toEqual({
+      attributedProfiles: 1,
+      attributedInPeriod: 1,
+    })
   })
 
   it('consulta somente municípios ativos para o recorte regional', async () => {
@@ -263,6 +275,8 @@ describe('métricas administrativas por município', () => {
       0,
       0,
       [],
+      0,
+      0,
       0,
       0,
       [],
@@ -290,6 +304,8 @@ describe('métricas administrativas por município', () => {
       [],
       2,
       1,
+      0,
+      0,
       [],
       [],
       [],
@@ -303,6 +319,11 @@ describe('métricas administrativas por município', () => {
     await getAdminDashboardMetrics(scope)
 
     expect(mocks.nutrizCount).toHaveBeenCalledWith({ where: scope })
+    expect(mocks.nutrizCount).toHaveBeenCalledWith({
+      where: {
+        AND: [scope, { referredByReferralLinkId: { not: null } }],
+      },
+    })
     expect(mocks.nutrizGroupBy).toHaveBeenCalledWith(
       expect.objectContaining({ by: ['journeyStatus'], where: scope }),
     )

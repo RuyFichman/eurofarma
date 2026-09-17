@@ -79,6 +79,10 @@ export type AdminDashboardMetrics = {
     activatedInPeriod: number
     withdrawnInPeriod: number
   }
+  referrals: {
+    attributedProfiles: number
+    attributedInPeriod: number
+  }
 }
 
 function subtractDays(from: Date, days: number): Date {
@@ -100,6 +104,8 @@ export async function getAdminDashboardMetrics(
     activeMunicipalitiesByRegion,
     nutrizTotal,
     nutrizCreatedInPeriod,
+    referredProfiles,
+    referredProfilesInPeriod,
     nutrizByStage,
     nutrizLocations,
     municipalitiesForRegion,
@@ -119,6 +125,20 @@ export async function getAdminDashboardMetrics(
     prisma.nutrizProfile.count({ where: nutrizScope }),
     prisma.nutrizProfile.count({
       where: { AND: [nutrizScope, { createdAt: { gte: since, lte: now } }] },
+    }),
+    prisma.nutrizProfile.count({
+      where: {
+        AND: [nutrizScope, { referredByReferralLinkId: { not: null } }],
+      },
+    }),
+    prisma.nutrizProfile.count({
+      where: {
+        AND: [
+          nutrizScope,
+          { referredByReferralLinkId: { not: null } },
+          { createdAt: { gte: since, lte: now } },
+        ],
+      },
     }),
     prisma.nutrizProfile.groupBy({
       by: ['journeyStatus'],
@@ -301,6 +321,10 @@ export async function getAdminDashboardMetrics(
       adoptionRate: percentOf(enabledProfiles, nutrizTotal),
       activatedInPeriod,
       withdrawnInPeriod,
+    },
+    referrals: {
+      attributedProfiles: referredProfiles,
+      attributedInPeriod: referredProfilesInPeriod,
     },
   }
 }

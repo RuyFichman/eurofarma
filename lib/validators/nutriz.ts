@@ -7,6 +7,7 @@ import {
   emailSchema,
 } from './common'
 import { formatLocalDate, isValidLocalDate } from '../utils/local-date-time'
+import { normalizeReferralCode } from '../referrals/code'
 
 /**
  * Formulario publico de cadastro da nutriz (Sprint 4).
@@ -58,6 +59,7 @@ export const nutrizSignupApiSchema = z
     journeyStatusWhatsappOptIn: z.boolean().optional().default(false),
     reminderWhatsappOptIn: z.boolean().optional().default(false),
     reminderReferenceDate: z.string().optional(),
+    referralCode: z.unknown().transform(normalizeReferralCode).optional(),
     sourceUtm: z.unknown().optional(),
   })
   .superRefine((values, context) => {

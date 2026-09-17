@@ -226,20 +226,38 @@ model NutrizProfile {
   createdAt         DateTime          @default(now()) @map("created_at")
   updatedAt         DateTime          @updatedAt @map("updated_at")
 
-  contactIntents        ContactIntent[]
-  whatsappClicks        WhatsappClick[]
-  appointments          Appointment[]
-  conversations         WhatsappConversation[]
-  journeyHistory        JourneyStatusHistory[]
-  communicationConsents CommunicationConsentEvent[]
-  notificationOutbox    NotificationOutbox[]
-  extractionLogs         ExtractionLog[]
-  wellbeingEntries       WellbeingEntry[]
-  recognitions           NutrizRecognition[]
+  contactIntents           ContactIntent[]
+  whatsappClicks           WhatsappClick[]
+  appointments             Appointment[]
+  conversations            WhatsappConversation[]
+  journeyHistory           JourneyStatusHistory[]
+  communicationConsents    CommunicationConsentEvent[]
+  notificationOutbox       NotificationOutbox[]
+  extractionLogs           ExtractionLog[]
+  wellbeingEntries         WellbeingEntry[]
+  recognitions             NutrizRecognition[]
+  referralLink             ReferralLink?               @relation("NutrizReferralLink")
+  referredByReferralLink   ReferralLink?               @relation("NutrizReferralAttribution", fields: [referredByReferralLinkId], references: [id], onDelete: SetNull)
+  referredByReferralLinkId String?                     @map("referred_by_referral_link_id")
 
   @@index([state, city, createdAt])
   @@index([journeyStatus, createdAt])
+  @@index([referredByReferralLinkId])
   @@map("nutriz_profiles")
+}
+
+/// Link opaco e estável, criado pela própria nutriz na Minha Área. O vínculo
+/// resultante serve apenas para atribuição de cadastro, sem recompensa material.
+model ReferralLink {
+  id              String   @id @default(uuid())
+  nutrizProfileId String   @unique @map("nutriz_profile_id")
+  code            String   @unique
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  nutrizProfile    NutrizProfile   @relation("NutrizReferralLink", fields: [nutrizProfileId], references: [id], onDelete: Cascade)
+  referredProfiles NutrizProfile[] @relation("NutrizReferralAttribution")
+
+  @@map("referral_links")
 }
 
 /// Registro pessoal da nutriz. Não representa doação, coleta ou agendamento.
