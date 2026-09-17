@@ -133,6 +133,7 @@ export async function POST(request: NextRequest) {
     journeyStatusWhatsappOptIn,
     reminderWhatsappOptIn,
     reminderReferenceDate,
+    referralCode,
     sourceUtm,
   } = parsed.data
   const reminderReferenceDateValue = reminderReferenceDate
@@ -232,6 +233,17 @@ export async function POST(request: NextRequest) {
               ...profileData,
               phoneWhatsapp,
               sourceUtm: utmValue ?? Prisma.JsonNull,
+              referredByReferralLinkId: referralCode
+                ? ((
+                    await transaction.referralLink.findFirst({
+                      where: {
+                        code: referralCode,
+                        nutrizProfile: { deletedAt: null },
+                      },
+                      select: { id: true },
+                    })
+                  )?.id ?? null)
+                : null,
             },
             select: { id: true },
           })

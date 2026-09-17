@@ -7,6 +7,7 @@ import {
   MapPin,
   MousePointerClick,
   Radio,
+  Share2,
   TrendingUp,
   UserPlus,
 } from 'lucide-react'
@@ -39,6 +40,7 @@ export function DashboardOverview({
     journey,
     retention,
     reminders,
+    referrals,
   } = metrics
 
   return (
@@ -177,9 +179,25 @@ export function DashboardOverview({
                 : COPY.metrics.reminders.empty
             }
           />
+          <AdminStatCard
+            icon={Share2}
+            label={COPY.metrics.referrals.label}
+            value={referrals.attributedProfiles}
+            description={
+              referrals.attributedProfiles > 0
+                ? COPY.metrics.referrals.description
+                    .replace(
+                      '{count}',
+                      formatCount(referrals.attributedInPeriod),
+                    )
+                    .replace('{days}', String(periodDays))
+                : COPY.metrics.referrals.empty
+            }
+          />
         </dl>
         <p className="text-muted-foreground mt-3 text-sm">
           {COPY.metrics.retention.note} {COPY.metrics.reminders.note}{' '}
+          {COPY.metrics.referrals.note}{' '}
           {COPY.metrics.reminders.activity
             .replace('{activated}', formatCount(reminders.activatedInPeriod))
             .replace('{withdrawn}', formatCount(reminders.withdrawnInPeriod))

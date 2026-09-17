@@ -1068,6 +1068,17 @@ export const NUTRIZ_AUTH = {
         },
       },
     },
+    referral: {
+      title: 'Indique o NutriLink',
+      description:
+        'Compartilhe seu link com outras nutrizes interessadas em conhecer o Lactare.',
+      linkLabel: 'Seu link de indicação',
+      copyAction: 'Copiar link',
+      copiedFeedback: 'Link copiado.',
+      copyError: 'Não foi possível copiar agora. Selecione e copie o link.',
+      safetyNotice:
+        'O link só registra a origem de um novo cadastro para fins de métrica. Ele não gera recompensa material, não confirma atendimento nem informa dados sobre outras pessoas.',
+    },
     personal: {
       validation: {
         recordedAtInvalid: 'Informe uma data e hora válidas.',
@@ -1854,6 +1865,12 @@ export const ADMIN = {
         activity:
           '{activated} ativações e {withdrawn} retiradas nos últimos {days} dias',
         note: 'O indicador mede consentimento vigente, não mensagens entregues. A entrega real pelo WhatsApp depende da integração com a Meta.',
+      },
+      referrals: {
+        label: 'Cadastros por indicação',
+        description: '{count} nos últimos {days} dias',
+        empty: 'Nenhum cadastro por indicação foi registrado',
+        note: 'A indicação mede apenas a origem do novo cadastro por link próprio; não cria recompensa material nem confirma doação.',
       },
     },
 

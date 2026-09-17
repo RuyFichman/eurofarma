@@ -130,7 +130,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 | RF12 | Gerar um cartão de impacto compartilhável após cada doação confirmada. |
 | RF13 | Gerar uma mensagem de encaminhamento pronta para a nutriz compartilhar com outras pessoas. |
 | RF14 | Atribuir e exibir reconhecimentos por status, como “primeira doação”, “doadora recorrente” e “embaixadora”, na área pessoal da nutriz. |
-| RF15 | Registrar quando um cadastro novo se origina de uma indicação, para fins de métrica, sem vincular a recompensa material. |
+| RF15 | Registrar quando um cadastro novo se origina de um link próprio de indicação, para fins de métrica de first-touch, sem vincular a recompensa material. |
 | RF16 | Permitir que o administrador atualize o status categórico da jornada da nutriz — ficha preenchida, exame agendado, aguardando resultado, apta ou não apta, kit entregue e apta a doações recorrentes — sem armazenar detalhes clínicos. |
 | RF17 | Notificar automaticamente a nutriz pelo WhatsApp sempre que o administrador atualizar seu status de jornada. |
 | RF19 | Permitir que a nutriz registre suas sessões de extração de leite, com data, hora e volume, para uso pessoal. |
@@ -401,6 +401,7 @@ As funcionalidades abaixo foram incluídas como evolução de menor prioridade q
 2. **Exportação do histórico em PDF:** a nutriz pode baixar seu histórico de doações como registro pessoal. O arquivo deve conter somente dados pertencentes à própria nutriz.
 3. **Registro opcional de bem-estar:** após uma doação, a nutriz pode registrar como se sentiu usando opções simples. Esse registro não é diário clínico, avaliação de saúde nem ferramenta terapêutica.
 4. **Conteúdo educativo por estágio:** a Minha Área pode destacar conteúdos adequados ao status atual, como orientações para quem aguarda resultado ou para quem já está em doações recorrentes. A sugestão não pode inferir diagnóstico ou substituir orientação do Lactare.
+5. **Indicação por link próprio:** a nutriz pode copiar um link opaco gerado na Minha Área. Somente um novo cadastro que apresente um código válido é atribuído ao link para fins de métrica; isso não gera recompensa material, atendimento, coleta ou mudança automática de status.
 
 Esses recursos não alteram a decisão de não oferecer agendamento. Datas e volumes são registros da nutriz ou referências informativas; qualquer coleta, visita ou atendimento continua sendo combinado diretamente com a equipe do Lactare.
 
