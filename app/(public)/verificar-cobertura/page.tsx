@@ -13,7 +13,8 @@ export const metadata: Metadata = {
   description: COVERAGE.meta.description,
 }
 
-export const dynamic = 'force-dynamic'
+/** Revalidada imediatamente pelo painel e, como salvaguarda, a cada hora. */
+export const revalidate = 3600
 
 export default async function CoveragePage() {
   let municipalities: PublicServiceMunicipality[]

@@ -88,13 +88,14 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última suíte completa contra o Supabase cloud passou com **569 testes em 77 arquivos**. Após o teste do cache de autenticação por requisição, a suíte unitária local passa com **492 testes em 68 arquivos**; a suíte completa no cloud ainda não foi repetida neste branch. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última suíte completa contra o Supabase cloud passou com **569 testes em 77 arquivos**. Após os testes do cache público de municípios e de sua invalidação administrativa, a suíte unitária local passa com **498 testes em 70 arquivos**; a suíte completa no cloud ainda não foi repetida neste branch. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
 - Scaffold Next.js e design system.
 - Landing pública, página “Sobre”, conteúdo educativo e style guide.
 - Página pública de verificação de cobertura por CEP ou município em `/verificar-cobertura`, com os 30 municípios do Lactare agrupados em seis sub-regiões.
+- A lista ativa de municípios usada pela página pública, pela API de cidades, pela verificação de CEP e pelo chatbot compartilha um cache de uma hora. Criação e edição no painel invalidam a tag e as superfícies públicas imediatamente; respostas que contêm o CEP informado continuam `no-store`.
 - Resolução de CEP pelo ViaCEP em `POST /api/coverage`, seguida da comparação com a lista ativa de `service_municipalities`; o CEP não é persistido.
 - Resposta transparente para localização fora da lista, com encaminhamento ao diretório oficial externo da rBLH.
 - Contato direto após cobertura positiva, com WhatsApp `+55 (11) 96629-0681`, telefone `(11) 4144-9604` e horário de segunda a sexta, das 7h às 22h. Os canais foram conferidos no site oficial do Lactare em 14 de setembro de 2026; a interface mantém link para a fonte e não representa confirmação de atendimento ou coleta.
@@ -219,7 +220,7 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Última suíte completa no cloud: 569 em 77 arquivos; suíte unitária local atual: 492 em 68 arquivos. |
+| Testes | Vitest | Última suíte completa no cloud: 569 em 77 arquivos; suíte unitária local atual: 498 em 70 arquivos. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
