@@ -33,17 +33,13 @@ export const metadata: Metadata = {
 
 export default async function NutrizAreaPage() {
   const nutriz = await requireNutrizUser()
-  const [journey, reminders] = await Promise.all([
+  const [journey, reminders, personal, referralLink] = await Promise.all([
     getNutrizJourneySnapshot(nutriz.id),
     getReminderConsentPreference(nutriz.id),
-  ])
-  if (!journey || !reminders) notFound()
-
-  const [personal, referralLink] = await Promise.all([
     getNutrizPersonalAreaData(nutriz.id),
     getOrCreateNutrizReferralLink(nutriz.id),
   ])
-  if (!personal || !referralLink) notFound()
+  if (!journey || !reminders || !personal || !referralLink) notFound()
 
   const copy = NUTRIZ_AUTH.area
 

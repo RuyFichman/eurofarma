@@ -88,7 +88,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **569 testes em 77 arquivos**. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última suíte completa contra o Supabase cloud passou com **569 testes em 77 arquivos**. Após o teste do cache de autenticação por requisição, a suíte unitária local passa com **492 testes em 68 arquivos**; a suíte completa no cloud ainda não foi repetida neste branch. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
@@ -219,7 +219,7 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Suíte completa no cloud: 569 em 77 arquivos. |
+| Testes | Vitest | Última suíte completa no cloud: 569 em 77 arquivos; suíte unitária local atual: 492 em 68 arquivos. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -327,6 +327,7 @@ tests/
 - Prefira Server Components.
 - Use Client Components somente para estado, eventos, APIs do navegador ou bibliotecas que os exijam.
 - Isole a menor parte interativa possível.
+- `getCurrentUser()` e `getNutrizAccess()` usam o `cache` do React para deduplicar autenticação somente dentro da mesma renderização. Não substituir a chamada de `requireNutrizUser()` nas Server Actions: cada mutação deve revalidar sessão e perfil em sua própria requisição.
 - Consultas ficam em lib/db/queries.
 - Validação compartilhada deve ficar fora de componentes e, quando possível, ser Prisma-free.
 

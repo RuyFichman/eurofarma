@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { cache } from 'react'
 
 import { prisma } from '../db/prisma'
 import { getCurrentUser } from './get-current-user'
@@ -37,7 +38,7 @@ function firstNameOf(fullName: string): string {
  * entra na consulta, não é filtro opcional: quem pediu exclusão não volta a
  * acessar a área só porque o cookie ainda é válido.
  */
-export async function getNutrizAccess(): Promise<NutrizAccess> {
+async function resolveNutrizAccess(): Promise<NutrizAccess> {
   const user = await getCurrentUser()
   if (!user) return { status: 'unauthenticated' }
 
@@ -67,6 +68,13 @@ export async function getNutrizAccess(): Promise<NutrizAccess> {
     },
   }
 }
+
+/**
+ * Deduplica o gate quando layout e página o chamam na mesma renderização.
+ * `cache` não persiste autorização entre requisições e não substitui a nova
+ * checagem obrigatória feita por cada Server Action.
+ */
+export const getNutrizAccess = cache(resolveNutrizAccess)
 
 /**
  * Exige sessão **de nutriz**. Use no layout da área protegida.
