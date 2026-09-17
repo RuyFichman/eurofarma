@@ -1076,6 +1076,17 @@ export const NUTRIZ_AUTH = {
       copyAction: 'Copiar link',
       copiedFeedback: 'Link copiado.',
       copyError: 'Não foi possível copiar agora. Selecione e copie o link.',
+      messageTitle: 'Mensagem pronta para compartilhar',
+      messageDescription:
+        'Você pode adaptar o texto antes de compartilhar com quem quiser.',
+      messageLabel: 'Mensagem de indicação',
+      messageTemplate:
+        'Oi! Conheci o NutriLink, uma iniciativa do Lactare para orientar a doação de leite humano na Grande São Paulo. Se você amamenta e quer verificar se sua cidade é atendida, acesse: {link}',
+      copyMessageAction: 'Copiar mensagem',
+      messageCopiedFeedback: 'Mensagem copiada.',
+      sendWhatsappAction: 'Abrir no WhatsApp',
+      sharingNotice:
+        'O envio é sempre uma escolha sua. O NutriLink não envia mensagens automaticamente nem informa dados sobre outras pessoas.',
       safetyNotice:
         'O link só registra a origem de um novo cadastro para fins de métrica. Ele não gera recompensa material, não confirma atendimento nem informa dados sobre outras pessoas.',
     },

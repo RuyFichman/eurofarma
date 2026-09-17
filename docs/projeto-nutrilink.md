@@ -226,7 +226,6 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 
 - RF06: entrega real pela Meta. Opt-in, cancelamento e regra do job de enfileiramento já estão implementados; o job não cria nem confirma agendamento.
 - RF12: cartão de impacto após confirmação legítima da doação.
-- RF13: mensagem pronta de encaminhamento com link de indicação.
 - RF14: reconhecimento por status na área pessoal. Reconhecimentos objetivos já estão implementados; ainda não há reconhecimento derivado de indicação.
 - RF15: atribuição específica de novos cadastros por indicação.
 - RF17: retirada e reconcessão do opt-in e entrega real por template aprovado da Meta. A base transacional, o processador e o simulador estão implementados, e a migration da outbox está aplicada no Supabase cloud.
@@ -246,7 +245,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 1. Implementar retirada e reconcessão do opt-in de avisos na área autenticada e no chatbot; o modelo append-only já suporta os dois eventos.
 2. Ligar a entrega real dos lembretes e a operação humana do handoff à infraestrutura da Meta.
 3. Evoluir o dashboard com eventos de entrega/adesão efetiva, recorrência e os segmentos que dependem de indicação e confirmação legítima de doação. Retorno observável, adesão vigente, alcance, cliques de contato e funil do `JourneyStatus` já estão implementados.
-4. Definir a confirmação de doação e, depois disso, implementar cartão, mensagem de indicação e reconhecimento derivado de indicação. Os reconhecimentos por status já estão implementados com base categórica e sem alegação clínica.
+4. Definir a confirmação de doação e, depois disso, implementar cartão e reconhecimento derivado de indicação. A mensagem de indicação já usa apenas o link próprio da nutriz e depende de ação explícita dela para copiar ou abrir o WhatsApp; os reconhecimentos por status permanecem baseados em categorias, sem alegação clínica.
 5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
 6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
