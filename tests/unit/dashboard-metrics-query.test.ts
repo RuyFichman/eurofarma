@@ -1,41 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
-  municipalityCount: vi.fn(),
   municipalityGroupBy: vi.fn(),
-  municipalityFindMany: vi.fn(),
   nutrizCount: vi.fn(),
   nutrizGroupBy: vi.fn(),
-  nutrizFindMany: vi.fn(),
-  contactClickCount: vi.fn(),
   contactClickGroupBy: vi.fn(),
-  consentFindMany: vi.fn(),
-  journeyHistoryFindMany: vi.fn(),
+  queryRaw: vi.fn(),
   transaction: vi.fn(),
 }))
 
 vi.mock('../../lib/db/prisma', () => ({
   prisma: {
-    serviceMunicipality: {
-      count: mocks.municipalityCount,
-      groupBy: mocks.municipalityGroupBy,
-      findMany: mocks.municipalityFindMany,
-    },
+    serviceMunicipality: { groupBy: mocks.municipalityGroupBy },
     nutrizProfile: {
       count: mocks.nutrizCount,
       groupBy: mocks.nutrizGroupBy,
-      findMany: mocks.nutrizFindMany,
     },
-    contactChannelClick: {
-      count: mocks.contactClickCount,
-      groupBy: mocks.contactClickGroupBy,
-    },
-    communicationConsentEvent: {
-      findMany: mocks.consentFindMany,
-    },
-    journeyStatusHistory: {
-      findMany: mocks.journeyHistoryFindMany,
-    },
+    contactChannelClick: { groupBy: mocks.contactClickGroupBy },
+    $queryRaw: mocks.queryRaw,
     $transaction: mocks.transaction,
   },
 }))
@@ -45,112 +27,144 @@ import {
   MUNICIPALITY_STATUS_KEYS,
 } from '../../lib/db/queries/dashboard-metrics'
 
-describe('métricas administrativas por município', () => {
+const EMPTY_TRANSACTION_RESULT = [
+  [],
+  [],
+  [
+    {
+      total: 0n,
+      created_in_period: 0n,
+      referred: 0n,
+      referred_in_period: 0n,
+      retention_cohort: 0n,
+    },
+  ],
+  0,
+  [],
+  [],
+  [
+    {
+      reminders_enabled: 0n,
+      reminders_activated: 0n,
+      reminders_withdrawn: 0n,
+      retained_profiles: 0n,
+    },
+  ],
+] as const
+
+describe('métricas administrativas otimizadas', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.municipalityCount.mockReturnValue(undefined)
     mocks.municipalityGroupBy.mockReturnValue(undefined)
-    mocks.municipalityFindMany.mockReturnValue(undefined)
     mocks.nutrizCount.mockReturnValue(undefined)
     mocks.nutrizGroupBy.mockReturnValue(undefined)
-    mocks.nutrizFindMany.mockReturnValue(undefined)
-    mocks.contactClickCount.mockReturnValue(undefined)
     mocks.contactClickGroupBy.mockReturnValue(undefined)
-    mocks.consentFindMany.mockResolvedValue([])
-    mocks.journeyHistoryFindMany.mockResolvedValue([])
+    mocks.queryRaw.mockReturnValue(undefined)
+    mocks.transaction.mockResolvedValue(EMPTY_TRANSACTION_RESULT)
   })
 
-  it('calcula ativos, inativos e preenche regiões sem registros com zero', async () => {
+  it('deriva totais e distribuições de agregações compactas', async () => {
     mocks.transaction.mockResolvedValue([
-      30,
-      28,
       [
-        { region: 'WEST', _count: { id: 9 } },
-        { region: 'ABC', _count: { id: 7 } },
+        { isActive: true, region: 'WEST', _count: { id: 21 } },
+        { isActive: true, region: 'ABC', _count: { id: 7 } },
+        { isActive: false, region: 'CAPITAL', _count: { id: 2 } },
       ],
-      14,
-      3,
-      4,
-      2,
       [
-        { journeyStatus: 'REGISTERED', _count: { id: 4 } },
-        { journeyStatus: 'FORM_RECEIVED', _count: { id: 3 } },
-        { journeyStatus: 'EXAM_SCHEDULED', _count: { id: 2 } },
-        { journeyStatus: 'AWAITING_RESULT', _count: { id: 1 } },
-        { journeyStatus: 'ELIGIBLE', _count: { id: 1 } },
-        { journeyStatus: 'NOT_ELIGIBLE', _count: { id: 1 } },
-        { journeyStatus: 'KIT_DELIVERED', _count: { id: 1 } },
+        {
+          journeyStatus: 'REGISTERED',
+          dashboardRegion: 'WEST',
+          _count: { id: 4 },
+        },
+        {
+          journeyStatus: 'FORM_RECEIVED',
+          dashboardRegion: 'ABC',
+          _count: { id: 3 },
+        },
+        {
+          journeyStatus: 'EXAM_SCHEDULED',
+          dashboardRegion: null,
+          _count: { id: 2 },
+        },
+        {
+          journeyStatus: 'AWAITING_RESULT',
+          dashboardRegion: 'WEST',
+          _count: { id: 1 },
+        },
+        {
+          journeyStatus: 'ELIGIBLE',
+          dashboardRegion: 'WEST',
+          _count: { id: 1 },
+        },
+        {
+          journeyStatus: 'NOT_ELIGIBLE',
+          dashboardRegion: null,
+          _count: { id: 1 },
+        },
+        {
+          journeyStatus: 'KIT_DELIVERED',
+          dashboardRegion: 'ABC',
+          _count: { id: 1 },
+        },
         {
           journeyStatus: 'RECURRING_DONATION_ELIGIBLE',
+          dashboardRegion: 'WEST',
           _count: { id: 1 },
         },
       ],
       [
-        { state: 'SP', city: 'Itapevi' },
-        { state: 'SP', city: 'Santo André' },
-        { state: 'RJ', city: 'Niterói' },
-      ],
-      [
-        { state: 'SP', name: 'Itapevi', region: 'WEST' },
-        { state: 'SP', name: 'Santo Andre', region: 'ABC' },
+        {
+          total: 14n,
+          created_in_period: 3n,
+          referred: 4n,
+          referred_in_period: 2n,
+          retention_cohort: 0n,
+        },
       ],
       5,
-      21,
-      7,
       [
         { channel: 'WHATSAPP', _count: { id: 15 } },
         { channel: 'PHONE', _count: { id: 6 } },
       ],
-      0,
+      [
+        { channel: 'WHATSAPP', _count: { id: 4 } },
+        { channel: 'PHONE', _count: { id: 3 } },
+      ],
+      [
+        {
+          reminders_enabled: 0n,
+          reminders_activated: 0n,
+          reminders_withdrawn: 0n,
+          retained_profiles: 0n,
+        },
+      ],
     ])
 
     const metrics = await getAdminDashboardMetrics()
 
-    expect(metrics.municipalities.total).toBe(30)
-    expect(metrics.municipalities.active).toBe(28)
-    expect(metrics.municipalities.regionsCovered).toBe(2)
+    expect(metrics.municipalities).toMatchObject({
+      total: 30,
+      active: 28,
+      regionsCovered: 2,
+      byStatus: [
+        { key: 'ACTIVE', count: 28 },
+        { key: 'INACTIVE', count: 2 },
+      ],
+    })
     expect(metrics.municipalities.byStatus.map((item) => item.key)).toEqual([
       ...MUNICIPALITY_STATUS_KEYS,
     ])
-    expect(metrics.municipalities.byStatus).toEqual([
-      { key: 'ACTIVE', count: 28 },
-      { key: 'INACTIVE', count: 2 },
+    expect(metrics.nutriz.total).toBe(14)
+    expect(metrics.nutriz.createdInPeriod).toBe(3)
+    expect(metrics.nutriz.byRegion).toEqual([
+      { key: 'CAPITAL', count: 0 },
+      { key: 'WEST', count: 7 },
+      { key: 'SOUTHWEST', count: 0 },
+      { key: 'ABC', count: 4 },
+      { key: 'NORTH', count: 0 },
+      { key: 'EAST_ALTO_TIETE', count: 0 },
+      { key: 'OUTSIDE_OR_UNMAPPED', count: 3 },
     ])
-    expect(
-      metrics.municipalities.byRegion.find((item) => item.key === 'CAPITAL')
-        ?.count,
-    ).toBe(0)
-    expect(
-      metrics.municipalities.byRegion.find((item) => item.key === 'WEST')
-        ?.count,
-    ).toBe(9)
-    expect(metrics.nutriz).toEqual({
-      total: 14,
-      createdInPeriod: 3,
-      byRegion: [
-        { key: 'CAPITAL', count: 0 },
-        { key: 'WEST', count: 1 },
-        { key: 'SOUTHWEST', count: 0 },
-        { key: 'ABC', count: 1 },
-        { key: 'NORTH', count: 0 },
-        { key: 'EAST_ALTO_TIETE', count: 0 },
-        { key: 'OUTSIDE_OR_UNMAPPED', count: 1 },
-      ],
-      byStage: [
-        { key: 'REGISTERED', count: 4 },
-        { key: 'DOCUMENT_SENT', count: 0 },
-        { key: 'FORM_RECEIVED', count: 3 },
-        { key: 'EXAM_SCHEDULED', count: 2 },
-        { key: 'EXAMS_COMPLETED', count: 0 },
-        { key: 'AWAITING_RESULT', count: 1 },
-        { key: 'ELIGIBLE', count: 1 },
-        { key: 'NOT_ELIGIBLE', count: 1 },
-        { key: 'KIT_SENT', count: 0 },
-        { key: 'KIT_DELIVERED', count: 1 },
-        { key: 'DONATION_CONFIRMED', count: 0 },
-        { key: 'RECURRING_DONATION_ELIGIBLE', count: 1 },
-      ],
-    })
     expect(metrics.reach).toEqual({
       signalsInPeriod: 12,
       registrationsInPeriod: 5,
@@ -169,88 +183,38 @@ describe('métricas administrativas por município', () => {
       ],
     })
     expect(metrics.journey.overallConversion).toBe(7)
-    expect(metrics.journey.notEligible).toBe(1)
-    expect(metrics.retention).toEqual({
-      cohortProfiles: 0,
-      retainedProfiles: 0,
-      rate: 0,
-    })
-    expect(metrics.reminders).toEqual({
-      eligibleProfiles: 14,
-      enabledProfiles: 0,
-      adoptionRate: 0,
-      activatedInPeriod: 0,
-      withdrawnInPeriod: 0,
-    })
   })
 
-  it('calcula retorno observavel e adesao pelo consentimento mais recente', async () => {
-    const now = new Date('2026-09-16T12:00:00.000Z')
-    const oldProfile = new Date('2026-07-01T12:00:00.000Z')
-    const recentProfile = new Date('2026-09-01T12:00:00.000Z')
-    const eventDate = new Date('2026-09-10T12:00:00.000Z')
-
+  it('recebe retenção e adesão já agregadas pelo banco', async () => {
     mocks.transaction.mockResolvedValue([
-      0,
-      0,
-      [],
-      3,
-      0,
-      1,
-      1,
       [],
       [],
+      [
+        {
+          total: 3n,
+          created_in_period: 0n,
+          referred: 1n,
+          referred_in_period: 1n,
+          retention_cohort: 2n,
+        },
+      ],
+      0,
       [],
-      0,
-      0,
-      0,
       [],
-      2,
-    ])
-    mocks.consentFindMany.mockResolvedValue([
-      {
-        nutrizProfileId: 'profile-2',
-        decision: 'WITHDRAWN',
-        sequence: 4n,
-        recordedAt: eventDate,
-        nutrizProfile: { createdAt: oldProfile },
-      },
-      {
-        nutrizProfileId: 'profile-3',
-        decision: 'GRANTED',
-        sequence: 3n,
-        recordedAt: eventDate,
-        nutrizProfile: { createdAt: recentProfile },
-      },
-      {
-        nutrizProfileId: 'profile-1',
-        decision: 'GRANTED',
-        sequence: 2n,
-        recordedAt: eventDate,
-        nutrizProfile: { createdAt: oldProfile },
-      },
-      {
-        nutrizProfileId: 'profile-1',
-        decision: 'WITHDRAWN',
-        sequence: 1n,
-        recordedAt: eventDate,
-        nutrizProfile: { createdAt: oldProfile },
-      },
-    ])
-    mocks.journeyHistoryFindMany.mockResolvedValue([
-      {
-        nutrizProfileId: 'profile-1',
-        changedAt: eventDate,
-        nutrizProfile: { createdAt: oldProfile },
-      },
-      {
-        nutrizProfileId: 'profile-2',
-        changedAt: eventDate,
-        nutrizProfile: { createdAt: oldProfile },
-      },
+      [
+        {
+          reminders_enabled: 2n,
+          reminders_activated: 2n,
+          reminders_withdrawn: 2n,
+          retained_profiles: 2n,
+        },
+      ],
     ])
 
-    const metrics = await getAdminDashboardMetrics({ deletedAt: null }, now)
+    const metrics = await getAdminDashboardMetrics(
+      {},
+      new Date('2026-09-16T12:00:00.000Z'),
+    )
 
     expect(metrics.retention).toEqual({
       cohortProfiles: 2,
@@ -264,72 +228,49 @@ describe('métricas administrativas por município', () => {
       activatedInPeriod: 2,
       withdrawnInPeriod: 2,
     })
-    expect(metrics.referrals).toEqual({
-      attributedProfiles: 1,
-      attributedInPeriod: 1,
-    })
   })
 
-  it('consulta somente municípios ativos para o recorte regional', async () => {
-    mocks.transaction.mockResolvedValue([
-      0,
-      0,
-      [],
-      0,
-      0,
-      0,
-      0,
-      [],
-      [],
-      [],
-      0,
-      0,
-      0,
-      [],
-      0,
-    ])
-
+  it('reduz o dashboard a sete operações agregadas na mesma transação', async () => {
     await getAdminDashboardMetrics()
 
-    expect(mocks.municipalityGroupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { isActive: true } }),
-    )
+    expect(mocks.transaction).toHaveBeenCalledOnce()
+    expect(mocks.transaction.mock.calls[0]?.[0]).toHaveLength(7)
+    expect(mocks.municipalityGroupBy).toHaveBeenCalledWith({
+      by: ['isActive', 'region'],
+      _count: { id: true },
+    })
+    expect(mocks.nutrizGroupBy).toHaveBeenCalledWith({
+      by: ['journeyStatus', 'dashboardRegion'],
+      where: { deletedAt: null },
+      _count: { id: true },
+    })
+    expect(mocks.queryRaw).toHaveBeenCalledTimes(2)
   })
 
-  it('aplica o mesmo recorte aos indicadores e distribuições de nutrizes', async () => {
-    const scope = { journeyStatus: 'KIT_DELIVERED', deletedAt: null } as const
-    mocks.transaction.mockResolvedValue([
-      0,
-      0,
-      [],
-      2,
-      1,
-      0,
-      0,
-      [],
-      [],
-      [],
-      0,
-      0,
-      0,
-      [],
-      0,
-    ])
+  it('aplica o mesmo recorte indexável aos grupos e agregações SQL', async () => {
+    const scope = {
+      stage: 'KIT_DELIVERED',
+      region: 'ABC',
+      origin: 'WEB',
+    } as const
 
     await getAdminDashboardMetrics(scope)
 
-    expect(mocks.nutrizCount).toHaveBeenCalledWith({ where: scope })
-    expect(mocks.nutrizCount).toHaveBeenCalledWith({
-      where: {
-        AND: [scope, { referredByReferralLinkId: { not: null } }],
-      },
-    })
     expect(mocks.nutrizGroupBy).toHaveBeenCalledWith(
-      expect.objectContaining({ by: ['journeyStatus'], where: scope }),
+      expect.objectContaining({
+        where: {
+          deletedAt: null,
+          journeyStatus: 'KIT_DELIVERED',
+          dashboardRegion: 'ABC',
+          registrationOrigin: 'WEB',
+        },
+      }),
     )
-    expect(mocks.nutrizFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: scope }),
-    )
+    for (const [query] of mocks.queryRaw.mock.calls) {
+      expect(query.values).toEqual(
+        expect.arrayContaining(['KIT_DELIVERED', 'ABC', 'WEB']),
+      )
+    }
     expect(mocks.contactClickGroupBy).toHaveBeenCalledWith({
       by: ['channel'],
       _count: { id: true },

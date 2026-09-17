@@ -1,11 +1,11 @@
-import type {
-  ContactChannel,
-  JourneyStatus,
-  ServiceRegion,
+import {
+  Prisma,
+  type ContactChannel,
+  type JourneyStatus,
+  type ServiceRegion,
 } from '@prisma/client'
 
 import {
-  buildDashboardLocationKey,
   DASHBOARD_STAGE_VALUES,
   type DashboardStage,
 } from '../../admin/dashboard/filters'
@@ -20,7 +20,11 @@ import {
 } from '../../constants/service-municipalities'
 import { JOURNEY_STATUS_VALUES } from '../../journey/status'
 import { prisma } from '../prisma'
-import type { DashboardNutrizScope } from './dashboard-segmentation'
+import {
+  dashboardNutrizSqlWhere,
+  type DashboardNutrizScope,
+  toDashboardNutrizWhere,
+} from './dashboard-segmentation'
 import { percentOf } from '../../utils/format-number'
 
 export const DASHBOARD_PERIOD_DAYS = 30
@@ -91,115 +95,192 @@ function subtractDays(from: Date, days: number): Date {
   return result
 }
 
+type DashboardProfileSummaryRow = {
+  total: bigint
+  created_in_period: bigint
+  referred: bigint
+  referred_in_period: bigint
+  retention_cohort: bigint
+}
+
+type DashboardActivityRow = {
+  reminders_enabled: bigint
+  reminders_activated: bigint
+  reminders_withdrawn: bigint
+  retained_profiles: bigint
+}
+
+function toCount(value: bigint | number | undefined): number {
+  return Number(value ?? 0)
+}
+
 export async function getAdminDashboardMetrics(
-  nutrizScope: DashboardNutrizScope = { deletedAt: null },
+  nutrizScope: DashboardNutrizScope = {},
   now = new Date(),
 ): Promise<AdminDashboardMetrics> {
   const since = subtractDays(now, DASHBOARD_PERIOD_DAYS)
   const retentionSince = subtractDays(now, DASHBOARD_RETENTION_DAYS)
+  const nutrizWhere = toDashboardNutrizWhere(nutrizScope)
+  const sqlWhere = dashboardNutrizSqlWhere(nutrizScope)
 
   const [
-    municipalitiesTotal,
-    activeMunicipalities,
-    activeMunicipalitiesByRegion,
-    nutrizTotal,
-    nutrizCreatedInPeriod,
-    referredProfiles,
-    referredProfilesInPeriod,
-    nutrizByStage,
-    nutrizLocations,
-    municipalitiesForRegion,
+    municipalitiesByStatusRegion,
+    nutrizDimensions,
+    profileSummaryRows,
     allNutrizCreatedInPeriod,
-    contactClicksTotal,
-    contactClicksCreatedInPeriod,
     contactClicksByChannel,
-    retentionCohortProfiles,
+    recentContactClicksByChannel,
+    activityRows,
   ] = await prisma.$transaction([
-    prisma.serviceMunicipality.count(),
-    prisma.serviceMunicipality.count({ where: { isActive: true } }),
     prisma.serviceMunicipality.groupBy({
-      by: ['region'],
-      where: { isActive: true },
+      by: ['isActive', 'region'],
       _count: { id: true },
-    }),
-    prisma.nutrizProfile.count({ where: nutrizScope }),
-    prisma.nutrizProfile.count({
-      where: { AND: [nutrizScope, { createdAt: { gte: since, lte: now } }] },
-    }),
-    prisma.nutrizProfile.count({
-      where: {
-        AND: [nutrizScope, { referredByReferralLinkId: { not: null } }],
-      },
-    }),
-    prisma.nutrizProfile.count({
-      where: {
-        AND: [
-          nutrizScope,
-          { referredByReferralLinkId: { not: null } },
-          { createdAt: { gte: since, lte: now } },
-        ],
-      },
     }),
     prisma.nutrizProfile.groupBy({
-      by: ['journeyStatus'],
-      where: nutrizScope,
+      by: ['journeyStatus', 'dashboardRegion'],
+      where: nutrizWhere,
       _count: { id: true },
     }),
-    prisma.nutrizProfile.findMany({
-      where: nutrizScope,
-      select: { state: true, city: true },
-    }),
-    prisma.serviceMunicipality.findMany({
-      select: { state: true, name: true, region: true },
-    }),
+    prisma.$queryRaw<DashboardProfileSummaryRow[]>(Prisma.sql`
+      SELECT
+        COUNT(*)::bigint AS "total",
+        COUNT(*) FILTER (
+          WHERE np."created_at" >= ${since} AND np."created_at" <= ${now}
+        )::bigint AS "created_in_period",
+        COUNT(*) FILTER (
+          WHERE np."referred_by_referral_link_id" IS NOT NULL
+        )::bigint AS "referred",
+        COUNT(*) FILTER (
+          WHERE np."referred_by_referral_link_id" IS NOT NULL
+            AND np."created_at" >= ${since}
+            AND np."created_at" <= ${now}
+        )::bigint AS "referred_in_period",
+        COUNT(*) FILTER (
+          WHERE np."created_at" <= ${retentionSince}
+        )::bigint AS "retention_cohort"
+      FROM "nutriz_profiles" np
+      WHERE ${sqlWhere}
+    `),
     prisma.nutrizProfile.count({
       where: { deletedAt: null, createdAt: { gte: since, lte: now } },
-    }),
-    prisma.contactChannelClick.count(),
-    prisma.contactChannelClick.count({
-      where: { createdAt: { gte: since, lte: now } },
     }),
     prisma.contactChannelClick.groupBy({
       by: ['channel'],
       _count: { id: true },
     }),
-    prisma.nutrizProfile.count({
-      where: {
-        AND: [nutrizScope, { createdAt: { lte: retentionSince } }],
-      },
+    prisma.contactChannelClick.groupBy({
+      by: ['channel'],
+      where: { createdAt: { gte: since, lte: now } },
+      _count: { id: true },
     }),
+    prisma.$queryRaw<DashboardActivityRow[]>(Prisma.sql`
+      WITH scoped_profiles AS MATERIALIZED (
+        SELECT np."id", np."created_at"
+        FROM "nutriz_profiles" np
+        WHERE ${sqlWhere}
+      ),
+      latest_reminders AS (
+        SELECT DISTINCT ON (e."nutriz_profile_id")
+          e."nutriz_profile_id", e."decision"
+        FROM "communication_consent_events" e
+        INNER JOIN scoped_profiles sp ON sp."id" = e."nutriz_profile_id"
+        WHERE e."purpose" = 'REMINDERS_WHATSAPP'
+          AND e."recorded_at" <= ${now}
+        ORDER BY e."nutriz_profile_id", e."sequence" DESC
+      ),
+      reminder_activity AS (
+        SELECT
+          COUNT(*) FILTER (WHERE e."decision" = 'GRANTED')::bigint AS "activated",
+          COUNT(*) FILTER (WHERE e."decision" = 'WITHDRAWN')::bigint AS "withdrawn"
+        FROM "communication_consent_events" e
+        INNER JOIN scoped_profiles sp ON sp."id" = e."nutriz_profile_id"
+        WHERE e."purpose" = 'REMINDERS_WHATSAPP'
+          AND e."recorded_at" >= ${since}
+          AND e."recorded_at" <= ${now}
+      )
+      SELECT
+        (
+          SELECT COUNT(*) FROM latest_reminders
+          WHERE "decision" = 'GRANTED'
+        )::bigint AS "reminders_enabled",
+        reminder_activity."activated" AS "reminders_activated",
+        reminder_activity."withdrawn" AS "reminders_withdrawn",
+        (
+          SELECT COUNT(*)
+          FROM scoped_profiles sp
+          WHERE sp."created_at" <= ${retentionSince}
+            AND (
+              EXISTS (
+                SELECT 1 FROM "journey_status_history" h
+                WHERE h."nutriz_profile_id" = sp."id"
+                  AND h."changed_at" > sp."created_at"
+                  AND h."changed_at" <= ${now}
+              )
+              OR EXISTS (
+                SELECT 1 FROM "communication_consent_events" e
+                WHERE e."nutriz_profile_id" = sp."id"
+                  AND e."purpose" = 'REMINDERS_WHATSAPP'
+                  AND e."recorded_at" > sp."created_at"
+                  AND e."recorded_at" <= ${now}
+              )
+            )
+        )::bigint AS "retained_profiles"
+      FROM reminder_activity
+    `),
   ])
 
-  const [reminderConsentEvents, journeyHistoryEvents] = await Promise.all([
-    prisma.communicationConsentEvent.findMany({
-      where: {
-        purpose: 'REMINDERS_WHATSAPP',
-        nutrizProfile: nutrizScope,
-      },
-      select: {
-        nutrizProfileId: true,
-        decision: true,
-        sequence: true,
-        recordedAt: true,
-        nutrizProfile: { select: { createdAt: true } },
-      },
-      orderBy: { sequence: 'desc' },
-    }),
-    prisma.journeyStatusHistory.findMany({
-      where: { nutrizProfile: nutrizScope, changedAt: { lte: now } },
-      select: {
-        nutrizProfileId: true,
-        changedAt: true,
-        nutrizProfile: { select: { createdAt: true } },
-      },
-    }),
-  ])
-
-  const regionCounts = new Map<ServiceRegion, number>(
-    activeMunicipalitiesByRegion.map((row) => [row.region, row._count.id]),
+  const profileSummary = profileSummaryRows[0]
+  const activity = activityRows[0]
+  const municipalitiesTotal = municipalitiesByStatusRegion.reduce(
+    (total, row) => total + row._count.id,
+    0,
   )
-  const stageCounts = new Map<JourneyStatus, number>(
-    nutrizByStage.map((row) => [row.journeyStatus, row._count.id]),
+  const activeMunicipalities = municipalitiesByStatusRegion.reduce(
+    (total, row) => total + (row.isActive ? row._count.id : 0),
+    0,
+  )
+  const regionCounts = new Map<ServiceRegion, number>(
+    SERVICE_REGION_VALUES.map((region) => [region as ServiceRegion, 0]),
+  )
+  for (const row of municipalitiesByStatusRegion) {
+    if (row.isActive) {
+      regionCounts.set(
+        row.region,
+        (regionCounts.get(row.region) ?? 0) + row._count.id,
+      )
+    }
+  }
+
+  const stageCounts = new Map<JourneyStatus, number>()
+  const nutrizRegionCounts = new Map<NutrizRegionKey, number>()
+  for (const row of nutrizDimensions) {
+    stageCounts.set(
+      row.journeyStatus,
+      (stageCounts.get(row.journeyStatus) ?? 0) + row._count.id,
+    )
+    const region: NutrizRegionKey = row.dashboardRegion ?? 'OUTSIDE_OR_UNMAPPED'
+    nutrizRegionCounts.set(
+      region,
+      (nutrizRegionCounts.get(region) ?? 0) + row._count.id,
+    )
+  }
+
+  const nutrizTotal = toCount(profileSummary?.total)
+  const nutrizCreatedInPeriod = toCount(profileSummary?.created_in_period)
+  const referredProfiles = toCount(profileSummary?.referred)
+  const referredProfilesInPeriod = toCount(profileSummary?.referred_in_period)
+  const retentionCohortProfiles = toCount(profileSummary?.retention_cohort)
+  const enabledProfiles = toCount(activity?.reminders_enabled)
+  const activatedInPeriod = toCount(activity?.reminders_activated)
+  const withdrawnInPeriod = toCount(activity?.reminders_withdrawn)
+  const retainedProfiles = toCount(activity?.retained_profiles)
+  const contactClicksTotal = contactClicksByChannel.reduce(
+    (total, row) => total + row._count.id,
+    0,
+  )
+  const contactClicksCreatedInPeriod = recentContactClicksByChannel.reduce(
+    (total, row) => total + row._count.id,
+    0,
   )
   const journeyStatusCounts = Object.fromEntries(
     JOURNEY_STATUS_VALUES.map((status) => [
@@ -210,68 +291,14 @@ export async function getAdminDashboardMetrics(
   const contactChannelCounts = new Map<ContactChannel, number>(
     contactClicksByChannel.map((row) => [row.channel, row._count.id]),
   )
-  const regionByLocation = new Map<string, ServiceRegion>(
-    municipalitiesForRegion.map((municipality) => [
-      buildDashboardLocationKey(municipality.state, municipality.name),
-      municipality.region,
-    ]),
-  )
-  const nutrizRegionCounts = new Map<NutrizRegionKey, number>()
-
-  for (const nutriz of nutrizLocations) {
-    const region = regionByLocation.get(
-      buildDashboardLocationKey(nutriz.state, nutriz.city),
-    )
-    const key: NutrizRegionKey = region ?? 'OUTSIDE_OR_UNMAPPED'
-    nutrizRegionCounts.set(key, (nutrizRegionCounts.get(key) ?? 0) + 1)
-  }
-
-  const latestReminderDecision = new Map<
-    string,
-    (typeof reminderConsentEvents)[number]['decision']
-  >()
-  let activatedInPeriod = 0
-  let withdrawnInPeriod = 0
-
-  for (const event of reminderConsentEvents) {
-    if (!latestReminderDecision.has(event.nutrizProfileId)) {
-      latestReminderDecision.set(event.nutrizProfileId, event.decision)
-    }
-    if (event.recordedAt >= since && event.recordedAt <= now) {
-      if (event.decision === 'GRANTED') activatedInPeriod += 1
-      if (event.decision === 'WITHDRAWN') withdrawnInPeriod += 1
-    }
-  }
-
-  const enabledProfiles = [...latestReminderDecision.values()].filter(
-    (decision) => decision === 'GRANTED',
-  ).length
-  const retainedProfileIds = new Set<string>()
-
-  for (const event of journeyHistoryEvents) {
-    if (
-      event.nutrizProfile.createdAt <= retentionSince &&
-      event.changedAt > event.nutrizProfile.createdAt
-    ) {
-      retainedProfileIds.add(event.nutrizProfileId)
-    }
-  }
-
-  for (const event of reminderConsentEvents) {
-    if (
-      event.nutrizProfile.createdAt <= retentionSince &&
-      event.recordedAt > event.nutrizProfile.createdAt
-    ) {
-      retainedProfileIds.add(event.nutrizProfileId)
-    }
-  }
 
   return {
     periodDays: DASHBOARD_PERIOD_DAYS,
     municipalities: {
       total: municipalitiesTotal,
       active: activeMunicipalities,
-      regionsCovered: activeMunicipalitiesByRegion.length,
+      regionsCovered: [...regionCounts.values()].filter((count) => count > 0)
+        .length,
       byStatus: [
         { key: 'ACTIVE', count: activeMunicipalities },
         {
@@ -312,8 +339,8 @@ export async function getAdminDashboardMetrics(
     journey: buildJourneyFunnel(journeyStatusCounts),
     retention: {
       cohortProfiles: retentionCohortProfiles,
-      retainedProfiles: retainedProfileIds.size,
-      rate: percentOf(retainedProfileIds.size, retentionCohortProfiles),
+      retainedProfiles,
+      rate: percentOf(retainedProfiles, retentionCohortProfiles),
     },
     reminders: {
       eligibleProfiles: nutrizTotal,

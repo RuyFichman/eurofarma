@@ -88,7 +88,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última suíte completa contra o Supabase cloud passou com **569 testes em 77 arquivos**. Após os testes do cache público de municípios e de sua invalidação administrativa, a suíte unitária local passa com **498 testes em 70 arquivos**; a suíte completa no cloud ainda não foi repetida neste branch. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última suíte completa contra o Supabase cloud passou com **569 testes em 77 arquivos**. Após os testes da otimização das consultas do dashboard, a suíte unitária local passa com **500 testes em 71 arquivos**; a suíte completa no cloud ainda não foi repetida neste branch. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
@@ -109,6 +109,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A última 
 - UC14/RF13 implementado localmente na Minha Área: a nutriz recebe uma mensagem pronta, editável e baseada apenas no próprio link opaco de indicação. Ela pode copiá-la ou abri-la pré-preenchida no WhatsApp; o NutriLink não envia mensagens automaticamente, não registra destinatários e não associa a indicação a recompensa material.
 - Login, logout, middleware, autorização por role e shell administrativo.
 - Dashboard administrativo adaptado para municípios e cadastros de nutrizes, com filtros combináveis por sub-região da Grande São Paulo, status atual de `JourneyStatus` e origem UTM. O mesmo recorte é aplicado aos cartões, à série temporal, às distribuições e ao funil progressivo da jornada; dados pessoais não são exibidos. O painel também apresenta sinais globais de alcance, cliques anônimos por canal, conversão acumulada e cadastros sem avanço registrado entre etapas. Como os cliques não referenciam nutriz nem localização, eles permanecem globais e não respondem aos filtros de região ou status.
+- Otimização local do dashboard: região e origem passam a ser dimensões categóricas derivadas e mantidas por triggers, com índices compostos para filtros e períodos. O filtro deixa de carregar perfis e montar listas de ids, os históricos de jornada e consentimento são agregados no PostgreSQL e os seis meses são calculados em uma consulta. Métricas usam sete operações agregadas e gráficos usam duas, sem transferir PII. A migration `20260917120000_optimize_dashboard_queries` está gerada e revisada localmente, mas ainda não foi aplicada no Supabase cloud.
 - Listagem de nutrizes com exposição reduzida de contato e acesso ao detalhe da jornada em `/admin/nutrizes/[id]`.
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
@@ -220,7 +221,7 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Última suíte completa no cloud: 569 em 77 arquivos; suíte unitária local atual: 498 em 70 arquivos. |
+| Testes | Vitest | Última suíte completa no cloud: 569 em 77 arquivos; suíte unitária local atual: 500 em 71 arquivos. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
