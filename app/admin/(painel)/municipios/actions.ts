@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { Prisma } from '@prisma/client'
 
@@ -14,6 +14,7 @@ import { prisma } from '@/lib/db/prisma'
 import {
   createAdminMunicipality,
   findAvailableMunicipalitySlug,
+  SERVICE_MUNICIPALITIES_CACHE_TAG,
   updateAdminMunicipality,
 } from '@/lib/db/queries/service-municipalities'
 import { ADMIN } from '@/lib/i18n/pt-br'
@@ -53,6 +54,7 @@ function databaseError(
 }
 
 function revalidateMunicipalitySurfaces(): void {
+  revalidateTag(SERVICE_MUNICIPALITIES_CACHE_TAG)
   revalidatePath(ADMIN_MUNICIPALITIES_PATH)
   revalidatePath('/admin/dashboard')
   revalidatePath('/verificar-cobertura')

@@ -4,6 +4,10 @@ import { getActiveServiceMunicipalities } from '@/lib/db/queries/service-municip
 import { citySearchParamsSchema } from '@/lib/validators/location'
 
 const NO_STORE_HEADERS = { 'Cache-Control': 'no-store' } as const
+const PUBLIC_CACHE_HEADERS = {
+  'Cache-Control':
+    'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+} as const
 
 /**
  * Lista somente municípios ativos da área do Lactare. UFs diferentes de SP
@@ -39,7 +43,7 @@ export async function GET(request: NextRequest) {
   if (parsed.data.state !== 'SP') {
     return NextResponse.json(
       { state: parsed.data.state, cities: [], count: 0 },
-      { status: 200, headers: NO_STORE_HEADERS },
+      { status: 200, headers: PUBLIC_CACHE_HEADERS },
     )
   }
 
@@ -48,7 +52,7 @@ export async function GET(request: NextRequest) {
     const cities = municipalities.map((item) => item.name)
     return NextResponse.json(
       { state: 'SP', cities, count: cities.length },
-      { status: 200, headers: NO_STORE_HEADERS },
+      { status: 200, headers: PUBLIC_CACHE_HEADERS },
     )
   } catch {
     return NextResponse.json(

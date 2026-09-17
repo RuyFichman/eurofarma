@@ -1,4 +1,5 @@
 import { Prisma, type ServiceRegion } from '@prisma/client'
+import { unstable_cache } from 'next/cache'
 
 import type { AdminMunicipalityFilters } from '../../admin/municipalities/filters'
 import { ADMIN_MUNICIPALITIES_PAGE_SIZE } from '../../admin/municipalities/filters'
@@ -52,7 +53,10 @@ export type PublicCoverageStats = {
   regionsCovered: number
 }
 
-export async function getActiveServiceMunicipalities(): Promise<
+export const SERVICE_MUNICIPALITIES_CACHE_TAG = 'service-municipalities'
+export const PUBLIC_COVERAGE_REVALIDATE_SECONDS = 3600
+
+async function loadActiveServiceMunicipalities(): Promise<
   PublicServiceMunicipality[]
 > {
   const municipalities = await prisma.serviceMunicipality.findMany({
@@ -66,6 +70,26 @@ export async function getActiveServiceMunicipalities(): Promise<
   )
 }
 
+const getCachedActiveServiceMunicipalities = unstable_cache(
+  loadActiveServiceMunicipalities,
+  ['active-service-municipalities-v1'],
+  {
+    revalidate: PUBLIC_COVERAGE_REVALIDATE_SECONDS,
+    tags: [SERVICE_MUNICIPALITIES_CACHE_TAG],
+  },
+)
+
+/**
+ * Fonte compartilhada das superfícies públicas de cobertura. A tag é
+ * invalidada pelas mutações administrativas, e o TTL limita a defasagem caso
+ * uma alteração aconteça fora do painel.
+ */
+export async function getActiveServiceMunicipalities(): Promise<
+  PublicServiceMunicipality[]
+> {
+  return getCachedActiveServiceMunicipalities()
+}
+
 export async function getActiveServiceMunicipalityByLocation(
   name: string,
   state: string,
@@ -73,27 +97,27 @@ export async function getActiveServiceMunicipalityByLocation(
   const normalizedState = state.trim().toUpperCase()
   if (normalizedState !== 'SP') return null
 
-  return prisma.serviceMunicipality.findFirst({
-    where: {
-      isActive: true,
-      state: normalizedState,
-      name: { equals: name.trim(), mode: 'insensitive' },
-    },
-    select: PUBLIC_MUNICIPALITY_SELECT,
-  })
+  const normalizedName = name.trim()
+  const municipalities = await getActiveServiceMunicipalities()
+
+  return (
+    municipalities.find(
+      (municipality) =>
+        municipality.state === normalizedState &&
+        municipality.name.localeCompare(normalizedName, 'pt-BR', {
+          sensitivity: 'accent',
+        }) === 0,
+    ) ?? null
+  )
 }
 
 export async function getPublicCoverageStats(): Promise<PublicCoverageStats> {
-  const [activeMunicipalities, regions] = await prisma.$transaction([
-    prisma.serviceMunicipality.count({ where: { isActive: true } }),
-    prisma.serviceMunicipality.groupBy({
-      by: ['region'],
-      where: { isActive: true },
-      _count: { id: true },
-    }),
-  ])
+  const municipalities = await getActiveServiceMunicipalities()
 
-  return { activeMunicipalities, regionsCovered: regions.length }
+  return {
+    activeMunicipalities: municipalities.length,
+    regionsCovered: new Set(municipalities.map((item) => item.region)).size,
+  }
 }
 
 export async function getAdminMunicipalities(
