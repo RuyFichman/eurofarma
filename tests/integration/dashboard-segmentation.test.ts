@@ -43,7 +43,8 @@ describe('segmentação combinável do dashboard', () => {
       otherOrigin.id,
     ]
     const metrics = await getAdminDashboardMetrics({
-      AND: [filteredScope, { id: { in: fixtureIds } }],
+      ...filteredScope,
+      profileIds: fixtureIds,
     })
 
     expect(metrics.nutriz.total).toBe(1)

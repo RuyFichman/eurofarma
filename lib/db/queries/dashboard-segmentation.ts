@@ -1,65 +1,87 @@
-import type { JourneyStatus, Prisma, ServiceRegion } from '@prisma/client'
-
 import {
-  buildDashboardLocationKey,
-  type DashboardFilters,
-} from '../../admin/dashboard/filters'
-import { getRegistrationOrigin } from '../../admin/dashboard/charts'
-import { prisma } from '../prisma'
+  Prisma,
+  type JourneyStatus,
+  type RegistrationOrigin,
+  type ServiceRegion,
+} from '@prisma/client'
 
-export type DashboardNutrizScope = Prisma.NutrizProfileWhereInput
+import type { DashboardFilters } from '../../admin/dashboard/filters'
+
+export type DashboardNutrizScope = {
+  stage?: JourneyStatus
+  region?: ServiceRegion
+  origin?: RegistrationOrigin
+  /** Recorte adicional usado por testes e auditorias pontuais, nunca pela URL. */
+  profileIds?: string[]
+}
+
+const REGISTRATION_ORIGIN_BY_FILTER = {
+  whatsapp: 'WHATSAPP',
+  web: 'WEB',
+  other: 'OTHER',
+  unknown: 'UNKNOWN',
+} as const satisfies Record<
+  Exclude<DashboardFilters['origin'], ''>,
+  RegistrationOrigin
+>
 
 /**
- * Constrói o mesmo recorte de nutrizes para cartões, gráficos e distribuições.
- * Região e origem exigem normalização (acentos da cidade e categorias da UTM).
- * Resolvemos somente os ids correspondentes e depois aplicamos esse conjunto
- * às agregações do Prisma, sem carregar nomes ou contatos pessoais.
+ * Constrói um recorte compacto para cartões, gráficos e distribuições. Região
+ * e origem já são dimensões derivadas pelo banco; nenhum perfil ou dado
+ * pessoal precisa ser carregado para montar os filtros.
  */
-export async function buildDashboardNutrizScope(
+export function buildDashboardNutrizScope(
   filters: DashboardFilters,
-): Promise<DashboardNutrizScope> {
-  const where: DashboardNutrizScope = { deletedAt: null }
-
-  if (filters.stage) {
-    where.journeyStatus = filters.stage as JourneyStatus
+): DashboardNutrizScope {
+  return {
+    ...(filters.stage ? { stage: filters.stage as JourneyStatus } : {}),
+    ...(filters.region ? { region: filters.region as ServiceRegion } : {}),
+    ...(filters.origin
+      ? { origin: REGISTRATION_ORIGIN_BY_FILTER[filters.origin] }
+      : {}),
   }
+}
 
-  let regionLocations: Set<string> | undefined
+export function toDashboardNutrizWhere(
+  scope: DashboardNutrizScope,
+): Prisma.NutrizProfileWhereInput {
+  return {
+    deletedAt: null,
+    ...(scope.stage ? { journeyStatus: scope.stage } : {}),
+    ...(scope.region ? { dashboardRegion: scope.region } : {}),
+    ...(scope.origin ? { registrationOrigin: scope.origin } : {}),
+    ...(scope.profileIds ? { id: { in: scope.profileIds } } : {}),
+  }
+}
 
-  if (filters.region) {
-    const municipalities = await prisma.serviceMunicipality.findMany({
-      where: { region: filters.region as ServiceRegion },
-      select: { name: true, state: true },
-    })
+/** Fragmento parametrizado usado apenas por agregações SQL do dashboard. */
+export function dashboardNutrizSqlWhere(
+  scope: DashboardNutrizScope,
+): Prisma.Sql {
+  const clauses: Prisma.Sql[] = [Prisma.sql`np."deleted_at" IS NULL`]
 
-    if (municipalities.length === 0) {
-      return { deletedAt: null, id: { in: [] } }
-    }
-
-    regionLocations = new Set(
-      municipalities.map((municipality) =>
-        buildDashboardLocationKey(municipality.state, municipality.name),
-      ),
+  if (scope.stage) {
+    clauses.push(
+      Prisma.sql`np."journey_status" = ${scope.stage}::"JourneyStatus"`,
+    )
+  }
+  if (scope.region) {
+    clauses.push(
+      Prisma.sql`np."dashboard_region" = ${scope.region}::"ServiceRegion"`,
+    )
+  }
+  if (scope.origin) {
+    clauses.push(
+      Prisma.sql`np."registration_origin" = ${scope.origin}::"RegistrationOrigin"`,
+    )
+  }
+  if (scope.profileIds) {
+    clauses.push(
+      scope.profileIds.length === 0
+        ? Prisma.sql`FALSE`
+        : Prisma.sql`np."id" IN (${Prisma.join(scope.profileIds)})`,
     )
   }
 
-  if (!filters.region && !filters.origin) return where
-
-  const candidates = await prisma.nutrizProfile.findMany({
-    where,
-    select: { id: true, state: true, city: true, sourceUtm: true },
-  })
-  const matchingIds = candidates
-    .filter(
-      (candidate) =>
-        (!regionLocations ||
-          regionLocations.has(
-            buildDashboardLocationKey(candidate.state, candidate.city),
-          )) &&
-        (!filters.origin ||
-          getRegistrationOrigin(candidate.sourceUtm) === filters.origin),
-    )
-    .map((candidate) => candidate.id)
-
-  return { AND: [where, { id: { in: matchingIds } }] }
+  return Prisma.join(clauses, ' AND ')
 }

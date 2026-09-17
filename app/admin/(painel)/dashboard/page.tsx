@@ -38,7 +38,7 @@ export default async function AdminDashboardPage({
   const filters = parseDashboardFilters(await searchParams)
   const hasFilters = hasActiveDashboardFilters(filters)
   const now = new Date()
-  const nutrizScope = await buildDashboardNutrizScope(filters)
+  const nutrizScope = buildDashboardNutrizScope(filters)
   const [metrics, charts] = await Promise.all([
     getAdminDashboardMetrics(nutrizScope, now),
     getDashboardCharts(now, nutrizScope),

@@ -36,6 +36,15 @@ enum ServiceRegion {
   EAST_ALTO_TIETE
 }
 
+/// Dimensão derivada de `source_utm.utm_source` para agregação e filtro do
+/// dashboard sem agrupar JSON nem carregar perfis na aplicação.
+enum RegistrationOrigin {
+  WHATSAPP
+  WEB
+  OTHER
+  UNKNOWN
+}
+
 enum InterestStatus {
   INTERESTED
   CONTACTED
@@ -201,30 +210,33 @@ model User {
 }
 
 model NutrizProfile {
-  id                String            @id @default(uuid())
+  id                 String             @id @default(uuid())
   /// `id` do usuário em `auth.users` (Supabase Auth), quando a nutriz tem conta.
   /// Nulo para quem se cadastrou só como lead. **Não** usa a tabela `users`, que
   /// é do staff (ADMIN/VIEWER) e é o que o `requireAdminUser()` consulta.
-  authUserId        String?           @unique @map("auth_user_id")
-  fullName          String            @map("full_name")
+  authUserId         String?            @unique @map("auth_user_id")
+  fullName           String             @map("full_name")
   /// Único porque é o identificador da nutriz no chatbot: o webhook resolve o
   /// perfil a partir do número que enviou a mensagem.
-  phoneWhatsapp     String            @unique @map("phone_whatsapp")
-  email             String?
-  state             String            @db.Char(2)
-  city              String
-  neighborhood      String?
-  interestStatus    InterestStatus    @default(INTERESTED) @map("interest_status")
+  phoneWhatsapp      String             @unique @map("phone_whatsapp")
+  email              String?
+  state              String             @db.Char(2)
+  city               String
+  neighborhood       String?
+  interestStatus     InterestStatus     @default(INTERESTED) @map("interest_status")
   /// Estado operacional atual da jornada. É independente do `interestStatus`
   /// legado e só pode avançar pelas transições explícitas do domínio.
-  journeyStatus     JourneyStatus     @default(REGISTERED) @map("journey_status")
-  contactPreference ContactPreference @default(WHATSAPP) @map("contact_preference")
-  lgpdConsentAt     DateTime          @map("lgpd_consent_at")
-  marketingConsent  Boolean           @default(false) @map("marketing_consent")
-  sourceUtm         Json?             @map("source_utm")
-  deletedAt         DateTime?         @map("deleted_at")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
+  journeyStatus      JourneyStatus      @default(REGISTERED) @map("journey_status")
+  contactPreference  ContactPreference  @default(WHATSAPP) @map("contact_preference")
+  lgpdConsentAt      DateTime           @map("lgpd_consent_at")
+  marketingConsent   Boolean            @default(false) @map("marketing_consent")
+  sourceUtm          Json?              @map("source_utm")
+  /// Dimensões derivadas e mantidas por trigger para o read model do dashboard.
+  dashboardRegion    ServiceRegion?     @map("dashboard_region")
+  registrationOrigin RegistrationOrigin @default(UNKNOWN) @map("registration_origin")
+  deletedAt          DateTime?          @map("deleted_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
 
   contactIntents           ContactIntent[]
   whatsappClicks           WhatsappClick[]
@@ -241,8 +253,12 @@ model NutrizProfile {
   referredByReferralLinkId String?                     @map("referred_by_referral_link_id")
 
   @@index([state, city, createdAt])
-  @@index([journeyStatus, createdAt])
+  @@index([deletedAt, createdAt], map: "nutriz_profiles_deleted_at_created_at_idx")
+  @@index([deletedAt, journeyStatus, createdAt], map: "nutriz_profiles_deleted_journey_created_idx")
+  @@index([deletedAt, dashboardRegion, createdAt], map: "nutriz_profiles_deleted_region_created_idx")
+  @@index([deletedAt, registrationOrigin, createdAt], map: "nutriz_profiles_deleted_origin_created_idx")
   @@index([referredByReferralLinkId])
+  @@index([deletedAt, referredByReferralLinkId, createdAt], map: "nutriz_profiles_deleted_referral_created_idx")
   @@map("nutriz_profiles")
 }
 
@@ -349,6 +365,8 @@ model CommunicationConsentEvent {
   notificationOutbox NotificationOutbox[] @relation("NotificationConsentSnapshot")
 
   @@index([nutrizProfileId, purpose, sequence], map: "communication_consent_events_profile_purpose_sequence_idx")
+  @@index([purpose, nutrizProfileId, sequence], map: "communication_consent_events_purpose_profile_sequence_idx")
+  @@index([purpose, nutrizProfileId, recordedAt], map: "communication_consent_events_purpose_profile_recorded_idx")
   @@map("communication_consent_events")
 }
 

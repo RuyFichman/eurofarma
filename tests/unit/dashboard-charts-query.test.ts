@@ -1,17 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
-  count: vi.fn(),
+  queryRaw: vi.fn(),
   groupBy: vi.fn(),
   transaction: vi.fn(),
 }))
 
 vi.mock('../../lib/db/prisma', () => ({
   prisma: {
-    nutrizProfile: {
-      count: mocks.count,
-      groupBy: mocks.groupBy,
-    },
+    nutrizProfile: { groupBy: mocks.groupBy },
+    $queryRaw: mocks.queryRaw,
     $transaction: mocks.transaction,
   },
 }))
@@ -21,34 +19,51 @@ import { getDashboardCharts } from '../../lib/db/queries/dashboard-charts'
 describe('consultas dos gráficos segmentados', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.count.mockReturnValue(undefined)
-    mocks.transaction.mockResolvedValue([0, 1, 2, 3, 4, 5])
-    mocks.groupBy.mockResolvedValue([
-      { sourceUtm: { utm_source: 'whatsapp' }, _count: { id: 2 } },
-      { sourceUtm: null, _count: { id: 1 } },
+    mocks.queryRaw.mockReturnValue(undefined)
+    mocks.groupBy.mockReturnValue(undefined)
+    mocks.transaction.mockResolvedValue([
+      [
+        { key: '2026-04', registrations: 0n },
+        { key: '2026-05', registrations: 1n },
+        { key: '2026-06', registrations: 2n },
+        { key: '2026-07', registrations: 3n },
+        { key: '2026-08', registrations: 4n },
+        { key: '2026-09', registrations: 5n },
+      ],
+      [
+        { registrationOrigin: 'WHATSAPP', _count: { id: 2 } },
+        { registrationOrigin: 'UNKNOWN', _count: { id: 1 } },
+      ],
     ])
   })
 
-  it('aplica o mesmo recorte a todos os meses e à origem', async () => {
+  it('agrega seis meses em uma consulta e agrupa pela origem materializada', async () => {
     const now = new Date('2026-09-12T12:00:00Z')
-    const scope = { interestStatus: 'DONATED', deletedAt: null } as const
+    const scope = {
+      stage: 'DONATION_CONFIRMED',
+      region: 'WEST',
+      origin: 'WHATSAPP',
+    } as const
 
     const charts = await getDashboardCharts(now, scope)
 
-    expect(mocks.count).toHaveBeenCalledTimes(6)
-    expect(mocks.count).toHaveBeenCalledWith({
+    expect(mocks.queryRaw).toHaveBeenCalledOnce()
+    expect(mocks.groupBy).toHaveBeenCalledWith({
+      by: ['registrationOrigin'],
       where: {
         AND: [
-          scope,
-          { createdAt: expect.objectContaining({ gte: expect.any(Date) }) },
+          {
+            deletedAt: null,
+            journeyStatus: 'DONATION_CONFIRMED',
+            dashboardRegion: 'WEST',
+            registrationOrigin: 'WHATSAPP',
+          },
+          { createdAt: { lt: now } },
         ],
       },
-    })
-    expect(mocks.groupBy).toHaveBeenCalledWith({
-      by: ['sourceUtm'],
-      where: { AND: [scope, { createdAt: { lt: now } }] },
       _count: { id: true },
     })
+    expect(mocks.transaction).toHaveBeenCalledOnce()
     expect(charts.months.map((month) => month.registrations)).toEqual([
       0, 1, 2, 3, 4, 5,
     ])
