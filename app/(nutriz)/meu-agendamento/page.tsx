@@ -48,7 +48,7 @@ export default async function NutrizAreaPage() {
   const copy = NUTRIZ_AUTH.area
 
   return (
-    <section className="bg-muted/30 min-h-[calc(100dvh-3.5rem)] px-6 py-12 md:min-h-[calc(100dvh-4rem)] md:py-16">
+    <section className="bg-muted/30 min-h-svh px-6 py-12 md:py-16">
       <div className="mx-auto max-w-5xl">
         <div className="flex items-center gap-3">
           <span className="bg-secondary text-primary flex size-11 items-center justify-center rounded-2xl">

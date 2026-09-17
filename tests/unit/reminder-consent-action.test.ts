@@ -20,7 +20,7 @@ vi.mock('../../lib/auth/supabase-server', () => ({
   createSupabaseServerClient: vi.fn(),
 }))
 
-import { setReminderConsentAction } from '../../app/(public)/meu-agendamento/actions'
+import { setReminderConsentAction } from '../../app/(nutriz)/meu-agendamento/actions'
 
 describe('ação da preferência de lembretes', () => {
   beforeEach(() => {

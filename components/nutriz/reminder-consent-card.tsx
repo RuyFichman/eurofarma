@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Bell, BellOff } from 'lucide-react'
 
-import { setReminderConsentAction } from '@/app/(public)/meu-agendamento/actions'
+import { setReminderConsentAction } from '@/app/(nutriz)/meu-agendamento/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'

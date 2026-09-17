@@ -7,7 +7,7 @@ import { Building2, MessageCircle, Search } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { APPOINTMENT } from '@/lib/i18n/pt-br'
-import { cancelAppointmentAction } from '@/app/(public)/meu-agendamento/actions'
+import { cancelAppointmentAction } from '@/app/(nutriz)/meu-agendamento/actions'
 
 const COPY = APPOINTMENT
 

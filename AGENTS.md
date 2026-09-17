@@ -274,6 +274,7 @@ Estrutura principal:
 ~~~text
 app/
   (public)/                 rotas públicas; cobertura em /verificar-cobertura
+  (nutriz)/                 área autenticada sem o chrome público
   admin/                    segmento literal /admin
     (painel)/               telas protegidas; municípios em /admin/municipios
   api/                      route handlers
@@ -311,6 +312,9 @@ tests/
 ### 6.1 Rotas e layouts
 
 - O grupo app/(public) já fornece Header, main#main-content e Footer.
+- O grupo app/(nutriz) fornece o main da área pessoal sem Header e Footer públicos; mover a área para esse route group evita lógica cliente baseada no pathname sem alterar `/meu-agendamento`.
+- O Header público é renderizado no servidor. O link de conta aponta sempre para `/entrar`, que redireciona uma nutriz já autenticada; não carregar o cliente Supabase apenas para trocar esse rótulo.
+- A navegação ativa é a única ilha cliente do Header. O menu mobile usa `details` nativo e não depende de Radix.
 - Páginas públicas não devem criar outro elemento main.
 - A área admin usa o segmento literal app/admin para preservar URLs /admin/*.
 - O grupo interno (painel) organiza telas protegidas sem entrar na URL.
