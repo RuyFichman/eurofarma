@@ -157,6 +157,22 @@ describe('advanceConversation', () => {
     expect(outsideHours.reply.body).toContain('próxima janela')
   })
 
+  it('retoma o autoatendimento quando a nutriz escreve "menu" durante a pausa', () => {
+    const result = step('HUMAN_HANDOFF', {
+      text: 'menu',
+      profile: PROFILE,
+    })
+    expect(result.nextStep).toBe('MENU')
+    expect(result.reply.type).not.toBe('text')
+  })
+
+  it('permanece pausado para qualquer outro texto durante o handoff', () => {
+    const result = step('HUMAN_HANDOFF', {
+      text: 'ainda estou esperando',
+    })
+    expect(result.nextStep).toBe('HUMAN_HANDOFF')
+  })
+
   it('abre FAQ em lista com cinco perguntas', () => {
     const result = step('MENU', { replyId: REPLY_IDS.menuKnowMore })
     expect(result.nextStep).toBe('FAQ')
