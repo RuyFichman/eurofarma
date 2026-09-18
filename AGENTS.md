@@ -114,7 +114,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
 - Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
-- Webhook da WhatsApp Cloud API, verificação de assinatura, rate limiting local e simulador com exemplos do fluxo ativo.
+- Camada de WhatsApp independente de provedor, com adaptadores para a Cloud API da Meta e para o Twilio, webhooks com verificação de assinatura, rate limiting local e simulador com exemplos do fluxo ativo. Credenciais e identificadores de template ficam restritos aos adaptadores.
 - Máquina de estados local do chatbot com apresentação e menu, FAQ, elegibilidade por CEP ou município, orientação dentro ou fora da área, cadastro simplificado opcional com consentimento, retomada de nutriz cadastrada pelo `JourneyStatus` e encaminhamento transparente aos canais oficiais do Lactare. O CEP não entra no contexto persistido; marketing permanece desligado e lembretes só são ativados por escolha explícita. A migration que amplia `WhatsappConversation` foi aplicada no Supabase cloud em 15 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; o enum com os dez estados, o default `MENU`, as colunas `context` e `misunderstood_count` e os dois CHECKs foram conferidos no banco. Como a tabela estava vazia, nenhuma conversa legada precisou ser convertida.
 - RF16 no painel: `JourneyStatus` separado de `interestStatus`, status atual, detalhe da nutriz, histórico append-only com autor e horário, observação administrativa limitada e transições explícitas. A mudança usa o status anterior como condição de concorrência e atualiza perfil e histórico na mesma transação; falha no histórico reverte o status. A migration foi aplicada no Supabase cloud em 13 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo; enum, coluna com default `REGISTERED`, índices, CHECKs, FKs `RESTRICT` e trigger de imutabilidade foram conferidos no banco.
 - Extensão do RF16 com quatro marcos adicionais, sem remover os oito anteriores: `DOCUMENT_SENT`, `EXAMS_COMPLETED`, `KIT_SENT` e `DONATION_CONFIRMED`. Somente `ADMIN` registra mudanças. As migrations `20260916120000_expand_journey_status_values` e `20260916121000_expand_journey_status_transitions` foram aplicadas separadamente e em ordem no Supabase cloud em 16 de setembro de 2026 e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. O enum com os doze valores na ordem do schema e o novo CHECK de transições foram conferidos no banco; as sete transições antigas continuam aceitas, atalhos pelos novos marcos são rejeitados e os perfis existentes permaneceram inalterados (o histórico estava vazio). Os testes de integração percorrem o caminho completo pelos novos marcos, exercitam o CHECK diretamente e comparam o enum do banco com `JOURNEY_STATUS_VALUES`. A confirmação de doação continua sendo uma ação administrativa do Lactare e qualquer reconhecimento derivado dela depende exclusivamente desse status categórico registrado, sem alegação clínica ou cálculo de impacto.
@@ -223,7 +223,7 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
 | Testes | Vitest | Última suíte completa no cloud: 569 em 77 arquivos; suíte unitária local atual: 500 em 71 arquivos. |
 | E2E | Playwright | sprint futuro |
-| Chatbot | WhatsApp Cloud API, sem SDK | código local parcial; falta infraestrutura Meta |
+| Chatbot | Interface independente de provedor, com adaptadores Meta e Twilio | código local parcial; falta infraestrutura real do provedor escolhido |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
 
 Não atualizar Prisma para 7 nem Zod para 4 sem uma migração planejada.
@@ -486,7 +486,7 @@ O código da integração existe, mas não há:
 - URL pública;
 - credenciais reais.
 
-As quatro variáveis WHATSAPP_* do .env.example precisam de valores reais. Valores locais servem apenas ao simulador.
+As variáveis do provedor escolhido no `.env.example` precisam de valores reais. Valores locais servem apenas aos simuladores; `AccountSid`, `ContentSid` e formatos do Twilio não podem entrar nas regras de negócio.
 
 O webhook:
 
@@ -496,7 +496,7 @@ O webhook:
 - compara assinatura com timingSafeEqual;
 - ignora recibos que não sejam mensagens;
 - limita localmente o volume por número, usando-o somente como chave efêmera em memória;
-- usa a Cloud API diretamente, sem SDK;
+- entrega o evento normalizado à mesma máquina de estados por meio da interface `WhatsAppProvider`; cada rota seleciona o adaptador Meta ou Twilio;
 - associa telefones considerando variantes com e sem nono dígito;
 - aceita números novos, mantém estado mínimo e só cria o perfil depois do consentimento explícito;
 - resolve o CEP somente durante a consulta e persiste apenas cidade e UF;
@@ -564,7 +564,7 @@ O ledger local já registra ativação e retirada de lembretes e o dashboard agr
 Estas decisões substituem decisões antigas conflitantes:
 
 1. **Escopo Lactare-only:** a base nacional é legado, não direção futura.
-2. **WhatsApp Cloud API como porta de entrada:** links wa.me ou tel podem continuar como ações de contato, mas não substituem o chatbot-alvo.
+2. **WhatsApp como porta de entrada, independente do provedor:** links wa.me ou tel podem continuar como ações de contato, mas não substituem o chatbot-alvo; Meta e Twilio são detalhes de transporte isolados por adaptadores.
 3. **Sem agendamento:** datas podem servir como referência de lembrete; não representam reserva ou confirmação.
 4. **Sem detalhes clínicos:** triagem e decisão pertencem ao Lactare, e dados de bebês pertencem aos hospitais. O NutriLink pode armazenar e exibir somente o status categórico informado manualmente pela equipe, sem avaliar exames.
 5. **Cobertura configurável:** a lista de municípios deve ser administrável e refletida imediatamente na elegibilidade.

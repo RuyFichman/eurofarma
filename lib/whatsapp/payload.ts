@@ -21,6 +21,11 @@ export type InboundWhatsappMessage = {
   replyId: string | null
 }
 
+export type WhatsappDeliveryDiagnostic = {
+  status: string
+  errorCodes: number[]
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
     ? (value as Record<string, unknown>)
@@ -82,4 +87,41 @@ export function extractInboundMessage(
   }
 
   return null
+}
+
+/**
+ * Extrai apenas o resultado técnico dos recibos enviados pela Meta.
+ * Identificadores, telefone, conteúdo e descrição do erro ficam de fora para
+ * que o diagnóstico possa ser registrado sem expor PII ou a mensagem enviada.
+ */
+export function extractDeliveryDiagnostics(
+  payload: unknown,
+): WhatsappDeliveryDiagnostic[] {
+  const root = asRecord(payload)
+  if (!root) return []
+
+  const diagnostics: WhatsappDeliveryDiagnostic[] = []
+  for (const entry of asArray(root.entry)) {
+    const entryRecord = asRecord(entry)
+    if (!entryRecord) continue
+
+    for (const change of asArray(entryRecord.changes)) {
+      const value = asRecord(asRecord(change)?.value)
+      if (!value) continue
+
+      for (const rawStatus of asArray(value.statuses)) {
+        const statusRecord = asRecord(rawStatus)
+        const status = asString(statusRecord?.status)
+        if (!status) continue
+
+        const errorCodes = asArray(statusRecord?.errors)
+          .map((error) => asRecord(error)?.code)
+          .filter((code): code is number => typeof code === 'number')
+
+        diagnostics.push({ status, errorCodes })
+      }
+    }
+  }
+
+  return diagnostics
 }

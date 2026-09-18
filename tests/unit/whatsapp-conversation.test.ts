@@ -5,6 +5,7 @@ import {
   advanceConversation,
   buildRegistrationFailureOutcome,
   REPLY_IDS,
+  resolveTextReplyId,
   type ConversationContext,
   type ConversationProfile,
   type ConversationStep,
@@ -17,6 +18,18 @@ const PROFILE: ConversationProfile = {
   journeyStatus: 'FORM_RECEIVED',
   reminderConsentEnabled: false,
 }
+
+describe('resolveTextReplyId', () => {
+  it('aceita por texto as opções exibidas no Sandbox', () => {
+    expect(resolveTextReplyId('Quero saber mais')).toBe(REPLY_IDS.menuKnowMore)
+    expect(resolveTextReplyId('SIM, CONCORDO!')).toBe(
+      REPLY_IDS.registrationAccept,
+    )
+    expect(resolveTextReplyId('Como guardar o leite?')).toBe(
+      REPLY_IDS.faqStorage,
+    )
+  })
+})
 
 function step(
   conversationStep: ConversationStep,
