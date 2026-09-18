@@ -182,6 +182,24 @@ enum NotificationDeliveryAttemptOutcome {
   SUPPRESSED
 }
 
+/// Provedor que emitiu um callback de ciclo de vida de uma mensagem de saída.
+enum NotificationDeliveryStatusProvider {
+  TWILIO
+}
+
+/// Estados de entrega categóricos recebidos no callback do provedor.
+enum NotificationDeliveryStatus {
+  ACCEPTED
+  QUEUED
+  SENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  UNDELIVERED
+  UNKNOWN
+}
+
 /// Provedor que atribui o identificador estável de uma mensagem recebida.
 enum WhatsappInboundMessageProvider {
   META_CLOUD_API
@@ -410,14 +428,34 @@ model NotificationOutbox {
   createdAt              DateTime                 @default(now()) @map("created_at")
   updatedAt              DateTime                 @updatedAt @map("updated_at")
 
-  nutrizProfile        NutrizProfile                 @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)
-  journeyStatusHistory JourneyStatusHistory?         @relation(fields: [journeyStatusHistoryId], references: [id], onDelete: Restrict)
-  consentEvent         CommunicationConsentEvent?    @relation("NotificationConsentSnapshot", fields: [consentEventId], references: [id], onDelete: Restrict)
+  nutrizProfile        NutrizProfile                     @relation(fields: [nutrizProfileId], references: [id], onDelete: Restrict)
+  journeyStatusHistory JourneyStatusHistory?             @relation(fields: [journeyStatusHistoryId], references: [id], onDelete: Restrict)
+  consentEvent         CommunicationConsentEvent?        @relation("NotificationConsentSnapshot", fields: [consentEventId], references: [id], onDelete: Restrict)
   attempts             NotificationDeliveryAttempt[]
+  deliveryStatusEvents NotificationDeliveryStatusEvent[]
 
   @@index([status, availableAt, createdAt], map: "notification_outbox_status_available_created_idx")
   @@index([nutrizProfileId, createdAt], map: "notification_outbox_nutriz_profile_id_created_at_idx")
   @@map("notification_outbox")
+}
+
+/// Auditoria append-only dos callbacks de status de entrega. O vínculo à outbox
+/// é opcional para reter um callback válido mesmo quando o MessageSid não foi
+/// encontrado localmente; não há telefone, corpo ou outro dado pessoal.
+model NotificationDeliveryStatusEvent {
+  id                String                             @id @default(uuid())
+  outboxId          String?                            @map("outbox_id")
+  provider          NotificationDeliveryStatusProvider
+  providerMessageId String                             @map("provider_message_id") @db.VarChar(255)
+  status            NotificationDeliveryStatus
+  errorCode         String?                            @map("error_code") @db.VarChar(64)
+  receivedAt        DateTime                           @default(now()) @map("received_at")
+
+  outbox NotificationOutbox? @relation(fields: [outboxId], references: [id], onDelete: Restrict)
+
+  @@index([provider, providerMessageId, receivedAt], map: "notification_delivery_status_provider_message_received_idx")
+  @@index([outboxId, status, receivedAt], map: "notification_delivery_status_outbox_status_received_idx")
+  @@map("notification_delivery_status_events")
 }
 
 /// Auditoria append-only de cada tentativa efetiva do worker.

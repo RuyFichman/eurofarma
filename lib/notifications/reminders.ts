@@ -29,10 +29,16 @@ export function parseReminderPayload(value: unknown): ReminderPayload | null {
   return parsed.success ? parsed.data : null
 }
 
+export function buildReminderNotificationVariables(
+  siteUrl: string,
+): Readonly<Record<string, string>> {
+  return { areaUrl: `${siteUrl.replace(/\/$/u, '')}/meu-agendamento` }
+}
+
 /** Lembrete único de continuidade após o kit ser marcado como enviado. */
 export function buildReminderNotificationBody(siteUrl: string): string {
   return WHATSAPP_BOT.reminders.jobBody.replace(
     '{areaUrl}',
-    `${siteUrl.replace(/\/$/u, '')}/meu-agendamento`,
+    buildReminderNotificationVariables(siteUrl).areaUrl!,
   )
 }

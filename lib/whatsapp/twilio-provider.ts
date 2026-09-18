@@ -80,6 +80,9 @@ export class TwilioWhatsAppProvider implements WhatsAppProvider {
         From: normalizeTwilioAddress(this.config.from),
         To: normalizeTwilioAddress(input.to),
         Body: buildTwilioBody(input.reply),
+        ...(input.statusCallbackUrl
+          ? { StatusCallback: input.statusCallbackUrl }
+          : {}),
       }),
     )
   }
@@ -108,6 +111,9 @@ export class TwilioWhatsAppProvider implements WhatsAppProvider {
         MessagingServiceSid: this.config.messagingServiceSid,
         ContentSid: template.contentSid,
         ContentVariables: JSON.stringify(variables),
+        ...(input.statusCallbackUrl
+          ? { StatusCallback: input.statusCallbackUrl }
+          : {}),
       }),
     )
   }
@@ -145,6 +151,19 @@ export class TwilioWhatsAppProvider implements WhatsAppProvider {
         errorCode: 'TWILIO_TRANSPORT_EXCEPTION',
       }
     }
+  }
+}
+
+export function getTwilioStatusCallbackUrl(): string | null {
+  const value = process.env.TWILIO_STATUS_CALLBACK_URL?.trim()
+  if (!value) return null
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' || url.protocol === 'http:'
+      ? url.toString()
+      : null
+  } catch {
+    return null
   }
 }
 

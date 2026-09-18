@@ -94,6 +94,65 @@ describe('processador da outbox', () => {
     )
   })
 
+  it('usa texto livre quando a última mensagem recebida tem menos de 24 horas', async () => {
+    mocks.claim.mockReset()
+    mocks.claim
+      .mockResolvedValueOnce({
+        ...claim,
+        lastInboundAt: new Date(NOW.getTime() - 23 * 60 * 60 * 1000),
+      })
+      .mockResolvedValueOnce(null)
+    const fakeTransport = transport({
+      outcome: 'SENT',
+      providerMessageId: 'SM-freeform-1',
+    })
+
+    await processNotificationOutbox({
+      transport: fakeTransport,
+      siteUrl: 'https://nutrilink.test',
+      now: () => NOW,
+    })
+
+    expect(fakeTransport.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        delivery: 'FREEFORM',
+        template: null,
+        templateVariables: null,
+      }),
+    )
+  })
+
+  it('usa template fora da janela de atendimento de 24 horas', async () => {
+    mocks.claim.mockReset()
+    mocks.claim
+      .mockResolvedValueOnce({
+        ...claim,
+        lastInboundAt: new Date(NOW.getTime() - 24 * 60 * 60 * 1000 - 1),
+      })
+      .mockResolvedValueOnce(null)
+    const fakeTransport = transport({
+      outcome: 'SENT',
+      providerMessageId: 'SM-template-1',
+    })
+
+    await processNotificationOutbox({
+      transport: fakeTransport,
+      siteUrl: 'https://nutrilink.test',
+      now: () => NOW,
+    })
+
+    expect(fakeTransport.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        delivery: 'TEMPLATE',
+        template: 'journey-status-changed',
+        templateVariables: {
+          status: 'Ficha recebida',
+          areaUrl: 'https://nutrilink.test/meu-agendamento',
+        },
+      }),
+    )
+  })
+
   it('agenda nova tentativa depois de falha temporária', async () => {
     await processNotificationOutbox({
       transport: transport({

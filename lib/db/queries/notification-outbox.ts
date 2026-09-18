@@ -21,6 +21,7 @@ export type ClaimedNotification = {
   toStatus: JourneyStatusValue | null
   payload: Prisma.JsonValue | null
   phoneWhatsapp: string
+  lastInboundAt: Date | null
   profileDeleted: boolean
   hasCurrentConsent: boolean
 }
@@ -38,6 +39,11 @@ const CLAIM_SELECT = {
     select: {
       phoneWhatsapp: true,
       deletedAt: true,
+      conversations: {
+        orderBy: { lastMessageAt: 'desc' },
+        take: 1,
+        select: { lastMessageAt: true },
+      },
       communicationConsents: {
         where: {
           purpose: {
@@ -127,6 +133,8 @@ export async function claimNextNotificationOutbox(
           | undefined) ?? null,
       payload: row.payload,
       phoneWhatsapp: row.nutrizProfile.phoneWhatsapp,
+      lastInboundAt:
+        row.nutrizProfile.conversations?.[0]?.lastMessageAt ?? null,
       profileDeleted: row.nutrizProfile.deletedAt !== null,
       hasCurrentConsent: currentConsent?.decision === 'GRANTED',
     }
