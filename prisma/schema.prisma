@@ -182,6 +182,20 @@ enum NotificationDeliveryAttemptOutcome {
   SUPPRESSED
 }
 
+/// Provedor que atribui o identificador estável de uma mensagem recebida.
+enum WhatsappInboundMessageProvider {
+  META_CLOUD_API
+  TWILIO
+}
+
+/// Resultado terminal do tratamento da mensagem recebida pelo webhook.
+enum WhatsappInboundMessageProcessingResult {
+  PROCESSING
+  PROCESSED
+  IGNORED
+  FAILED
+}
+
 /// Opções mínimas e não clínicas de como a nutriz se sentiu ao registrar um
 /// momento de bem-estar. Não é diário de saúde nem avaliação terapêutica.
 enum WellbeingFeeling {
@@ -580,9 +594,29 @@ model WhatsappConversation {
   createdAt          DateTime                 @default(now()) @map("created_at")
   updatedAt          DateTime                 @updatedAt @map("updated_at")
 
-  nutrizProfile NutrizProfile? @relation(fields: [nutrizProfileId], references: [id])
+  nutrizProfile   NutrizProfile?           @relation(fields: [nutrizProfileId], references: [id])
+  inboundMessages WhatsappInboundMessage[]
 
   @@map("whatsapp_conversations")
+}
+
+/// Entrada deduplicada antes de qualquer efeito no fluxo. Não armazena corpo,
+/// telefone, nome, CEP ou outro conteúdo da mensagem.
+model WhatsappInboundMessage {
+  id                String                                 @id @default(uuid())
+  provider          WhatsappInboundMessageProvider
+  providerMessageId String                                 @map("provider_message_id") @db.VarChar(255)
+  conversationId    String?                                @map("conversation_id")
+  receivedAt        DateTime                               @default(now()) @map("received_at")
+  processingResult  WhatsappInboundMessageProcessingResult @default(PROCESSING) @map("processing_result")
+  processedAt       DateTime?                              @map("processed_at")
+
+  conversation WhatsappConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, providerMessageId], map: "whatsapp_inbound_messages_provider_message_key")
+  @@index([conversationId, receivedAt], map: "whatsapp_inbound_messages_conversation_received_idx")
+  @@index([processingResult, receivedAt], map: "whatsapp_inbound_messages_result_received_idx")
+  @@map("whatsapp_inbound_messages")
 }
 
 model EducationalContent {

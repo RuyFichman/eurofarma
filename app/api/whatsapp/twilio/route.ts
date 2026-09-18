@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
     await processInboundWhatsappMessage({
       message,
       provider: getTwilioWhatsAppProvider(),
+      inboundProvider: 'TWILIO',
       siteUrl: getSiteUrl(request),
     })
   } catch (error) {
