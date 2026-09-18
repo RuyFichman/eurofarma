@@ -204,6 +204,10 @@ O job de lembretes foi implementado sobre a mesma outbox do RF17. Ele enfileira 
 
 O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para falar com a equipe do Lactare. O mesmo chat do WhatsApp é mantido, o bot fica pausado e a resposta diferencia atendimento dentro e fora da janela de segunda a sábado, das 9h às 18h, no horário de Brasília. “Menu” é a saída explícita para retomar o autoatendimento. A migration `20260916200000_add_human_handoff_step` foi aplicada no Supabase cloud em 17 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo. A integração do atendente e a infraestrutura real da Meta continuam pendentes.
 
+### Paridade do handoff humano no adaptador Twilio (18 de setembro de 2026)
+
+`POST /api/whatsapp/twilio` reaproveita a mesma `processInboundWhatsappMessage` e a mesma máquina de estados do webhook da Meta, então a pausa de `HUMAN_HANDOFF` já valia para os dois provedores desde que a máquina de estados foi compartilhada. Esta atualização acrescenta cobertura de teste dedicada que comprova a paridade em vez de assumi-la: `tests/unit/whatsapp-twilio-route.test.ts` cobre assinatura inválida ou ausente, reentrega idempotente pelo `MessageSid`, o pedido explícito de handoff pelo mesmo número, o bot permanecendo mudo durante a pausa e a retomada do autoatendimento ao escrever “menu”. `tests/unit/whatsapp-conversation.test.ts` ganhou os casos equivalentes na máquina de estados pura (retomada por “menu” e permanência pausada para qualquer outro texto). Nenhum comportamento de produção mudou; a decisão entre Twilio Conversations/Flex e uma fila/tela administrativa própria para a operação humana completa (seção 11.2) continua em aberto.
+
 ## 4. Stack
 
 | Camada | Tecnologia | Versão ou nota |
