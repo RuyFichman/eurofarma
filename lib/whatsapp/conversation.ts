@@ -122,6 +122,45 @@ const FAQ_ANSWER_BY_ID = {
 const HEALTH_QUESTION_PATTERN =
   /\b(posso\s+doar|rem[eé]dio|medicamento|doen[cç]a|febre|infec|[aá]lcool|fumo|cigarro|sa[uú]de|diagn[oó]stico|exame)\b/iu
 
+function normalizeReplyText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/gu, '')
+    .trim()
+    .toLocaleLowerCase('pt-BR')
+    .replace(/[?!.,]+$/gu, '')
+}
+
+const TEXT_REPLY_ENTRIES: ReadonlyArray<readonly [string, string]> = [
+  [WHATSAPP_BOT.menu.knowMore, REPLY_IDS.menuKnowMore],
+  [WHATSAPP_BOT.menu.donate, REPLY_IDS.menuDonate],
+  [WHATSAPP_BOT.menu.human, REPLY_IDS.menuHuman],
+  [WHATSAPP_BOT.menu.reminders, REPLY_IDS.menuReminders],
+  [WHATSAPP_BOT.faq.questions.WHO_CAN_DONATE, REPLY_IDS.faqWhoCanDonate],
+  [WHATSAPP_BOT.faq.questions.HOW_IT_WORKS, REPLY_IDS.faqHowItWorks],
+  [WHATSAPP_BOT.faq.questions.STORAGE, REPLY_IDS.faqStorage],
+  [WHATSAPP_BOT.faq.questions.PAIN, REPLY_IDS.faqPain],
+  [WHATSAPP_BOT.faq.questions.FREQUENCY, REPLY_IDS.faqFrequency],
+  [WHATSAPP_BOT.faq.more, REPLY_IDS.faqMore],
+  [WHATSAPP_BOT.faq.donate, REPLY_IDS.faqDonate],
+  [WHATSAPP_BOT.faq.site, REPLY_IDS.faqSite],
+  [WHATSAPP_BOT.registration.accept, REPLY_IDS.registrationAccept],
+  [WHATSAPP_BOT.registration.decline, REPLY_IDS.registrationDecline],
+  [WHATSAPP_BOT.reminders.enable, REPLY_IDS.remindersEnable],
+  [WHATSAPP_BOT.reminders.disable, REPLY_IDS.remindersDisable],
+  [WHATSAPP_BOT.reminders.back, REPLY_IDS.remindersBack],
+]
+
+const TEXT_REPLY_IDS = new Map<string, string>(
+  TEXT_REPLY_ENTRIES.map(([label, id]) => [normalizeReplyText(label), id]),
+)
+
+/** Permite usar o mesmo fluxo em provedores que oferecem apenas texto livre. */
+export function resolveTextReplyId(text: string | null): string | null {
+  if (!text) return null
+  return TEXT_REPLY_IDS.get(normalizeReplyText(text)) ?? null
+}
+
 function emptyContext(): ConversationContext {
   return {}
 }

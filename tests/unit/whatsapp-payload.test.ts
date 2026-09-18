@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest'
 
-import { extractInboundMessage } from '../../lib/whatsapp/payload'
+import {
+  extractDeliveryDiagnostics,
+  extractInboundMessage,
+} from '../../lib/whatsapp/payload'
 import { buildBrazilianWhatsappCandidates } from '../../lib/whatsapp/phone-candidates'
 
 function envelope(value: Record<string, unknown>): unknown {
@@ -81,6 +84,28 @@ describe('extractInboundMessage', () => {
         envelope({ statuses: [{ id: 'wamid.1', status: 'delivered' }] }),
       ),
     ).toBeNull()
+  })
+
+  it('extrai diagnóstico de entrega sem identificadores ou PII', () => {
+    expect(
+      extractDeliveryDiagnostics(
+        envelope({
+          statuses: [
+            {
+              id: 'wamid.1',
+              recipient_id: '5511999998888',
+              status: 'failed',
+              errors: [{ code: 130497, message: 'detalhe sensível' }],
+            },
+          ],
+        }),
+      ),
+    ).toEqual([{ status: 'failed', errorCodes: [130497] }])
+  })
+
+  it('ignora recibos malformados no diagnóstico', () => {
+    expect(extractDeliveryDiagnostics(null)).toEqual([])
+    expect(extractDeliveryDiagnostics(envelope({ statuses: [{}] }))).toEqual([])
   })
 
   it('ignora payload malformado sem lancar', () => {

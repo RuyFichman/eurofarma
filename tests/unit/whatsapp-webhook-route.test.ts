@@ -25,7 +25,7 @@ vi.mock('../../lib/db/queries/whatsapp-conversations', () => ({
 vi.mock('../../lib/whatsapp/coverage', () => ({
   resolveWhatsappCoverageInput: mocks.resolveCoverage,
 }))
-vi.mock('../../lib/whatsapp/client', () => ({
+vi.mock('../../lib/whatsapp/provider', () => ({
   sendWhatsappReply: mocks.sendReply,
 }))
 vi.mock('../../lib/security/rate-limit', () => ({
