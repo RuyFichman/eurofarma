@@ -93,7 +93,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 ### 3.1 O que está implementado
 
 - Scaffold Next.js e design system.
-- Landing pública, página “Sobre”, conteúdo educativo e style guide.
+- Landing pública, página “Sobre”, conteúdo educativo, style guide e minutas técnicas de Privacidade e Termos em `/privacidade` e `/termos`. As minutas deixam explícita a pendência de validação institucional e jurídica e não apresentam canal fictício como oficial.
 - Página pública de verificação de cobertura por CEP ou município em `/verificar-cobertura`, com os 30 municípios do Lactare agrupados em seis sub-regiões.
 - A lista ativa de municípios usada pela página pública, pela API de cidades, pela verificação de CEP e pelo chatbot compartilha um cache de uma hora. Criação e edição no painel invalidam a tag e as superfícies públicas imediatamente; respostas que contêm o CEP informado continuam `no-store`.
 - Resolução de CEP pelo ViaCEP em `POST /api/coverage`, seguida da comparação com a lista ativa de `service_municipalities`; o CEP não é persistido.
@@ -129,7 +129,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF01 — elegibilidade por CEP | **Implementado no escopo validável.** O ViaCEP resolve município e UF, e a lista ativa indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite. A interface não promete confirmação logística; a uniformidade operacional nos 30 municípios ainda depende de validação do Lactare. |
 | RF02 — área atendida | **Implementado no escopo atualizado.** A interface exibe os 30 municípios atendidos; bancos de leite e pontos de coleta não são mais entidades públicas ou administrativas do produto. |
 | RF03 — fora da cobertura | **Implementado.** CEP ou município fora da lista recebe explicação e link oficial da rBLH. |
-| RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório no formulário, mas Privacidade e Termos ainda dão 404. |
+| RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório e as rotas de Privacidade e Termos têm minutas técnicas locais, mas a identificação do controlador e do encarregado, o canal institucional e a redação jurídica ainda dependem de validação da Eurofarma antes de qualquer publicação. |
 | RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
 | RF06 — lembretes opcionais | **Parcial, consentimento implementado.** Opt-in e cancelamento são separados, opcionais e auditáveis no cadastro, na área autenticada e no chatbot; a ativação registra uma data de referência sem horário e confirma somente a ativação, nunca agendamento. As migrations da referência ainda estão locais, o job de enfileiramento está implementado e a entrega real dos lembretes depende da Meta. |
 | RF07 — tracking de contato | **Implementado.** O clique nos canais oficiais do Lactare é gravado como evento anônimo em `contact_channel_clicks`, sem unidade legada e sem CEP ou PII. O tracking antigo por unidade continua aposentado (`/api/track` responde 410). O painel lê o total, a janela de 30 dias e a distribuição por canal. |
@@ -176,7 +176,7 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Integração real do processador da outbox com templates aprovados da Meta.
 - Cartão de impacto e reconhecimento de indicação.
 - Conta Meta, número, templates e URL pública para o WhatsApp.
-- Política de Privacidade, Termos de Uso e RLS das tabelas existentes continuam obrigatórios antes de exposição pública, mas foram adiados pelo time para depois da entrega de municípios. As tabelas pessoais `extraction_logs` e `wellbeing_entries` já têm RLS e policies de propriedade aplicadas no cloud.
+- Validação jurídica e institucional das minutas de Privacidade e Termos, incluindo controlador, encarregado e canal de exercício de direitos, além de RLS das tabelas existentes, continuam obrigatórias antes de exposição pública. As tabelas pessoais `extraction_logs` e `wellbeing_entries` já têm RLS e policies de propriedade aplicadas no cloud.
 
 ### 3.5 Validações externas pendentes
 
@@ -410,7 +410,7 @@ Antes de qualquer deploy ou demonstração pública com dados reais, são obriga
 
 - habilitar RLS;
 - criar e testar policies;
-- publicar Privacidade e Termos;
+- validar juridicamente e publicar Privacidade e Termos com controlador, encarregado e canal institucional definidos;
 - trocar o rate limit em memória por store distribuído;
 - adicionar proteção anti-spam;
 - revisar logs e respostas de erro;
