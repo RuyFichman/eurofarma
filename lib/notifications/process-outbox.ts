@@ -4,12 +4,15 @@ import {
 } from '../db/queries/notification-outbox'
 import {
   buildJourneyStatusNotificationBody,
+  buildJourneyStatusNotificationVariables,
   getNotificationRetryAt,
+  WHATSAPP_CUSTOMER_SERVICE_WINDOW_MS,
   type NotificationTransport,
   type NotificationTransportResult,
 } from './journey-status-notification'
 import {
   buildReminderNotificationBody,
+  buildReminderNotificationVariables,
   parseReminderPayload,
 } from './reminders'
 
@@ -27,6 +30,17 @@ function safeErrorCode(value: string): string {
     .toUpperCase()
     .replace(/[^A-Z0-9_:-]/gu, '_')
   return normalized.slice(0, 64) || 'UNKNOWN_ERROR'
+}
+
+export function isWhatsappCustomerServiceWindowActive(
+  lastInboundAt: Date | null,
+  now: Date,
+): boolean {
+  if (!lastInboundAt || lastInboundAt > now) return false
+  return (
+    now.getTime() - lastInboundAt.getTime() <=
+    WHATSAPP_CUSTOMER_SERVICE_WINDOW_MS
+  )
 }
 
 async function transportResult(
@@ -77,13 +91,22 @@ export async function processNotificationOutbox(params: {
     }
 
     let body: string
+    let template: 'journey-status-changed' | 'kit-delivery-follow-up'
+    let templateVariables: Readonly<Record<string, string>>
     if (claim.kind === 'JOURNEY_STATUS_CHANGED' && claim.toStatus) {
       body = buildJourneyStatusNotificationBody(claim.toStatus, params.siteUrl)
+      template = 'journey-status-changed'
+      templateVariables = buildJourneyStatusNotificationVariables(
+        claim.toStatus,
+        params.siteUrl,
+      )
     } else if (
       claim.kind === 'REMINDER' &&
       parseReminderPayload(claim.payload)
     ) {
       body = buildReminderNotificationBody(params.siteUrl)
+      template = 'kit-delivery-follow-up'
+      templateVariables = buildReminderNotificationVariables(params.siteUrl)
     } else {
       await finalizeNotificationOutbox({
         claim,
@@ -99,11 +122,20 @@ export async function processNotificationOutbox(params: {
       continue
     }
 
+    const delivery = isWhatsappCustomerServiceWindowActive(
+      claim.lastInboundAt,
+      now(),
+    )
+      ? 'FREEFORM'
+      : 'TEMPLATE'
     const result = await transportResult(params.transport, {
       outboxId: claim.id,
       idempotencyKey: claim.idempotencyKey,
       to: claim.phoneWhatsapp,
       body,
+      delivery,
+      template: delivery === 'TEMPLATE' ? template : null,
+      templateVariables: delivery === 'TEMPLATE' ? templateVariables : null,
     })
     const completedAt = now()
 
