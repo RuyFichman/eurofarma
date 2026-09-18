@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
     await processInboundWhatsappMessage({
       message,
       provider: getMetaWhatsAppProvider(),
+      inboundProvider: 'META_CLOUD_API',
       siteUrl: getSiteUrl(request),
     })
 

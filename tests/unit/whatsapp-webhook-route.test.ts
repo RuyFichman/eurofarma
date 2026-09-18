@@ -11,6 +11,8 @@ const mocks = vi.hoisted(() => ({
   sendReply: vi.fn(),
   rateLimit: vi.fn(),
   setReminderConsent: vi.fn(),
+  claimInboundMessage: vi.fn(),
+  finishInboundMessage: vi.fn(),
 }))
 
 vi.mock('../../lib/whatsapp/signature', () => ({
@@ -21,6 +23,10 @@ vi.mock('../../lib/db/queries/whatsapp-conversations', () => ({
   getConversationState: mocks.getState,
   saveConversationState: mocks.saveState,
   createWhatsappNutrizLead: mocks.createLead,
+}))
+vi.mock('../../lib/db/queries/whatsapp-inbound-messages', () => ({
+  claimWhatsappInboundMessage: mocks.claimInboundMessage,
+  finishWhatsappInboundMessage: mocks.finishInboundMessage,
 }))
 vi.mock('../../lib/whatsapp/coverage', () => ({
   resolveWhatsappCoverageInput: mocks.resolveCoverage,
@@ -64,6 +70,11 @@ describe('POST /api/whatsapp/webhook', () => {
       status: 'UPDATED',
       enabled: true,
     })
+    mocks.claimInboundMessage.mockResolvedValue({
+      id: 'inbound-1',
+      claimed: true,
+    })
+    mocks.finishInboundMessage.mockResolvedValue(undefined)
   })
 
   afterEach(() => vi.unstubAllEnvs())
@@ -104,6 +115,35 @@ describe('POST /api/whatsapp/webhook', () => {
       misunderstoodCount: 0,
     })
     expect(mocks.sendReply.mock.calls[0]?.[0].reply.type).toBe('buttons')
+  })
+
+  it('encerra uma reentrega antes de consultar ou alterar a conversa', async () => {
+    mocks.claimInboundMessage.mockResolvedValue({
+      id: 'inbound-duplicate',
+      claimed: false,
+    })
+
+    const response = await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'wamid.duplicate-1',
+          text: { body: 'Olá' },
+        }),
+      ),
+    )
+
+    expect(response.status).toBe(200)
+    expect(mocks.claimInboundMessage).toHaveBeenCalledWith({
+      provider: 'META_CLOUD_API',
+      providerMessageId: 'wamid.duplicate-1',
+    })
+    expect(mocks.findNutriz).not.toHaveBeenCalled()
+    expect(mocks.getState).not.toHaveBeenCalled()
+    expect(mocks.saveState).not.toHaveBeenCalled()
+    expect(mocks.createLead).not.toHaveBeenCalled()
+    expect(mocks.setReminderConsent).not.toHaveBeenCalled()
+    expect(mocks.sendReply).not.toHaveBeenCalled()
   })
 
   it('resolve cobertura e persiste apenas município e UF', async () => {
@@ -246,6 +286,11 @@ describe('POST /api/whatsapp/webhook', () => {
       status: 'UPDATED',
       enabled: true,
     })
+    mocks.claimInboundMessage.mockResolvedValue({
+      id: 'inbound-1',
+      claimed: true,
+    })
+    mocks.finishInboundMessage.mockResolvedValue(undefined)
 
     await POST(
       request(
