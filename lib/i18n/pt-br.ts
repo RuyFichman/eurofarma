@@ -48,6 +48,126 @@ export const FOOTER = {
   copyright: `© ${new Date().getFullYear()} NutriLink. Todos os direitos reservados.`,
 } as const
 
+export const LEGAL = {
+  privacy: {
+    meta: {
+      title: 'Política de Privacidade | NutriLink',
+      description:
+        'Saiba como o NutriLink trata dados pessoais durante a jornada digital de relacionamento com o Lactare.',
+    },
+    eyebrow: 'Privacidade e proteção de dados',
+    title: 'Política de Privacidade',
+    introduction:
+      'Esta página descreve, de forma transparente, como o NutriLink trata dados pessoais para oferecer a experiência digital de relacionamento com o Lactare.',
+    updatedAt: 'Última atualização: 18 de setembro de 2026.',
+    reviewNotice:
+      'Versão para demonstração técnica. O texto deverá ser validado pelas áreas jurídica e de privacidade da Eurofarma antes de qualquer exposição pública.',
+    sections: [
+      {
+        title: '1. Quem participa desta experiência',
+        paragraphs: [
+          'O NutriLink é a solução digital de apoio à jornada das nutrizes atendidas pelo Lactare, banco de leite humano da Eurofarma. O Lactare permanece responsável pelo atendimento, pela avaliação profissional e pela operação de coleta e processamento do leite.',
+          'O NutriLink não realiza triagem clínica, não mantém prontuário e não substitui o contato com a equipe do Lactare.',
+        ],
+      },
+      {
+        title: '2. Quais dados podem ser tratados',
+        paragraphs: [
+          'Conforme a funcionalidade utilizada, podemos tratar nome, e-mail, telefone ou WhatsApp, cidade, preferências de comunicação, consentimentos, origem do cadastro e status categórico da jornada informado pelo Lactare.',
+          'Registros pessoais opcionais disponibilizados na área autenticada pertencem à própria nutriz e não devem conter informações clínicas. O CEP consultado para verificar cobertura é usado somente para identificar município e UF e não é armazenado pelo NutriLink.',
+        ],
+      },
+      {
+        title: '3. Para quais finalidades',
+        paragraphs: [
+          'Os dados são utilizados para criar e proteger a conta, verificar a área atendida, manter a continuidade da jornada, responder pelo chatbot, registrar consentimentos, enviar comunicações autorizadas e produzir métricas agregadas de uso e melhoria do serviço.',
+          'Lembretes e avisos pelo WhatsApp dependem de autorização específica e podem ser cancelados. Um lembrete nunca representa agendamento ou confirmação de coleta.',
+        ],
+      },
+      {
+        title: '4. Compartilhamento e fornecedores',
+        paragraphs: [
+          'Os dados podem ser processados por fornecedores essenciais de infraestrutura, autenticação, banco de dados e comunicação, apenas na medida necessária para operar o serviço. O canal de WhatsApp pode envolver a plataforma da Meta e, conforme a configuração adotada, um provedor intermediário de comunicação. A relação de fornecedores e seus papéis deverá ser validada antes da publicação definitiva.',
+          'O NutriLink não vende dados pessoais nem oferece recompensa material por indicação.',
+        ],
+      },
+      {
+        title: '5. Segurança e conservação',
+        paragraphs: [
+          'São adotadas medidas técnicas e organizacionais para limitar acessos, reduzir os dados coletados e proteger as informações contra uso indevido. Os dados devem ser conservados somente pelo período necessário às finalidades informadas e às obrigações aplicáveis.',
+        ],
+      },
+      {
+        title: '6. Seus direitos',
+        paragraphs: [
+          'A titular pode solicitar confirmação do tratamento, acesso, correção, informação sobre compartilhamento, portabilidade quando aplicável, revogação de consentimento e eliminação de dados tratados com base em consentimento, observadas as hipóteses legais de conservação.',
+          'Solicitações de privacidade e exclusão podem ser encaminhadas ao canal de contato indicado abaixo. Antes de atender ao pedido, poderá ser necessário confirmar a identidade da solicitante para proteger seus dados.',
+        ],
+      },
+      {
+        title: '7. Contato',
+        paragraphs: [
+          'A identificação do controlador, do encarregado e o canal institucional para exercício de direitos deverão ser definidos e validados pela Eurofarma antes da publicação definitiva. Esta versão de demonstração não deve ser usada para enviar solicitações formais de privacidade.',
+        ],
+      },
+    ],
+  },
+  terms: {
+    meta: {
+      title: 'Termos de Uso | NutriLink',
+      description:
+        'Conheça as condições de uso da experiência digital NutriLink.',
+    },
+    eyebrow: 'Condições de uso',
+    title: 'Termos de Uso',
+    introduction:
+      'Estes termos apresentam os limites e as condições básicas para uso da experiência digital NutriLink.',
+    updatedAt: 'Última atualização: 18 de setembro de 2026.',
+    reviewNotice:
+      'Versão para demonstração técnica. O texto deverá ser validado pelas áreas jurídica e de privacidade da Eurofarma antes de qualquer exposição pública.',
+    sections: [
+      {
+        title: '1. Finalidade do NutriLink',
+        paragraphs: [
+          'O NutriLink oferece informações educativas, verificação geográfica da área atendida pelo Lactare, cadastro opcional, área pessoal e canais digitais de relacionamento.',
+          'A plataforma não realiza diagnóstico, triagem clínica, agendamento ou confirmação automática de coleta.',
+        ],
+      },
+      {
+        title: '2. Cadastro e segurança da conta',
+        paragraphs: [
+          'A usuária deve fornecer informações verdadeiras, manter suas credenciais protegidas e comunicar qualquer suspeita de acesso indevido. O cadastro é opcional e exige concordância com o tratamento de dados necessário à conta.',
+        ],
+      },
+      {
+        title: '3. Jornada e comunicações',
+        paragraphs: [
+          'Os status exibidos são categorias operacionais registradas pela equipe autorizada. Questões clínicas e a combinação de data e horário de coleta permanecem sob responsabilidade dos profissionais e dos canais oficiais do Lactare.',
+          'Comunicações opcionais podem ser canceladas. Sugestões e lembretes são informativos e não acionam uma coleta automaticamente.',
+        ],
+      },
+      {
+        title: '4. Uso responsável',
+        paragraphs: [
+          'Não é permitido tentar acessar contas de terceiros, interferir no funcionamento do serviço, automatizar abuso dos canais ou inserir conteúdo ilícito, ofensivo ou dados clínicos desnecessários.',
+        ],
+      },
+      {
+        title: '5. Disponibilidade e alterações',
+        paragraphs: [
+          'A demonstração pode sofrer interrupções e mudanças durante o desenvolvimento. Funcionalidades dependentes de serviços externos, como WhatsApp e e-mail, também estão sujeitas à disponibilidade desses fornecedores.',
+        ],
+      },
+      {
+        title: '6. Contato',
+        paragraphs: [
+          'O canal institucional para dúvidas sobre estes termos deverá ser definido e validado pela Eurofarma antes da publicação definitiva. Esta versão de demonstração não apresenta um canal oficial de atendimento jurídico.',
+        ],
+      },
+    ],
+  },
+} as const
+
 export const HOME = {
   hero: {
     badge: 'Área de atuação do Lactare',

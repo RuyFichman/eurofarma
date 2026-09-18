@@ -154,7 +154,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 ## 6. Segurança e LGPD
 
 - Consentimento explícito e separado para cadastro e lembretes.
-- Política de Privacidade e Termos de Uso publicados; ainda pendentes na implementação.
+- Minutas técnicas de Política de Privacidade e Termos de Uso disponíveis localmente; identificação do controlador e do encarregado, canal institucional e redação jurídica ainda dependem de validação da Eurofarma antes da publicação.
 - RLS no Supabase; ainda pendente na implementação.
 - Exposição reduzida de dados pessoais no painel administrativo.
 - Rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública; o limitador atual é apenas local e em memória.
@@ -215,7 +215,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
 - **Elegibilidade operacional:** o produto verifica se o CEP ou município pertence à área configurada e indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; a confirmação da modalidade e da logística continua dependendo do Lactare.
-- **Cadastro com LGPD:** o bloqueio de consentimento existe, mas `/privacidade` e `/termos` ainda retornam 404 e precisam ser publicados.
+- **Cadastro com LGPD:** o bloqueio de consentimento existe e `/privacidade` e `/termos` apresentam minutas técnicas locais. Elas não substituem a validação institucional e jurídica nem podem ser tratadas como políticas definitivas enquanto controlador, encarregado e canal de exercício de direitos não forem definidos.
 - **Métricas:** a segmentação combinável por região, status atual e origem, os sinais observáveis de alcance, os cliques por canal e o funil progressivo do `JourneyStatus` estão implementados. “Sem avanço” identifica o ponto atual entre etapas e não prova desistência. Ainda faltam retenção, adesão a lembretes, recorrência de doações confirmadas, indicação própria e velocidade até a primeira doação.
 - **Tracking de contato:** o evento novo mede os canais diretos do Lactare, já está gravando e alimenta total, janela de 30 dias e distribuição por canal no painel; o evento antigo, vinculado a unidades, continua aposentado. Como os eventos novos são anônimos, os números permanecem globais e não são segmentados por região ou status.
 - **Chatbot:** menu, perguntas frequentes, elegibilidade, orientação, cadastro opcional, retomada por status, ativação ou cancelamento de lembretes e handoff humano local estão implementados. O handoff exige pedido explícito, continua no mesmo chat, pausa o bot e direciona para a equipe do Lactare de segunda a sábado, das 9h às 18h, no horário de Brasília; fora desse horário, o pedido permanece registrado para a próxima janela, sem prazo de resposta prometido. Avisos de status e lembretes têm consentimentos opcionais separados. O job local de enfileiramento dos lembretes está implementado sem linguagem de agendamento; ainda faltam envio real, vídeo institucional oficial, retirada e reconcessão dos avisos de status, operação humana conectada à infraestrutura da Meta e pós-doação baseado em confirmação legítima. Não há conta Meta, número, templates ou URL pública para a entrega real.
@@ -229,7 +229,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 - RF14: reconhecimento por status na área pessoal. Reconhecimentos objetivos já estão implementados; ainda não há reconhecimento derivado de indicação.
 - RF15: atribuição específica de novos cadastros por indicação.
 - RF17: retirada e reconcessão do opt-in e entrega real por template aprovado da Meta. A base transacional, o processador e o simulador estão implementados, e a migration da outbox está aplicada no Supabase cloud.
-- Páginas de Política de Privacidade e Termos de Uso, adiadas pelo time para depois desta entrega.
+- Validação institucional e jurídica das minutas de Política de Privacidade e Termos de Uso, incluindo controlador, encarregado e canal para exercício de direitos.
 - RLS, rate limiting distribuído e proteção anti-spam, também adiados, mas ainda obrigatórios antes de exposição pública.
 - Validação operacional de e-mail e WhatsApp, caso exigida pelo Lactare.
 - Ativação real do chatbot na Meta.
@@ -246,7 +246,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 2. Ligar a entrega real dos lembretes e a operação humana do handoff à infraestrutura da Meta.
 3. Evoluir o dashboard com eventos de entrega/adesão efetiva, recorrência e os segmentos que dependem de indicação e confirmação legítima de doação. Retorno observável, adesão vigente, alcance, cliques de contato e funil do `JourneyStatus` já estão implementados.
 4. Definir a confirmação de doação e, depois disso, implementar cartão e reconhecimento derivado de indicação. A mensagem de indicação já usa apenas o link próprio da nutriz e depende de ação explícita dela para copiar ou abrir o WhatsApp; os reconhecimentos por status permanecem baseados em categorias, sem alegação clínica.
-5. Publicar Privacidade e Termos, aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. O time decidiu executar esse bloco por último, mas ele permanece bloqueador de publicação.
+5. Validar juridicamente e publicar Privacidade e Termos com controlador, encarregado e canal institucional definidos; aplicar RLS e concluir rate limiting distribuído e proteção anti-spam antes de qualquer exposição pública. Esse bloco permanece bloqueador de publicação.
 6. Ativar a integração real com a Meta somente quando houver conta, número, templates e URL pública.
 
 ### 9.6 Risco de adoção do status da jornada
