@@ -84,10 +84,9 @@ export function HomeHero() {
 
         {/* Coluna visual. Foto fornecida pelo time (TODO: confirmar licença de
             uso com a Eurofarma antes de qualquer exposição pública).
-            Proporção 4/5: a original é 800x1200 (retrato), e um recorte
-            paisagem cortaria o rosto do bebê. */}
-        <div className="relative">
-          <div className="ring-border/60 relative aspect-[4/5] overflow-hidden rounded-3xl shadow-lg ring-1">
+            O recorte quadrado equilibra a composição sem perder o rosto do bebê. */}
+        <div className="relative mx-auto w-full max-w-[32rem] lg:ml-auto">
+          <div className="ring-border/60 relative aspect-square overflow-hidden rounded-3xl shadow-lg ring-1">
             <Image
               src="/images/hero-bebe.jpg"
               alt={hero.imageAlt}

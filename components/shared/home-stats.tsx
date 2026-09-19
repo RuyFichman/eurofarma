@@ -41,25 +41,25 @@ export function HomeStats({ stats }: HomeStatsProps) {
         {COPY.title}
       </h2>
 
-      <dl className="bg-card divide-border -mt-10 grid grid-cols-2 divide-x rounded-3xl border shadow-md md:-mt-14">
+      <dl className="bg-card -mt-10 grid grid-cols-1 divide-y rounded-3xl border shadow-md sm:grid-cols-2 sm:divide-x sm:divide-y-0 md:-mt-14">
         {items.map((item) => (
           // `flex-col-reverse`: o número aparece primeiro, mas no DOM o rótulo
           // (`dt`) vem antes do valor (`dd`), como a lista de definição exige.
           <div
             key={item.label}
-            className="flex flex-col-reverse items-center gap-1 px-4 py-7 text-center md:px-6 md:py-8"
+            className="flex flex-col-reverse items-center gap-1 px-6 py-7 text-center md:px-10 md:py-8"
           >
-            <dt className="text-muted-foreground text-sm text-balance">
+            <dt className="text-muted-foreground text-sm font-medium tracking-tight text-balance">
               {item.label}
             </dt>
-            <dd className="text-primary text-3xl font-bold tabular-nums md:text-4xl">
+            <dd className="text-primary text-4xl font-semibold tracking-tight tabular-nums md:text-5xl">
               {item.value}
             </dd>
           </div>
         ))}
       </dl>
 
-      <p className="text-muted-foreground mt-4 text-center text-xs text-pretty">
+      <p className="text-muted-foreground mt-5 pb-8 text-center text-xs text-pretty md:pb-10">
         {COPY.sourceNote}
       </p>
     </section>
