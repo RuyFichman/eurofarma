@@ -1227,6 +1227,30 @@ export const NUTRIZ_AUTH = {
       safetyNotice:
         'O link só registra a origem de um novo cadastro para fins de métrica. Ele não gera recompensa material, não confirma atendimento nem informa dados sobre outras pessoas.',
     },
+    account: {
+      title: 'Meus dados',
+      whatsappLabel: 'WhatsApp',
+      consentLabel: 'Consentimento LGPD',
+      consentValue: 'Dado em {date}',
+      editAction: 'Editar dados',
+      cancelAction: 'Cancelar',
+      saveAction: 'Salvar dados',
+      saving: 'Salvando...',
+      savedFeedback: 'Seus dados foram atualizados.',
+      deleteAction: 'Excluir conta',
+      deleteConfirm:
+        'Excluir sua conta? Você perde o acesso à Minha Área. Para voltar, será preciso falar com a equipe do Lactare.',
+      deleting: 'Excluindo...',
+      error: 'Não foi possível concluir agora. Tente novamente.',
+      phoneNotice:
+        'Para alterar seu WhatsApp, fale diretamente com a equipe do Lactare.',
+      fields: {
+        fullName: 'Nome completo',
+        city: 'Cidade',
+        state: 'UF',
+      },
+      contactAction: 'Falar com a equipe do Lactare',
+    },
     personal: {
       validation: {
         recordedAtInvalid: 'Informe uma data e hora válidas.',
@@ -1258,9 +1282,10 @@ export const NUTRIZ_AUTH = {
         deleteConfirm: 'Excluir este registro pessoal?',
         deletedFeedback: 'Registro excluído.',
         thresholdSuggestion: {
-          title: 'Seu volume registrado já é relevante',
+          title: 'Você já registrou {volume} ml no total',
           description:
-            'Você registrou {volume} ml no total. Se quiser alinhar os próximos passos, fale diretamente com a equipe do Lactare. Este aviso não envia uma solicitação nem confirma coleta.',
+            'Isso não agenda nada — é só uma sugestão. Se quiser, avise a equipe do Lactare. Este aviso não envia solicitação nem confirma coleta.',
+          contactAction: 'Avisar a equipe',
         },
         error: 'Não foi possível salvar o registro agora. Tente novamente.',
       },
@@ -1285,6 +1310,37 @@ export const NUTRIZ_AUTH = {
         deletedFeedback: 'Registro excluído.',
         empty: 'Nenhum registro de bem-estar foi feito.',
         error: 'Não foi possível salvar agora. Tente novamente.',
+      },
+      highlights: {
+        badges: {
+          title: 'Seus selos',
+          description: 'Última conquista: {title}.',
+          empty:
+            'Seus primeiros selos aparecem conforme a equipe registra suas etapas.',
+          action: 'Ver selos',
+        },
+        impactCard: {
+          title: 'Cartão de impacto',
+          description:
+            'O cartão simbólico para compartilhar suas conquistas ainda está em construção.',
+          action: 'Em breve',
+        },
+        content: {
+          title: 'Aumentando a produção',
+          description: 'Conteúdo sugerido para o seu momento na jornada.',
+          action: 'Ler artigo',
+          href: '/como-funciona#amamentacao-na-pratica',
+        },
+      },
+      donations: {
+        title: 'Histórico de doações',
+        description:
+          'Cada item corresponde a uma doação registrada pela equipe do Lactare.',
+        exportAction: 'Exportar PDF',
+        itemTitle: 'Coleta confirmada pela equipe',
+        wellbeingTag: 'Bem-estar: {feeling}',
+        empty: 'Ainda não há doação registrada pela equipe do Lactare.',
+        hint: 'O registro é feito pela equipe do Lactare. Esta lista não confirma nem agenda novas coletas.',
       },
       history: {
         title: 'Seu histórico para baixar',

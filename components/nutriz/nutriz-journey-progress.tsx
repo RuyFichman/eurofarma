@@ -73,7 +73,7 @@ export function NutrizJourneyProgress({
             return (
               <li
                 key={step.label}
-                className="relative flex items-center gap-3 sm:block"
+                className="relative flex items-center gap-3 sm:flex-col sm:gap-0 sm:text-center"
               >
                 {index > 0 ? (
                   <span
@@ -101,7 +101,7 @@ export function NutrizJourneyProgress({
                     <Circle className="size-3" />
                   )}
                 </span>
-                <span className="text-sm font-medium sm:mt-3 sm:block sm:text-center">
+                <span className="text-sm font-medium sm:mt-3 sm:text-center">
                   {step.label}
                 </span>
               </li>

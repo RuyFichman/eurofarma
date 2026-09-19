@@ -15,6 +15,11 @@ import {
   deleteNutrizWellbeingEntry,
 } from '@/lib/db/queries/nutriz-personal-area'
 import {
+  softDeleteNutrizAccount,
+  updateNutrizAccount,
+} from '@/lib/db/queries/nutriz-account'
+import { nutrizAccountUpdateSchema } from '@/lib/validators/nutriz-account'
+import {
   extractionLogSchema,
   personalRecordIdSchema,
   wellbeingEntrySchema,
@@ -260,4 +265,60 @@ export async function deleteWellbeingEntryAction(
   } catch {
     return { ok: false, code: 'DATABASE_ERROR' }
   }
+}
+
+/** Atualiza nome e localidade da própria nutriz. */
+export async function updateNutrizAccountAction(
+  input: unknown,
+): Promise<PersonalAreaActionResult> {
+  const nutriz = await requireNutrizUser()
+  const parsed = nutrizAccountUpdateSchema.safeParse(input)
+  if (!parsed.success) {
+    return {
+      ok: false,
+      code: 'VALIDATION_ERROR',
+      fields: getFieldErrors(parsed.error),
+    }
+  }
+
+  try {
+    const updated = await updateNutrizAccount({
+      nutrizProfileId: nutriz.id,
+      data: parsed.data,
+    })
+    if (!updated) return { ok: false, code: 'NOT_FOUND' }
+
+    revalidatePath('/meu-agendamento')
+    return { ok: true }
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[updateNutrizAccountAction]', error)
+    }
+    return { ok: false, code: 'DATABASE_ERROR' }
+  }
+}
+
+/**
+ * Exclusão de conta pedida pela própria nutriz.
+ *
+ * Marca o soft delete, encerra a sessão e devolve para a home. O `redirect`
+ * fica fora do `try` porque sinaliza por exceção.
+ */
+export async function deleteNutrizAccountAction(): Promise<PersonalAreaActionResult> {
+  const nutriz = await requireNutrizUser()
+
+  try {
+    const deleted = await softDeleteNutrizAccount(nutriz.id)
+    if (!deleted) return { ok: false, code: 'NOT_FOUND' }
+
+    const supabase = await createSupabaseServerClient()
+    await supabase.auth.signOut()
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[deleteNutrizAccountAction]', error)
+    }
+    return { ok: false, code: 'DATABASE_ERROR' }
+  }
+
+  return { ok: true }
 }
