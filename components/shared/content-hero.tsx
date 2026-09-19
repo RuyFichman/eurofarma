@@ -1,6 +1,5 @@
-import { BookOpen, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { CONTENT } from '@/lib/i18n/pt-br'
 import { cn } from '@/lib/utils/cn'
@@ -11,12 +10,7 @@ export function ContentHero() {
   return (
     <section className="from-primary to-chart-3 text-primary-foreground bg-gradient-to-b">
       <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-24">
-        <Badge variant="secondary" className="gap-1.5">
-          <BookOpen aria-hidden="true" />
-          {hero.badge}
-        </Badge>
-
-        <h1 className="mt-6">
+        <h1>
           {hero.titleLead}{' '}
           <span className="text-secondary block sm:inline">
             {hero.titleHighlight}
