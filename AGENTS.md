@@ -73,7 +73,7 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 **Referência desta seção:** 19 de setembro de 2026.
 
-O estado descrito abaixo está integrado à `main` até a PR #49. Isso inclui o RF16 no painel, a jornada segura na área pessoal e o contato oficial do Lactare após cobertura positiva. Novos trabalhos devem partir dessa base, sem reabrir os branches `feat-rf16-modelo-jornada` ou `feat-contato-lactare` para acrescentar funcionalidades.
+O estado descrito abaixo está integrado à `main` até a PR #55. Isso inclui o RF16 no painel, a jornada segura na área pessoal, o contato oficial do Lactare após cobertura positiva e as gestões administrativas de conteúdos e campanhas. Novos trabalhos devem partir dessa base, sem reabrir os branches `feat-rf16-modelo-jornada`, `feat-contato-lactare`, `feat/admin-conteudos` ou `feat/admin-campanhas` para acrescentar funcionalidades.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
@@ -128,7 +128,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 
 | Requisito | Situação atual |
 |---|---|
-| RF01 — elegibilidade por CEP | **Implementado no escopo validável.** O ViaCEP resolve município e UF, e a lista ativa indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite. A interface não promete confirmação logística; a uniformidade operacional nos 30 municípios ainda depende de validação do Lactare. |
+| RF01 — elegibilidade por CEP | **Implementado.** O ViaCEP resolve município e UF, e a lista ativa indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite, uniforme nos 30 municípios atendidos conforme confirmação do Lactare em 19 de setembro de 2026. A interface não promete confirmação individual de triagem, data ou disponibilidade. |
 | RF02 — área atendida | **Implementado no escopo atualizado.** A interface exibe os 30 municípios atendidos; bancos de leite e pontos de coleta não são mais entidades públicas ou administrativas do produto. |
 | RF03 — fora da cobertura | **Implementado.** CEP ou município fora da lista recebe explicação e link oficial da rBLH. |
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório e as rotas de Privacidade e Termos têm minutas técnicas locais, mas a identificação do controlador e do encarregado, o canal institucional e a redação jurídica ainda dependem de validação da Eurofarma antes de qualquer publicação. |
@@ -188,7 +188,7 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - Validar com a equipe do Lactare quem atualiza cada status da jornada e se existe capacidade operacional para manter os registros consistentes.
 - Validar textos jurídicos e consentimentos.
 
-Até essas respostas existirem, prefira linguagem conservadora. Estar na área de atuação não autoriza prometer coleta domiciliar gratuita uniforme.
+Até essas respostas existirem, prefira linguagem conservadora. A cobertura uniforme nos 30 municípios foi confirmada pelo Lactare em 19 de setembro de 2026; a interface continua sem prometer triagem, data ou disponibilidade individual.
 
 ### 3.6 Próximas entregas recomendadas
 
@@ -553,7 +553,7 @@ Mensagens do bot devem vir de WHATSAPP_BOT em lib/i18n/pt-br.ts e responder em p
 
 A fonte de produto adotada é o Mapa do Leite do Lactare, com 30 municípios. A lista completa e as fontes estão em docs/projeto-nutrilink.md.
 
-Na web, a nutriz pode selecionar um município ou informar um CEP. O endpoint `POST /api/coverage` valida oito dígitos, consulta o ViaCEP com timeout e compara município/UF com os registros ativos de `ServiceMunicipality`. Estar na lista significa **elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite**, não coleta confirmada; a uniformidade operacional nos 30 municípios ainda depende de validação do Lactare. O CEP não é salvo nem enviado ao tracking.
+Na web, a nutriz pode selecionar um município ou informar um CEP. O endpoint `POST /api/coverage` valida oito dígitos, consulta o ViaCEP com timeout e compara município/UF com os registros ativos de `ServiceMunicipality`. Estar na lista significa **elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite**, uniforme nos 30 municípios atendidos conforme confirmação do Lactare em 19 de setembro de 2026, não coleta confirmada. Triagem, data e disponibilidade continuam dependendo de contato direto com o Lactare. O CEP não é salvo nem enviado ao tracking.
 
 Sub-regiões:
 
