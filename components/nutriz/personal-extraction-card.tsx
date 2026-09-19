@@ -36,7 +36,8 @@ export function PersonalExtractionCard({
 }) {
   const copy = NUTRIZ_AUTH.area.personal.extraction
   const router = useRouter()
-  const [recordedAt, setRecordedAt] = useState(defaultRecordedAt)
+  const [date, setDate] = useState(defaultRecordedAt.slice(0, 10))
+  const [time, setTime] = useState(defaultRecordedAt.slice(11, 16))
   const [volumeMl, setVolumeMl] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
@@ -47,7 +48,10 @@ export function PersonalExtractionCard({
     setError(null)
     setFeedback(null)
     startTransition(async () => {
-      const result = await createExtractionLogAction({ recordedAt, volumeMl })
+      const result = await createExtractionLogAction({
+        recordedAt: `${date}T${time}`,
+        volumeMl,
+      })
       if (!result.ok) {
         setError(
           result.fields?.recordedAt ?? result.fields?.volumeMl ?? copy.error,
@@ -76,8 +80,8 @@ export function PersonalExtractionCard({
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-primary/15 h-full gap-5">
+      <CardHeader className="px-5 pt-5 sm:px-6">
         <div className="flex items-start gap-3">
           <span className="bg-secondary text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
             <Droplets className="size-5" aria-hidden="true" />
@@ -93,16 +97,28 @@ export function PersonalExtractionCard({
       <CardContent>
         <form
           onSubmit={submit}
-          className="grid gap-4 sm:grid-cols-[1fr_10rem_auto] sm:items-end"
+          className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem_9rem_auto] sm:items-end"
         >
           <div className="space-y-2">
-            <Label htmlFor="extraction-recorded-at">{copy.dateLabel}</Label>
+            <Label htmlFor="extraction-date">Data</Label>
             <Input
-              id="extraction-recorded-at"
-              type="datetime-local"
-              value={recordedAt}
-              onChange={(event) => setRecordedAt(event.target.value)}
-              aria-label={copy.datePlaceholder}
+              id="extraction-date"
+              type="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+              aria-label="Data da sessão"
+              disabled={isPending}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="extraction-time">Hora</Label>
+            <Input
+              id="extraction-time"
+              type="time"
+              value={time}
+              onChange={(event) => setTime(event.target.value)}
+              aria-label="Hora da sessão"
               disabled={isPending}
               required
             />
