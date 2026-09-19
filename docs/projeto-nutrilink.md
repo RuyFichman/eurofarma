@@ -66,7 +66,7 @@ A solução tem três frentes:
 
 - Apresentação do projeto e respostas a perguntas frequentes.
 - Cadastro simplificado e opcional.
-- Verificação de elegibilidade por CEP ou município: informa a elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite e orienta o próximo contato; a uniformidade operacional desse atendimento nos 30 municípios ainda depende de validação do Lactare, conforme o Anexo A.5.
+- Verificação de elegibilidade por CEP ou município: informa a elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite e orienta o próximo contato. A cobertura é uniforme nos 30 municípios atendidos, conforme confirmação do Lactare em 19 de setembro de 2026; triagem, data e disponibilidade individual continuam dependendo de contato direto com o Lactare.
 - Orientação transparente para quem está fora da área de atuação.
 - Lembretes personalizados somente para quem ativar o recurso, por opt-in.
 - Acompanhamento após a doação.
@@ -116,7 +116,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 
 | ID | Descrição |
 |---|---|
-| RF01 | Verificar a elegibilidade geográfica para coleta domiciliar gratuita a partir do CEP ou município, sem representar confirmação logística e respeitando a validação operacional pendente do Lactare. |
+| RF01 | Verificar a elegibilidade geográfica para coleta domiciliar gratuita a partir do CEP ou município, uniforme nos 30 municípios atendidos conforme confirmação do Lactare em 19 de setembro de 2026, sem representar confirmação individual de triagem, data ou disponibilidade. |
 | RF02 | Exibir os municípios atendidos pelo Lactare e suas sub-regiões. Bancos de leite e pontos de coleta não são entidades gerenciadas pelo NutriLink. |
 | RF03 | Informar quando a nutriz está fora da área de cobertura e indicar canal externo oficial. |
 | RF04 | Permitir cadastro opcional com consentimento LGPD. |
@@ -188,7 +188,7 @@ Esta seção descreve o repositório em 16 de setembro de 2026. Ela prevalece so
 - Painel administrativo com autenticação e autorização por perfil `ADMIN`.
 - Página pública `/verificar-cobertura`, com consulta por CEP ou município e os 30 municípios agrupados nas seis sub-regiões adotadas pelo projeto.
 - Endpoint `POST /api/coverage`: valida o CEP, consulta o ViaCEP com timeout e compara o município e a UF com `service_municipalities`, sem persistir o CEP.
-- Resultado conservador: município ativo indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; triagem, modalidade, data, disponibilidade e uniformidade operacional ainda dependem de confirmação direta do Lactare.
+- Resultado conservador: município ativo indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite, uniforme nos 30 municípios atendidos conforme confirmação do Lactare em 19 de setembro de 2026; triagem, data e disponibilidade individual continuam dependendo de contato direto com o Lactare.
 - Resposta para localização fora da lista com encaminhamento ao diretório oficial externo da rBLH.
 - Contato direto depois da cobertura positiva pelo WhatsApp `+55 (11) 96629-0681` ou telefone `(11) 4144-9604`, com o horário publicado de segunda a sexta, das 7h às 22h. Os dados foram conferidos no site oficial do Lactare em 14 de setembro de 2026, e a interface mantém acesso à fonte sem prometer atendimento ou coleta.
 - Tracking anônimo dos canais oficiais do Lactare (RF07): o clique no WhatsApp ou no telefone do cartão de contato grava canal, superfície, campanha de origem e horário em `contact_channel_clicks`, por `POST /api/contact-click`. O evento não depende das unidades legadas e não guarda CEP, telefone, IP nem referrer; o painel exibe total, janela de 30 dias e distribuição por canal.
@@ -306,7 +306,7 @@ Arujá, Barueri, Caieiras, Cajamar, Carapicuíba, Cotia, Diadema, Embu das Artes
 
 Foi encontrada uma divergência nas fontes públicas: o site institucional da Eurofarma e publicações do perfil oficial do Lactare usam, em algumas campanhas, a descrição mais restrita “Zona Sul de São Paulo, região do ABC, Cotia ou Itapevi”. O Mapa do Leite foi adotado como fonte de verdade por ser uma ferramenta dedicada especificamente à checagem de cobertura. A descrição de campanhas pode refletir um recorte de captação ativa em determinado momento.
 
-Permanece pendente a confirmação de que a coleta domiciliar gratuita é oferecida de forma uniforme nos 30 municípios. Até a validação direta com o Lactare, o sistema pode afirmar que o município está na área de atuação, mas não deve prometer uma modalidade de coleta que não esteja configurada e validada.
+A coleta domiciliar gratuita é uniforme nos 30 municípios atendidos, conforme confirmação do Lactare em 19 de setembro de 2026. O sistema pode informar essa cobertura, mas não deve prometer triagem, data ou disponibilidade individual.
 
 #### Como a consulta por CEP funciona
 
