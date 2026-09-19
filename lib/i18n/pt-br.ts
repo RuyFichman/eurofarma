@@ -369,7 +369,6 @@ export const CONTENT = {
       'Espaço educativo do NutriLink: guias, vídeos e dúvidas frequentes para acompanhar cada etapa da sua jornada como nutriz, da primeira dúvida à primeira doação.',
   },
   hero: {
-    badge: 'Espaço Educativo NutriLink',
     titleLead: 'Tudo que você precisa saber',
     titleHighlight: 'para cuidar e compartilhar',
     description:
