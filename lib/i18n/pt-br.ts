@@ -248,6 +248,24 @@ export const HOME = {
         description:
           'Lave as mãos com água e sabão por 20 segundos. Limpe as mamas com uma compressa estéril antes de cada extração.',
       },
+      {
+        tag: 'Identificação',
+        title: 'Identifique o frasco',
+        description:
+          'Anote a data e o horário da extração antes de guardar o frasco. Siga as orientações recebidas pela equipe do Lactare.',
+      },
+      {
+        tag: 'Orientação',
+        title: 'Conte com o Lactare',
+        description:
+          'Para dúvidas sobre sua jornada ou os próximos passos, fale diretamente com a equipe do Lactare.',
+      },
+      {
+        tag: 'Preparação',
+        title: 'Prepare seu momento',
+        description:
+          'Antes de começar, deixe o frasco e os utensílios limpos ao alcance e escolha um momento tranquilo.',
+      },
     ],
   },
   finalCta: {
