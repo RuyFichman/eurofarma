@@ -1,10 +1,20 @@
 import {
   Prisma,
+  type WhatsappReplyDeliveryOutcome,
   type WhatsappInboundMessageProcessingResult,
   type WhatsappInboundMessageProvider,
 } from '@prisma/client'
 
 import { prisma } from '../prisma'
+
+function sanitizeTechnicalCode(value: string | undefined): string | null {
+  if (!value) return null
+  const normalized = value
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_:-]/gu, '_')
+  return normalized.slice(0, 64) || null
+}
 
 /**
  * Cria o registro de entrada antes dos efeitos do webhook. A restrição única
@@ -50,12 +60,27 @@ export async function finishWhatsappInboundMessage(params: {
   id: string
   result: Exclude<WhatsappInboundMessageProcessingResult, 'PROCESSING'>
   phoneWhatsapp?: string
+  replyDelivery?: {
+    outcome: WhatsappReplyDeliveryOutcome
+    providerMessageId?: string
+    errorCode?: string
+  }
 }): Promise<void> {
+  const replyDelivery = params.replyDelivery
   await prisma.whatsappInboundMessage.update({
     where: { id: params.id },
     data: {
       processingResult: params.result,
       processedAt: new Date(),
+      ...(replyDelivery
+        ? {
+            replyDeliveryOutcome: replyDelivery.outcome,
+            replyProviderMessageId:
+              replyDelivery.providerMessageId?.trim().slice(0, 255) || null,
+            replyErrorCode: sanitizeTechnicalCode(replyDelivery.errorCode),
+            replyAttemptedAt: new Date(),
+          }
+        : {}),
       ...(params.phoneWhatsapp
         ? {
             conversation: {

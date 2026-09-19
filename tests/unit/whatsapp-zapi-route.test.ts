@@ -92,7 +92,10 @@ describe('POST /api/whatsapp/zapi/[secret]', () => {
       isNewConversation: true,
     })
     mocks.saveState.mockResolvedValue(undefined)
-    mocks.sendReply.mockResolvedValue(true)
+    mocks.sendReply.mockResolvedValue({
+      outcome: 'SENT',
+      providerMessageId: 'zapi-outbound-1',
+    })
     mocks.claimInboundMessage.mockResolvedValue({
       id: 'inbound-1',
       claimed: true,
@@ -143,5 +146,32 @@ describe('POST /api/whatsapp/zapi/[secret]', () => {
       expect.objectContaining({ phoneWhatsapp: '5511999998888', step: 'MENU' }),
     )
     expect(mocks.sendReply.mock.calls[0]?.[0].reply.type).toBe('buttons')
+    expect(mocks.finishInboundMessage).toHaveBeenLastCalledWith({
+      id: 'inbound-1',
+      result: 'PROCESSED',
+      phoneWhatsapp: '5511999998888',
+      replyDelivery: {
+        outcome: 'SENT',
+        providerMessageId: 'zapi-outbound-1',
+      },
+    })
+  })
+
+  it('audita falha de envio e não marca a entrada como processada', async () => {
+    mocks.sendReply.mockResolvedValue({
+      outcome: 'RETRYABLE_FAILURE',
+      errorCode: 'ZAPI_HTTP_503',
+    })
+
+    expect((await post(payload())).status).toBe(200)
+    expect(mocks.finishInboundMessage).toHaveBeenLastCalledWith({
+      id: 'inbound-1',
+      result: 'FAILED',
+      phoneWhatsapp: '5511999998888',
+      replyDelivery: {
+        outcome: 'RETRYABLE_FAILURE',
+        errorCode: 'ZAPI_HTTP_503',
+      },
+    })
   })
 })

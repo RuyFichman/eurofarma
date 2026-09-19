@@ -185,6 +185,7 @@ enum NotificationDeliveryAttemptOutcome {
 /// Provedor que emitiu um callback de ciclo de vida de uma mensagem de saída.
 enum NotificationDeliveryStatusProvider {
   TWILIO
+  ZAPI
 }
 
 /// Estados de entrega categóricos recebidos no callback do provedor.
@@ -213,6 +214,15 @@ enum WhatsappInboundMessageProcessingResult {
   PROCESSED
   IGNORED
   FAILED
+}
+
+/// Resultado técnico do único envio reativo iniciado por uma mensagem recebida.
+/// Não contém corpo, telefone, nome, CEP ou qualquer outro dado pessoal.
+enum WhatsappReplyDeliveryOutcome {
+  SENT
+  NOT_CONFIGURED
+  RETRYABLE_FAILURE
+  PERMANENT_FAILURE
 }
 
 /// Opções mínimas e não clínicas de como a nutriz se sentiu ao registrar um
@@ -642,19 +652,24 @@ model WhatsappConversation {
 /// Entrada deduplicada antes de qualquer efeito no fluxo. Não armazena corpo,
 /// telefone, nome, CEP ou outro conteúdo da mensagem.
 model WhatsappInboundMessage {
-  id                String                                 @id @default(uuid())
-  provider          WhatsappInboundMessageProvider
-  providerMessageId String                                 @map("provider_message_id") @db.VarChar(255)
-  conversationId    String?                                @map("conversation_id")
-  receivedAt        DateTime                               @default(now()) @map("received_at")
-  processingResult  WhatsappInboundMessageProcessingResult @default(PROCESSING) @map("processing_result")
-  processedAt       DateTime?                              @map("processed_at")
+  id                     String                                 @id @default(uuid())
+  provider               WhatsappInboundMessageProvider
+  providerMessageId      String                                 @map("provider_message_id") @db.VarChar(255)
+  conversationId         String?                                @map("conversation_id")
+  receivedAt             DateTime                               @default(now()) @map("received_at")
+  processingResult       WhatsappInboundMessageProcessingResult @default(PROCESSING) @map("processing_result")
+  processedAt            DateTime?                              @map("processed_at")
+  replyDeliveryOutcome   WhatsappReplyDeliveryOutcome?          @map("reply_delivery_outcome")
+  replyProviderMessageId String?                                @map("reply_provider_message_id") @db.VarChar(255)
+  replyErrorCode         String?                                @map("reply_error_code") @db.VarChar(64)
+  replyAttemptedAt       DateTime?                              @map("reply_attempted_at")
 
   conversation WhatsappConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
 
   @@unique([provider, providerMessageId], map: "whatsapp_inbound_messages_provider_message_key")
   @@index([conversationId, receivedAt], map: "whatsapp_inbound_messages_conversation_received_idx")
   @@index([processingResult, receivedAt], map: "whatsapp_inbound_messages_result_received_idx")
+  @@index([provider, replyProviderMessageId], map: "whatsapp_inbound_messages_provider_reply_message_idx")
   @@map("whatsapp_inbound_messages")
 }
 

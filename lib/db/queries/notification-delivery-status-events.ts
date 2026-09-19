@@ -1,4 +1,7 @@
-import { type NotificationDeliveryStatus } from '@prisma/client'
+import {
+  type NotificationDeliveryStatus,
+  type NotificationDeliveryStatusProvider,
+} from '@prisma/client'
 
 import { prisma } from '../prisma'
 
@@ -16,7 +19,8 @@ function sanitizeErrorCode(value: string | null): string | null {
  * outbox: elas registram o envio; esta tabela registra apenas o ciclo de vida
  * posterior, inclusive callbacks válidos ainda sem MessageSid conhecido.
  */
-export async function recordTwilioDeliveryStatusEvent(params: {
+export async function recordNotificationDeliveryStatusEvent(params: {
+  provider: NotificationDeliveryStatusProvider
   providerMessageId: string
   status: NotificationDeliveryStatus
   errorCode: string | null
@@ -29,10 +33,29 @@ export async function recordTwilioDeliveryStatusEvent(params: {
   await prisma.notificationDeliveryStatusEvent.create({
     data: {
       outboxId: outbox?.id,
-      provider: 'TWILIO',
+      provider: params.provider,
       providerMessageId: params.providerMessageId,
       status: params.status,
       errorCode: sanitizeErrorCode(params.errorCode),
     },
   })
+}
+
+export function recordTwilioDeliveryStatusEvent(params: {
+  providerMessageId: string
+  status: NotificationDeliveryStatus
+  errorCode: string | null
+}): Promise<void> {
+  return recordNotificationDeliveryStatusEvent({
+    ...params,
+    provider: 'TWILIO',
+  })
+}
+
+export function recordZapiDeliveryStatusEvent(params: {
+  providerMessageId: string
+  status: NotificationDeliveryStatus
+  errorCode: string | null
+}): Promise<void> {
+  return recordNotificationDeliveryStatusEvent({ ...params, provider: 'ZAPI' })
 }

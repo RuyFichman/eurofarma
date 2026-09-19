@@ -132,7 +132,7 @@ export async function processInboundWhatsappMessage(params: {
       misunderstoodCount: outcome.misunderstoodCount,
     })
 
-    await sendWhatsappReply({
+    const replyDelivery = await sendWhatsappReply({
       to: message.from,
       reply: hydrateWhatsappReply(outcome.reply, siteUrl),
       provider,
@@ -140,8 +140,14 @@ export async function processInboundWhatsappMessage(params: {
 
     await finishWhatsappInboundMessage({
       id: inboundMessage.id,
-      result: 'PROCESSED',
+      result: replyDelivery.outcome === 'SENT' ? 'PROCESSED' : 'FAILED',
       phoneWhatsapp: message.from,
+      replyDelivery: {
+        outcome: replyDelivery.outcome,
+        ...(replyDelivery.outcome === 'SENT'
+          ? { providerMessageId: replyDelivery.providerMessageId }
+          : { errorCode: replyDelivery.errorCode }),
+      },
     })
   } catch (error) {
     try {
