@@ -13,13 +13,13 @@ CREATE TYPE "NotificationDeliveryStatus" AS ENUM (
 );
 
 CREATE TABLE "notification_delivery_status_events" (
-  "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-  "outbox_id" UUID,
+  "id" TEXT NOT NULL,
+  "outbox_id" TEXT,
   "provider" "NotificationDeliveryStatusProvider" NOT NULL,
   "provider_message_id" VARCHAR(255) NOT NULL,
   "status" "NotificationDeliveryStatus" NOT NULL,
   "error_code" VARCHAR(64),
-  "received_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "received_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT "notification_delivery_status_events_pkey" PRIMARY KEY ("id")
 );

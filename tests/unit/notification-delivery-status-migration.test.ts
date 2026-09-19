@@ -22,7 +22,10 @@ describe('migration da auditoria de status de entrega', () => {
     expect(migrationSql).toContain(
       '"status" "NotificationDeliveryStatus" NOT NULL',
     )
-    expect(migrationSql).toContain('"outbox_id" UUID')
+    // TEXT, não UUID: `notification_outbox.id` é TEXT, como todo id do
+    // schema `public`, que vem do `@default(uuid())` gerado no client.
+    expect(migrationSql).toContain('"outbox_id" TEXT')
+    expect(migrationSql).toContain('"received_at" TIMESTAMP(3)')
   })
 
   it('protege a auditoria contra update e delete', () => {
