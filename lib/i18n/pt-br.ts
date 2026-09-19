@@ -1560,11 +1560,11 @@ export const NUTRIZ_AUTH = {
         },
       },
     },
-    logout: 'Sair',
   },
   header: {
     login: 'Entrar',
     account: 'Minha área',
+    logout: 'Sair',
   },
 } as const
 

@@ -1,3 +1,4 @@
+import { Header } from '@/components/shared/header'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 
 /**
@@ -9,8 +10,13 @@ import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
  * divisão de trabalho do painel (ver seção 13 do AGENTS.md).
  *
  * Consequência a respeitar: **toda tela nova da área entra dentro desta pasta**.
- * O route group `(nutriz)` mantém a área fora do chrome público sem alterar a
+ * O route group `(nutriz)` mantém a área fora do layout público sem alterar a
  * URL e sem depender de lógica cliente baseada no pathname.
+ *
+ * O `Header` é renderizado aqui, e não herdado de `(public)`, porque a área
+ * precisa da navegação do site mas não do `Footer` institucional nem do `main`
+ * público — ter dois `main` na mesma página quebraria o alvo do "pular para o
+ * conteúdo".
  */
 export default async function MeuAgendamentoLayout({
   children,
@@ -18,5 +24,10 @@ export default async function MeuAgendamentoLayout({
   children: React.ReactNode
 }) {
   await requireNutrizUser()
-  return <main id="main-content">{children}</main>
+  return (
+    <>
+      <Header />
+      <main id="main-content">{children}</main>
+    </>
+  )
 }

@@ -1,11 +1,29 @@
 import Link from 'next/link'
-import { LogIn, Menu, X } from 'lucide-react'
+import { LogIn, LogOut, Menu, UserRound, X } from 'lucide-react'
 
+import { logoutNutrizAction } from '@/app/(nutriz)/meu-agendamento/actions'
 import { Logo } from '@/components/shared/logo'
 import { HeaderNavigation } from '@/components/shared/header-navigation'
+import { getNutrizAccess } from '@/lib/auth/get-nutriz-user'
 import { A11Y, NAV, NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 
-export function Header() {
+/**
+ * Cabeçalho público, renderizado no servidor.
+ *
+ * Ele consulta `getNutrizAccess()` porque um link "Entrar" para quem já tem
+ * sessão é informação errada, não só um rótulo inconveniente. A consulta é
+ * deduplicada pelo `cache` do React, então a área da nutriz — que já chama o
+ * mesmo gate no layout — não paga uma segunda ida ao banco. O custo real é
+ * outro e está assumido: ler cookie torna dinâmica a renderização das páginas
+ * públicas que incluem este cabeçalho.
+ *
+ * `forbidden` (admin logado, ou perfil com soft delete) é tratado como visitante:
+ * essas pessoas não têm Minha Área para onde voltar.
+ */
+export async function Header() {
+  const access = await getNutrizAccess()
+  const isNutriz = access.status === 'authenticated'
+
   return (
     <header className="border-border bg-background/80 sticky top-0 z-50 border-b backdrop-blur-sm">
       {/* Skip to content (acessibilidade — visível só ao focar via teclado) */}
@@ -22,15 +40,36 @@ export function Header() {
         <HeaderNavigation items={NAV.items} ariaLabel={A11Y.navMenu} />
 
         <div className="flex items-center gap-3">
-          {/* A rota decide se deve mostrar o login ou redirecionar uma nutriz
-              que já possui sessão. Assim o site público não carrega Supabase. */}
-          <Link
-            href="/entrar"
-            className="text-foreground/80 hover:text-primary hidden items-center gap-1.5 text-sm transition-colors sm:inline-flex"
-          >
-            <LogIn className="size-4" aria-hidden="true" />
-            {NUTRIZ_AUTH.header.login}
-          </Link>
+          {isNutriz ? (
+            <>
+              <Link
+                href="/meu-agendamento"
+                className="text-foreground/80 hover:text-primary hidden items-center gap-1.5 text-sm transition-colors sm:inline-flex"
+              >
+                <UserRound className="size-4" aria-hidden="true" />
+                {NUTRIZ_AUTH.header.account}
+              </Link>
+              <form action={logoutNutrizAction} className="hidden md:block">
+                <button
+                  type="submit"
+                  className="text-muted-foreground hover:text-primary inline-flex items-center gap-1.5 text-sm transition-colors"
+                >
+                  <LogOut className="size-4" aria-hidden="true" />
+                  {NUTRIZ_AUTH.header.logout}
+                </button>
+              </form>
+            </>
+          ) : (
+            /* A rota decide se deve mostrar o login ou redirecionar uma nutriz
+               que já possui sessão — este link é apenas o caminho feliz. */
+            <Link
+              href="/entrar"
+              className="text-foreground/80 hover:text-primary hidden items-center gap-1.5 text-sm transition-colors sm:inline-flex"
+            >
+              <LogIn className="size-4" aria-hidden="true" />
+              {NUTRIZ_AUTH.header.login}
+            </Link>
+          )}
 
           {/* CTA sempre visível */}
           <Link
@@ -63,13 +102,34 @@ export function Header() {
                 mobile
               />
               <div className="mt-4 grid gap-2 border-t pt-4">
-                <Link
-                  href="/entrar"
-                  className="text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
-                >
-                  <LogIn className="size-4" aria-hidden="true" />
-                  {NUTRIZ_AUTH.header.login}
-                </Link>
+                {isNutriz ? (
+                  <>
+                    <Link
+                      href="/meu-agendamento"
+                      className="text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
+                    >
+                      <UserRound className="size-4" aria-hidden="true" />
+                      {NUTRIZ_AUTH.header.account}
+                    </Link>
+                    <form action={logoutNutrizAction}>
+                      <button
+                        type="submit"
+                        className="text-muted-foreground hover:bg-muted inline-flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
+                      >
+                        <LogOut className="size-4" aria-hidden="true" />
+                        {NUTRIZ_AUTH.header.logout}
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <Link
+                    href="/entrar"
+                    className="text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
+                  >
+                    <LogIn className="size-4" aria-hidden="true" />
+                    {NUTRIZ_AUTH.header.login}
+                  </Link>
+                )}
                 <Link
                   href={NAV.cta.href}
                   className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors"

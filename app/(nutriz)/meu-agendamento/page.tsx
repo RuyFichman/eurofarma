@@ -55,7 +55,7 @@ export default async function NutrizAreaPage() {
     journey.journeyStatus === 'RECURRING_DONATION_ELIGIBLE'
 
   return (
-    <section className="bg-muted/35 min-h-svh px-4 py-8 sm:px-6 md:py-12">
+    <section className="bg-muted/35 min-h-[calc(100dvh-3.5rem)] px-4 py-8 sm:px-6 md:min-h-[calc(100dvh-4rem)] md:py-12">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-3">
