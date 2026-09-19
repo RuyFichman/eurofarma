@@ -3,7 +3,9 @@
 ## Decisão atual
 
 A integração Z-API está limitada ao chatbot **reativo**: ela recebe uma mensagem
-privada e envia a resposta daquela conversa. Avisos de mudança de jornada e
+privada e envia a resposta daquela conversa. O adaptador usa somente
+`send-text`; botões e listas são convertidos em opções numeradas, com orientação
+para a pessoa responder usando o título da opção. Avisos de mudança de jornada e
 lembretes continuam sem transporte Z-API.
 
 A outbox preserva sua regra de janela de atendimento e de templates aprovados

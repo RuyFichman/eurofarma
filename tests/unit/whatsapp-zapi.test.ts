@@ -113,7 +113,7 @@ describe('integração Z-API', () => {
     expect(isZapiTestPhoneAllowed('5511777776666')).toBe(true)
   })
 
-  it('envia texto, botões e listas com os contratos da Z-API', async () => {
+  it('envia texto puro e degrada interações instáveis para opções numeradas', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ messageId: 'zapi-outbound-1' }), {
         status: 200,
@@ -165,18 +165,19 @@ describe('integração Z-API', () => {
     })
 
     const [buttonsUrl, buttonsRequest] = fetchMock.mock.calls[1] ?? []
-    expect(buttonsUrl).toContain('/send-button-list')
-    expect(JSON.parse(buttonsRequest.body)).toMatchObject({
-      buttonList: { buttons: [{ id: 'doar', label: 'Quero doar' }] },
+    expect(buttonsUrl).toContain('/send-text')
+    expect(JSON.parse(buttonsRequest.body)).toEqual({
+      phone: '5511999998888',
+      message:
+        'Escolha uma opção\n\n1 - Quero doar\n\nResponda com o texto da opção desejada.',
     })
 
     const [listUrl, listRequest] = fetchMock.mock.calls[2] ?? []
-    expect(listUrl).toContain('/send-option-list')
-    expect(JSON.parse(listRequest.body)).toMatchObject({
-      optionList: {
-        buttonLabel: 'Abrir opções',
-        options: [{ id: 'lembretes', title: 'Lembretes' }],
-      },
+    expect(listUrl).toContain('/send-text')
+    expect(JSON.parse(listRequest.body)).toEqual({
+      phone: '5511999998888',
+      message:
+        'Mais opções\n\n1 - Lembretes\n\nResponda com o texto da opção desejada.',
     })
   })
 })

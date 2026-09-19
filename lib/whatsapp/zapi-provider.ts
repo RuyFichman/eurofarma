@@ -30,39 +30,28 @@ function classifyFailure(status: number): SendResult {
     : { outcome: 'PERMANENT_FAILURE', errorCode }
 }
 
+function interactiveReplyAsText(
+  reply: Extract<BotReply, { type: 'buttons' | 'list' }>,
+): string {
+  const options = reply.type === 'buttons' ? reply.buttons : reply.rows
+  const numberedOptions = options
+    .map((option, index) => `${index + 1} - ${option.title}`)
+    .join('\n')
+
+  return `${reply.body}\n\n${numberedOptions}\n\nResponda com o texto da opção desejada.`
+}
+
 function requestForReply(reply: BotReply): {
-  operation: 'send-text' | 'send-button-list' | 'send-option-list'
+  operation: 'send-text'
   body: Record<string, unknown>
 } {
   if (reply.type === 'text') {
     return { operation: 'send-text', body: { message: reply.body } }
   }
 
-  if (reply.type === 'buttons') {
-    return {
-      operation: 'send-button-list',
-      body: {
-        message: reply.body,
-        buttonList: {
-          buttons: reply.buttons.map((button) => ({
-            id: button.id,
-            label: button.title,
-          })),
-        },
-      },
-    }
-  }
-
   return {
-    operation: 'send-option-list',
-    body: {
-      message: reply.body,
-      optionList: {
-        title: reply.button,
-        buttonLabel: reply.button,
-        options: reply.rows.map((row) => ({ id: row.id, title: row.title })),
-      },
-    },
+    operation: 'send-text',
+    body: { message: interactiveReplyAsText(reply) },
   }
 }
 
