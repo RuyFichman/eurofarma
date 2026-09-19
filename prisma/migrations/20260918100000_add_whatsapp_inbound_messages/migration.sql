@@ -11,13 +11,13 @@ CREATE TYPE "WhatsappInboundMessageProcessingResult" AS ENUM (
 );
 
 CREATE TABLE "whatsapp_inbound_messages" (
-  "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+  "id" TEXT NOT NULL,
   "provider" "WhatsappInboundMessageProvider" NOT NULL,
   "provider_message_id" VARCHAR(255) NOT NULL,
-  "conversation_id" UUID,
-  "received_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "conversation_id" TEXT,
+  "received_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "processing_result" "WhatsappInboundMessageProcessingResult" NOT NULL DEFAULT 'PROCESSING',
-  "processed_at" TIMESTAMPTZ,
+  "processed_at" TIMESTAMP(3),
 
   CONSTRAINT "whatsapp_inbound_messages_pkey" PRIMARY KEY ("id")
 );
