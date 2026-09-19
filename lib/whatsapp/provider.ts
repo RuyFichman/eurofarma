@@ -34,14 +34,21 @@ export async function sendWhatsappReply(params: {
   to: string
   reply: BotReply
   statusCallbackUrl?: string
-}): Promise<boolean> {
-  if (!params.provider) return false
-  return wasMessageSent(
-    await params.provider.sendSessionMessage({
+}): Promise<SendResult> {
+  if (!params.provider) {
+    return { outcome: 'NOT_CONFIGURED', errorCode: 'PROVIDER_NOT_CONFIGURED' }
+  }
+  try {
+    return await params.provider.sendSessionMessage({
       to: params.to,
       reply: params.reply,
-    }),
-  )
+    })
+  } catch {
+    return {
+      outcome: 'RETRYABLE_FAILURE',
+      errorCode: 'PROVIDER_TRANSPORT_EXCEPTION',
+    }
+  }
 }
 
 export function wasMessageSent(result: SendResult): boolean {

@@ -71,7 +71,10 @@ describe('POST /api/whatsapp/twilio', () => {
     mocks.rateLimit.mockReturnValue({ success: true })
     mocks.findNutriz.mockResolvedValue(null)
     mocks.saveState.mockResolvedValue(undefined)
-    mocks.sendReply.mockResolvedValue(true)
+    mocks.sendReply.mockResolvedValue({
+      outcome: 'SENT',
+      providerMessageId: 'twilio-outbound-1',
+    })
     mocks.setReminderConsent.mockResolvedValue({
       status: 'UPDATED',
       enabled: true,

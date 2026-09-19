@@ -65,7 +65,10 @@ describe('POST /api/whatsapp/webhook', () => {
     mocks.rateLimit.mockReturnValue({ success: true })
     mocks.findNutriz.mockResolvedValue(null)
     mocks.saveState.mockResolvedValue(undefined)
-    mocks.sendReply.mockResolvedValue(true)
+    mocks.sendReply.mockResolvedValue({
+      outcome: 'SENT',
+      providerMessageId: 'meta-outbound-1',
+    })
     mocks.setReminderConsent.mockResolvedValue({
       status: 'UPDATED',
       enabled: true,

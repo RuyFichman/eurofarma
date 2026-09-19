@@ -12,7 +12,10 @@ vi.mock('../../lib/db/prisma', () => ({
   },
 }))
 
-import { recordTwilioDeliveryStatusEvent } from '../../lib/db/queries/notification-delivery-status-events'
+import {
+  recordTwilioDeliveryStatusEvent,
+  recordZapiDeliveryStatusEvent,
+} from '../../lib/db/queries/notification-delivery-status-events'
 
 describe('auditoria de callback Twilio', () => {
   beforeEach(() => {
@@ -58,6 +61,26 @@ describe('auditoria de callback Twilio', () => {
         outboxId: undefined,
         errorCode: '63016___TEMPLATE_UNAVAILABLE',
       }),
+    })
+  })
+
+  it('registra callback da Z-API sem telefone, corpo ou vínculo obrigatório', async () => {
+    mocks.findOutbox.mockResolvedValue(null)
+
+    await recordZapiDeliveryStatusEvent({
+      providerMessageId: 'zapi-read-1',
+      status: 'READ',
+      errorCode: null,
+    })
+
+    expect(mocks.createEvent).toHaveBeenCalledWith({
+      data: {
+        outboxId: undefined,
+        provider: 'ZAPI',
+        providerMessageId: 'zapi-read-1',
+        status: 'READ',
+        errorCode: null,
+      },
     })
   })
 })
