@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useState, useTransition } from 'react'
 import { CircleAlert, Droplets, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 
 import {
   createExtractionLogAction,
@@ -17,6 +18,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { LACTARE_CONTACT } from '@/lib/constants/lactare-contact'
 import { Label } from '@/components/ui/label'
 import type { NutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
@@ -80,7 +82,7 @@ export function PersonalExtractionCard({
   }
 
   return (
-    <Card className="border-primary/15 h-full gap-5">
+    <Card className="border-primary/15 gap-5">
       <CardHeader className="px-5 pt-5 sm:px-6">
         <div className="flex items-start gap-3">
           <span className="bg-secondary text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
@@ -97,7 +99,7 @@ export function PersonalExtractionCard({
       <CardContent>
         <form
           onSubmit={submit}
-          className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_8rem_9rem_auto] sm:items-end"
+          className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end"
         >
           <div className="space-y-2">
             <Label htmlFor="extraction-date">Data</Label>
@@ -153,6 +155,35 @@ export function PersonalExtractionCard({
           <p role="status" className="text-primary mt-3 text-sm">
             {feedback}
           </p>
+        ) : null}
+
+        {shouldShowExtractionContactSuggestion(data.extractionTotalMl) ? (
+          <aside className="border-primary/25 bg-secondary/40 mt-5 flex gap-3 rounded-xl border p-4">
+            <CircleAlert
+              className="text-primary mt-0.5 size-4 shrink-0"
+              aria-hidden="true"
+            />
+            <div>
+              <h3 className="text-sm font-semibold">
+                {copy.thresholdSuggestion.title.replace(
+                  '{volume}',
+                  formatCount(data.extractionTotalMl),
+                )}
+              </h3>
+              <p className="text-muted-foreground mt-1 text-sm leading-5">
+                {copy.thresholdSuggestion.description}
+              </p>
+              <Button asChild size="sm" variant="outline" className="mt-3">
+                <Link
+                  href={LACTARE_CONTACT.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {copy.thresholdSuggestion.contactAction}
+                </Link>
+              </Button>
+            </div>
+          </aside>
         ) : null}
 
         <div className="bg-muted/50 mt-6 grid gap-3 rounded-xl border p-4 sm:grid-cols-2">
@@ -215,26 +246,6 @@ export function PersonalExtractionCard({
             </ul>
           )}
         </div>
-
-        {shouldShowExtractionContactSuggestion(data.extractionTotalMl) ? (
-          <aside className="bg-secondary/30 mt-5 flex gap-3 rounded-xl border p-4">
-            <CircleAlert
-              className="text-primary mt-0.5 size-4 shrink-0"
-              aria-hidden="true"
-            />
-            <div>
-              <h3 className="text-sm font-medium">
-                {copy.thresholdSuggestion.title}
-              </h3>
-              <p className="text-muted-foreground mt-1 text-xs leading-5">
-                {copy.thresholdSuggestion.description.replace(
-                  '{volume}',
-                  formatCount(data.extractionTotalMl),
-                )}
-              </p>
-            </div>
-          </aside>
-        ) : null}
       </CardContent>
     </Card>
   )

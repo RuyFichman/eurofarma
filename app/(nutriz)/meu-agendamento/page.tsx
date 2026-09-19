@@ -11,7 +11,9 @@ import {
 import { NutrizJourneyProgress } from '@/components/nutriz/nutriz-journey-progress'
 import { EducationalSuggestions } from '@/components/nutriz/educational-suggestions'
 import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-card'
-import { PersonalHistoryCard } from '@/components/nutriz/personal-history-card'
+import { DonationHistoryCard } from '@/components/nutriz/donation-history-card'
+import { PersonalHighlights } from '@/components/nutriz/personal-highlights'
+import { NutrizAccountCard } from '@/components/nutriz/nutriz-account-card'
 import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
 import { NutrizRecognitionsCard } from '@/components/nutriz/nutriz-recognitions-card'
 import { NutrizReferralCard } from '@/components/nutriz/nutriz-referral-card'
@@ -21,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { getNutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
 import { getReminderConsentPreference } from '@/lib/db/queries/communication-consents'
+import { getNutrizAccountData } from '@/lib/db/queries/nutriz-account'
 import { getNutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
 import { getOrCreateNutrizReferralLink } from '@/lib/db/queries/referral-links'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
@@ -34,13 +37,17 @@ export const metadata: Metadata = {
 
 export default async function NutrizAreaPage() {
   const nutriz = await requireNutrizUser()
-  const [journey, reminders, personal, referralLink] = await Promise.all([
-    getNutrizJourneySnapshot(nutriz.id),
-    getReminderConsentPreference(nutriz.id),
-    getNutrizPersonalAreaData(nutriz.id),
-    getOrCreateNutrizReferralLink(nutriz.id),
-  ])
-  if (!journey || !reminders || !personal || !referralLink) notFound()
+  const [journey, reminders, personal, referralLink, account] =
+    await Promise.all([
+      getNutrizJourneySnapshot(nutriz.id),
+      getReminderConsentPreference(nutriz.id),
+      getNutrizPersonalAreaData(nutriz.id),
+      getOrCreateNutrizReferralLink(nutriz.id),
+      getNutrizAccountData(nutriz.id),
+    ])
+  if (!journey || !reminders || !personal || !referralLink || !account) {
+    notFound()
+  }
 
   const copy = NUTRIZ_AUTH.area
   const isPostDonation =
@@ -72,20 +79,40 @@ export default async function NutrizAreaPage() {
           <NutrizJourneyProgress snapshot={journey} />
         </div>
 
-        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+        <div className="mt-6">
           <PersonalExtractionCard
             data={personal}
             defaultRecordedAt={formatDateTimeLocal(new Date())}
           />
+        </div>
+
+        <div className="mt-6">
           <ReminderConsentCard
             enabled={reminders.enabled}
             referenceDate={reminders.referenceDate}
           />
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="mt-6">
+          <DonationHistoryCard
+            snapshot={journey}
+            wellbeingEntries={personal.wellbeingEntries}
+          />
+        </div>
+
+        <div className="mt-6">
+          <PersonalHighlights recognitions={personal.recognitions} />
+        </div>
+
+        <div className="mt-6">
+          <NutrizAccountCard account={account} />
+        </div>
+
+        <div
+          id="seus-reconhecimentos"
+          className="mt-6 grid scroll-mt-6 items-start gap-6 lg:grid-cols-2"
+        >
           <NutrizRecognitionsCard recognitions={personal.recognitions} />
-          <PersonalHistoryCard />
           <EducationalSuggestions status={journey.journeyStatus} />
         </div>
 
