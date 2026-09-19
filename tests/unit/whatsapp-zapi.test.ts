@@ -49,6 +49,21 @@ describe('integração Z-API', () => {
     }
   })
 
+  it('descarta payloads malformados sem tentar inferir telefone ou conteúdo', () => {
+    for (const payload of [
+      null,
+      [],
+      'ReceivedCallback',
+      {},
+      inbound({ phone: 'telefone-inválido' }),
+      inbound({ messageId: '   ' }),
+      inbound({ text: { message: '   ' } }),
+      inbound({ text: { message: 42 } }),
+    ]) {
+      expect(extractZapiInboundMessage(payload, instanceId)).toBeNull()
+    }
+  })
+
   it('extrai os ids das respostas de botão e de lista', () => {
     expect(
       extractZapiInboundMessage(
