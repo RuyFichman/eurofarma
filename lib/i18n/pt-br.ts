@@ -2089,6 +2089,142 @@ export const ADMIN = {
       empty: 'Nenhuma nutriz corresponde ao recorte selecionado.',
     },
   },
+  contents: {
+    seo: {
+      title: 'Conteúdos | NutriLink Admin',
+      description: 'Organize o acervo educativo do NutriLink.',
+    },
+    title: 'Conteúdos educativos',
+    description:
+      'Crie e revise materiais educativos em Markdown, mantendo rascunhos separados dos itens publicados no acervo.',
+    integrationNotice:
+      'A página pública Como funciona continua versionada em código. Publicar um item aqui organiza o acervo administrativo, mas ainda não altera automaticamente aquela página.',
+    createAction: 'Novo conteúdo',
+    filters: {
+      label: 'Filtros da lista de conteúdos',
+      search: {
+        label: 'Buscar conteúdo',
+        placeholder: 'Título, categoria ou identificador',
+      },
+      status: {
+        label: 'Situação',
+        all: 'Todas',
+        published: 'Publicados',
+        draft: 'Rascunhos',
+      },
+      category: { label: 'Categoria', all: 'Todas as categorias' },
+      actions: { apply: 'Filtrar', clear: 'Limpar filtros' },
+    },
+    results: {
+      countOne: 'conteúdo encontrado',
+      countOther: 'conteúdos encontrados',
+    },
+    table: {
+      caption: 'Conteúdos educativos do acervo administrativo',
+      columns: {
+        content: 'Conteúdo',
+        category: 'Categoria',
+        status: 'Situação',
+        updatedAt: 'Atualizado em',
+        actions: 'Ações',
+      },
+      withoutCategory: 'Sem categoria',
+      published: 'Publicado',
+      draft: 'Rascunho',
+      edit: 'Editar',
+      slugLabel: 'Identificador: {slug}',
+      editAria: 'Editar {title}',
+    },
+    empty: {
+      database: {
+        title: 'Nenhum conteúdo cadastrado',
+        description:
+          'Crie o primeiro material para iniciar o acervo administrativo.',
+      },
+      filtered: {
+        title: 'Nenhum conteúdo encontrado',
+        description: 'Ajuste ou limpe os filtros para tentar novamente.',
+      },
+    },
+    pagination: {
+      label: 'Paginação dos conteúdos',
+      previous: 'Anterior',
+      next: 'Próxima',
+      status: 'Página {page} de {total}',
+    },
+    form: {
+      create: {
+        seo: {
+          title: 'Novo conteúdo | NutriLink Admin',
+          description: 'Adicione um material ao acervo educativo do NutriLink.',
+        },
+        title: 'Novo conteúdo',
+        description:
+          'Escreva o material em Markdown e escolha se ele começa como rascunho ou publicado no acervo.',
+        submit: 'Criar conteúdo',
+      },
+      edit: {
+        seo: {
+          title: 'Editar conteúdo | NutriLink Admin',
+          description: 'Atualize um material do acervo educativo do NutriLink.',
+        },
+        title: 'Editar conteúdo',
+        description:
+          'Revise o texto, a categoria e a situação do material. O endereço interno permanece estável.',
+        submit: 'Salvar alterações',
+      },
+      fields: {
+        title: {
+          label: 'Título',
+          placeholder: 'Ex.: Como armazenar o leite com segurança',
+        },
+        category: {
+          label: 'Categoria',
+          placeholder: 'Ex.: Armazenamento',
+          optional: 'Opcional',
+        },
+        bodyMarkdown: {
+          label: 'Conteúdo em Markdown',
+          placeholder:
+            'Escreva o conteúdo educativo usando títulos, listas e parágrafos.',
+          helper:
+            'Não inclua dados pessoais, orientações clínicas individualizadas ou promessas de coleta.',
+        },
+        status: { label: 'Situação', placeholder: 'Selecione' },
+        slug: {
+          label: 'Identificador interno',
+          helper:
+            'Gerado automaticamente no cadastro e preservado nas edições.',
+        },
+      },
+      status: {
+        draft: 'Rascunho — disponível somente no painel',
+        published: 'Publicado — disponível no acervo administrativo',
+      },
+      actions: { back: 'Voltar para conteúdos', cancel: 'Cancelar' },
+      validation: {
+        titleRequired: 'Informe um título com pelo menos 3 caracteres.',
+        titleCharacters: 'Use letras ou números no título.',
+        titleMax: 'O título deve ter no máximo 160 caracteres.',
+        categoryMax: 'A categoria deve ter no máximo 80 caracteres.',
+        bodyRequired: 'Escreva pelo menos 20 caracteres de conteúdo.',
+        bodyMax: 'O conteúdo deve ter no máximo 50.000 caracteres.',
+        statusRequired: 'Selecione uma situação válida.',
+      },
+      mutations: {
+        submittingCreate: 'Criando conteúdo...',
+        submittingUpdate: 'Salvando alterações...',
+        createError:
+          'Não foi possível criar o conteúdo agora. Tente novamente.',
+        updateError:
+          'Não foi possível salvar o conteúdo agora. Tente novamente.',
+        validationGeneric: 'Revise os campos destacados.',
+        conflict: 'Não foi possível gerar um endereço único para este título.',
+        notFound: 'Este conteúdo não existe mais.',
+        errorTitle: 'Não foi possível salvar',
+      },
+    },
+  },
   municipalities: {
     seo: {
       title: 'Municípios | NutriLink Admin',
