@@ -204,6 +204,7 @@ enum NotificationDeliveryStatus {
 enum WhatsappInboundMessageProvider {
   META_CLOUD_API
   TWILIO
+  ZAPI
 }
 
 /// Resultado terminal do tratamento da mensagem recebida pelo webhook.
