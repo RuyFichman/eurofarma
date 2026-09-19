@@ -88,7 +88,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **622 testes em 92 arquivos**, já com a otimização das consultas do dashboard e a idempotência de entrada dos dois provedores. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **631 testes em 95 arquivos**, já com a otimização das consultas do dashboard e a idempotência de entrada dos dois provedores. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
@@ -113,6 +113,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 - Listagem de nutrizes com exposição reduzida de contato e acesso ao detalhe da jornada em `/admin/nutrizes/[id]`.
 - Listagem, cadastro e edição dos municípios atendidos em `/admin/municipios`.
 - Gestão do acervo educativo em `/admin/conteudos`, com listagem filtrável, criação e edição em Markdown, estados de rascunho ou publicado, slug estável e autoria vinculada ao admin autenticado. O acervo administrativo ainda não alimenta automaticamente a página pública “Como funciona”, que permanece versionada em componentes.
+- Gestão de campanhas em `/admin/campanhas`, com busca, filtros, criação, edição, ativação ou desativação e geração de links para rotas públicas internas com `utm_source`, `utm_medium` e `utm_campaign`. A tela preserva parâmetros existentes, vincula a criação ao admin autenticado e não inclui PII na URL. Ela não contabiliza cliques nem cria relação direta entre campanha e cadastro: a atribuição aparece nos indicadores somente quando o cadastro preserva as UTMs do link.
 - Migration Prisma da tabela `service_municipalities`, com carga inicial exata dos 30 municípios, gerada, versionada e aplicada no Supabase cloud em 12 de setembro de 2026. Os 30 registros foram conferidos por sub-região e a migration está registrada em `_prisma_migrations`.
 - Rotas públicas e administrativas antigas de unidades aposentadas: redirecionam para o fluxo de cobertura; `/api/units` e `/api/track` respondem `410 Gone`.
 - Camada de WhatsApp independente de provedor, com adaptadores para a Cloud API da Meta e para o Twilio, webhooks com verificação de assinatura, rate limiting local e simulador com exemplos do fluxo ativo. Credenciais e identificadores de template ficam restritos aos adaptadores. Antes de qualquer efeito, `whatsapp_inbound_messages` reivindica a combinação única de provedor e identificador da mensagem, registra recebimento, conversa e resultado sem corpo ou PII e encerra reentregas sem repetir cadastro, consentimento, transição ou resposta. A Cloud API usa `wamid` e o Twilio usa `MessageSid`; a migration `20260918100000_add_whatsapp_inbound_messages` foi aplicada no Supabase cloud em 18 de setembro de 2026 e registrada em `_prisma_migrations` com o checksum SHA-256 do arquivo. Antes de aplicar, o SQL foi corrigido: ele declarava `id` e `conversation_id` como `UUID` e os horários como `TIMESTAMPTZ`, enquanto todas as outras tabelas do schema `public` usam `TEXT` (o id é gerado pelo Prisma, não pelo banco) e `TIMESTAMP(3)`. O tipo errado quebrava a FK para `whatsapp_conversations.id`, que é `TEXT`. Tabela, enums, índices e a FK `SET NULL` foram conferidos no banco.
@@ -227,7 +228,7 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Última suíte completa no cloud: 622 em 92 arquivos; suíte unitária local atual: 542 em 81 arquivos. |
+| Testes | Vitest | Última suíte completa no cloud: 631 em 95 arquivos; suíte unitária local atual: 551 em 84 arquivos. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | Interface independente de provedor, com adaptadores Meta e Twilio | código local parcial; falta infraestrutura real do provedor escolhido |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |

@@ -2089,6 +2089,167 @@ export const ADMIN = {
       empty: 'Nenhuma nutriz corresponde ao recorte selecionado.',
     },
   },
+  campaigns: {
+    seo: {
+      title: 'Campanhas | NutriLink Admin',
+      description: 'Crie e organize links rastreáveis do NutriLink.',
+    },
+    title: 'Campanhas',
+    description:
+      'Organize links de divulgação com UTMs consistentes e destinos públicos do NutriLink.',
+    attributionNotice:
+      'Esta área gera links rastreáveis, mas não contabiliza cliques. A origem aparece nos indicadores somente quando um cadastro preserva as UTMs do link.',
+    createAction: 'Nova campanha',
+    filters: {
+      label: 'Filtros da lista de campanhas',
+      search: {
+        label: 'Buscar campanha',
+        placeholder: 'Nome, origem ou identificador',
+      },
+      status: {
+        label: 'Situação',
+        all: 'Todas',
+        active: 'Ativas',
+        inactive: 'Inativas',
+      },
+      source: { label: 'Origem', all: 'Todas as origens' },
+      actions: { apply: 'Filtrar', clear: 'Limpar filtros' },
+    },
+    results: {
+      countOne: 'campanha encontrada',
+      countOther: 'campanhas encontradas',
+    },
+    table: {
+      caption: 'Campanhas e links rastreáveis do NutriLink',
+      columns: {
+        campaign: 'Campanha',
+        sourceMedium: 'Origem / mídia',
+        link: 'Link rastreável',
+        status: 'Situação',
+        createdAt: 'Criada em',
+        actions: 'Ações',
+      },
+      active: 'Ativa',
+      inactive: 'Inativa',
+      edit: 'Editar',
+      editAria: 'Editar {name}',
+      identifierLabel: 'utm_campaign: {value}',
+    },
+    empty: {
+      database: {
+        title: 'Nenhuma campanha cadastrada',
+        description:
+          'Crie a primeira campanha para padronizar os links de divulgação.',
+      },
+      filtered: {
+        title: 'Nenhuma campanha encontrada',
+        description: 'Ajuste ou limpe os filtros para tentar novamente.',
+      },
+    },
+    pagination: {
+      label: 'Paginação das campanhas',
+      previous: 'Anterior',
+      next: 'Próxima',
+      status: 'Página {page} de {total}',
+    },
+    link: {
+      copy: 'Copiar',
+      copied: 'Copiado',
+      copyError: 'Não foi possível copiar',
+      open: 'Abrir',
+      copyAria: 'Copiar link da campanha {name}',
+      openAria: 'Abrir destino da campanha {name}',
+    },
+    form: {
+      create: {
+        seo: {
+          title: 'Nova campanha | NutriLink Admin',
+          description: 'Crie um link rastreável para divulgação do NutriLink.',
+        },
+        title: 'Nova campanha',
+        description:
+          'Defina o destino público e os parâmetros que identificarão a origem dos futuros cadastros.',
+        submit: 'Criar campanha',
+      },
+      edit: {
+        seo: {
+          title: 'Editar campanha | NutriLink Admin',
+          description: 'Atualize os dados de uma campanha do NutriLink.',
+        },
+        title: 'Editar campanha',
+        description:
+          'A alteração muda o link gerado daqui em diante. Links já distribuídos não são atualizados.',
+        submit: 'Salvar alterações',
+      },
+      fields: {
+        name: {
+          label: 'Nome interno',
+          placeholder: 'Ex.: Feira da Saúde — setembro',
+          helper: 'Visível somente no painel administrativo.',
+        },
+        utmSource: {
+          label: 'Origem (utm_source)',
+          placeholder: 'Ex.: instagram',
+          helper: 'Canal ou plataforma de origem.',
+        },
+        utmMedium: {
+          label: 'Mídia (utm_medium)',
+          placeholder: 'Ex.: social',
+          helper: 'Tipo de divulgação utilizado.',
+        },
+        utmCampaign: {
+          label: 'Identificador (utm_campaign)',
+          placeholder: 'Ex.: feira_saude_setembro',
+          helper: 'Identificador estável para a leitura de atribuição.',
+        },
+        landingUrl: {
+          label: 'Destino no NutriLink',
+          placeholder: 'Ex.: /cadastro',
+          helper:
+            'Use somente uma rota pública interna. Parâmetros existentes serão preservados.',
+        },
+        status: { label: 'Situação', placeholder: 'Selecione' },
+        trackingPreview: {
+          label: 'Prévia do link rastreável',
+          helper:
+            'Confira o destino antes de distribuir. Nenhum dado pessoal é incluído na URL.',
+        },
+      },
+      status: {
+        active: 'Ativa — pronta para divulgação',
+        inactive: 'Inativa — mantida apenas no histórico',
+      },
+      actions: { back: 'Voltar para campanhas', cancel: 'Cancelar' },
+      validation: {
+        nameRequired: 'Informe um nome com pelo menos 3 caracteres.',
+        nameMax: 'O nome deve ter no máximo 120 caracteres.',
+        utmSourceRequired: 'Informe a origem da campanha.',
+        utmMediumRequired: 'Informe a mídia da campanha.',
+        utmCampaignRequired: 'Informe o identificador da campanha.',
+        utmMax: 'Cada parâmetro UTM deve ter no máximo 200 caracteres.',
+        utmFormat:
+          'Use letras minúsculas, números, ponto, hífen, sublinhado ou til, sem espaços.',
+        landingUrlRequired: 'Informe o destino da campanha.',
+        landingUrlMax: 'O destino deve ter no máximo 500 caracteres.',
+        landingUrlInternal:
+          'Use uma rota pública interna iniciada por /, fora das áreas admin, api e auth.',
+        statusRequired: 'Selecione uma situação válida.',
+      },
+      mutations: {
+        submittingCreate: 'Criando campanha...',
+        submittingUpdate: 'Salvando alterações...',
+        createError:
+          'Não foi possível criar a campanha agora. Tente novamente.',
+        updateError:
+          'Não foi possível salvar a campanha agora. Tente novamente.',
+        validationGeneric: 'Revise os campos destacados.',
+        conflict:
+          'Já existe uma campanha com esta combinação de origem, mídia e identificador.',
+        notFound: 'Esta campanha não existe mais.',
+        errorTitle: 'Não foi possível salvar',
+      },
+    },
+  },
   contents: {
     seo: {
       title: 'Conteúdos | NutriLink Admin',
