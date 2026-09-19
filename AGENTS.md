@@ -73,7 +73,7 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 **Referência desta seção:** 19 de setembro de 2026.
 
-O estado descrito abaixo está integrado à `main` até a PR #49. Isso inclui o RF16 no painel, a jornada segura na área pessoal e o contato oficial do Lactare após cobertura positiva. Novos trabalhos devem partir dessa base, sem reabrir os branches `feat-rf16-modelo-jornada` ou `feat-contato-lactare` para acrescentar funcionalidades.
+O estado descrito abaixo está integrado à `main` até a PR #55. Isso inclui o RF16 no painel, a jornada segura na área pessoal, o contato oficial do Lactare após cobertura positiva e as gestões administrativas de conteúdos e campanhas. Novos trabalhos devem partir dessa base, sem reabrir os branches `feat-rf16-modelo-jornada`, `feat-contato-lactare`, `feat/admin-conteudos` ou `feat/admin-campanhas` para acrescentar funcionalidades.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
