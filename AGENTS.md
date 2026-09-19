@@ -71,9 +71,9 @@ Não remover a palavra “Lactare” de textos que expliquem cobertura, atendime
 
 ## 3. Estado atual do projeto
 
-**Referência desta seção:** 16 de setembro de 2026.
+**Referência desta seção:** 18 de setembro de 2026.
 
-O estado descrito abaixo está integrado à `main` até a PR #14. Isso inclui o RF16 no painel, a jornada segura na área pessoal e o contato oficial do Lactare após cobertura positiva. Novos trabalhos devem partir dessa base, sem reabrir os branches `feat-rf16-modelo-jornada` ou `feat-contato-lactare` para acrescentar funcionalidades.
+O estado descrito abaixo está integrado à `main` até a PR #49. Isso inclui o RF16 no painel, a jornada segura na área pessoal e o contato oficial do Lactare após cobertura positiva. Novos trabalhos devem partir dessa base, sem reabrir os branches `feat-rf16-modelo-jornada` ou `feat-contato-lactare` para acrescentar funcionalidades.
 
 MVP em desenvolvimento local. Não há deploy, domínio, staging, produção, CI/CD ou monitoramento.
 
@@ -88,7 +88,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **580 testes em 82 arquivos**, já com a otimização das consultas do dashboard. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **616 testes em 90 arquivos**, já com a otimização das consultas do dashboard e a idempotência de entrada dos dois provedores. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
@@ -175,7 +175,8 @@ Não criar preview estático com estado “confirmado” ou lembrete de coleta s
 - RLS para `nutriz_profiles`, `journey_status_history`, `contact_channel_clicks`, `whatsapp_conversations`, `communication_consent_events`, `notification_outbox` e `notification_delivery_attempts`; a autorização do RF16 já existe na aplicação e o evento do RF07 é anônimo, mas as tabelas continuam sem policies no Supabase. O contexto conversacional contém cidade durante o cadastro e o próprio registro identifica o número de WhatsApp, portanto deve ser tratado como PII. O nome só é solicitado e gravado no perfil depois do consentimento.
 - Integração real do processador da outbox com templates aprovados da Meta.
 - Cartão de impacto e reconhecimento de indicação.
-- Conta Meta, número, templates e URL pública para o WhatsApp.
+- Conta Meta, número, templates e URL pública para o WhatsApp. Uma conta de provedor capaz de entregar mensagem de sessão livre também é pré-requisito: a conta trial da Twilio recebe, mas não responde (seção 11.1).
+- Falha de envio da resposta do chatbot é engolida em silêncio. `sendWhatsappReply` devolve `boolean` e `processInboundWhatsappMessage` ignora o retorno, então a mensagem recebida é marcada `PROCESSED` mesmo quando a resposta não saiu, sem log e sem sinal no banco. Em 18 de setembro de 2026 isso escondeu por bastante tempo uma recusa do provedor; a causa só apareceu ao consultar a API do Twilio. Registrar o resultado do envio, sem PII, antes de ligar a entrega real.
 - Validação jurídica e institucional das minutas de Privacidade e Termos, incluindo controlador, encarregado e canal de exercício de direitos, além de RLS das tabelas existentes, continuam obrigatórias antes de exposição pública. As tabelas pessoais `extraction_logs` e `wellbeing_entries` já têm RLS e policies de propriedade aplicadas no cloud.
 
 ### 3.5 Validações externas pendentes
@@ -225,7 +226,7 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Última suíte completa no cloud: 569 em 77 arquivos; suíte unitária local atual: 500 em 71 arquivos. |
+| Testes | Vitest | Última suíte completa no cloud: 616 em 90 arquivos; suíte unitária local atual: 536 em 79 arquivos. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | Interface independente de provedor, com adaptadores Meta e Twilio | código local parcial; falta infraestrutura real do provedor escolhido |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |
@@ -485,12 +486,16 @@ O script gera uma senha forte ou usa ADMIN_PASSWORD do ambiente. Nunca registrar
 O código da integração existe, mas não há:
 
 - app configurado na Meta;
-- número de teste ou número oficial;
+- número oficial;
 - templates aprovados;
-- URL pública;
-- credenciais reais.
+- URL pública estável;
+- conta de provedor capaz de entregar a conversa.
 
 As variáveis do provedor escolhido no `.env.example` precisam de valores reais. Valores locais servem apenas aos simuladores; `AccountSid`, `ContentSid` e formatos do Twilio não podem entrar nas regras de negócio.
+
+**Entrada validada de ponta a ponta com o Twilio em 18 de setembro de 2026.** Uma conta trial, um número trial e um túnel temporário foram usados para receber uma mensagem real de WhatsApp. Funcionaram: assinatura, idempotência pelo `MessageSid`, máquina de estados e gravação com `processing_result` `PROCESSED`. O webhook de entrada de uma conta trial se configura dentro da modal “Try out WhatsApp” do Console (radio **Inbound**, auto-reply **Custom**), e não em Messaging ou Numbers & senders.
+
+**A saída não funciona em conta trial, e isso não é limitação do nosso código.** O sender trial recusa mensagem de sessão livre com `21654 ContentSid Required`, exigindo template aprovado em toda mensagem, inclusive dentro da janela de 24 horas. Como o fluxo conversacional é feito apenas de mensagens de sessão, não há entrega real sem upgrade da conta. No trial também estão bloqueados o Console em Messaging, a API de Channel Senders e a Content API (`20003 This feature is not available on a Trial account`), então nem criar template próprio é possível. Enquanto a conta for trial, exercite a conversa pelos simuladores locais e não prometa demonstração pelo WhatsApp real.
 
 O webhook:
 

@@ -18,8 +18,11 @@ describe('migration de idempotência de mensagens recebidas', () => {
       '"provider" "WhatsappInboundMessageProvider"',
     )
     expect(migrationSql).toContain('"provider_message_id" VARCHAR(255)')
-    expect(migrationSql).toContain('"conversation_id" UUID')
-    expect(migrationSql).toContain('"received_at" TIMESTAMPTZ')
+    // TEXT e TIMESTAMP(3) são o padrão do schema `public`: o id vem do
+    // `@default(uuid())` do Prisma, gerado no client. `conversation_id` como
+    // UUID era recusado pelo Postgres na FK para `whatsapp_conversations.id`.
+    expect(migrationSql).toContain('"conversation_id" TEXT')
+    expect(migrationSql).toContain('"received_at" TIMESTAMP(3)')
     expect(migrationSql).toContain(
       '"processing_result" "WhatsappInboundMessageProcessingResult"',
     )
