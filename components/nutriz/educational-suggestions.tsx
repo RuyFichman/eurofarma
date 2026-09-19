@@ -27,7 +27,7 @@ export function EducationalSuggestions({
   }))
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <div className="flex items-center gap-2">
           <BookOpen className="text-primary size-5" aria-hidden="true" />

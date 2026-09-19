@@ -52,7 +52,7 @@ export function ReminderConsentCard({
   const Icon = current ? Bell : BellOff
 
   return (
-    <Card className="mt-6">
+    <Card className="mt-0 h-full">
       <CardHeader>
         <div className="flex items-start gap-3">
           <span className="bg-secondary text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">

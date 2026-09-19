@@ -9,7 +9,7 @@ export function PersonalHistoryCard() {
   const copy = NUTRIZ_AUTH.area.personal.history
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>{copy.title}</CardTitle>
       </CardHeader>

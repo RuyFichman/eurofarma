@@ -16,7 +16,7 @@ export function NutrizRecognitionsCard({
   const copy = NUTRIZ_AUTH.area.recognitions
 
   return (
-    <Card className="mt-6">
+    <Card className="mt-0 h-full">
       <CardHeader>
         <div className="flex items-center gap-3">
           <span className="bg-secondary text-primary flex size-10 items-center justify-center rounded-xl">

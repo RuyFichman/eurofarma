@@ -8,6 +8,7 @@ import {
   NutrizJourneyGuidance,
   NutrizJourneyTimeline,
 } from '@/components/nutriz/nutriz-journey-status'
+import { NutrizJourneyProgress } from '@/components/nutriz/nutriz-journey-progress'
 import { EducationalSuggestions } from '@/components/nutriz/educational-suggestions'
 import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-card'
 import { PersonalHistoryCard } from '@/components/nutriz/personal-history-card'
@@ -42,24 +43,61 @@ export default async function NutrizAreaPage() {
   if (!journey || !reminders || !personal || !referralLink) notFound()
 
   const copy = NUTRIZ_AUTH.area
+  const isPostDonation =
+    journey.journeyStatus === 'DONATION_CONFIRMED' ||
+    journey.journeyStatus === 'RECURRING_DONATION_ELIGIBLE'
 
   return (
-    <section className="bg-muted/30 min-h-svh px-6 py-12 md:py-16">
-      <div className="mx-auto max-w-5xl">
-        <div className="flex items-center gap-3">
-          <span className="bg-secondary text-primary flex size-11 items-center justify-center rounded-2xl">
-            <UserRound className="size-5" aria-hidden="true" />
-          </span>
-          <div>
-            <p className="text-primary text-sm font-semibold">{copy.badge}</p>
-            <h1 className="text-2xl font-semibold md:text-3xl">
-              {copy.greetingTemplate.replace('{firstName}', nutriz.firstName)}
-            </h1>
+    <section className="bg-muted/35 min-h-svh px-4 py-8 sm:px-6 md:py-12">
+      <div className="mx-auto max-w-6xl">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="bg-secondary text-primary flex size-11 items-center justify-center rounded-2xl">
+              <UserRound className="size-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-primary text-sm font-semibold">{copy.badge}</p>
+              <h1 className="text-2xl font-semibold md:text-3xl">
+                {copy.greetingTemplate.replace('{firstName}', nutriz.firstName)}
+              </h1>
+            </div>
           </div>
+          <span className="bg-secondary text-secondary-foreground rounded-full px-3 py-1.5 text-xs font-semibold">
+            {NUTRIZ_AUTH.area.journey.status[journey.journeyStatus].label}
+          </span>
         </div>
         <p className="text-muted-foreground mt-3">{copy.subtitle}</p>
 
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+        <div className="mt-8">
+          <NutrizJourneyProgress snapshot={journey} />
+        </div>
+
+        <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+          <PersonalExtractionCard
+            data={personal}
+            defaultRecordedAt={formatDateTimeLocal(new Date())}
+          />
+          <ReminderConsentCard
+            enabled={reminders.enabled}
+            referenceDate={reminders.referenceDate}
+          />
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          <NutrizRecognitionsCard recognitions={personal.recognitions} />
+          <PersonalHistoryCard />
+          <EducationalSuggestions status={journey.journeyStatus} />
+        </div>
+
+        <NutrizReferralCard code={referralLink.code} />
+
+        {isPostDonation ? (
+          <div className="mt-6">
+            <WellbeingCard entries={personal.wellbeingEntries} />
+          </div>
+        ) : null}
+
+        <div className="mt-6 grid items-start gap-6 lg:grid-cols-2">
           <NutrizJourneyCurrentStatus snapshot={journey} />
           <NutrizJourneyGuidance status={journey.journeyStatus} />
         </div>
@@ -67,34 +105,6 @@ export default async function NutrizAreaPage() {
         <div className="mt-6">
           <NutrizJourneyTimeline snapshot={journey} />
         </div>
-
-        <ReminderConsentCard
-          enabled={reminders.enabled}
-          referenceDate={reminders.referenceDate}
-        />
-
-        <NutrizRecognitionsCard recognitions={personal.recognitions} />
-
-        <NutrizReferralCard code={referralLink.code} />
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-          <PersonalExtractionCard
-            data={personal}
-            defaultRecordedAt={formatDateTimeLocal(new Date())}
-          />
-          <PersonalHistoryCard />
-        </div>
-
-        <div className="mt-6">
-          <EducationalSuggestions status={journey.journeyStatus} />
-        </div>
-
-        {journey.journeyStatus === 'DONATION_CONFIRMED' ||
-        journey.journeyStatus === 'RECURRING_DONATION_ELIGIBLE' ? (
-          <div className="mt-6">
-            <WellbeingCard entries={personal.wellbeingEntries} />
-          </div>
-        ) : null}
 
         <Card className="mt-6">
           <CardHeader>
