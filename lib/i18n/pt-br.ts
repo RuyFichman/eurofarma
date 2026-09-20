@@ -690,24 +690,24 @@ export const CONTENT = {
           'Prioritariamente para recém-nascidos prematuros e de baixo peso internados em UTIs Neonatais. Esses bebês não podem receber fórmulas artificiais e o leite humano é o único alimento adequado para seu desenvolvimento.',
       },
       {
-        question: 'Quem pode doar leite humano?',
+        question: 'Quando a febre em recém-nascidos deve preocupar?',
         answer:
-          'Toda mulher que amamenta, produz um volume excedente de leite, está saudável e não utiliza medicamentos contraindicados para a amamentação pode ser uma doadora. Basta entrar em contato com o banco de leite para fazer o cadastro e receber as orientações.',
+          'Nos primeiros meses de vida, qualquer febre pede atenção médica imediata. Como o sistema imunológico do bebê ainda está em desenvolvimento, a febre deve sempre ser avaliada por um pediatra para identificar a causa e garantir o tratamento correto.',
       },
       {
-        question: 'O que é amamentação cruzada e por que ela é perigosa?',
+        question: 'Como agir com segurança em caso de engasgo no bebê?',
         answer:
-          'Amamentação cruzada é a prática de amamentar o filho de outra mulher diretamente no peito. Ela é contraindicada pela Organização Mundial da Saúde e pelo Ministério da Saúde devido ao risco de transmissão de doenças infectocontagiosas. A forma segura de compartilhar leite é por meio da doação a um Banco de Leite Humano, onde o leite passa por rigoroso processo de pasteurização.',
+          'O engasgo é uma emergência que exige calma e ação rápida. Em bebês, a manobra recomendada é colocá-lo de bruços sobre o seu antebraço, com a cabeça um pouco mais baixa que o corpo, e aplicar 5 pancadas firmes entre as escápulas (nas costas). Se o bebê não desobstruir as vias aéreas, chame imediatamente o serviço de emergência (192).',
       },
       {
-        question: 'Como saber se o meu leite é suficiente?',
+        question: 'Como higienizar corretamente o coto umbilical?',
         answer:
-          'A melhor forma de avaliar se o bebê está mamando o suficiente é observar o ganho de peso nas consultas pediátricas e os sinais do dia a dia, como se ele molha fraldas com frequência (urina clara) e se demonstra satisfação após as mamadas. A sensação de peito "murcho" não significa falta de leite, pois a maior parte da produção ocorre durante a própria mamada.',
+          'A limpeza do coto umbilical deve ser feita a cada troca de fralda e depois do banho. Use uma haste flexível com algodão embebido em álcool a 70%, limpando suavemente a base do umbigo em movimentos circulares. Mantenha a área sempre limpa, seca e fora da fralda para facilitar a cicatrização.',
       },
       {
-        question: 'Como identificar uma boa pega do bebê?',
+        question: 'Respiração do bebê: o que é normal e o que exige atenção?',
         answer:
-          'Uma pega adequada acontece quando o bebê abocanha a maior parte da aréola (e não apenas o mamilo), fica com a boca bem aberta ("boca de peixinho"), o queixo encostado na mama e o nariz livre. A amamentação correta não deve causar dor nem ferimentos no peito.',
+          'Em recém-nascidos, é comum a respiração ser irregular e mais rápida. Porém, sinais como chiado, afundamento das costelas ao respirar, lábios arroxeados ou pausas respiratórias prolongadas são alertas que exigem avaliação médica urgente.',
       },
     ],
     help: {

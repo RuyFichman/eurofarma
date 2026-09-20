@@ -7,11 +7,13 @@ import { CONTENT } from '@/lib/i18n/pt-br'
 
 export function ContentFaq() {
   const { faq } = CONTENT
+  const half = Math.ceil(faq.items.length / 2)
+  const columns = [faq.items.slice(0, half), faq.items.slice(half)]
 
   return (
     <section
       id="duvidas-frequentes"
-      className="mx-auto max-w-3xl px-6 py-16 md:py-20"
+      className="mx-auto max-w-5xl px-6 py-16 md:py-20"
     >
       <ContentSectionHeader
         icon={HelpCircle}
@@ -19,30 +21,34 @@ export function ContentFaq() {
         title={faq.title}
       />
 
-      <ul className="mt-8 space-y-3">
-        {faq.items.map((item) => (
-          <li key={item.question}>
-            <details className="group bg-card overflow-hidden rounded-xl border">
-              <summary className="hover:bg-muted/60 flex list-none items-center justify-between gap-4 p-5 font-medium transition-colors [&::-webkit-details-marker]:hidden">
-                <span className="flex items-start gap-3">
-                  <HelpCircle
-                    className="text-primary mt-0.5 size-5 shrink-0"
-                    aria-hidden="true"
-                  />
-                  {item.question}
-                </span>
-                <ChevronDown
-                  className="text-primary size-5 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  aria-hidden="true"
-                />
-              </summary>
-              <p className="text-muted-foreground px-5 pb-5 pl-13 leading-relaxed">
-                {item.answer}
-              </p>
-            </details>
-          </li>
+      <div className="mt-8 grid gap-3 md:grid-cols-2 md:items-start md:gap-x-6">
+        {columns.map((column, columnIndex) => (
+          <ul key={columnIndex} className="space-y-3">
+            {column.map((item) => (
+              <li key={item.question}>
+                <details className="group bg-card overflow-hidden rounded-xl border">
+                  <summary className="hover:bg-muted/60 flex list-none items-center justify-between gap-4 p-5 font-medium transition-colors [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-start gap-3">
+                      <HelpCircle
+                        className="text-primary mt-0.5 size-5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      {item.question}
+                    </span>
+                    <ChevronDown
+                      className="text-primary size-5 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                      aria-hidden="true"
+                    />
+                  </summary>
+                  <p className="text-muted-foreground px-5 pb-5 pl-13 leading-relaxed">
+                    {item.answer}
+                  </p>
+                </details>
+              </li>
+            ))}
+          </ul>
         ))}
-      </ul>
+      </div>
 
       <aside aria-labelledby="faq-help-title" className="mt-12 text-center">
         <h3 id="faq-help-title" className="text-lg sm:text-xl">
