@@ -210,19 +210,9 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
                 placeholder={COVERAGE.checker.cep.placeholder}
                 className="bg-background h-12 rounded-xl"
                 aria-invalid={Boolean(error?.field)}
-                aria-describedby={
-                  error?.field
-                    ? 'coverage-cep-hint coverage-error'
-                    : 'coverage-cep-hint'
-                }
+                aria-describedby={error?.field ? 'coverage-error' : undefined}
                 disabled={isSubmitting}
               />
-              <p
-                id="coverage-cep-hint"
-                className="text-muted-foreground text-xs"
-              >
-                {COVERAGE.checker.cep.hint}
-              </p>
             </div>
           ) : (
             <div className="space-y-2">

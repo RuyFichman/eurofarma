@@ -653,7 +653,6 @@ export const COVERAGE = {
     cep: {
       label: 'CEP da residência',
       placeholder: '00000-000',
-      hint: 'Digite os oito números do CEP.',
       validation: 'Informe um CEP válido no formato 00000-000.',
     },
     municipality: {
