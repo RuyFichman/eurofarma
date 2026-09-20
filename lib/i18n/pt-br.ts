@@ -1431,21 +1431,12 @@ export const NUTRIZ_AUTH = {
         safetyNotice:
           'Em caso de dúvida sobre ficha, exame ou aptidão, converse diretamente com a equipe do Lactare. O NutriLink não realiza atendimento clínico.',
       },
-      timeline: {
-        title: 'Linha do tempo da sua jornada',
-        description:
-          'Você vê somente as etapas categóricas registradas e suas datas. Observações internas, responsáveis e detalhes clínicos não aparecem aqui.',
-        current: 'Etapa atual',
-        recordedAt: 'Registrado em {date}',
-      },
       status: {
         REGISTERED: {
           label: 'Cadastrada',
           title: 'Seu cadastro foi registrado',
           description:
             'Seus dados de cadastro estão no NutriLink. Isso não representa triagem concluída nem confirmação de coleta.',
-          timelineDescription:
-            'O cadastro foi criado no NutriLink, com o consentimento informado no formulário.',
           guidance: [
             'Confira se o seu município continua na área de atuação atual do Lactare.',
             'As próximas etapas aparecem aqui somente depois de serem registradas pela equipe do Lactare.',
@@ -1456,8 +1447,6 @@ export const NUTRIZ_AUTH = {
           title: 'O envio do documento foi registrado',
           description:
             'A equipe do Lactare registrou que o documento foi enviado pela nutriz fora do NutriLink. O conteúdo do documento não é armazenado aqui.',
-          timelineDescription:
-            'O Lactare registrou o envio do documento pela nutriz.',
           guidance: [
             'Continue seguindo as orientações fornecidas diretamente pela equipe do Lactare.',
             'Não envie documentos ou informações de saúde pelo NutriLink.',
@@ -1468,8 +1457,6 @@ export const NUTRIZ_AUTH = {
           title: 'O recebimento da ficha foi registrado',
           description:
             'A equipe do Lactare registrou esta etapa. O NutriLink não guarda as respostas nem informações de saúde da ficha.',
-          timelineDescription:
-            'O Lactare registrou o recebimento da ficha tratada fora do NutriLink.',
           guidance: [
             'Continue seguindo as orientações fornecidas diretamente pela equipe do Lactare.',
             'Esta área mostra apenas o avanço da etapa e não o conteúdo da ficha.',
@@ -1480,8 +1467,6 @@ export const NUTRIZ_AUTH = {
           title: 'A etapa do exame foi combinada',
           description:
             'O Lactare registrou que o exame foi agendado fora do NutriLink. A data e as instruções devem ser confirmadas diretamente com a equipe.',
-          timelineDescription:
-            'O Lactare registrou que a etapa do exame foi combinada pelos canais de atendimento.',
           guidance: [
             'Confirme data e orientações pelo mesmo canal utilizado no atendimento com o Lactare.',
             'O NutriLink não agenda exames nem altera a combinação feita com a equipe.',
@@ -1492,8 +1477,6 @@ export const NUTRIZ_AUTH = {
           title: 'A realização dos exames foi registrada',
           description:
             'O Lactare registrou somente que os exames foram realizados. O NutriLink não recebe, consulta ou interpreta resultados.',
-          timelineDescription:
-            'A equipe do Lactare registrou a conclusão da etapa de realização dos exames.',
           guidance: [
             'Aguarde a próxima orientação fornecida diretamente pela equipe do Lactare.',
             'Não envie laudos, valores ou resultados de exame pelo NutriLink.',
@@ -1504,8 +1487,6 @@ export const NUTRIZ_AUTH = {
           title: 'A avaliação está com o Lactare',
           description:
             'O Lactare registrou que aguarda a avaliação profissional. O NutriLink não consulta, recebe ou interpreta o laudo.',
-          timelineDescription:
-            'A jornada foi marcada como aguardando a avaliação conduzida pelo Lactare.',
           guidance: [
             'Aguarde a orientação fornecida diretamente pela equipe responsável do Lactare.',
             'Não envie laudos, valores ou resultados de exame pelo NutriLink.',
@@ -1516,8 +1497,6 @@ export const NUTRIZ_AUTH = {
           title: 'A categoria “apta” foi registrada',
           description:
             'O Lactare registrou esta categoria depois da avaliação profissional. O NutriLink não tomou nem calculou essa decisão.',
-          timelineDescription:
-            'O Lactare registrou a categoria “apta”, sem incluir qualquer detalhe clínico.',
           guidance: [
             'A próxima etapa operacional é combinar diretamente com o Lactare a entrega do kit.',
             'O NutriLink não confirma data, horário ou disponibilidade da visita.',
@@ -1528,8 +1507,6 @@ export const NUTRIZ_AUTH = {
           title: 'A categoria “não apta” foi registrada',
           description:
             'O Lactare registrou esta categoria. O NutriLink não guarda nem apresenta o motivo clínico da decisão.',
-          timelineDescription:
-            'O Lactare registrou a categoria “não apta”, sem incluir o motivo ou detalhes clínicos.',
           guidance: [
             'Para compreender a decisão, converse diretamente com a equipe responsável do Lactare pelo canal usado no atendimento.',
             'Não envie laudos ou informações de saúde pelo NutriLink.',
@@ -1540,8 +1517,6 @@ export const NUTRIZ_AUTH = {
           title: 'O envio do kit foi registrado',
           description:
             'O Lactare registrou o envio do kit. Esta etapa não confirma a entrega, uma coleta futura nem uma doação realizada.',
-          timelineDescription:
-            'A equipe do Lactare registrou que o kit foi enviado.',
           guidance: [
             'A entrega e qualquer orientação logística continuam sob responsabilidade da equipe do Lactare.',
             'O NutriLink não confirma data, horário ou disponibilidade de visita.',
@@ -1552,8 +1527,6 @@ export const NUTRIZ_AUTH = {
           title: 'A entrega do kit foi registrada',
           description:
             'O Lactare registrou que o kit foi entregue. Esta etapa não confirma uma coleta futura nem uma doação realizada.',
-          timelineDescription:
-            'A equipe do Lactare registrou a conclusão da etapa de entrega do kit.',
           guidance: [
             'Siga as orientações de higiene, coleta e armazenamento recebidas da equipe do Lactare.',
             'As coletas seguintes dependem da operação e da combinação direta com o Lactare.',
@@ -1564,8 +1537,6 @@ export const NUTRIZ_AUTH = {
           title: 'A confirmação da doação foi registrada',
           description:
             'Um administrador do Lactare registrou a doação como confirmada. O NutriLink não calcula impacto clínico nem confirma coletas futuras.',
-          timelineDescription:
-            'A equipe do Lactare registrou administrativamente a confirmação da doação.',
           guidance: [
             'Continue seguindo as orientações fornecidas diretamente pela equipe do Lactare.',
             'Cada nova etapa logística deve ser combinada com a equipe; o NutriLink não realiza agendamentos.',
@@ -1576,8 +1547,6 @@ export const NUTRIZ_AUTH = {
           title: 'A aptidão para recorrência foi registrada',
           description:
             'O Lactare registrou que a jornada pode seguir para doações recorrentes. Isso não confirma uma doação nem agenda uma coleta.',
-          timelineDescription:
-            'O Lactare registrou a aptidão para a etapa de doações recorrentes.',
           guidance: [
             'Continue seguindo as orientações operacionais fornecidas diretamente pelo Lactare.',
             'Cada data ou horário continua sendo combinado com a equipe; o NutriLink não realiza agendamentos.',
