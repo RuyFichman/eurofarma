@@ -4,6 +4,7 @@ import {
   phoneSchema,
   cepSchema,
   emailSchema,
+  cpfSchema,
 } from '../lib/validators/common'
 import { unitCreateSchema, unitCsvRowSchema } from '../lib/validators/unit'
 import { nutrizSignupSchema } from '../lib/validators/nutriz'
@@ -62,6 +63,21 @@ const cases: Case[] = [
   {
     label: 'Email invalido',
     run: () => emailSchema.parse('nope'),
+    shouldFail: true,
+  },
+  {
+    label: 'CPF formatado com digitos verificadores validos',
+    run: () => cpfSchema.parse('111.444.777-35'),
+    shouldFail: false,
+  },
+  {
+    label: 'CPF com digito verificador invalido',
+    run: () => cpfSchema.parse('111.444.777-30'),
+    shouldFail: true,
+  },
+  {
+    label: 'CPF com sequencia repetida (falso positivo classico)',
+    run: () => cpfSchema.parse('00000000000'),
     shouldFail: true,
   },
 
