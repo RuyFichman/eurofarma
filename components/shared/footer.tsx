@@ -72,7 +72,15 @@ export function Footer() {
 
         {/* Barra inferior */}
         <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs opacity-70 md:flex-row md:items-center md:justify-between">
-          <p>{FOOTER.copyright}</p>
+          <p>
+            {FOOTER.copyright} <span aria-hidden="true">·</span>{' '}
+            <Link
+              href={FOOTER.links.admin.href}
+              className="opacity-80 transition-opacity hover:underline hover:opacity-100"
+            >
+              {FOOTER.links.admin.label}
+            </Link>
+          </p>
           <div className="flex flex-col gap-0.5 md:items-end">
             <span>{SITE.credits}</span>
             <span>{SITE.partnerCredit}</span>

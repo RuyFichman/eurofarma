@@ -35,6 +35,7 @@ export const FOOTER = {
       label: 'Verificar cidade atendida',
       href: '/verificar-cobertura',
     },
+    admin: { label: 'Admin', href: '/admin/login' },
   },
   contact: {
     title: 'Contato institucional',
