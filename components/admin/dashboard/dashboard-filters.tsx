@@ -24,22 +24,30 @@ export function DashboardFiltersForm({
 
   return (
     <section
-      className="bg-card rounded-2xl border p-5 shadow-sm"
+      className="bg-card rounded-xl border shadow-sm"
       aria-labelledby="dashboard-filters-title"
     >
-      <div className="mb-4">
-        <h2 id="dashboard-filters-title" className="font-semibold">
-          {COPY.title}
-        </h2>
-        <p className="text-muted-foreground mt-1 text-sm text-pretty">
-          {COPY.description}
-        </p>
+      <div className="flex items-start gap-3 border-b px-5 py-4">
+        <span
+          className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg"
+          aria-hidden
+        >
+          <Filter className="size-4" />
+        </span>
+        <div>
+          <h2 id="dashboard-filters-title" className="text-base font-semibold">
+            {COPY.title}
+          </h2>
+          <p className="text-muted-foreground mt-0.5 text-xs leading-relaxed text-pretty">
+            {COPY.description}
+          </p>
+        </div>
       </div>
 
       <form
         method="get"
         aria-label={COPY.label}
-        className="grid gap-4 lg:grid-cols-[repeat(3,minmax(10rem,1fr))_auto] lg:items-end"
+        className="grid gap-4 px-5 py-4 lg:grid-cols-[repeat(3,minmax(10rem,1fr))_auto] lg:items-end"
       >
         <div className="space-y-2">
           <Label htmlFor="dashboard-region">{COPY.region.label}</Label>
@@ -47,7 +55,7 @@ export function DashboardFiltersForm({
             id="dashboard-region"
             name="region"
             defaultValue={filters.region}
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-background h-10 w-full rounded-lg border px-3 text-sm shadow-xs"
           >
             <option value="">{COPY.region.all}</option>
             {SERVICE_REGION_VALUES.map((region) => (
@@ -64,7 +72,7 @@ export function DashboardFiltersForm({
             id="dashboard-stage"
             name="stage"
             defaultValue={filters.stage}
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-background h-10 w-full rounded-lg border px-3 text-sm shadow-xs"
           >
             <option value="">{COPY.stage.all}</option>
             {DASHBOARD_STAGE_VALUES.map((stage) => (
@@ -81,7 +89,7 @@ export function DashboardFiltersForm({
             id="dashboard-origin"
             name="origin"
             defaultValue={filters.origin}
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            className="border-input bg-background h-10 w-full rounded-lg border px-3 text-sm shadow-xs"
           >
             <option value="">{COPY.origin.all}</option>
             {ORIGIN_KEYS.map((origin) => (
@@ -92,20 +100,19 @@ export function DashboardFiltersForm({
           </select>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 lg:justify-end">
           {hasFilters ? (
             <Button asChild type="button" variant="outline">
               <Link href={ADMIN_DASHBOARD_PATH}>{COPY.actions.clear}</Link>
             </Button>
           ) : null}
-          <Button type="submit">
-            <Filter aria-hidden="true" />
+          <Button type="submit" className="h-10">
             {COPY.actions.apply}
           </Button>
         </div>
       </form>
 
-      <p className="text-muted-foreground mt-4 border-t pt-4 text-xs text-pretty">
+      <p className="text-muted-foreground border-t px-5 py-3 text-xs leading-relaxed text-pretty">
         {COPY.limitations}
       </p>
     </section>

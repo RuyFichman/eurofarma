@@ -28,7 +28,7 @@ export function OriginChart({ origins }: { origins: OriginCount[] }) {
 
   return (
     <section
-      className="bg-card min-w-0 rounded-2xl border p-5 shadow-sm"
+      className="bg-card min-w-0 rounded-xl border p-5 shadow-sm md:p-6"
       aria-labelledby="origin-chart-title"
     >
       <h2 id="origin-chart-title" className="text-base font-semibold">
@@ -37,7 +37,7 @@ export function OriginChart({ origins }: { origins: OriginCount[] }) {
       <p className="text-muted-foreground mt-1 text-xs">
         {COPY.originsSubtitle.replace('{count}', formatCount(total))}
       </p>
-      <div className="relative mx-auto my-5 size-48">
+      <div className="relative mx-auto my-5 size-44">
         <svg viewBox="0 0 200 200" className="size-full" aria-hidden="true">
           <circle
             cx="100"
@@ -114,7 +114,9 @@ export function OriginChart({ origins }: { origins: OriginCount[] }) {
           ))}
         </dl>
       )}
-      <p className="text-muted-foreground mt-5 text-xs">{COPY.originsNote}</p>
+      <p className="text-muted-foreground mt-5 border-t pt-4 text-xs leading-relaxed">
+        {COPY.originsNote}
+      </p>
     </section>
   )
 }
