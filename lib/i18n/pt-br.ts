@@ -38,8 +38,34 @@ export const FOOTER = {
     admin: { label: 'Admin', href: '/admin/login' },
   },
   contact: {
-    title: 'Contato institucional',
-    placeholder: 'contato@nutrilink.com.br',
+    title: 'Canais oficiais do Lactare',
+    description: 'Acompanhe o banco de leite e fale diretamente com a equipe.',
+    email: {
+      label: 'E-mail do Lactare',
+      address: 'bl@lactare.com.br',
+    },
+    channels: {
+      website: {
+        label: 'Site do Lactare',
+        href: 'https://www.lactare.com.br/',
+      },
+      instagram: {
+        label: 'Instagram do Lactare',
+        href: 'https://www.instagram.com/lactarebr/',
+      },
+      youtube: {
+        label: 'YouTube do Lactare',
+        href: 'https://www.youtube.com/@lactarebr',
+      },
+      linkedin: {
+        label: 'LinkedIn do Lactare',
+        href: 'https://www.linkedin.com/company/lactarebr',
+      },
+      whatsapp: {
+        label: 'WhatsApp do Lactare',
+        href: 'https://wa.me/5511966290681',
+      },
+    },
   },
   copyright: `© ${new Date().getFullYear()} NutriLink. Todos os direitos reservados.`,
 } as const
