@@ -179,7 +179,7 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
           <legend className="text-sm font-medium">
             {COVERAGE.checker.methodLabel}
           </legend>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="mx-auto mt-3 grid max-w-4xl gap-3 sm:grid-cols-2">
             {(['cep', 'municipality'] as const).map((option) => (
               <button
                 key={option}
@@ -194,7 +194,7 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
           </div>
         </fieldset>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+        <div className="mx-auto mt-6 max-w-xl space-y-4">
           {method === 'cep' ? (
             <div className="space-y-2">
               <Label htmlFor="coverage-cep">{COVERAGE.checker.cep.label}</Label>
@@ -210,19 +210,9 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
                 placeholder={COVERAGE.checker.cep.placeholder}
                 className="bg-background h-12 rounded-xl"
                 aria-invalid={Boolean(error?.field)}
-                aria-describedby={
-                  error?.field
-                    ? 'coverage-cep-hint coverage-error'
-                    : 'coverage-cep-hint'
-                }
+                aria-describedby={error?.field ? 'coverage-error' : undefined}
                 disabled={isSubmitting}
               />
-              <p
-                id="coverage-cep-hint"
-                className="text-muted-foreground text-xs"
-              >
-                {COVERAGE.checker.cep.hint}
-              </p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -263,7 +253,7 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
           <Button
             type="submit"
             size="lg"
-            className="h-12 rounded-xl px-6"
+            className="mx-auto flex h-12 rounded-xl px-6"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
