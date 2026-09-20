@@ -1,73 +1,50 @@
-import {
-  ArrowRight,
-  Droplets,
-  MapPin,
-  MessageCircle,
-  Package,
-  Syringe,
-  Truck,
-} from 'lucide-react'
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ContentSectionHeader } from '@/components/shared/content-section-header'
 import { CONTENT } from '@/lib/i18n/pt-br'
-
-const STEP_ICONS = [MessageCircle, MapPin, Syringe, Package, Droplets, Truck]
 
 export function ContentDonationPath() {
   const { donationPath } = CONTENT
-  const lastIndex = donationPath.steps.length - 1
 
   return (
-    <section className="mx-auto max-w-7xl px-6 pt-16 md:pt-20">
-      <ContentSectionHeader
-        icon={ArrowRight}
-        eyebrow={donationPath.eyebrow}
-        title={donationPath.title}
-        description={donationPath.description}
-      />
+    <section>
+      <div className="mx-auto max-w-7xl px-6 py-16 md:py-20 lg:py-24">
+        <header className="mx-auto max-w-3xl text-center">
+          <p className="text-primary text-xs font-medium tracking-[0.24em] uppercase">
+            {donationPath.eyebrow}
+          </p>
+          <h2
+            id="donation-path-title"
+            className="text-foreground mt-5 text-3xl font-semibold tracking-[-0.03em] text-balance md:text-4xl"
+          >
+            {donationPath.title}
+          </h2>
+          <p className="text-muted-foreground mt-4 text-sm text-pretty md:text-base">
+            {donationPath.description}
+          </p>
+        </header>
 
-      <ol className="mt-10 grid gap-8 md:mt-12 md:grid-cols-6 md:gap-4">
-        {donationPath.steps.map((step, index) => {
-          const Icon = STEP_ICONS[index] ?? MessageCircle
-          return (
+        <ol
+          aria-labelledby="donation-path-title"
+          className="md:before:bg-border relative mt-14 grid gap-10 md:mt-16 md:grid-cols-6 md:gap-5 md:before:absolute md:before:top-6 md:before:right-[calc(100%/12)] md:before:left-[calc(100%/12)] md:before:h-px md:before:content-['']"
+        >
+          {donationPath.steps.map((step, index) => (
             <li
               key={step.title}
-              className="relative flex flex-col items-center text-center"
+              className="relative grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-x-5 md:block md:text-center"
             >
-              {index < lastIndex ? (
-                <span
-                  className="bg-border absolute top-5 left-[calc(50%+1.5rem)] hidden h-0.5 w-[calc(100%-3rem)] md:block"
-                  aria-hidden="true"
-                />
-              ) : null}
-              <span className="bg-primary text-primary-foreground relative z-10 flex size-10 items-center justify-center rounded-full text-sm font-bold">
-                {index + 1}
+              <span className="bg-primary text-primary-foreground border-primary relative z-10 flex size-12 items-center justify-center rounded-full border text-xs font-semibold shadow-sm md:mx-auto">
+                {String(index + 1).padStart(2, '0')}
               </span>
-              {/* `flex-1`: o `li` já estica com o grid, mas o cartão parava na
-                  altura do próprio texto — daí as bases desalinhadas. */}
-              <Card className="mt-6 flex w-full flex-1 flex-col gap-3 py-5">
-                {/* `justify-items-center`, não `items-center`: o CardHeader é um
-                    grid, e ali `items-*` alinha na vertical — era por isso que o
-                    ícone ficava à esquerda com o título centralizado. */}
-                <CardHeader className="justify-items-center px-5">
-                  <span className="bg-secondary text-primary flex size-11 items-center justify-center rounded-xl">
-                    <Icon className="size-5" aria-hidden="true" />
-                  </span>
-                  <CardTitle className="mt-2 text-center text-base">
-                    {step.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-5">
-                  <p className="text-muted-foreground text-sm leading-6">
-                    {step.description}
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="pt-1 md:pt-0">
+                <h3 className="text-foreground text-base font-semibold md:mt-6">
+                  {step.title}
+                </h3>
+                <p className="text-muted-foreground mt-2 text-sm leading-6 md:mt-3">
+                  {step.description}
+                </p>
+              </div>
             </li>
-          )
-        })}
-      </ol>
+          ))}
+        </ol>
+      </div>
     </section>
   )
 }

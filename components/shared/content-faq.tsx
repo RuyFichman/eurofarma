@@ -44,11 +44,8 @@ export function ContentFaq() {
         ))}
       </ul>
 
-      <aside
-        aria-labelledby="faq-help-title"
-        className="bg-card mt-10 rounded-2xl border p-6 text-center shadow-sm sm:p-8"
-      >
-        <h3 id="faq-help-title" className="text-base sm:text-lg">
+      <aside aria-labelledby="faq-help-title" className="mt-12 text-center">
+        <h3 id="faq-help-title" className="text-lg sm:text-xl">
           {faq.help.title}
         </h3>
 
@@ -56,7 +53,7 @@ export function ContentFaq() {
           <Button
             asChild
             size="lg"
-            className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 h-11 rounded-full px-7 has-[>svg]:px-6"
+            className="h-11 rounded-full px-7 has-[>svg]:px-6"
           >
             <Link href={faq.help.whatsapp.href}>
               <MessageCircle aria-hidden="true" />

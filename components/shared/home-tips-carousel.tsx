@@ -136,7 +136,7 @@ export function HomeTipsCarousel({ tips }: HomeTipsCarouselProps) {
                 isActive
                   ? 'z-20 opacity-100'
                   : isPreview
-                    ? 'z-10 opacity-45 blur-[1px] hover:opacity-70'
+                    ? 'z-10 opacity-45 blur-[2px] hover:opacity-70'
                     : 'pointer-events-none z-0 opacity-0'
               }`}
               style={{ transform }}
