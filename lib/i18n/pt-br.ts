@@ -540,28 +540,28 @@ export const CONTENT = {
     eyebrow: 'Seção 4',
     title: 'Jornadas possíveis',
     description:
-      'Exemplos ilustrativos de como a informação e o acolhimento podem apoiar cada etapa.',
+      'Relatos reais de nutrizes atendidas pelo Lactare, publicados pelos canais oficiais do banco de leite.',
     items: [
       {
-        role: 'Doadora',
+        role: 'Doadora e receptora',
         quote:
-          'Quando descobri que meu leite poderia salvar a vida de um bebê prematuro, chorei de emoção. O processo foi muito mais simples do que imaginava. Hoje é parte da minha rotina e me sinto parte de algo enorme.',
-        name: 'Jornada ilustrativa 1',
-        detail: 'Exemplo de uma primeira doação',
-      },
-      {
-        role: 'Continuidade',
-        quote:
-          'Nosso filho nasceu com 28 semanas. Durante 4 meses, o leite humano doado foi o único alimento que ele recebeu. Hoje ele tem 2 anos e é cheio de vida. Não temos palavras para agradecer.',
-        name: 'Jornada ilustrativa 2',
-        detail: 'Exemplo de acompanhamento acolhedor',
+          'Ah, a doação de leite! Descobri o Lactare no nascimento da minha primeira filha, que hoje tem 3 anos, e contribuí um pouco com a doação de leite. Com minha segunda filha foi diferente: ela nasceu prematura e precisou de doação na UTI neonatal. Quando ela saiu da UTI, procurei de novo o Lactare e fui recebida de braços abertos por esse projeto que ajuda tantos bebês! Sempre fui recebida com um sorriso, as meninas são fantásticas e estão de parabéns.',
+        name: 'Polyana',
+        detail: 'Doadora e receptora, mãe de Mariana e Maria Vitória',
       },
       {
         role: 'Doadora',
         quote:
-          'Tinha muito leite sobrando e não sabia o que fazer. Uma amiga me indicou o NutriLink. Em menos de uma semana já estava cadastrada e fazendo minha primeira coleta. É gratificante demais.',
-        name: 'Jornada ilustrativa 3',
-        detail: 'Exemplo de indicação entre nutrizes',
+          'Sou mãe do Arthur, de 6 meses. Foi durante o pré-natal que conheci o Lactare e aprendi mais sobre amamentação e doação de leite humano. Com o apoio que recebi, consegui amamentar o meu filho e também doar o leite excedente. Vi de perto a angústia das famílias que aguardavam do lado de fora da UTI neonatal, torcendo pela recuperação de seus bebês. Foi ali que compreendi ainda mais a importância da doação de leite humano. Hoje, compartilho minha experiência e incentivo outras pessoas a conhecerem a doação. É uma sensação maravilhosa nutrir o meu filho e ainda poder ajudar tantos bebês prematuros.',
+        name: 'Bruna Sousa',
+        detail: 'Mãe do Arthur',
+      },
+      {
+        role: 'Receptora e doadora',
+        quote:
+          'Eu estava muito triste por não conseguir amamentar minha filha e me sentia frustrada. O Lactare salvou a minha amamentação. Quando voltamos para casa, meu leite desceu, meus seios ficaram empedrados, feridos e doendo muito. Eu tinha leite, mas não sabia como massagear nem fazer a extração, e minha filha não conseguia mamar. Desesperado, meu marido ligou para o Lactare e fomos orientados a ir até lá. Fui acolhida pelas enfermeiras, que cuidaram de mim, extraíram meu leite e me ensinaram a amamentar, massagear as mamas e fazer a extração corretamente. Foi por causa desse acolhimento que hoje tenho a alegria de retribuir um pouco desse cuidado, doando leite para outros bebês.',
+        name: 'Ariane Nazari',
+        detail: 'Mãe da Alice',
       },
     ],
     cta: {
