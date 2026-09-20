@@ -1,8 +1,9 @@
-import { Award, Share2 } from 'lucide-react'
+import { Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { MyBadgesCard } from '@/components/nutriz/my-badges-card'
 import type { NutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 
@@ -39,23 +40,10 @@ export function PersonalHighlights({
   recognitions: NutrizPersonalAreaData['recognitions']
 }) {
   const copy = NUTRIZ_AUTH.area.personal.highlights
-  const recognitionCopy = NUTRIZ_AUTH.area.recognitions
-  const latest = recognitions.at(-1)
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <HighlightCard
-        icon={Award}
-        title={copy.badges.title}
-        description={
-          latest
-            ? copy.badges.description.replace(
-                '{title}',
-                recognitionCopy.items[latest.kind].title,
-              )
-            : copy.badges.empty
-        }
-      />
+    <div className="grid gap-6 md:grid-cols-2 md:items-start">
+      <MyBadgesCard recognitions={recognitions} />
 
       {/*
         RF12 continua pendente: o cartão de impacto só existe depois de uma

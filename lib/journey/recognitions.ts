@@ -12,6 +12,19 @@ export type JourneyRecognitionRule = {
   status: JourneyStatusValue
 }
 
+/**
+ * Ordem de apresentação em "Meus selos", na área pessoal. Segue a ordem em
+ * que os reconhecimentos ficam alcançáveis na jornada, não a ordem em que
+ * cada nutriz efetivamente os recebe.
+ */
+export const RECOGNITION_KIND_ORDER: readonly RecognitionKindValue[] = [
+  'JOURNEY_STARTED',
+  'READY_FOR_DONATION',
+  'KIT_RECEIVED',
+  'FIRST_DONATION',
+  'CONTINUITY_RECOGNIZED',
+]
+
 /** Reconhecimentos cumulativos, sem recompensa material ou alegação clínica. */
 const RECOGNITION_BY_STATUS: Partial<
   Record<JourneyStatusValue, readonly JourneyRecognitionRule[]>

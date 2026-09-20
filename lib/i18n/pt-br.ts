@@ -1294,10 +1294,17 @@ export const NUTRIZ_AUTH = {
       },
       highlights: {
         badges: {
-          title: 'Seus selos',
+          title: 'Meus selos',
           description: 'Última conquista: {title}.',
           empty:
             'Seus primeiros selos aparecem conforme a equipe registra suas etapas.',
+          subtitle:
+            'Um jeito de guardar cada passo da sua jornada com o Lactare.',
+          expandAction: 'Ver selos',
+          collapseAction: 'Ocultar selos',
+          progressLabel: 'conquistados até agora',
+          achievedOn: 'Conquistado em {date}',
+          pending: 'Ainda não conquistado.',
         },
         impactCard: {
           title: 'Cartão de impacto',
