@@ -122,7 +122,14 @@ export function AdminJourneyStatusForm({
               <SelectContent>
                 {allowedStatuses.map((status) => (
                   <SelectItem key={status} value={status}>
-                    {getJourneyStatusLabel(status)}
+                    {/* Doação confirmada pode se repetir; sem esta marca a
+                        opção pareceria o status que já está em vigor. */}
+                    {status === currentStatus
+                      ? copy.form.nextStatus.repeatOption.replace(
+                          '{label}',
+                          getJourneyStatusLabel(status),
+                        )
+                      : getJourneyStatusLabel(status)}
                   </SelectItem>
                 ))}
               </SelectContent>
