@@ -236,7 +236,7 @@ export function NutrizAccountCard({ account }: { account: NutrizAccountData }) {
 
       <Button
         asChild
-        className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 mt-4 w-full"
+        className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 mt-4"
       >
         <a href={LACTARE_CONTACT.whatsappHref} target="_blank" rel="noreferrer">
           <WhatsappIcon className="size-4" />
