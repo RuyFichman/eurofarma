@@ -1914,7 +1914,7 @@ export const WHATSAPP_BOT = {
     welcome:
       'Oi! Aqui é o Lactare, banco de leite humano da Eurofarma 💛 Ajudamos mães que amamentam a doar o leite excedente pra bebês prematuros internados em UTI neonatal. Como posso te ajudar hoje?',
     registeredWelcome:
-      'Oi, {name}! 💙\n\nSeu status atual no NutriLink é: {status}. Essa categoria foi registrada pela equipe do Lactare; o bot não realiza avaliação clínica.\n\n{guidance}\n\nComo posso ajudar agora?',
+      'Oi, {name}! 💙\n\nSeu status atual no NutriLink é: {status}.\n\nEssa categoria foi registrada pela equipe do Lactare; o bot não realiza avaliação clínica.\n\n{guidance}\n\nComo posso ajudar agora?',
     knowMore: 'Quero saber mais',
     donate: 'Quero doar meu leite',
     human: 'Falar com alguém da equipe',
@@ -1922,7 +1922,7 @@ export const WHATSAPP_BOT = {
     button: 'Ver opções',
   },
   faq: {
-    body: 'Sobre o que você quer saber?',
+    body: 'Ótimo! Sobre qual desses temas você quer saber mais?',
     button: 'Ver dúvidas',
     questions: {
       STEPS: 'Quais são todas as etapas até o processo de doação?',
