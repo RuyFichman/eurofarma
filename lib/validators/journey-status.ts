@@ -4,6 +4,7 @@ import {
   canTransitionJourneyStatus,
   JOURNEY_STATUS_VALUES,
 } from '../journey/status'
+import { isValidLocalDateTime } from '../utils/local-date-time'
 import { ADMIN } from '../i18n/pt-br'
 
 export const JOURNEY_ADMINISTRATIVE_NOTE_MAX_LENGTH = 500
@@ -32,11 +33,28 @@ export const journeyAdministrativeNoteSchema = z
   .optional()
   .transform((value) => value || undefined)
 
+/**
+ * Só tem efeito quando `toStatus` é `KIT_SENT` — data/horário combinados da
+ * visita, informados pelo admin (20/09/2026). Fonte legítima do lembrete de
+ * entrega do kit na área da nutriz; opcional, e a aplicação ignora o campo
+ * para qualquer outra transição.
+ */
+export const kitDeliveryScheduledAtSchema = z
+  .string()
+  .trim()
+  .refine(
+    (value) => value === '' || isValidLocalDateTime(value),
+    COPY.kitScheduledAtInvalid,
+  )
+  .optional()
+  .transform((value) => value || undefined)
+
 export const journeyStatusTransitionSchema = z
   .object({
     fromStatus: z.enum(JOURNEY_STATUS_VALUES),
     toStatus: z.enum(JOURNEY_STATUS_VALUES),
     administrativeNote: journeyAdministrativeNoteSchema,
+    kitDeliveryScheduledAt: kitDeliveryScheduledAtSchema,
   })
   .refine(
     ({ fromStatus, toStatus }) =>

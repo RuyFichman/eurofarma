@@ -8,12 +8,12 @@ import { DonationHistoryCard } from '@/components/nutriz/donation-history-card'
 import { JourneySummaryCard } from '@/components/nutriz/journey-summary-card'
 import { PersonalHighlights } from '@/components/nutriz/personal-highlights'
 import { NutrizAccountCard } from '@/components/nutriz/nutriz-account-card'
-import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
+import { MyRemindersCard } from '@/components/nutriz/my-reminders-card'
 import { NutrizReferralCard } from '@/components/nutriz/nutriz-referral-card'
 import { WellbeingCard } from '@/components/nutriz/wellbeing-card'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { getNutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
-import { getReminderConsentPreference } from '@/lib/db/queries/communication-consents'
+import { getNutrizReminderOverview } from '@/lib/db/queries/nutriz-reminders'
 import { getNutrizAccountData } from '@/lib/db/queries/nutriz-account'
 import { getNutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
 import {
@@ -34,7 +34,7 @@ export default async function NutrizAreaPage() {
   const [journey, reminders, personal, referralLink, account, referredSignup] =
     await Promise.all([
       getNutrizJourneySnapshot(nutriz.id),
-      getReminderConsentPreference(nutriz.id),
+      getNutrizReminderOverview(nutriz.id),
       getNutrizPersonalAreaData(nutriz.id),
       getOrCreateNutrizReferralLink(nutriz.id),
       getNutrizAccountData(nutriz.id),
@@ -87,10 +87,7 @@ export default async function NutrizAreaPage() {
         </div>
 
         <div className="mt-6">
-          <ReminderConsentCard
-            enabled={reminders.enabled}
-            referenceDate={reminders.referenceDate}
-          />
+          <MyRemindersCard overview={reminders} />
         </div>
 
         <div className="mt-6 grid gap-6 md:grid-cols-2">

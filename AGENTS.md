@@ -88,7 +88,7 @@ A esteira funciona com:
 - pnpm check:validators;
 - pnpm test, test:unit, test:integration e test:coverage.
 
-TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **631 testes em 95 arquivos**, já com a otimização das consultas do dashboard e a idempotência de entrada dos dois provedores. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
+TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte completa passa contra o Supabase cloud com **707 testes em 104 arquivos** (contagem em 20 de setembro de 2026, já com "Meus lembretes"), já com a otimização das consultas do dashboard e a idempotência de entrada dos dois provedores. As migrations `20260916180000_add_notification_outbox`, `20260916190000_add_reminder_consent_purpose`, `20260916193000_add_reminder_outbox_kind` e `20260916193100_add_reminder_outbox_payload` foram aplicadas no Supabase cloud em 16 de setembro de 2026, nessa ordem e separadamente, e registradas em `_prisma_migrations` com o checksum SHA-256 dos arquivos. As migrations anteriores do RF07, RF16, estado conversacional e `service_municipalities` continuam aplicadas.
 
 ### 3.1 O que está implementado
 
@@ -134,7 +134,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 | RF03 — fora da cobertura | **Implementado.** CEP ou município fora da lista recebe explicação e link oficial da rBLH. |
 | RF04 — cadastro opcional e LGPD | **Parcial.** O consentimento é obrigatório e as rotas de Privacidade e Termos têm minutas técnicas locais, mas a identificação do controlador e do encarregado, o canal institucional e a redação jurídica ainda dependem de validação da Eurofarma antes de qualquer publicação. |
 | RF05 — login da nutriz | **Implementado.** A recuperação por e-mail depende de SMTP. |
-| RF06 — lembretes opcionais | **Parcial, consentimento implementado.** Opt-in e cancelamento são separados, opcionais e auditáveis no cadastro, na área autenticada e no chatbot; a ativação registra uma data de referência sem horário e confirma somente a ativação, nunca agendamento. As migrations da referência ainda estão locais, o job de enfileiramento está implementado e a entrega real dos lembretes depende da Meta. |
+| RF06 — lembretes opcionais | **Parcial, consentimento e configuração implementados.** Opt-in e cancelamento são separados, opcionais e auditáveis no cadastro, no chatbot e, desde 20 de setembro de 2026, na área autenticada via "Meus lembretes" (três tipos configuráveis individualmente: validade do leite, doação futura, entrega do kit). Nenhum deles agenda ou confirma nada. O job que calcularia quando cada lembrete vence e o enfileiraria na outbox ainda não existe (ver "Meus lembretes" na seção 3); a entrega real continua dependendo da Meta. |
 | RF07 — tracking de contato | **Implementado.** O clique nos canais oficiais do Lactare é gravado como evento anônimo em `contact_channel_clicks`, sem unidade legada e sem CEP ou PII. O tracking antigo por unidade continua aposentado (`/api/track` responde 410). O painel lê o total, a janela de 30 dias e a distribuição por canal. |
 | RF08 — painel autenticado | **Implementado.** Inclui checagem de role ADMIN. |
 | RF09 — municípios atendidos | **Implementado.** O CRUD administra `service_municipalities` e a tabela existe no Supabase cloud com os 30 municípios. |
@@ -268,6 +268,16 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 
 `POST /api/whatsapp/twilio` reaproveita a mesma `processInboundWhatsappMessage` e a mesma máquina de estados do webhook da Meta, então a pausa de `HUMAN_HANDOFF` já valia para os dois provedores desde que a máquina de estados foi compartilhada. Esta atualização acrescenta cobertura de teste dedicada que comprova a paridade em vez de assumi-la: `tests/unit/whatsapp-twilio-route.test.ts` cobre assinatura inválida ou ausente, reentrega idempotente pelo `MessageSid`, o pedido explícito de handoff pelo mesmo número, o bot permanecendo mudo durante a pausa e a retomada do autoatendimento ao escrever “menu”. `tests/unit/whatsapp-conversation.test.ts` ganhou os casos equivalentes na máquina de estados pura (retomada por “menu” e permanência pausada para qualquer outro texto). Nenhum comportamento de produção mudou; a decisão entre Twilio Conversations/Flex e uma fila/tela administrativa própria para a operação humana completa (seção 11.2) continua em aberto.
 
+### Meus lembretes (20 de setembro de 2026)
+
+O card único "Lembretes pelo WhatsApp" (on/off genérico + uma data de referência) virou "Meus lembretes": um disclosure (`details`/`summary`, mesmo padrão de `MyBadgesCard`) com até três lembretes configuráveis independentemente — validade do leite, doação futura e entrega do kit —, cada um com tela própria de configuração e prévia da mensagem. Nenhum tipo aparece na lista sem um dado real que o autorize: validade do leite exige alguma `ExtractionLog`; entrega do kit exige que o admin já tenha registrado a data/horário da visita. O consentimento guarda-chuva (`CommunicationConsentEvent`, purpose `REMINDERS_WHATSAPP`) continua sendo a fonte de LGPD por trás — ativar qualquer lembrete concede esse consentimento se ainda não existir, e desativar o último lembrete ativo o retira; o fluxo do chatbot no WhatsApp não mudou e usa o mesmo consentimento.
+
+Nova tabela `nutriz_reminder_preferences` (uma linha por nutriz e tipo, não um ledger — reativar sobrescreve a configuração anterior), com um CHECK que garante que cada tipo só aceite as opções de aviso da sua própria lista e só preencha o campo que faz sentido para ele (sessão de origem para validade do leite; data autodeclarada para doação futura; nenhum dos dois para entrega do kit, que lê `NutrizProfile.kitDeliveryScheduledAt`). RLS e policies de propriedade foram aplicadas desde já, no mesmo padrão de `extraction_logs`/`wellbeing_entries`. Duas migrations aplicadas no Supabase cloud em 20 de setembro de 2026: `20260920060000_add_nutriz_kit_delivery_scheduled_at` e `20260920070000_add_nutriz_reminder_preferences`.
+
+**Decisão do time sobre a entrega do kit:** como o sistema nunca teve data/horário para essa visita (só o status categórico `KIT_SENT`), o admin agora pode informar opcionalmente esse dado ao registrar a transição no painel (`AdminJourneyStatusForm`) — vira a única fonte legítima do lembrete correspondente; a nutriz nunca a preenche, só visualiza.
+
+**Escopo desta rodada:** só a camada de configuração (telas, prévia, persistência da preferência). O job que calcularia quando cada lembrete vence e o enfileiraria na `notification_outbox` fica para uma etapa seguinte, na mesma fronteira já documentada para RF06/RF17 (entrega real depende da Meta). `lib/reminders/schedule.ts` já traz as funções puras de cálculo de data prontas para esse job futuro.
+
 ## 4. Stack
 
 | Camada | Tecnologia | Versão ou nota |
@@ -285,7 +295,7 @@ O fluxo local agora registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente
 | Conteúdo | Componentes estruturados; MDX previsto | políticas e conteúdo futuro |
 | Pacotes | pnpm | obrigatório |
 | Node | 22 LTS planejado | ambiente atual roda Node 24 |
-| Testes | Vitest | Última suíte completa no cloud: 631 em 95 arquivos; suíte unitária local atual: 551 em 84 arquivos. |
+| Testes | Vitest | Última suíte completa no cloud: 707 em 104 arquivos. |
 | E2E | Playwright | sprint futuro |
 | Chatbot | Interface independente de provedor, com adaptadores Meta e Twilio | código local parcial; falta infraestrutura real do provedor escolhido |
 | Consulta de CEP | ViaCEP | `POST /api/coverage`, sem persistência do CEP |

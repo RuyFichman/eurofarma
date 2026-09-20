@@ -5,6 +5,7 @@ import {
   type AdminJourneyStatusUpdate,
 } from '../../validators/journey-status'
 import { getRecognitionRulesForStatus } from '../../journey/recognitions'
+import { localDateTimeToDate } from '../../utils/local-date-time'
 import { prisma } from '../prisma'
 
 const ADMIN_NUTRIZ_JOURNEY_SELECT = {
@@ -76,13 +77,24 @@ export async function applyAdminNutrizJourneyStatusTransition(
   client: JourneyWriteClient,
   input: AdminJourneyStatusMutationInput,
 ): Promise<AdminJourneyStatusMutationResult> {
+  const kitDeliveryScheduledAt =
+    input.toStatus === 'KIT_SENT' && input.kitDeliveryScheduledAt
+      ? localDateTimeToDate(input.kitDeliveryScheduledAt)
+      : null
+
   const updated = await client.nutrizProfile.updateMany({
     where: {
       id: input.nutrizProfileId,
       deletedAt: null,
       journeyStatus: input.fromStatus,
     },
-    data: { journeyStatus: input.toStatus },
+    data: {
+      journeyStatus: input.toStatus,
+      // Só a transição para KIT_SENT grava a data/horário da visita — fonte
+      // do lembrete de entrega do kit na área da nutriz (20/09/2026). Para
+      // qualquer outro destino, o campo enviado é ignorado.
+      ...(kitDeliveryScheduledAt ? { kitDeliveryScheduledAt } : {}),
+    },
   })
 
   if (updated.count !== 1) {
