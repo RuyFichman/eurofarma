@@ -1,12 +1,14 @@
 'use client'
 
-import { Copy, Link2, Send } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Copy, Link2 } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { WhatsappIcon } from '@/components/shared/whatsapp-icon'
+import { SITE_ORIGIN } from '@/lib/constants/site'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 import {
   buildReferralMessage,
@@ -16,19 +18,16 @@ import {
 export function NutrizReferralCard({ code }: { code: string }) {
   const copy = NUTRIZ_AUTH.area.referral
   const path = `/cadastro?indicacao=${encodeURIComponent(code)}`
-  const [link, setLink] = useState(path)
+  // `SITE_ORIGIN` é fixo (não depende de `window`), então o link e a
+  // mensagem já saem corretos no primeiro render — sem o piscar de um
+  // useEffect trocando o caminho relativo pela URL absoluta depois do mount.
+  const link = new URL(path, SITE_ORIGIN).toString()
   const [message, setMessage] = useState(() =>
-    buildReferralMessage(copy.messageTemplate, path),
+    buildReferralMessage(copy.messageTemplate, link),
   )
   const [feedback, setFeedback] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const whatsappShareUrl = buildWhatsappShareUrl(message)
-
-  useEffect(() => {
-    const absoluteLink = new URL(path, window.location.origin).toString()
-    setLink(absoluteLink)
-    setMessage(buildReferralMessage(copy.messageTemplate, absoluteLink))
-  }, [copy.messageTemplate, path])
 
   async function copyText(value: string, successMessage: string) {
     setFeedback(null)
@@ -42,10 +41,7 @@ export function NutrizReferralCard({ code }: { code: string }) {
   }
 
   function copyLink() {
-    return copyText(
-      new URL(path, window.location.origin).toString(),
-      copy.copiedFeedback,
-    )
+    return copyText(link, copy.copiedFeedback)
   }
 
   return (
@@ -74,7 +70,12 @@ export function NutrizReferralCard({ code }: { code: string }) {
             readOnly
             onFocus={(event) => event.currentTarget.select()}
           />
-          <Button type="button" onClick={copyLink} className="shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={copyLink}
+            className="shrink-0"
+          >
             <Copy aria-hidden="true" />
             {copy.copyAction}
           </Button>
@@ -102,13 +103,16 @@ export function NutrizReferralCard({ code }: { code: string }) {
               <Copy aria-hidden="true" />
               {copy.copyMessageAction}
             </Button>
-            <Button asChild>
+            <Button
+              asChild
+              className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90"
+            >
               <a
                 href={whatsappShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Send aria-hidden="true" />
+                <WhatsappIcon className="size-4" />
                 {copy.sendWhatsappAction}
               </a>
             </Button>

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useState, useTransition } from 'react'
-import { MessageCircle, ShieldCheck, Smartphone } from 'lucide-react'
+import { ShieldCheck, Smartphone } from 'lucide-react'
 
 import {
   deleteNutrizAccountAction,
@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { WhatsappIcon } from '@/components/shared/whatsapp-icon'
 import { BRAZILIAN_STATES } from '@/lib/constants/brazilian-states'
 import { LACTARE_CONTACT } from '@/lib/constants/lactare-contact'
 import type { NutrizAccountData } from '@/lib/db/queries/nutriz-account'
@@ -199,7 +200,7 @@ export function NutrizAccountCard({ account }: { account: NutrizAccountData }) {
               </div>
             </form>
           ) : (
-            <div className="mt-5 grid gap-3 border-t pt-5 sm:grid-cols-2">
+            <div className="mt-5 flex flex-wrap gap-3 border-t pt-5">
               <Button
                 type="button"
                 variant="outline"
@@ -233,12 +234,21 @@ export function NutrizAccountCard({ account }: { account: NutrizAccountData }) {
         </CardContent>
       </Card>
 
-      <Button asChild variant="outline" className="mt-4 w-full">
-        <a href={LACTARE_CONTACT.whatsappHref} target="_blank" rel="noreferrer">
-          <MessageCircle aria-hidden="true" />
-          {copy.contactAction}
-        </a>
-      </Button>
+      <div className="mt-4 flex justify-center">
+        <Button
+          asChild
+          className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90"
+        >
+          <a
+            href={LACTARE_CONTACT.whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <WhatsappIcon className="size-4" />
+            {copy.contactAction}
+          </a>
+        </Button>
+      </div>
     </section>
   )
 }

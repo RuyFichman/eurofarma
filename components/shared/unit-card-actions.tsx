@@ -113,7 +113,7 @@ export function UnitCardActions({
             <Button
               asChild
               size="sm"
-              className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full rounded-lg"
+              className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90 w-full rounded-lg"
             >
               <a
                 href={whatsappUrl}
