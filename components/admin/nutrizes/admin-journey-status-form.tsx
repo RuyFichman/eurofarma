@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { getJourneyStatusLabel } from '@/lib/admin/nutrizes/journey-labels'
 import {
-  getAllowedJourneyTransitions,
+  getAllowedAdminJourneyTransitions,
   type JourneyStatusValue,
 } from '@/lib/journey/status'
 import { ADMIN } from '@/lib/i18n/pt-br'
@@ -38,12 +38,8 @@ export function AdminJourneyStatusForm({
   currentStatus: JourneyStatusValue
 }) {
   const copy = ADMIN.nutrizJourney
-  const allowedStatuses = getAllowedJourneyTransitions(currentStatus)
-  const isKitDeliveryConfirmation =
-    currentStatus === 'KIT_SENT' &&
-    allowedStatuses.length === 1 &&
-    allowedStatuses[0] === 'KIT_DELIVERED'
-  const formCopy = isKitDeliveryConfirmation ? copy.kitDelivery : copy.form
+  const allowedStatuses = getAllowedAdminJourneyTransitions(currentStatus)
+  const formCopy = copy.form
   const [submitError, setSubmitError] = useState<string | null>(null)
   const form = useForm<
     JourneyStatusTransitionInput,
