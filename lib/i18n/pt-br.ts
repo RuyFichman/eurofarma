@@ -492,51 +492,51 @@ export const CONTENT = {
     action: { label: 'Ver todos os guias', href: '#' },
     cards: [
       {
-        tag: 'Extração',
-        title: 'Técnica de Extração Manual',
+        tag: 'Elegibilidade',
+        title: 'Quem pode doar leite humano?',
         description:
-          'Posicione o polegar e o indicador formando um C. Pressione para dentro e depois comprima suavemente, em ritmo constante.',
-        readTime: '4 min de leitura',
+          'Toda mulher que amamenta, produz um volume excedente de leite, está saudável e não utiliza medicamentos contraindicados para a amamentação pode ser uma doadora. Basta entrar em contato com o banco de leite para fazer o cadastro e receber as orientações.',
+        readTime: '1 min de leitura',
         cta: { label: 'Ler artigo', href: '#' },
       },
       {
-        tag: 'Armazenamento',
-        title: 'Armazenamento Seguro',
+        tag: 'Segurança',
+        title: 'O que é amamentação cruzada e por que ela é perigosa?',
         description:
-          'Freezer: até 15 dias. Congelador: até 3 meses. Geladeira: até 12 horas. Nunca reaqueça no micro-ondas.',
-        readTime: '3 min de leitura',
+          'Amamentação cruzada é a prática de amamentar o filho de outra mulher diretamente no peito. Ela é contraindicada pela Organização Mundial da Saúde e pelo Ministério da Saúde devido ao risco de transmissão de doenças infectocontagiosas. A forma segura de compartilhar leite é por meio da doação a um Banco de Leite Humano, onde o leite passa por rigoroso processo de pasteurização.',
+        readTime: '1 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Saúde',
+        title: 'É possível amamentar com mastite?',
+        description:
+          'Sim. Na maioria dos casos, amamentar ou extrair o leite no peito afetado ajuda a aliviar o ingurgitamento e acelera a recuperação. O leite de uma mama com mastite não faz mal ao bebê. Contudo, é fundamental buscar avaliação médica para o tratamento adequado da infecção.',
+        readTime: '1 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Produção',
+        title: 'Como saber se o meu leite é suficiente?',
+        description:
+          'A melhor forma de avaliar se o bebê está mamando o suficiente é observar o ganho de peso nas consultas pediátricas e os sinais do dia a dia, como se ele molha fraldas com frequência (urina clara) e se demonstra satisfação após as mamadas. A sensação de peito "murcho" não significa falta de leite, pois a maior parte da produção ocorre durante a própria mamada.',
+        readTime: '1 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Relactação',
+        title: 'É possível retomar a amamentação após uma pausa?',
+        description:
+          'Sim, o processo é chamado de relactação. Com o estímulo correto das mamas (frequência de extração ou sucção do bebê) e orientação profissional especializada, é possível reestimular a produção de leite humano mesmo após dias ou semanas sem amamentar.',
+        readTime: '1 min de leitura',
         cta: { label: 'Ler artigo', href: '#' },
       },
       {
         tag: 'Pega',
-        title: 'Pega Correta do Bebê',
+        title: 'Como identificar uma boa pega do bebê?',
         description:
-          'A boca do bebê deve abocanhar boa parte da aréola, não apenas o mamilo. Lábios virados para fora é o sinal certo.',
-        readTime: '5 min de leitura',
-        cta: { label: 'Ler artigo', href: '#' },
-      },
-      {
-        tag: 'Posicionamento',
-        title: 'Posições para Amamentar',
-        description:
-          'Tradicional, cavaleiro, invertida, deitada — cada posição tem vantagens. A certa é a que funciona para você e seu bebê.',
-        readTime: '6 min de leitura',
-        cta: { label: 'Ler artigo', href: '#' },
-      },
-      {
-        tag: 'Dicas',
-        title: 'Aumentando a Produção',
-        description:
-          'Ofereça o peito com frequência, mantenha-se hidratada, durma quando o bebê dormir e evite estresse desnecessário.',
-        readTime: '4 min de leitura',
-        cta: { label: 'Ler artigo', href: '#' },
-      },
-      {
-        tag: 'Higiene',
-        title: 'Higiene na Extração',
-        description:
-          'Lave as mãos, limpe as mamas com compressa estéril, esterilize frascos e bombas a cada uso. Prevenção é essencial.',
-        readTime: '3 min de leitura',
+          'Uma pega adequada acontece quando o bebê abocanha a maior parte da aréola (e não apenas o mamilo), fica com a boca bem aberta ("boca de peixinho"), o queixo encostado na mama e o nariz livre. A amamentação correta não deve causar dor nem ferimentos no peito.',
+        readTime: '1 min de leitura',
         cta: { label: 'Ler artigo', href: '#' },
       },
     ],
