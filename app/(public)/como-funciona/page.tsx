@@ -20,7 +20,7 @@ export default function ContentPage() {
     <>
       <ContentHero />
       <ContentStartHere />
-      <div id="caminho-da-doacao" className="bg-muted/40 pb-16 md:pb-20">
+      <div id="caminho-da-doacao" className="bg-muted/35 pb-16 md:pb-20">
         <ContentDonationPath />
         <ContentVideos />
         <ContentChecklist />
