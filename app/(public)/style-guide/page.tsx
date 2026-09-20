@@ -29,39 +29,76 @@ export const metadata = {
 
 type ColorToken = { name: string; className: string; value: string }
 
+// Os valores hex abaixo refletem os tokens hsl() de app/globals.css (paleta
+// azul, seção 7 do AGENTS.md). Esta página já usava as classes reais
+// (bg-primary etc.), então as caixinhas sempre renderizaram a cor certa —
+// só os rótulos e os hex de referência tinham ficado presos numa paleta
+// "Berry/Sage/Cream" anterior à decisão pelo azul.
 const colorTokens: ColorToken[] = [
-  { name: 'background', className: 'bg-background', value: '#FDFCFB' },
-  { name: 'foreground', className: 'bg-foreground', value: '#1A1014' },
-  { name: 'primary (Berry)', className: 'bg-primary', value: '#6D2E46' },
+  { name: 'background', className: 'bg-background', value: '#FAFCFF' },
+  { name: 'foreground', className: 'bg-foreground', value: '#1A2B3C' },
+  { name: 'primary', className: 'bg-primary', value: '#3A7AB8' },
   {
     name: 'primary-foreground',
     className: 'bg-primary-foreground',
     value: '#FAFAFA',
   },
-  { name: 'secondary (Sage)', className: 'bg-secondary', value: '#E4EFEA' },
+  { name: 'secondary', className: 'bg-secondary', value: '#D6EAFF' },
   {
     name: 'secondary-foreground',
     className: 'bg-secondary-foreground',
-    value: '#1E3329',
+    value: '#223D59',
   },
-  { name: 'accent (Cream)', className: 'bg-accent', value: '#F3E8DC' },
-  { name: 'muted', className: 'bg-muted', value: '#F4F1ED' },
+  { name: 'accent', className: 'bg-accent', value: '#C1DDF6' },
+  { name: 'muted', className: 'bg-muted', value: '#F1F5F9' },
   {
     name: 'muted-foreground',
     className: 'bg-muted-foreground',
-    value: '#6B6366',
+    value: '#586674',
   },
-  { name: 'destructive', className: 'bg-destructive', value: '#C01F1F' },
-  { name: 'border', className: 'bg-border', value: '#E8E3DD' },
-  { name: 'ring', className: 'bg-ring', value: '#6D2E46' },
+  { name: 'destructive', className: 'bg-destructive', value: '#C11F1F' },
+  { name: 'border', className: 'bg-border', value: '#CEE2F3' },
+  { name: 'ring', className: 'bg-ring', value: '#3A7AB8' },
 ]
 
 const chartTokens: ColorToken[] = [
-  { name: 'chart-1', className: 'bg-chart-1', value: '#6D2E46' },
-  { name: 'chart-2', className: 'bg-chart-2', value: '#84B59F' },
-  { name: 'chart-3', className: 'bg-chart-3', value: '#D9C2A3' },
-  { name: 'chart-4', className: 'bg-chart-4', value: '#4A86C4' },
-  { name: 'chart-5', className: 'bg-chart-5', value: '#E08A33' },
+  { name: 'chart-1', className: 'bg-chart-1', value: '#3A7AB8' },
+  { name: 'chart-2', className: 'bg-chart-2', value: '#42946F' },
+  { name: 'chart-3', className: 'bg-chart-3', value: '#5BA4D4' },
+  { name: 'chart-4', className: 'bg-chart-4', value: '#EAA23E' },
+  { name: 'chart-5', className: 'bg-chart-5', value: '#349DB2' },
+]
+
+// Exceções controladas à paleta azul (seção "CTAs de WhatsApp..." e "Atualização
+// da Minha Área" do AGENTS.md): cada uma tem escopo restrito documentado em
+// globals.css e não deve ser usada fora dele.
+const exceptionTokens: ColorToken[] = [
+  {
+    name: 'whatsapp-brand',
+    className: 'bg-whatsapp-brand',
+    value: '#25D366',
+  },
+  {
+    name: 'whatsapp-brand-foreground',
+    className: 'bg-whatsapp-brand-foreground',
+    value: '#FFFFFF',
+  },
+  { name: 'achievement', className: 'bg-achievement', value: '#D89F0E' },
+  {
+    name: 'achievement-foreground',
+    className: 'bg-achievement-foreground',
+    value: '#FFFFFF',
+  },
+  {
+    name: 'achievement-soft',
+    className: 'bg-achievement-soft',
+    value: '#FEF9EB',
+  },
+  {
+    name: 'achievement-soft-foreground',
+    className: 'bg-achievement-soft-foreground',
+    value: '#845B15',
+  },
 ]
 
 const spacings: { label: string; px: number }[] = [
@@ -124,6 +161,16 @@ export default function StyleGuidePage(): ReactNode {
         <h3>Cores de gráfico (dashboard)</h3>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
           {chartTokens.map((token) => (
+            <Swatch key={token.name} token={token} />
+          ))}
+        </div>
+        <h3>Exceções controladas (fora da paleta azul)</h3>
+        <p className="text-muted-foreground text-sm">
+          Uso restrito ao escopo documentado em cada token — ver comentários em{' '}
+          <code>app/globals.css</code>.
+        </p>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {exceptionTokens.map((token) => (
             <Swatch key={token.name} token={token} />
           ))}
         </div>
