@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { Award, BookOpen, Share2 } from 'lucide-react'
+import { Award, Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -44,7 +43,7 @@ export function PersonalHighlights({
   const latest = recognitions.at(-1)
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div className="grid gap-6 md:grid-cols-2">
       <HighlightCard
         icon={Award}
         title={copy.badges.title}
@@ -70,16 +69,6 @@ export function PersonalHighlights({
       >
         <Button variant="outline" size="sm" disabled>
           {copy.impactCard.action}
-        </Button>
-      </HighlightCard>
-
-      <HighlightCard
-        icon={BookOpen}
-        title={copy.content.title}
-        description={copy.content.description}
-      >
-        <Button asChild variant="outline" size="sm">
-          <Link href={copy.content.href}>{copy.content.action}</Link>
         </Button>
       </HighlightCard>
     </div>

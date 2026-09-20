@@ -210,6 +210,8 @@ A área também passou a exibir a barra de navegação do site. O `Footer` insti
 
 "Meus dados" é autoatendimento cadastral: a nutriz vê nome, localidade, WhatsApp mascarado e a data do consentimento LGPD, edita nome, cidade e UF por Server Action com lista explícita de campos, e pode excluir a própria conta. A exclusão é soft delete em `nutriz_profiles.deleted_at`, seguida de `signOut` — o gate `getNutrizAccess` já trata esse campo como acesso negado. O WhatsApp não é editável por autoatendimento: ele é único no banco e identifica a nutriz no chatbot. A remoção definitiva dos registros continua sendo procedimento operacional, pendente de definição de retenção.
 
+O card "Destaques" (`personal-highlights.tsx`) tinha um terceiro item estático, "Aumentando a produção", que linkava sempre para o mesmo artigo em `/como-funciona`, duplicando o que "Conteúdos para esta etapa" já mostra dentro do disclosure "Minha jornada" a partir de `getEducationalSuggestionIds`. Em 20 de setembro de 2026 esse card estático foi removido; "Destaques" passou de três para dois cards ("Seus selos" e "Cartão de impacto"), e a chave `highlights.content` saiu de `NUTRIZ_AUTH.area.personal`. Conteúdo sugerido por estágio continua existindo apenas em um lugar: dentro de "Minha jornada".
+
 ### Doações repetidas no histórico (20 de setembro de 2026)
 
 Doar é um evento que se repete; o status da jornada é um estado só. Como `DONATION_CONFIRMED` era alcançável uma única vez e `RECURRING_DONATION_ELIGIBLE` era terminal, o admin do Lactare conseguia registrar apenas a primeira doação da nutriz, e o "Histórico de doações" da área pessoal nunca podia crescer. O histórico append-only continua sendo a fonte.

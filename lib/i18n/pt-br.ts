@@ -1305,12 +1305,6 @@ export const NUTRIZ_AUTH = {
             'O cartão simbólico para compartilhar suas conquistas ainda está em construção.',
           action: 'Em breve',
         },
-        content: {
-          title: 'Aumentando a produção',
-          description: 'Conteúdo sugerido para o seu momento na jornada.',
-          action: 'Ler artigo',
-          href: '/como-funciona#amamentacao-na-pratica',
-        },
       },
       donations: {
         title: 'Histórico de doações',
