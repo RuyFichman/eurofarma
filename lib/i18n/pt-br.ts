@@ -2970,6 +2970,7 @@ export const ADMIN = {
       nextStatus: {
         label: 'Próximo status',
         placeholder: 'Selecione o próximo status',
+        repeatOption: '{label} (registrar nova ocorrência)',
       },
       note: {
         label: 'Observação administrativa (opcional)',

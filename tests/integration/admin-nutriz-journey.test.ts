@@ -261,6 +261,8 @@ describe('atualização transacional da jornada', () => {
       ['EXAM_SCHEDULED', 'EXAMS_COMPLETED'],
       ['ELIGIBLE', 'KIT_SENT'],
       ['KIT_DELIVERED', 'DONATION_CONFIRMED'],
+      ['DONATION_CONFIRMED', 'DONATION_CONFIRMED'],
+      ['RECURRING_DONATION_ELIGIBLE', 'DONATION_CONFIRMED'],
     ]
     const rejected: Array<[JourneyStatusValue, JourneyStatusValue]> = [
       ['REGISTERED', 'EXAMS_COMPLETED'],
@@ -269,6 +271,7 @@ describe('atualização transacional da jornada', () => {
       ['NOT_ELIGIBLE', 'KIT_SENT'],
       ['KIT_SENT', 'DONATION_CONFIRMED'],
       ['DONATION_CONFIRMED', 'KIT_DELIVERED'],
+      ['RECURRING_DONATION_ELIGIBLE', 'KIT_DELIVERED'],
     ]
 
     await withRolledBackJourney(async (transaction, { nutrizId, adminId }) => {
