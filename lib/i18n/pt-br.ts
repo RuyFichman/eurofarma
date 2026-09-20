@@ -1831,27 +1831,6 @@ export const WHATSAPP_BOT = {
   },
 } as const
 
-export const THANKS = {
-  meta: {
-    title: 'Cadastro concluído',
-    description:
-      'Seu cadastro foi concluído no NutriLink. Agora você pode verificar a cobertura do Lactare e acompanhar sua jornada.',
-  },
-  badge: 'Cadastro recebido',
-  title: 'Obrigada por fazer parte dessa rede de amor 💙',
-  body: 'Seu cadastro foi recebido com todo o cuidado. Agora você pode verificar se sua cidade faz parte da área de atuação do Lactare.',
-  nextSteps: {
-    title: 'O que acontece agora?',
-    items: [
-      'Verifique se sua cidade está na área de atuação',
-      'Consulte os conteúdos para se preparar com segurança',
-      'A triagem e os próximos passos são combinados diretamente com o Lactare',
-    ],
-  },
-  primaryCta: 'Verificar minha cidade',
-  secondaryCta: 'Ver como funciona a doação',
-} as const
-
 export const ADMIN_LOGIN = {
   seo: {
     title: 'Entrar no painel admin',
