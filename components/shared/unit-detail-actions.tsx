@@ -87,10 +87,13 @@ export function UnitDetailActions({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       {whatsappUrl ? (
+        // Reafirma cor de texto e borda no hover: a variante "default" do
+        // Button inverte para fundo branco/texto azul ao passar o mouse, e
+        // esse botão precisa continuar verde.
         <Button
           asChild
           size="lg"
-          className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 w-full sm:w-auto"
+          className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 hover:text-whatsapp-foreground w-full border-transparent hover:border-transparent sm:w-auto"
         >
           <a
             href={whatsappUrl}

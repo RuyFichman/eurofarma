@@ -198,7 +198,7 @@ export function NutrizJourneyProgress({
         </ol>
 
         <details className="group/details mt-5 open:mt-0">
-          <summary className="text-primary inline-flex cursor-pointer items-center gap-2 text-sm font-medium [&::-webkit-details-marker]:hidden">
+          <summary className="text-primary inline-flex cursor-pointer items-center gap-2 text-sm font-medium underline-offset-4 hover:underline [&::-webkit-details-marker]:hidden">
             <ChevronDown
               className="size-4 transition-transform group-open/details:rotate-180"
               aria-hidden="true"

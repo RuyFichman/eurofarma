@@ -103,9 +103,12 @@ export function NutrizReferralCard({ code }: { code: string }) {
               <Copy aria-hidden="true" />
               {copy.copyMessageAction}
             </Button>
+            {/* Reafirma cor de texto e borda no hover: a variante "default" do
+                Button inverte para fundo branco/texto azul ao passar o mouse,
+                e esse botão precisa continuar verde (exceção documentada). */}
             <Button
               asChild
-              className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90"
+              className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90 hover:text-whatsapp-brand-foreground border-transparent hover:border-transparent"
             >
               <a
                 href={whatsappShareUrl}

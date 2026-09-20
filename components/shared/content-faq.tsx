@@ -22,8 +22,8 @@ export function ContentFaq() {
       <ul className="mt-8 space-y-3">
         {faq.items.map((item) => (
           <li key={item.question}>
-            <details className="group bg-card rounded-xl border">
-              <summary className="flex list-none items-center justify-between gap-4 p-5 font-medium [&::-webkit-details-marker]:hidden">
+            <details className="group bg-card overflow-hidden rounded-xl border">
+              <summary className="hover:bg-muted/60 flex list-none items-center justify-between gap-4 p-5 font-medium transition-colors [&::-webkit-details-marker]:hidden">
                 <span className="flex items-start gap-3">
                   <HelpCircle
                     className="text-primary mt-0.5 size-5 shrink-0"

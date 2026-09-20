@@ -186,7 +186,7 @@ export function CoverageChecker({ municipalities }: CoverageCheckerProps) {
                 type="button"
                 onClick={() => selectMethod(option)}
                 aria-pressed={method === option}
-                className="aria-pressed:border-primary aria-pressed:bg-secondary/40 focus-visible:border-ring focus-visible:ring-ring/50 flex min-h-11 items-center justify-center rounded-xl border px-4 text-sm font-medium transition-colors outline-none focus-visible:ring-[3px]"
+                className="hover:border-primary/50 hover:bg-secondary/20 aria-pressed:border-primary aria-pressed:bg-secondary/40 focus-visible:border-ring focus-visible:ring-ring/50 flex min-h-11 items-center justify-center rounded-xl border px-4 text-sm font-medium transition-colors outline-none focus-visible:ring-[3px]"
               >
                 {COVERAGE.checker.methods[option]}
               </button>

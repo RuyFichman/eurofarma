@@ -197,7 +197,7 @@ export function LoginForm() {
           type="button"
           onClick={onForgotPassword}
           disabled={isSendingReset}
-          className="text-primary mx-auto block text-sm underline underline-offset-4 disabled:opacity-60"
+          className="text-primary hover:text-primary/70 mx-auto block text-sm underline underline-offset-4 transition-colors disabled:opacity-60"
         >
           {isSendingReset
             ? COPY.actions.sendingReset

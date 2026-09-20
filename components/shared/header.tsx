@@ -74,7 +74,7 @@ export async function Header() {
           {/* CTA sempre visível */}
           <Link
             href={NAV.cta.href}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors"
+            className="bg-primary text-primary-foreground hover:bg-background hover:text-primary hover:border-primary inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-transparent px-3 text-sm font-medium whitespace-nowrap transition-colors"
           >
             <span className="md:hidden">{NAV.cta.shortLabel}</span>
             <span className="hidden md:inline">{NAV.cta.label}</span>
@@ -132,7 +132,7 @@ export async function Header() {
                 )}
                 <Link
                   href={NAV.cta.href}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 items-center justify-center rounded-md px-4 text-sm font-medium transition-colors"
+                  className="bg-primary text-primary-foreground hover:bg-background hover:text-primary hover:border-primary inline-flex h-10 items-center justify-center rounded-md border border-transparent px-4 text-sm font-medium transition-colors"
                 >
                   {NAV.cta.label}
                 </Link>
