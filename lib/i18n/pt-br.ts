@@ -1135,16 +1135,6 @@ export const NUTRIZ_AUTH = {
     greetingTemplate: 'Olá, {firstName}!',
     subtitle: 'Sua jornada com informação e transparência 💙',
     badge: 'Área da nutriz',
-    coverage: {
-      title: 'Cobertura e informações da doação',
-      description:
-        'Acompanhar sua jornada não substitui a consulta da área de atuação do Lactare nem as orientações dadas diretamente pela equipe.',
-      searchCta: 'Verificar cobertura',
-      howCta: 'Ver como funciona a doação',
-    },
-    registeredLocation: 'Cidade informada no cadastro',
-    coverageNotice:
-      'A presença da cidade no seu cadastro não confirma cobertura. Consulte a lista atual antes de continuar.',
     reminders: {
       title: 'Lembretes pelo WhatsApp',
       enabledLabel: 'Lembretes ativados',

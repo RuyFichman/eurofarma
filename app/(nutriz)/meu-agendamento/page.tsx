@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowRight, MapPin, UserRound } from 'lucide-react'
+import { UserRound } from 'lucide-react'
 
 import {
   NutrizJourneyCurrentStatus,
@@ -16,8 +15,6 @@ import { NutrizAccountCard } from '@/components/nutriz/nutriz-account-card'
 import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
 import { NutrizReferralCard } from '@/components/nutriz/nutriz-referral-card'
 import { WellbeingCard } from '@/components/nutriz/wellbeing-card'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { getNutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
 import { getReminderConsentPreference } from '@/lib/db/queries/communication-consents'
@@ -122,43 +119,6 @@ export default async function NutrizAreaPage() {
         <div className="mt-6">
           <NutrizJourneyTimeline snapshot={journey} />
         </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>{copy.coverage.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground leading-7">
-              {copy.coverage.description}
-            </p>
-            <div className="bg-muted/50 mt-6 rounded-xl border p-4">
-              <p className="text-muted-foreground text-xs">
-                {copy.registeredLocation}
-              </p>
-              <p className="mt-1 flex items-center gap-2 font-medium">
-                <MapPin className="text-primary size-4" aria-hidden="true" />
-                {nutriz.city}, {nutriz.state}
-              </p>
-              <p className="text-muted-foreground mt-2 text-xs leading-5">
-                {copy.coverageNotice}
-              </p>
-            </div>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Button asChild>
-                <Link href="/verificar-cobertura">
-                  <MapPin aria-hidden="true" />
-                  {copy.coverage.searchCta}
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/como-funciona">
-                  {copy.coverage.howCta}
-                  <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </section>
   )
