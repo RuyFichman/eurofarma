@@ -14,10 +14,10 @@ export function JourneySummaryCard() {
   const copy = NUTRIZ_AUTH.area.personal.history
 
   return (
-    <Card className="h-full">
+    <Card className="h-full py-5">
       <CardContent className="flex h-full flex-col">
         <div className="flex items-center gap-3">
-          <span className="bg-primary text-primary-foreground flex size-10 shrink-0 items-center justify-center rounded-xl">
+          <span className="bg-secondary text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
             <FileDown className="size-5" aria-hidden="true" />
           </span>
           {/* O h2 traz a semântica; o tamanho vem das classes, não da escala
@@ -29,7 +29,11 @@ export function JourneySummaryCard() {
           {copy.description}
         </p>
 
-        <Button asChild className="mt-auto w-fit">
+        {/* mt-4 no mobile: sem o stretch de duas colunas, o card fica só do
+            tamanho do próprio conteúdo, e mt-auto sozinho não sobra espaço
+            pra empurrar o botão. A partir de md, o grid de duas colunas
+            estica o card e mt-auto volta a colar o botão no rodapé. */}
+        <Button asChild className="mt-4 w-fit md:mt-auto">
           <Link href="/meu-agendamento/historico">
             <Download aria-hidden="true" />
             {copy.action}
