@@ -718,6 +718,12 @@ export const COVERAGE = {
     emptyTitle: 'Cobertura indisponível no momento',
     emptyDescription:
       'Não foi possível carregar a lista de municípios. Tente novamente em alguns instantes.',
+    map: {
+      imageAlt:
+        'Mapa com um marcador para cada município atendido pelo Lactare',
+      unavailable:
+        'Mapa indisponível no momento. A lista abaixo continua completa.',
+    },
   },
 } as const
 

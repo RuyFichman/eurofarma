@@ -41,3 +41,39 @@ export function buildMapboxStaticImageUrl(params: {
 
   return `${MAPBOX_STATIC_BASE}/${marker}/${viewport}/${width}x${height}@2x?access_token=${encodeURIComponent(token)}`
 }
+
+/**
+ * Mesma API, com um pino pequeno por ponto e enquadramento automático
+ * (`auto`) em vez de centro/zoom fixos — para o mapa de visão geral de
+ * `/verificar-cobertura` (vários municípios), não para a localização de uma
+ * unidade só. `width`/`height` ficam ≤ 640 por padrão: a Static Images API da
+ * Mapbox limita o lado maior da imagem final a 1280px, e aqui sempre pedimos
+ * `@2x`.
+ */
+export function buildMapboxStaticMultiMarkerImageUrl(params: {
+  points: ReadonlyArray<{ lat: number; lng: number }>
+  width?: number
+  height?: number
+}): string | null {
+  const token = getMapboxToken()
+  if (!token) return null
+
+  const validPoints = params.points.filter(
+    (point) =>
+      Number.isFinite(point.lat) &&
+      Number.isFinite(point.lng) &&
+      point.lat >= -90 &&
+      point.lat <= 90 &&
+      point.lng >= -180 &&
+      point.lng <= 180,
+  )
+  if (validPoints.length === 0) return null
+
+  const { width = 640, height = 280 } = params
+
+  const markers = validPoints
+    .map((point) => `pin-s+${MARKER_COLOR}(${point.lng},${point.lat})`)
+    .join(',')
+
+  return `${MAPBOX_STATIC_BASE}/${markers}/auto/${width}x${height}@2x?access_token=${encodeURIComponent(token)}`
+}
