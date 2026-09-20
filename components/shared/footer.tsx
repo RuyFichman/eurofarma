@@ -1,15 +1,29 @@
 import Link from 'next/link'
+import { Globe2, Mail } from 'lucide-react'
 
 import { Logo } from '@/components/shared/logo'
+import {
+  InstagramIcon,
+  LinkedinIcon,
+  YoutubeIcon,
+} from '@/components/shared/social-brand-icons'
+import { WhatsappIcon } from '@/components/shared/whatsapp-icon'
 import { FOOTER, NAV, SITE } from '@/lib/i18n/pt-br'
 
 const legalLinks = [FOOTER.links.privacy, FOOTER.links.terms]
+const lactareChannels = [
+  { ...FOOTER.contact.channels.website, icon: Globe2 },
+  { ...FOOTER.contact.channels.instagram, icon: InstagramIcon },
+  { ...FOOTER.contact.channels.youtube, icon: YoutubeIcon },
+  { ...FOOTER.contact.channels.linkedin, icon: LinkedinIcon },
+  { ...FOOTER.contact.channels.whatsapp, icon: WhatsappIcon },
+] as const
 
 export function Footer() {
   return (
     <footer className="bg-sidebar text-sidebar-foreground">
       <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1.4fr]">
           {/* Marca */}
           <div className="space-y-3">
             <Logo variant="light" size="lg" />
@@ -56,17 +70,43 @@ export function Footer() {
             </ul>
           </nav>
 
-          {/* Contato */}
+          {/* Canais oficiais do Lactare */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold tracking-wide uppercase opacity-70">
               {FOOTER.contact.title}
             </h3>
+            <p className="max-w-xs text-sm leading-6 opacity-80">
+              {FOOTER.contact.description}
+            </p>
             <a
-              href={`mailto:${FOOTER.contact.placeholder}`}
-              className="text-sm opacity-80 transition-opacity hover:underline hover:opacity-100"
+              href={`mailto:${FOOTER.contact.email.address}`}
+              className="focus-visible:ring-ring/50 inline-flex items-center gap-2 rounded-sm text-sm opacity-80 transition-opacity outline-none hover:underline hover:opacity-100 focus-visible:ring-[3px]"
             >
-              {FOOTER.contact.placeholder}
+              <Mail className="size-4 shrink-0" aria-hidden="true" />
+              {FOOTER.contact.email.address}
             </a>
+
+            <ul className="flex flex-wrap gap-2 pt-1">
+              {lactareChannels.map((channel) => {
+                const Icon = channel.icon
+
+                return (
+                  <li key={channel.href}>
+                    <a
+                      href={channel.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={channel.label}
+                      title={channel.label}
+                      className="focus-visible:ring-ring/50 flex size-10 items-center justify-center rounded-full border border-white/15 bg-white/5 opacity-85 transition-all outline-none hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/10 hover:opacity-100 focus-visible:ring-[3px]"
+                    >
+                      <Icon className="size-4.5" aria-hidden="true" />
+                      <span className="sr-only">{channel.label}</span>
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
           </div>
         </div>
 
