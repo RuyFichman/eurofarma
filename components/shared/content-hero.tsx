@@ -17,7 +17,7 @@ export function ContentHero() {
         priority
         sizes="100vw"
         aria-hidden="true"
-        className="scale-105 object-cover opacity-75 blur-md"
+        className="scale-105 object-cover opacity-75 blur-[10px]"
       />
       <div
         aria-hidden="true"
