@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 
 import { CoverageChecker } from '@/components/shared/coverage-checker'
 import { CoverageMunicipalityList } from '@/components/shared/coverage-municipality-list'
@@ -26,9 +27,18 @@ export default async function CoveragePage() {
 
   return (
     <>
-      <section className="bg-card relative overflow-hidden border-b">
+      <section className="bg-card relative isolate overflow-hidden border-b">
+        <Image
+          src="/images/verificar-cobertura-hero.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          aria-hidden="true"
+          className="scale-105 object-cover opacity-55 blur-[3px]"
+        />
         <div
-          className="bg-secondary/60 pointer-events-none absolute -top-24 right-0 size-72 rounded-full blur-3xl"
+          className="from-card/95 via-card/85 to-card/65 pointer-events-none absolute inset-0 bg-gradient-to-r"
           aria-hidden="true"
         />
         <div className="relative mx-auto max-w-6xl px-6 py-12 md:py-16">
