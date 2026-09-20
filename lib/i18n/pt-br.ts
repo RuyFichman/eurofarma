@@ -632,7 +632,7 @@ export const CONTENT = {
         quote:
           'Ah, a doação de leite! Descobri o Lactare no nascimento da minha primeira filha, que hoje tem 3 anos, e contribuí um pouco com a doação de leite. Com minha segunda filha foi diferente: ela nasceu prematura e precisou de doação na UTI neonatal. Quando ela saiu da UTI, procurei de novo o Lactare e fui recebida de braços abertos por esse projeto que ajuda tantos bebês! Sempre fui recebida com um sorriso, as meninas são fantásticas e estão de parabéns.',
         name: 'Polyana',
-        detail: 'Doadora e receptora, mãe de Mariana e Maria Vitória',
+        detail: 'Mãe de Mariana e Maria Vitória',
       },
       {
         role: 'Doadora',
@@ -688,6 +688,26 @@ export const CONTENT = {
         question: 'Para quais bebês o leite doado é destinado?',
         answer:
           'Prioritariamente para recém-nascidos prematuros e de baixo peso internados em UTIs Neonatais. Esses bebês não podem receber fórmulas artificiais e o leite humano é o único alimento adequado para seu desenvolvimento.',
+      },
+      {
+        question: 'Quem pode doar leite humano?',
+        answer:
+          'Toda mulher que amamenta, produz um volume excedente de leite, está saudável e não utiliza medicamentos contraindicados para a amamentação pode ser uma doadora. Basta entrar em contato com o banco de leite para fazer o cadastro e receber as orientações.',
+      },
+      {
+        question: 'O que é amamentação cruzada e por que ela é perigosa?',
+        answer:
+          'Amamentação cruzada é a prática de amamentar o filho de outra mulher diretamente no peito. Ela é contraindicada pela Organização Mundial da Saúde e pelo Ministério da Saúde devido ao risco de transmissão de doenças infectocontagiosas. A forma segura de compartilhar leite é por meio da doação a um Banco de Leite Humano, onde o leite passa por rigoroso processo de pasteurização.',
+      },
+      {
+        question: 'Como saber se o meu leite é suficiente?',
+        answer:
+          'A melhor forma de avaliar se o bebê está mamando o suficiente é observar o ganho de peso nas consultas pediátricas e os sinais do dia a dia, como se ele molha fraldas com frequência (urina clara) e se demonstra satisfação após as mamadas. A sensação de peito "murcho" não significa falta de leite, pois a maior parte da produção ocorre durante a própria mamada.',
+      },
+      {
+        question: 'Como identificar uma boa pega do bebê?',
+        answer:
+          'Uma pega adequada acontece quando o bebê abocanha a maior parte da aréola (e não apenas o mamilo), fica com a boca bem aberta ("boca de peixinho"), o queixo encostado na mama e o nariz livre. A amamentação correta não deve causar dor nem ferimentos no peito.',
       },
     ],
     help: {
