@@ -314,9 +314,10 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // 7. Abrir a sessão (o @supabase/ssr grava os cookies) para ela cair logada em
-  //    `/obrigada`. Falha aqui **não** invalida o cadastro: a conta existe e ela
-  //    entra pela tela de login — por isso não há rollback neste passo.
+  // 7. Abrir a sessão (o @supabase/ssr grava os cookies) para ela cair logada
+  //    direto na Minha Área (`/meu-agendamento`). Falha aqui **não** invalida o
+  //    cadastro: a conta existe e ela entra pela tela de login — por isso não
+  //    há rollback neste passo.
   try {
     const supabase = await createSupabaseServerClient()
     await supabase.auth.signInWithPassword({ email, password })
