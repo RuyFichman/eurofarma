@@ -31,6 +31,12 @@ export type JourneyStatusValue = (typeof JOURNEY_STATUS_VALUES)[number]
  * evidência operacional ser definida, ele não autoriza inferir impacto,
  * recorrência ou qualquer detalhe clínico. `RECURRING_DONATION_ELIGIBLE`
  * continua significando somente aptidão registrada para recorrência.
+ *
+ * Doar é um evento que se repete, enquanto o status é um estado só. Por isso
+ * `DONATION_CONFIRMED` aceita a si mesmo e volta a ser alcançável a partir de
+ * `RECURRING_DONATION_ELIGIBLE`: cada registro do Lactare acrescenta uma linha
+ * ao histórico append-only, que é o que a nutriz lê como suas doações. Sem
+ * isso, só a primeira doação da vida da nutriz poderia ser registrada.
  */
 export const JOURNEY_STATUS_TRANSITIONS = {
   REGISTERED: ['DOCUMENT_SENT', 'FORM_RECEIVED'],
@@ -43,8 +49,8 @@ export const JOURNEY_STATUS_TRANSITIONS = {
   NOT_ELIGIBLE: [],
   KIT_SENT: ['KIT_DELIVERED'],
   KIT_DELIVERED: ['DONATION_CONFIRMED', 'RECURRING_DONATION_ELIGIBLE'],
-  DONATION_CONFIRMED: ['RECURRING_DONATION_ELIGIBLE'],
-  RECURRING_DONATION_ELIGIBLE: [],
+  DONATION_CONFIRMED: ['DONATION_CONFIRMED', 'RECURRING_DONATION_ELIGIBLE'],
+  RECURRING_DONATION_ELIGIBLE: ['DONATION_CONFIRMED'],
 } as const satisfies Record<JourneyStatusValue, readonly JourneyStatusValue[]>
 
 export function getAllowedJourneyTransitions(

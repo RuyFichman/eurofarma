@@ -10,8 +10,12 @@ import { formatLongDate } from '@/lib/utils/format-date'
  * Cada doação vem de uma transição registrada pela equipe do Lactare. A área
  * pessoal apenas lê esse histórico categórico: ela não confirma coleta nem
  * deduz doação a partir dos registros pessoais de extração.
+ *
+ * Só `DONATION_CONFIRMED` é doação. `RECURRING_DONATION_ELIGIBLE` significa
+ * aptidão registrada para continuar doando, e contá-lo aqui transformava uma
+ * aptidão em coleta que talvez nunca tenha acontecido.
  */
-const DONATION_STATUSES = ['DONATION_CONFIRMED', 'RECURRING_DONATION_ELIGIBLE']
+const DONATION_STATUS = 'DONATION_CONFIRMED'
 
 export function DonationHistoryCard({
   snapshot,
@@ -24,7 +28,7 @@ export function DonationHistoryCard({
   const wellbeingCopy = NUTRIZ_AUTH.area.personal.wellbeing
 
   const donations = snapshot.journeyHistory
-    .filter((entry) => DONATION_STATUSES.includes(entry.toStatus))
+    .filter((entry) => entry.toStatus === DONATION_STATUS)
     .sort((a, b) => b.changedAt.getTime() - a.changedAt.getTime())
 
   return (

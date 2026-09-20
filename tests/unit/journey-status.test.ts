@@ -30,6 +30,9 @@ const ALLOWED_TRANSITIONS: [JourneyStatusValue, JourneyStatusValue][] = [
   ['KIT_DELIVERED', 'DONATION_CONFIRMED'],
   ['KIT_DELIVERED', 'RECURRING_DONATION_ELIGIBLE'],
   ['DONATION_CONFIRMED', 'RECURRING_DONATION_ELIGIBLE'],
+  // Doação se repete: o Lactare registra cada nova coleta confirmada.
+  ['DONATION_CONFIRMED', 'DONATION_CONFIRMED'],
+  ['RECURRING_DONATION_ELIGIBLE', 'DONATION_CONFIRMED'],
 ]
 
 const REJECTED_TRANSITIONS: [JourneyStatusValue, JourneyStatusValue][] = [
@@ -40,6 +43,7 @@ const REJECTED_TRANSITIONS: [JourneyStatusValue, JourneyStatusValue][] = [
   ['NOT_ELIGIBLE', 'KIT_DELIVERED'],
   ['DONATION_CONFIRMED', 'KIT_DELIVERED'],
   ['RECURRING_DONATION_ELIGIBLE', 'REGISTERED'],
+  ['RECURRING_DONATION_ELIGIBLE', 'KIT_DELIVERED'],
 ]
 
 describe('regras de transição do status da jornada', () => {
@@ -70,6 +74,9 @@ describe('regras de transição do status da jornada', () => {
     ])
     expect(getAllowedJourneyTransitions('KIT_SENT')).toEqual(['KIT_DELIVERED'])
     expect(getAllowedJourneyTransitions('NOT_ELIGIBLE')).toEqual([])
+    expect(getAllowedJourneyTransitions('RECURRING_DONATION_ELIGIBLE')).toEqual(
+      ['DONATION_CONFIRMED'],
+    )
   })
 })
 
