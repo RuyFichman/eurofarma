@@ -29,7 +29,10 @@ export function ContentStories() {
           description={stories.description}
         />
 
-        {/* Depoimentos ilustrativos — substituir por relatos reais e consentidos (LGPD). */}
+        {/* Relatos reais de nutrizes do Lactare, publicados pelos canais
+            oficiais do banco de leite (consentidos para essa divulgação).
+            Substituídos em 20 de setembro de 2026; antes eram exemplos
+            fictícios com nomes "Jornada ilustrativa N". */}
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {stories.items.map((story) => (
             <Card key={story.name} className="relative h-full">
