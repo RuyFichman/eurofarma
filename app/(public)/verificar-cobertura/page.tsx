@@ -35,10 +35,10 @@ export default async function CoveragePage() {
           priority
           sizes="100vw"
           aria-hidden="true"
-          className="scale-105 object-cover opacity-55 blur-[3px]"
+          className="scale-105 object-cover opacity-75 blur-[0.6px]"
         />
         <div
-          className="from-card/95 via-card/85 to-card/65 pointer-events-none absolute inset-0 bg-gradient-to-r"
+          className="from-card/95 via-card/55 to-card/55 pointer-events-none absolute inset-0 bg-gradient-to-r"
           aria-hidden="true"
         />
         <div className="relative mx-auto max-w-6xl px-6 py-12 md:py-16">
