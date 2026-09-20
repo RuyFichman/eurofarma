@@ -1,7 +1,5 @@
-import Link from 'next/link'
-import { Check, Download } from 'lucide-react'
+import { Check } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { NutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
 import type { NutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
@@ -30,20 +28,9 @@ export function DonationHistoryCard({
     .sort((a, b) => b.changedAt.getTime() - a.changedAt.getTime())
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <CardTitle>{copy.title}</CardTitle>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/meu-agendamento/historico">
-              <Download aria-hidden="true" />
-              {copy.exportAction}
-            </Link>
-          </Button>
-        </div>
-        <p className="text-muted-foreground text-sm leading-6">
-          {copy.description}
-        </p>
+        <CardTitle className="text-xl">{copy.title}</CardTitle>
       </CardHeader>
       <CardContent>
         {donations.length === 0 ? (
@@ -90,9 +77,6 @@ export function DonationHistoryCard({
             })}
           </ul>
         )}
-        <p className="text-muted-foreground mt-4 text-xs leading-5">
-          {copy.hint}
-        </p>
       </CardContent>
     </Card>
   )

@@ -133,6 +133,48 @@ export type NutrizHistoryPdfData = {
   wellbeingEntries: Array<{ recordedAt: Date; feeling: string }>
 }
 
+/**
+ * O tempo como doadora conta a partir da primeira doação confirmada pelo
+ * Lactare. Sem essa transição registrada não existe período nenhum, e a linha
+ * simplesmente não entra no documento.
+ */
+function firstDonationAt(
+  history: NutrizHistoryPdfData['journey']['journeyHistory'],
+): Date | null {
+  const first = history.find((entry) => entry.toStatus === 'DONATION_CONFIRMED')
+  return first ? first.changedAt : null
+}
+
+function donorDuration(
+  since: Date,
+  now: Date,
+  copy: {
+    donorMonths: string
+    donorMonth: string
+    donorDays: string
+    donorDay: string
+  },
+): string {
+  const months =
+    (now.getFullYear() - since.getFullYear()) * 12 +
+    (now.getMonth() - since.getMonth()) -
+    (now.getDate() < since.getDate() ? 1 : 0)
+
+  if (months >= 1) {
+    return months === 1
+      ? copy.donorMonth
+      : copy.donorMonths.replace('{count}', String(months))
+  }
+
+  const days = Math.max(
+    0,
+    Math.floor((now.getTime() - since.getTime()) / 86_400_000),
+  )
+  return days === 1
+    ? copy.donorDay
+    : copy.donorDays.replace('{count}', String(days))
+}
+
 export function buildNutrizHistoryPdf(
   data: NutrizHistoryPdfData,
   copy: {
@@ -141,6 +183,11 @@ export function buildNutrizHistoryPdf(
     name: string
     journeyTitle: string
     registered: string
+    donorSince: string
+    donorMonths: string
+    donorMonth: string
+    donorDays: string
+    donorDay: string
     status: string
     extractionTitle: string
     extraction: string
@@ -152,15 +199,27 @@ export function buildNutrizHistoryPdf(
   getStatusLabel: (status: JourneyStatusValue) => string,
   formatDateTime: (value: Date) => string,
 ): Uint8Array {
+  const now = new Date()
+  const donorSince = firstDonationAt(data.journey.journeyHistory)
+
   const lines: PdfLine[] = [
     line(copy.title, 16),
-    line(copy.generatedAt.replace('{date}', formatDateTime(new Date()))),
+    line(copy.generatedAt.replace('{date}', formatDateTime(now))),
     line(copy.name.replace('{name}', data.fullName), 12),
     line(''),
     line(copy.journeyTitle, 12),
     line(
       copy.registered.replace('{date}', formatDateTime(data.journey.createdAt)),
     ),
+    ...(donorSince
+      ? [
+          line(
+            copy.donorSince
+              .replace('{duration}', donorDuration(donorSince, now, copy))
+              .replace('{date}', formatDateTime(donorSince)),
+          ),
+        ]
+      : []),
     ...data.journey.journeyHistory.map((entry) =>
       line(
         copy.status
