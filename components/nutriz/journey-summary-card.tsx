@@ -14,7 +14,7 @@ export function JourneySummaryCard() {
   const copy = NUTRIZ_AUTH.area.personal.history
 
   return (
-    <Card className="h-full">
+    <Card className="h-full py-5">
       <CardContent className="flex h-full flex-col">
         <div className="flex items-center gap-3">
           <span className="bg-secondary text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">

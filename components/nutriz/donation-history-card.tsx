@@ -32,13 +32,13 @@ export function DonationHistoryCard({
     .sort((a, b) => b.changedAt.getTime() - a.changedAt.getTime())
 
   return (
-    <Card className="h-full">
+    <Card className="h-full gap-4 py-5">
       <CardHeader>
         <CardTitle className="text-xl">{copy.title}</CardTitle>
       </CardHeader>
       <CardContent>
         {donations.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-6 text-center">
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-4 text-center">
             <span
               className="bg-secondary text-primary flex size-11 items-center justify-center rounded-full"
               aria-hidden="true"
