@@ -57,6 +57,15 @@
     --whatsapp: hsl(142 71% 30%);
     --whatsapp-foreground: hsl(0 0% 100%);
 
+    /* Verde exato de marca do WhatsApp (#25D366), pedido explicitamente para
+       os dois CTAs de WhatsApp da área da nutriz ("Falar com a equipe do
+       Lactare" e "Abrir no WhatsApp"), mesmo com texto branco reprovando
+       WCAG AA (~2:1 de contraste) — por isso `--whatsapp` acima existe
+       escurecido e continua sendo o padrão do resto do produto. Valor em hex
+       literal, não hsl(), para não perder precisão na conversão. */
+    --whatsapp-brand: #25d366;
+    --whatsapp-brand-foreground: #ffffff;
+
     /* Selos conquistados (área pessoal da nutriz) — dourado. Segunda exceção
        controlada à paleta azul, como o verde do WhatsApp: marca apenas o
        estado "conquistado" dos selos. `--achievement` é superfície decorativa
@@ -118,6 +127,8 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-whatsapp: var(--whatsapp);
   --color-whatsapp-foreground: var(--whatsapp-foreground);
+  --color-whatsapp-brand: var(--whatsapp-brand);
+  --color-whatsapp-brand-foreground: var(--whatsapp-brand-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

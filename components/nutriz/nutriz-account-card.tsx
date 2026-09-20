@@ -234,15 +234,21 @@ export function NutrizAccountCard({ account }: { account: NutrizAccountData }) {
         </CardContent>
       </Card>
 
-      <Button
-        asChild
-        className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 mt-4"
-      >
-        <a href={LACTARE_CONTACT.whatsappHref} target="_blank" rel="noreferrer">
-          <WhatsappIcon className="size-4" />
-          {copy.contactAction}
-        </a>
-      </Button>
+      <div className="mt-4 flex justify-center">
+        <Button
+          asChild
+          className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90"
+        >
+          <a
+            href={LACTARE_CONTACT.whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <WhatsappIcon className="size-4" />
+            {copy.contactAction}
+          </a>
+        </Button>
+      </div>
     </section>
   )
 }
