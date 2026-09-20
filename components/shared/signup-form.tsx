@@ -148,6 +148,9 @@ export function SignupForm() {
         // navegação). A sessão já veio nos cookies da resposta.
         setIsRedirecting(true)
         router.push('/obrigada')
+        // Server Component com dado de sessão: sem refresh o cabeçalho ficaria
+        // com o estado anterior em cache (mesmo ajuste do login-form.tsx).
+        router.refresh()
         return
       }
 
