@@ -6,8 +6,8 @@
 
 @layer base {
   :root {
-    /* Backgrounds — #F4F9FF azul gelado / #1A2B3C navy */
-    --background: hsl(214 100% 98%);
+    /* Backgrounds — #F4F9FF azul gelado clareado minimamente p/ 99% (era 98%) / #1A2B3C navy */
+    --background: hsl(214 100% 99%);
     --foreground: hsl(210 39% 17%);
 
     /* Cards e popovers — card branco, texto navy */
