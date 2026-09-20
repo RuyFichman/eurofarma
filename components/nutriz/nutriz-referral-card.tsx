@@ -1,12 +1,13 @@
 'use client'
 
-import { Copy, Link2, Send } from 'lucide-react'
+import { Copy, Link2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { WhatsappIcon } from '@/components/shared/whatsapp-icon'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 import {
   buildReferralMessage,
@@ -102,13 +103,16 @@ export function NutrizReferralCard({ code }: { code: string }) {
               <Copy aria-hidden="true" />
               {copy.copyMessageAction}
             </Button>
-            <Button asChild>
+            <Button
+              asChild
+              className="bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90"
+            >
               <a
                 href={whatsappShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Send aria-hidden="true" />
+                <WhatsappIcon className="size-4" />
                 {copy.sendWhatsappAction}
               </a>
             </Button>
