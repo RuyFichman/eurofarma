@@ -4,7 +4,11 @@ import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 import { getNutrizPersonalExportData } from '@/lib/db/queries/nutriz-personal-area'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 import { buildNutrizHistoryPdf } from '@/lib/pdf/nutriz-history'
-import { formatLongDate, formatTime } from '@/lib/utils/format-date'
+import {
+  formatFullDate,
+  formatShortDate,
+  formatTime,
+} from '@/lib/utils/format-date'
 
 export const runtime = 'nodejs'
 
@@ -14,11 +18,13 @@ export async function GET() {
   if (!data) return new NextResponse('Not found', { status: 404 })
 
   const copy = NUTRIZ_AUTH.area.personal.history.pdf
-  const pdf = buildNutrizHistoryPdf(
+  const pdf = await buildNutrizHistoryPdf(
     data,
     copy,
-    (status) => NUTRIZ_AUTH.area.journey.status[status].label,
-    (date) => `${formatLongDate(date)} ${formatTime(date)}`,
+    formatShortDate,
+    formatTime,
+    (date) => `${formatFullDate(date)}, às ${formatTime(date)}`,
+    (feeling) => NUTRIZ_AUTH.area.personal.wellbeing.choices[feeling],
   )
 
   return new NextResponse(pdf as BodyInit, {
@@ -26,7 +32,7 @@ export async function GET() {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition':
-        'attachment; filename="historico-pessoal-nutrilink.pdf"',
+        'attachment; filename="resumo-jornada-nutrilink.pdf"',
       'Cache-Control': 'private, no-store',
     },
   })

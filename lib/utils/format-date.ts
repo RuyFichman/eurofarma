@@ -53,3 +53,19 @@ export function formatLongDate(value: Date): string {
 export function formatTime(value: Date): string {
   return TIME.format(value)
 }
+
+const FULL_DATE = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'America/Sao_Paulo',
+})
+
+/**
+ * `19 de setembro de 2026` — como `formatLongDate`, mas sem o dia da semana.
+ * Usada no rodapé do PDF exportado, onde o dia da semana não agrega nada ao
+ * carimbo de geração.
+ */
+export function formatFullDate(value: Date): string {
+  return FULL_DATE.format(value)
+}
