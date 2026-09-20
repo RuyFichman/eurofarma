@@ -1550,9 +1550,9 @@ export const NUTRIZ_AUTH = {
           },
         },
         impactCard: {
-          title: 'Cartão de impacto',
+          title: 'Postal do Bem',
           description:
-            'O cartão simbólico para compartilhar suas conquistas ainda está em construção.',
+            'Sua doação é uma história real. Compartilhe seu postal e ajude mais bebês a receberem leite',
           action: 'Em breve',
         },
       },
