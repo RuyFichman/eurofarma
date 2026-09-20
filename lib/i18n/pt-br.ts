@@ -1393,6 +1393,21 @@ export const NUTRIZ_AUTH = {
       },
     },
     journey: {
+      progress: {
+        eyebrow: 'Minha jornada',
+        steps: {
+          REGISTRATION: 'Cadastro',
+          HEALTH_FORM: 'Ficha de saúde',
+          BLOOD_TEST: 'Exame de sangue',
+          KIT_DELIVERY: 'Entrega do kit',
+          DONATION: 'Doação',
+        },
+        expandAction: 'Ver detalhes',
+        collapseAction: 'Ocultar detalhes',
+        currentBadge: 'Você está aqui',
+        sourceNotice:
+          'As etapas são atualizadas pela equipe do Lactare. Esta visualização não substitui orientações recebidas diretamente pela equipe.',
+      },
       current: {
         eyebrow: 'Sua etapa atual',
         updatedAt: 'Última atualização registrada em {date}',

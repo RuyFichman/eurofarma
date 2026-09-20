@@ -5,11 +5,9 @@ import { ArrowRight, MapPin, UserRound } from 'lucide-react'
 
 import {
   NutrizJourneyCurrentStatus,
-  NutrizJourneyGuidance,
   NutrizJourneyTimeline,
 } from '@/components/nutriz/nutriz-journey-status'
 import { NutrizJourneyProgress } from '@/components/nutriz/nutriz-journey-progress'
-import { EducationalSuggestions } from '@/components/nutriz/educational-suggestions'
 import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-card'
 import { DonationHistoryCard } from '@/components/nutriz/donation-history-card'
 import { PersonalHighlights } from '@/components/nutriz/personal-highlights'
@@ -108,12 +106,8 @@ export default async function NutrizAreaPage() {
           <NutrizAccountCard account={account} />
         </div>
 
-        <div
-          id="seus-reconhecimentos"
-          className="mt-6 grid scroll-mt-6 items-start gap-6 lg:grid-cols-2"
-        >
+        <div id="seus-reconhecimentos" className="mt-6 scroll-mt-6">
           <NutrizRecognitionsCard recognitions={personal.recognitions} />
-          <EducationalSuggestions status={journey.journeyStatus} />
         </div>
 
         <NutrizReferralCard code={referralLink.code} />
@@ -124,9 +118,8 @@ export default async function NutrizAreaPage() {
           </div>
         ) : null}
 
-        <div className="mt-6 grid items-start gap-6 lg:grid-cols-2">
+        <div className="mt-6">
           <NutrizJourneyCurrentStatus snapshot={journey} />
-          <NutrizJourneyGuidance status={journey.journeyStatus} />
         </div>
 
         <div className="mt-6">

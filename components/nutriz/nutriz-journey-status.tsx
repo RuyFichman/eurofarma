@@ -1,4 +1,4 @@
-import { BadgeCheck, CircleAlert, Info, ListChecks } from 'lucide-react'
+import { BadgeCheck, Info } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import {
@@ -65,51 +65,6 @@ export function NutrizJourneyCurrentStatus({
           />
           <p className="text-muted-foreground text-sm leading-6">
             {copy.current.sourceNotice}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-export function NutrizJourneyGuidance({
-  status,
-}: {
-  status: JourneyStatusValue
-}) {
-  const copy = NUTRIZ_AUTH.area.journey
-  const statusCopy = getStatusCopy(status)
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <ListChecks className="text-primary size-5" aria-hidden="true" />
-          <CardTitle>{copy.guidance.title}</CardTitle>
-        </div>
-        <CardDescription className="leading-6">
-          {copy.guidance.description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <ul className="space-y-3">
-          {statusCopy.guidance.map((item) => (
-            <li key={item} className="flex gap-3 text-sm leading-6">
-              <span
-                className="bg-primary mt-2 size-1.5 shrink-0 rounded-full"
-                aria-hidden="true"
-              />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="bg-muted/50 flex gap-3 rounded-xl border p-4">
-          <CircleAlert
-            className="text-primary mt-0.5 size-4 shrink-0"
-            aria-hidden="true"
-          />
-          <p className="text-muted-foreground text-xs leading-5">
-            {copy.guidance.safetyNotice}
           </p>
         </div>
       </CardContent>
