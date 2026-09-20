@@ -61,24 +61,17 @@ export async function Header() {
             </>
           ) : (
             /* A rota decide se deve mostrar o login ou redirecionar uma nutriz
-               que já possui sessão — este link é apenas o caminho feliz. */
+               que já possui sessão — este link é apenas o caminho feliz.
+               Único CTA à direita: antes havia também um botão "Verificar
+               cobertura" aqui, duplicando o mesmo item já presente no menu. */
             <Link
               href="/entrar"
-              className="text-foreground/80 hover:text-primary hidden items-center gap-1.5 text-sm transition-colors sm:inline-flex"
+              className="bg-primary text-primary-foreground hover:bg-background hover:text-primary hover:border-primary inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-transparent px-3 text-sm font-medium whitespace-nowrap transition-colors"
             >
               <LogIn className="size-4" aria-hidden="true" />
               {NUTRIZ_AUTH.header.login}
             </Link>
           )}
-
-          {/* CTA sempre visível */}
-          <Link
-            href={NAV.cta.href}
-            className="bg-primary text-primary-foreground hover:bg-background hover:text-primary hover:border-primary inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-transparent px-3 text-sm font-medium whitespace-nowrap transition-colors"
-          >
-            <span className="md:hidden">{NAV.cta.shortLabel}</span>
-            <span className="hidden md:inline">{NAV.cta.label}</span>
-          </Link>
 
           {/* `details` preserva teclado e estado expandido sem hidratar Radix. */}
           <details className="group relative md:hidden">
@@ -101,42 +94,28 @@ export async function Header() {
                 ariaLabel={A11Y.navMenu}
                 mobile
               />
-              <div className="mt-4 grid gap-2 border-t pt-4">
-                {isNutriz ? (
-                  <>
-                    <Link
-                      href="/meu-agendamento"
-                      className="text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
-                    >
-                      <UserRound className="size-4" aria-hidden="true" />
-                      {NUTRIZ_AUTH.header.account}
-                    </Link>
-                    <form action={logoutNutrizAction}>
-                      <button
-                        type="submit"
-                        className="text-muted-foreground hover:bg-muted inline-flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
-                      >
-                        <LogOut className="size-4" aria-hidden="true" />
-                        {NUTRIZ_AUTH.header.logout}
-                      </button>
-                    </form>
-                  </>
-                ) : (
+              {/* Sem sessão, o botão "Entrar" já fica sempre visível na barra
+                  acima, inclusive no mobile — nada a repetir aqui. */}
+              {isNutriz ? (
+                <div className="mt-4 grid gap-2 border-t pt-4">
                   <Link
-                    href="/entrar"
+                    href="/meu-agendamento"
                     className="text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
                   >
-                    <LogIn className="size-4" aria-hidden="true" />
-                    {NUTRIZ_AUTH.header.login}
+                    <UserRound className="size-4" aria-hidden="true" />
+                    {NUTRIZ_AUTH.header.account}
                   </Link>
-                )}
-                <Link
-                  href={NAV.cta.href}
-                  className="bg-primary text-primary-foreground hover:bg-background hover:text-primary hover:border-primary inline-flex h-10 items-center justify-center rounded-md border border-transparent px-4 text-sm font-medium transition-colors"
-                >
-                  {NAV.cta.label}
-                </Link>
-              </div>
+                  <form action={logoutNutrizAction}>
+                    <button
+                      type="submit"
+                      className="text-muted-foreground hover:bg-muted inline-flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium"
+                    >
+                      <LogOut className="size-4" aria-hidden="true" />
+                      {NUTRIZ_AUTH.header.logout}
+                    </button>
+                  </form>
+                </div>
+              ) : null}
             </div>
           </details>
         </div>
