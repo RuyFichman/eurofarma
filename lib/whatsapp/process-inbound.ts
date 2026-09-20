@@ -25,6 +25,10 @@ import { resolveWhatsappCoverageInput } from './coverage'
 import type { InboundWhatsappMessage } from './payload'
 import { sendWhatsappReply, type WhatsAppProvider } from './provider'
 import { hydrateWhatsappReply } from './reply'
+import {
+  getZapiReplyOptionIds,
+  resolveZapiNumberedReplyId,
+} from './zapi-reply-options'
 
 const RATE_LIMIT = { limit: 30, windowMs: 60_000 }
 
@@ -72,7 +76,15 @@ export async function processInboundWhatsappMessage(params: {
       context: state.context,
       misunderstoodCount: state.misunderstoodCount,
       text: message.text,
-      replyId: message.replyId ?? resolveTextReplyId(message.text),
+      replyId:
+        message.replyId ??
+        (inboundProvider === 'ZAPI'
+          ? resolveZapiNumberedReplyId(
+              message.text,
+              state.context.zapiReplyOptionIds,
+            )
+          : null) ??
+        resolveTextReplyId(message.text),
       coverage,
       profile,
       isNewConversation: state.isNewConversation,
@@ -124,11 +136,21 @@ export async function processInboundWhatsappMessage(params: {
       }
     }
 
+    const context =
+      inboundProvider === 'ZAPI'
+        ? {
+            ...outcome.context,
+            ...(getZapiReplyOptionIds(outcome.reply)
+              ? { zapiReplyOptionIds: getZapiReplyOptionIds(outcome.reply)! }
+              : {}),
+          }
+        : outcome.context
+
     await saveConversationState({
       phoneWhatsapp: message.from,
       nutrizProfileId,
       step: outcome.nextStep,
-      context: outcome.context,
+      context,
       misunderstoodCount: outcome.misunderstoodCount,
     })
 

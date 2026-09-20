@@ -5,6 +5,11 @@ import {
 
 import { prisma } from '../prisma'
 
+type DeliveryStatusEventClient = Pick<
+  typeof prisma,
+  'notificationOutbox' | 'notificationDeliveryStatusEvent'
+>
+
 function sanitizeErrorCode(value: string | null): string | null {
   if (!value) return null
   const normalized = value
@@ -19,18 +24,21 @@ function sanitizeErrorCode(value: string | null): string | null {
  * outbox: elas registram o envio; esta tabela registra apenas o ciclo de vida
  * posterior, inclusive callbacks válidos ainda sem MessageSid conhecido.
  */
-export async function recordNotificationDeliveryStatusEvent(params: {
-  provider: NotificationDeliveryStatusProvider
-  providerMessageId: string
-  status: NotificationDeliveryStatus
-  errorCode: string | null
-}): Promise<void> {
-  const outbox = await prisma.notificationOutbox.findFirst({
+export async function recordNotificationDeliveryStatusEvent(
+  params: {
+    provider: NotificationDeliveryStatusProvider
+    providerMessageId: string
+    status: NotificationDeliveryStatus
+    errorCode: string | null
+  },
+  client: DeliveryStatusEventClient = prisma,
+): Promise<void> {
+  const outbox = await client.notificationOutbox.findFirst({
     where: { providerMessageId: params.providerMessageId },
     select: { id: true },
   })
 
-  await prisma.notificationDeliveryStatusEvent.create({
+  await client.notificationDeliveryStatusEvent.create({
     data: {
       outboxId: outbox?.id,
       provider: params.provider,
@@ -52,10 +60,16 @@ export function recordTwilioDeliveryStatusEvent(params: {
   })
 }
 
-export function recordZapiDeliveryStatusEvent(params: {
-  providerMessageId: string
-  status: NotificationDeliveryStatus
-  errorCode: string | null
-}): Promise<void> {
-  return recordNotificationDeliveryStatusEvent({ ...params, provider: 'ZAPI' })
+export function recordZapiDeliveryStatusEvent(
+  params: {
+    providerMessageId: string
+    status: NotificationDeliveryStatus
+    errorCode: string | null
+  },
+  client?: DeliveryStatusEventClient,
+): Promise<void> {
+  return recordNotificationDeliveryStatusEvent(
+    { ...params, provider: 'ZAPI' },
+    client,
+  )
 }

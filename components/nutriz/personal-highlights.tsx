@@ -16,7 +16,7 @@ function HighlightCard({
   icon: LucideIcon
   title: string
   description: string
-  children: React.ReactNode
+  children?: React.ReactNode
 }) {
   return (
     <Card className="h-full">
@@ -28,7 +28,7 @@ function HighlightCard({
         <p className="text-muted-foreground mt-2 text-sm leading-6">
           {description}
         </p>
-        <div className="mt-4">{children}</div>
+        {children ? <div className="mt-4">{children}</div> : null}
       </CardContent>
     </Card>
   )
@@ -56,11 +56,7 @@ export function PersonalHighlights({
               )
             : copy.badges.empty
         }
-      >
-        <Button asChild variant="outline" size="sm">
-          <Link href="#seus-reconhecimentos">{copy.badges.action}</Link>
-        </Button>
-      </HighlightCard>
+      />
 
       {/*
         RF12 continua pendente: o cartão de impacto só existe depois de uma

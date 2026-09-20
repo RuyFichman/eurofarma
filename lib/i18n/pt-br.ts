@@ -1169,15 +1169,6 @@ export const NUTRIZ_AUTH = {
         'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
     },
     recognitions: {
-      title: 'Reconhecimentos da sua jornada',
-      description:
-        'São reconhecimentos simbólicos atribuídos conforme as etapas registradas pelo Lactare.',
-      symbolic: 'Simbólico',
-      assignedAt: 'Registrado em {date}',
-      empty:
-        'Os primeiros reconhecimentos aparecerão conforme sua jornada avançar.',
-      safetyNotice:
-        'Eles não representam recompensa material, avaliação clínica ou confirmação de coleta futura.',
       items: {
         JOURNEY_STARTED: {
           title: 'Jornada iniciada',
@@ -1317,7 +1308,6 @@ export const NUTRIZ_AUTH = {
           description: 'Última conquista: {title}.',
           empty:
             'Seus primeiros selos aparecem conforme a equipe registra suas etapas.',
-          action: 'Ver selos',
         },
         impactCard: {
           title: 'Cartão de impacto',
@@ -1334,26 +1324,26 @@ export const NUTRIZ_AUTH = {
       },
       donations: {
         title: 'Histórico de doações',
-        description:
-          'Cada item corresponde a uma doação registrada pela equipe do Lactare.',
-        exportAction: 'Exportar PDF',
         itemTitle: 'Coleta confirmada pela equipe',
         wellbeingTag: 'Bem-estar: {feeling}',
-        empty: 'Ainda não há doação registrada pela equipe do Lactare.',
-        hint: 'O registro é feito pela equipe do Lactare. Esta lista não confirma nem agenda novas coletas.',
+        empty: 'Ainda não há doação registrada pela Lactare.',
       },
       history: {
-        title: 'Seu histórico para baixar',
+        title: 'Resumo da sua jornada',
         description:
-          'Baixe uma cópia dos status categóricos da sua jornada e dos seus registros pessoais. O arquivo não inclui observações internas nem detalhes clínicos.',
-        action: 'Baixar histórico em PDF',
-        hint: 'O PDF contém somente dados da sua própria área.',
+          'Sessões, doações e tempo como doadora em um documento — ótimo para levar na entrega do kit.',
+        action: 'Exportar PDF',
         pdf: {
           title: 'Histórico pessoal da jornada',
           generatedAt: 'Gerado em {date}.',
           name: 'Nutriz: {name}',
           journeyTitle: 'Jornada registrada pelo Lactare',
           registered: 'Cadastro criado em {date}',
+          donorSince: 'Tempo como doadora: {duration}, desde {date}',
+          donorMonths: '{count} meses',
+          donorMonth: '1 mês',
+          donorDays: '{count} dias',
+          donorDay: '1 dia',
           status: '{label} — {date}',
           extractionTitle: 'Registros pessoais de extração/ordenha',
           extraction: '{date} — {volume} ml',
@@ -1393,6 +1383,21 @@ export const NUTRIZ_AUTH = {
       },
     },
     journey: {
+      progress: {
+        eyebrow: 'Minha jornada',
+        steps: {
+          REGISTRATION: 'Cadastro',
+          HEALTH_FORM: 'Ficha de saúde',
+          BLOOD_TEST: 'Exame de sangue',
+          KIT_DELIVERY: 'Entrega do kit',
+          DONATION: 'Doação',
+        },
+        expandAction: 'Ver detalhes',
+        collapseAction: 'Ocultar detalhes',
+        currentBadge: 'Você está aqui',
+        sourceNotice:
+          'As etapas são atualizadas pela equipe do Lactare. Esta visualização não substitui orientações recebidas diretamente pela equipe.',
+      },
       current: {
         eyebrow: 'Sua etapa atual',
         updatedAt: 'Última atualização registrada em {date}',

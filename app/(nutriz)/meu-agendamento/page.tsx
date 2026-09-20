@@ -5,17 +5,15 @@ import { ArrowRight, MapPin, UserRound } from 'lucide-react'
 
 import {
   NutrizJourneyCurrentStatus,
-  NutrizJourneyGuidance,
   NutrizJourneyTimeline,
 } from '@/components/nutriz/nutriz-journey-status'
 import { NutrizJourneyProgress } from '@/components/nutriz/nutriz-journey-progress'
-import { EducationalSuggestions } from '@/components/nutriz/educational-suggestions'
 import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-card'
 import { DonationHistoryCard } from '@/components/nutriz/donation-history-card'
+import { JourneySummaryCard } from '@/components/nutriz/journey-summary-card'
 import { PersonalHighlights } from '@/components/nutriz/personal-highlights'
 import { NutrizAccountCard } from '@/components/nutriz/nutriz-account-card'
 import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
-import { NutrizRecognitionsCard } from '@/components/nutriz/nutriz-recognitions-card'
 import { NutrizReferralCard } from '@/components/nutriz/nutriz-referral-card'
 import { WellbeingCard } from '@/components/nutriz/wellbeing-card'
 import { Button } from '@/components/ui/button'
@@ -93,11 +91,12 @@ export default async function NutrizAreaPage() {
           />
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
           <DonationHistoryCard
             snapshot={journey}
             wellbeingEntries={personal.wellbeingEntries}
           />
+          <JourneySummaryCard />
         </div>
 
         <div className="mt-6">
@@ -108,14 +107,6 @@ export default async function NutrizAreaPage() {
           <NutrizAccountCard account={account} />
         </div>
 
-        <div
-          id="seus-reconhecimentos"
-          className="mt-6 grid scroll-mt-6 items-start gap-6 lg:grid-cols-2"
-        >
-          <NutrizRecognitionsCard recognitions={personal.recognitions} />
-          <EducationalSuggestions status={journey.journeyStatus} />
-        </div>
-
         <NutrizReferralCard code={referralLink.code} />
 
         {isPostDonation ? (
@@ -124,9 +115,8 @@ export default async function NutrizAreaPage() {
           </div>
         ) : null}
 
-        <div className="mt-6 grid items-start gap-6 lg:grid-cols-2">
+        <div className="mt-6">
           <NutrizJourneyCurrentStatus snapshot={journey} />
-          <NutrizJourneyGuidance status={journey.journeyStatus} />
         </div>
 
         <div className="mt-6">

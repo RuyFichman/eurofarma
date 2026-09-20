@@ -52,7 +52,7 @@ describe('callback de status da Z-API', () => {
 
   afterEach(() => vi.unstubAllEnvs())
 
-  it('mapeia SENT, RECEIVED e READ sem preservar telefone', () => {
+  it('mapeia os estados conhecidos sem preservar telefone', () => {
     expect(
       extractZapiDeliveryStatusEvents(payload({ status: 'SENT' }), instanceId),
     ).toEqual([
@@ -80,6 +80,30 @@ describe('callback de status da Z-API', () => {
       {
         providerMessageId: 'zapi-message-1',
         status: 'READ',
+        errorCode: null,
+      },
+    ])
+    expect(
+      extractZapiDeliveryStatusEvents(
+        payload({ status: 'DELIVERED' }),
+        instanceId,
+      ),
+    ).toEqual([
+      {
+        providerMessageId: 'zapi-message-1',
+        status: 'DELIVERED',
+        errorCode: null,
+      },
+    ])
+    expect(
+      extractZapiDeliveryStatusEvents(
+        payload({ status: 'FAILED' }),
+        instanceId,
+      ),
+    ).toEqual([
+      {
+        providerMessageId: 'zapi-message-1',
+        status: 'FAILED',
         errorCode: null,
       },
     ])

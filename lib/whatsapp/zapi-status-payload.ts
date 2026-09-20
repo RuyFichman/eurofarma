@@ -5,9 +5,17 @@ type UnknownRecord = Record<string, unknown>
 const STATUS_BY_ZAPI_VALUE: Readonly<
   Record<string, NotificationDeliveryStatus>
 > = {
+  ACCEPTED: 'ACCEPTED',
+  QUEUED: 'QUEUED',
+  PENDING: 'QUEUED',
+  SENDING: 'SENDING',
   SENT: 'SENT',
   RECEIVED: 'DELIVERED',
+  DELIVERED: 'DELIVERED',
   READ: 'READ',
+  FAILED: 'FAILED',
+  ERROR: 'FAILED',
+  UNDELIVERED: 'UNDELIVERED',
 }
 
 function asRecord(value: unknown): UnknownRecord | null {
