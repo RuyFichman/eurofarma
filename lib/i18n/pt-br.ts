@@ -2038,8 +2038,10 @@ export const ADMIN = {
     period: 'Últimos {days} dias',
 
     metrics: {
-      /** Heading do bloco de cartões — visualmente oculto, lido por leitor de tela. */
+      /** Heading visível do bloco de indicadores prioritários. */
       title: 'Indicadores principais',
+      operationalTitle: 'Cobertura e engajamento',
+      readingNotes: 'Como interpretar estes dados',
       activeMunicipalities: {
         label: 'Municípios ativos',
         description: 'Aparecem na verificação pública',
@@ -2107,6 +2109,8 @@ export const ADMIN = {
         note: 'A indicação mede apenas a origem do novo cadastro por link próprio; não cria recompensa material nem confirma doação.',
       },
     },
+
+    detailsTitle: 'Detalhamento dos indicadores',
 
     journeyFunnel: {
       title: 'Funil da jornada',

@@ -24,26 +24,55 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
     LEFT + (index * (RIGHT - LEFT)) / Math.max(1, months.length - 1)
   const y = (value: number) => BOTTOM - (value / ceiling) * (BOTTOM - TOP)
   const selected = active === null ? undefined : months[active]
+  const points = months
+    .map((month, index) => `${x(index)},${y(month.registrations)}`)
+    .join(' ')
+  const areaPath = months.length
+    ? `M ${x(0)} ${BOTTOM} L ${points.replaceAll(',', ' ')} L ${x(months.length - 1)} ${BOTTOM} Z`
+    : ''
   const period = COPY.period
     .replace('{start}', months[0]?.label ?? '')
     .replace('{end}', months.at(-1)?.label ?? '')
 
   return (
     <section
-      className="bg-card min-w-0 rounded-2xl border p-5 shadow-sm"
+      className="bg-card min-w-0 rounded-xl border p-5 shadow-sm md:p-6"
       aria-labelledby="activity-chart-title"
     >
-      <h2 id="activity-chart-title" className="text-base font-semibold">
-        {COPY.evolution}
-      </h2>
-      <p className="text-muted-foreground mt-1 text-xs">{period}</p>
-      <div className="mt-5 overflow-x-auto">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 id="activity-chart-title" className="text-base font-semibold">
+            {COPY.evolution}
+          </h2>
+          <p className="text-muted-foreground mt-1 text-xs">{period}</p>
+        </div>
+        <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs font-medium">
+          {COPY.registrations}
+        </span>
+      </div>
+      <div className="mt-4 overflow-x-auto">
         <svg
           viewBox="0 0 800 260"
           className="w-full min-w-[440px]"
           role="group"
           aria-label={COPY.evolution}
         >
+          <defs>
+            <linearGradient
+              id="dashboard-activity-fill"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop offset="0%" stopColor="var(--chart-3)" stopOpacity="0.34" />
+              <stop
+                offset="100%"
+                stopColor="var(--chart-3)"
+                stopOpacity="0.02"
+              />
+            </linearGradient>
+          </defs>
           {ticks.map((tick) => (
             <g key={tick}>
               <line
@@ -87,12 +116,13 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
               strokeDasharray="4 4"
             />
           )}
+          {areaPath ? (
+            <path d={areaPath} fill="url(#dashboard-activity-fill)" />
+          ) : null}
           {SERIES.map((series) => (
             <g key={series.key}>
               <polyline
-                points={months
-                  .map((month, index) => `${x(index)},${y(month[series.key])}`)
-                  .join(' ')}
+                points={points}
                 fill="none"
                 stroke={series.color}
                 strokeWidth="2.5"
@@ -132,23 +162,6 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
           ))}
         </svg>
       </div>
-      <div className="mt-2 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs">
-        {SERIES.map((series) => (
-          <span
-            key={series.key}
-            className="text-muted-foreground flex items-center gap-2"
-          >
-            <span
-              className="inline-block w-5 border-t-2"
-              style={{
-                borderColor: series.color,
-                borderStyle: series.dashed ? 'dashed' : 'solid',
-              }}
-            />
-            {COPY[series.key]}
-          </span>
-        ))}
-      </div>
       <p
         className="text-primary mt-3 min-h-5 text-center text-xs tabular-nums"
         aria-live="polite"
@@ -159,8 +172,8 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
             ? COPY.evolutionEmpty
             : '\u00a0'}
       </p>
-      <p className="text-muted-foreground mt-3 text-xs">{COPY.evolutionNote}</p>
-      <details className="mt-3 text-xs">
+      <p className="text-muted-foreground mt-2 text-xs">{COPY.evolutionNote}</p>
+      <details className="mt-4 border-t pt-3 text-xs">
         <summary className="text-primary cursor-pointer">
           {COPY.viewData}
         </summary>
