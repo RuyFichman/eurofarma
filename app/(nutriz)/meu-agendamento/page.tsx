@@ -13,7 +13,6 @@ import { DonationHistoryCard } from '@/components/nutriz/donation-history-card'
 import { PersonalHighlights } from '@/components/nutriz/personal-highlights'
 import { NutrizAccountCard } from '@/components/nutriz/nutriz-account-card'
 import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
-import { NutrizRecognitionsCard } from '@/components/nutriz/nutriz-recognitions-card'
 import { NutrizReferralCard } from '@/components/nutriz/nutriz-referral-card'
 import { WellbeingCard } from '@/components/nutriz/wellbeing-card'
 import { Button } from '@/components/ui/button'
@@ -104,10 +103,6 @@ export default async function NutrizAreaPage() {
 
         <div className="mt-6">
           <NutrizAccountCard account={account} />
-        </div>
-
-        <div id="seus-reconhecimentos" className="mt-6 scroll-mt-6">
-          <NutrizRecognitionsCard recognitions={personal.recognitions} />
         </div>
 
         <NutrizReferralCard code={referralLink.code} />

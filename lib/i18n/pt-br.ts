@@ -1169,15 +1169,6 @@ export const NUTRIZ_AUTH = {
         'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
     },
     recognitions: {
-      title: 'Reconhecimentos da sua jornada',
-      description:
-        'São reconhecimentos simbólicos atribuídos conforme as etapas registradas pelo Lactare.',
-      symbolic: 'Simbólico',
-      assignedAt: 'Registrado em {date}',
-      empty:
-        'Os primeiros reconhecimentos aparecerão conforme sua jornada avançar.',
-      safetyNotice:
-        'Eles não representam recompensa material, avaliação clínica ou confirmação de coleta futura.',
       items: {
         JOURNEY_STARTED: {
           title: 'Jornada iniciada',
@@ -1317,7 +1308,6 @@ export const NUTRIZ_AUTH = {
           description: 'Última conquista: {title}.',
           empty:
             'Seus primeiros selos aparecem conforme a equipe registra suas etapas.',
-          action: 'Ver selos',
         },
         impactCard: {
           title: 'Cartão de impacto',
