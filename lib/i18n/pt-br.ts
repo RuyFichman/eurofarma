@@ -461,17 +461,29 @@ export const CONTENT = {
     ],
   },
   checklist: {
-    title: 'O que esperar da sua primeira visita',
-    subtitle: 'Marque cada item conforme você se preparar',
     readyLabel: 'prontos',
-    items: [
-      'Lavar as mãos com água e sabão por 20 segundos',
-      'Ter o frasco de vidro esterilizado disponível',
-      'Levar documento de identidade com foto',
-      'Caderneta de Saúde do bebê (primeira visita)',
-      'Chegar com 10 min de antecedência',
-      'Usar roupa confortável para amamentação',
-      'Levar o leite em bolsa térmica (se coletado em casa)',
+    groups: [
+      {
+        title: 'O que esperar da entrega do kit',
+        subtitle: 'Marque cada item conforme você se preparar',
+        items: [
+          'Levar documento de identidade com foto',
+          'Levar a Caderneta de Saúde do bebê',
+          'Usar roupa confortável para amamentação',
+          'Ter em mãos seu histórico de saúde (medicamentos, exames recentes)',
+        ],
+      },
+      {
+        title: 'Como se preparar para a coleta em casa',
+        subtitle: 'Marque cada item conforme você se preparar',
+        items: [
+          'Lavar as mãos com água e sabão por 20 segundos',
+          'Higienizar as mamas e secar com papel toalha',
+          'Ter o frasco de vidro esterilizado por perto',
+          'Etiquetar o frasco com data e horário',
+          'Guardar o leite no freezer até a equipe buscar',
+        ],
+      },
     ],
   },
   practice: {
