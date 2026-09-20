@@ -174,7 +174,7 @@ export function ActivityChart({ months }: { months: MonthlyActivity[] }) {
       </p>
       <p className="text-muted-foreground mt-2 text-xs">{COPY.evolutionNote}</p>
       <details className="mt-4 border-t pt-3 text-xs">
-        <summary className="text-primary cursor-pointer">
+        <summary className="text-primary cursor-pointer underline-offset-4 hover:underline">
           {COPY.viewData}
         </summary>
         <table className="mt-2 w-full text-left tabular-nums">

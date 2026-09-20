@@ -161,7 +161,7 @@ export function MyBadgesCard({
                 </p>
               </div>
             </div>
-            <span className="text-primary mt-1 inline-flex shrink-0 items-center gap-1 text-sm font-medium">
+            <span className="text-primary mt-1 inline-flex shrink-0 items-center gap-1 text-sm font-medium underline-offset-4 group-hover/badges:underline">
               <span className="group-open/badges:hidden">
                 {COPY.expandAction}
               </span>

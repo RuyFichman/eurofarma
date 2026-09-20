@@ -192,7 +192,7 @@ export function HomeTipsCarousel({ tips }: HomeTipsCarouselProps) {
               type="button"
               className={`h-2 rounded-full transition-all ${
                 index === activeIndex
-                  ? 'bg-primary w-7'
+                  ? 'bg-primary hover:bg-primary/80 w-7'
                   : 'bg-border hover:bg-muted-foreground/50 w-2'
               }`}
               onClick={() => moveTo(index)}

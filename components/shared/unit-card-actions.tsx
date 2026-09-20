@@ -110,10 +110,13 @@ export function UnitCardActions({
           ) : null}
 
           {whatsappUrl ? (
+            // Reafirma cor de texto e borda no hover: a variante "default" do
+            // Button inverte para fundo branco/texto azul ao passar o mouse,
+            // e esse botão precisa continuar verde (exceção documentada).
             <Button
               asChild
               size="sm"
-              className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90 w-full rounded-lg"
+              className="bg-whatsapp-brand text-whatsapp-brand-foreground hover:bg-whatsapp-brand/90 hover:text-whatsapp-brand-foreground w-full rounded-lg border-transparent hover:border-transparent"
             >
               <a
                 href={whatsappUrl}
