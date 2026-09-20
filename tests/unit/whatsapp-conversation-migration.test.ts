@@ -19,6 +19,30 @@ const zapiMigrationSql = readFileSync(
   'utf8',
 )
 
+const nutrizCpfMigrationSql = readFileSync(
+  resolve(
+    process.cwd(),
+    'prisma/migrations/20260920040000_add_nutriz_cpf_and_address/migration.sql',
+  ),
+  'utf8',
+)
+
+const stepValuesMigrationSql = readFileSync(
+  resolve(
+    process.cwd(),
+    'prisma/migrations/20260920041000_expand_whatsapp_conversation_step_values/migration.sql',
+  ),
+  'utf8',
+)
+
+const registrationDraftMigrationSql = readFileSync(
+  resolve(
+    process.cwd(),
+    'prisma/migrations/20260920050000_expand_whatsapp_conversation_registration_draft/migration.sql',
+  ),
+  'utf8',
+)
+
 describe('migration do fluxo conversacional', () => {
   it('adiciona os estados ativos e muda o default para MENU', () => {
     for (const step of [
@@ -68,5 +92,50 @@ describe('migration do fluxo conversacional', () => {
       "(\"context\" - 'location' - 'zapiReplyOptionIds') = '{}'::jsonb",
     )
     expect(zapiMigrationSql).not.toMatch(/phone|full_name|zip|message_body/iu)
+  })
+})
+
+describe('migração do fluxo consolidado do chatbot (20/09/2026)', () => {
+  it('adiciona CPF e endereço a nutriz_profiles, únicos só quando preenchidos', () => {
+    expect(nutrizCpfMigrationSql).toContain('ADD COLUMN "cpf" TEXT')
+    expect(nutrizCpfMigrationSql).toContain('ADD COLUMN "address" TEXT')
+    expect(nutrizCpfMigrationSql).toContain(
+      'CREATE UNIQUE INDEX "nutriz_profiles_cpf_key" ON "nutriz_profiles"("cpf")',
+    )
+    expect(nutrizCpfMigrationSql).not.toMatch(/DROP\s+(COLUMN|TABLE)/iu)
+  })
+
+  it('acrescenta os novos estados sem remover nenhum valor existente do enum', () => {
+    for (const step of [
+      'FAQ_MENU',
+      'FAQ_STEPS_MENU',
+      'FAQ_STEPS_CLOSING',
+      'FAQ_WHO_CLOSING',
+      'FAQ_PAIN_CLOSING',
+      'FAQ_FREQUENCY_CLOSING',
+      'AWAITING_CPF',
+      'AWAITING_EMAIL',
+      'AWAITING_ADDRESS',
+      'POST_REGISTRATION_MENU',
+    ]) {
+      expect(stepValuesMigrationSql).toContain(`ADD VALUE '${step}'`)
+    }
+    expect(stepValuesMigrationSql).not.toMatch(/DROP\s+VALUE|'FAQ'\s*;/u)
+  })
+
+  it('aceita o rascunho de cadastro no contexto só com o formato certo', () => {
+    expect(registrationDraftMigrationSql).toContain("? 'registration'")
+    expect(registrationDraftMigrationSql).toContain(
+      "- 'fullName' - 'cpf' - 'email' - 'address'",
+    )
+    // CPF: só formato (11 dígitos) — o dígito verificador é conferido na aplicação.
+    expect(registrationDraftMigrationSql).toContain("~ '^[0-9]{11}$'")
+    // faqStep: só os quatro IDs internos das etapas de doação.
+    expect(registrationDraftMigrationSql).toContain(
+      "'HEALTH_FORM', 'KIT', 'EXTRACTION', 'COLLECTION'",
+    )
+    expect(registrationDraftMigrationSql).not.toMatch(
+      /phone|zip|message_body/iu,
+    )
   })
 })

@@ -11,6 +11,7 @@ export function hydrateWhatsappReply(
     '{howItWorksUrl}': `${siteUrl}/como-funciona`,
     '{privacyUrl}': `${siteUrl}/privacidade`,
     '{coverageUrl}': `${siteUrl}/verificar-cobertura`,
+    '{areaUrl}': `${siteUrl}/meu-agendamento`,
     '{directoryUrl}': COVERAGE.outside.officialDirectoryHref,
     '{whatsapp}': LACTARE_CONTACT.whatsappDisplay,
     '{phone}': LACTARE_CONTACT.phoneDisplay,

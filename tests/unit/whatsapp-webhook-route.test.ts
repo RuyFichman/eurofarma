@@ -149,7 +149,7 @@ describe('POST /api/whatsapp/webhook', () => {
     expect(mocks.sendReply).not.toHaveBeenCalled()
   })
 
-  it('resolve cobertura e persiste apenas município e UF', async () => {
+  it('resolve cobertura e já pede o nome, sem passar pelo consentimento ainda', async () => {
     mocks.getState.mockResolvedValue({
       step: 'AWAITING_COVERAGE',
       context: {},
@@ -175,7 +175,7 @@ describe('POST /api/whatsapp/webhook', () => {
     expect(mocks.resolveCoverage).toHaveBeenCalledWith('06000-000')
     expect(mocks.saveState).toHaveBeenCalledWith(
       expect.objectContaining({
-        step: 'AWAITING_CONSENT',
+        step: 'AWAITING_FULL_NAME',
         context: { location: { city: 'Osasco', state: 'SP' } },
       }),
     )
@@ -184,17 +184,54 @@ describe('POST /api/whatsapp/webhook', () => {
     )
   })
 
-  it('pede o nome após o aceite e só então cria o lead', async () => {
+  it('coleta nome, CPF, e-mail e endereço e só cria o lead depois do aceite', async () => {
+    const location = { city: 'Osasco', state: 'SP' }
     mocks.getState
       .mockResolvedValueOnce({
-        step: 'AWAITING_CONSENT',
-        context: { location: { city: 'Osasco', state: 'SP' } },
+        step: 'AWAITING_FULL_NAME',
+        context: { location },
         misunderstoodCount: 0,
         isNewConversation: false,
       })
       .mockResolvedValueOnce({
-        step: 'AWAITING_FULL_NAME',
-        context: { location: { city: 'Osasco', state: 'SP' } },
+        step: 'AWAITING_CPF',
+        context: { location, registration: { fullName: 'Maria da Silva' } },
+        misunderstoodCount: 0,
+        isNewConversation: false,
+      })
+      .mockResolvedValueOnce({
+        step: 'AWAITING_EMAIL',
+        context: {
+          location,
+          registration: { fullName: 'Maria da Silva', cpf: '11144477735' },
+        },
+        misunderstoodCount: 0,
+        isNewConversation: false,
+      })
+      .mockResolvedValueOnce({
+        step: 'AWAITING_ADDRESS',
+        context: {
+          location,
+          registration: {
+            fullName: 'Maria da Silva',
+            cpf: '11144477735',
+            email: 'maria@example.com',
+          },
+        },
+        misunderstoodCount: 0,
+        isNewConversation: false,
+      })
+      .mockResolvedValueOnce({
+        step: 'AWAITING_CONSENT',
+        context: {
+          location,
+          registration: {
+            fullName: 'Maria da Silva',
+            cpf: '11144477735',
+            email: 'maria@example.com',
+            address: 'Rua das Flores, 123',
+          },
+        },
         misunderstoodCount: 0,
         isNewConversation: false,
       })
@@ -210,6 +247,66 @@ describe('POST /api/whatsapp/webhook', () => {
         payload({
           from: '5511999998888',
           id: 'm3',
+          text: { body: 'Maria da Silva' },
+        }),
+      ),
+    )
+    expect(mocks.createLead).not.toHaveBeenCalled()
+    expect(mocks.saveState).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ step: 'AWAITING_CPF' }),
+    )
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'm4',
+          text: { body: '111.444.777-35' },
+        }),
+      ),
+    )
+    expect(mocks.createLead).not.toHaveBeenCalled()
+    expect(mocks.saveState).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ step: 'AWAITING_EMAIL' }),
+    )
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'm5',
+          text: { body: 'maria@example.com' },
+        }),
+      ),
+    )
+    expect(mocks.createLead).not.toHaveBeenCalled()
+    expect(mocks.saveState).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ step: 'AWAITING_ADDRESS' }),
+    )
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'm6',
+          text: { body: 'Rua das Flores, 123' },
+        }),
+      ),
+    )
+    expect(mocks.createLead).not.toHaveBeenCalled()
+    expect(mocks.saveState).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({ step: 'AWAITING_CONSENT' }),
+    )
+
+    await POST(
+      request(
+        payload({
+          from: '5511999998888',
+          id: 'm7',
           interactive: {
             type: 'button_reply',
             button_reply: { id: 'cadastro_aceito', title: 'Sim, concordo' },
@@ -218,34 +315,21 @@ describe('POST /api/whatsapp/webhook', () => {
       ),
     )
 
-    expect(mocks.createLead).not.toHaveBeenCalled()
-    expect(mocks.saveState).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({ step: 'AWAITING_FULL_NAME' }),
-    )
-
-    await POST(
-      request(
-        payload({
-          from: '5511999998888',
-          id: 'm4',
-          text: { body: 'Maria da Silva' },
-        }),
-      ),
-    )
-
     expect(mocks.createLead).toHaveBeenCalledWith({
       phoneWhatsapp: '5511999998888',
       fullName: 'Maria da Silva',
+      cpf: '11144477735',
+      email: 'maria@example.com',
+      address: 'Rua das Flores, 123',
       city: 'Osasco',
       state: 'SP',
     })
     expect(mocks.saveState).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({ nutrizProfileId: 'profile-1', step: 'MENU' }),
-    )
-    expect(mocks.sendReply.mock.calls[1]?.[0].reply.body).toContain(
-      '+55 (11) 96629-0681',
+      5,
+      expect.objectContaining({
+        nutrizProfileId: 'profile-1',
+        step: 'POST_REGISTRATION_MENU',
+      }),
     )
   })
 
@@ -317,10 +401,18 @@ describe('POST /api/whatsapp/webhook', () => {
     )
   })
 
-  it('mantém o passo para nova tentativa quando o cadastro falha', async () => {
+  it('mantém só a localização e reabre o nome quando o cadastro falha', async () => {
     mocks.getState.mockResolvedValue({
-      step: 'AWAITING_FULL_NAME',
-      context: { location: { city: 'Osasco', state: 'SP' } },
+      step: 'AWAITING_CONSENT',
+      context: {
+        location: { city: 'Osasco', state: 'SP' },
+        registration: {
+          fullName: 'Maria da Silva',
+          cpf: '11144477735',
+          email: 'maria@example.com',
+          address: 'Rua das Flores, 123',
+        },
+      },
       misunderstoodCount: 0,
       isNewConversation: false,
     })
@@ -331,7 +423,10 @@ describe('POST /api/whatsapp/webhook', () => {
         payload({
           from: '5511999998888',
           id: 'm5',
-          text: { body: 'Maria da Silva' },
+          interactive: {
+            type: 'button_reply',
+            button_reply: { id: 'cadastro_aceito', title: 'Sim, concordo' },
+          },
         }),
       ),
     )
