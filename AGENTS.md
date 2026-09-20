@@ -206,6 +206,8 @@ A área pessoal foi reorganizada em seções empilhadas de largura total: jornad
 
 O card "Minha jornada" (antes "Sua jornada") passou de quatro para cinco passos — Cadastro, Ficha de saúde, Exame de sangue, Entrega do kit e Doação — e virou um disclosure nativo (`details`/`summary`, sem Client Component). Fechado, ele mostra a régua horizontal e a ação "Ver detalhes"; aberto, troca para a linha vertical das cinco etapas, com a etapa atual marcada e expandida. Dentro dessa expansão ficam agora "Orientações desta etapa" e "Conteúdos para esta etapa", que antes eram dois cards soltos da página (`NutrizJourneyGuidance`, removido de `nutriz-journey-status.tsx`, e `educational-suggestions.tsx`, removido). O conteúdo continua vindo do status categórico já registrado pelo Lactare, por `NUTRIZ_AUTH.area.journey.status[...]` e `getEducationalSuggestionIds`: os cinco passos são apenas um agrupamento de apresentação dos doze `JourneyStatus` e nenhuma etapa não alcançada exibe conteúdo próprio. O aviso de que a visualização não substitui orientações da equipe saiu do estado fechado e agora fecha o conteúdo expandido.
 
+A área também passou a exibir a barra de navegação do site. O `Footer` institucional continua de fora, e o `main` segue único na página para não quebrar o alvo do "pular para o conteúdo". O cabeçalho ficou ciente da sessão na mesma mudança (seção 6.1), o que ligou `logoutNutrizAction` a uma interface pela primeira vez: até então não havia como encerrar a sessão pela navegação.
+
 "Meus dados" é autoatendimento cadastral: a nutriz vê nome, localidade, WhatsApp mascarado e a data do consentimento LGPD, edita nome, cidade e UF por Server Action com lista explícita de campos, e pode excluir a própria conta. A exclusão é soft delete em `nutriz_profiles.deleted_at`, seguida de `signOut` — o gate `getNutrizAccess` já trata esse campo como acesso negado. O WhatsApp não é editável por autoatendimento: ele é único no banco e identifica a nutriz no chatbot. A remoção definitiva dos registros continua sendo procedimento operacional, pendente de definição de retenção.
 
 ### Atualização do job de lembretes (16 de setembro de 2026)
@@ -330,9 +332,11 @@ tests/
 ### 6.1 Rotas e layouts
 
 - O grupo app/(public) já fornece Header, main#main-content e Footer.
-- O grupo app/(nutriz) fornece o main da área pessoal sem Header e Footer públicos; mover a área para esse route group evita lógica cliente baseada no pathname sem alterar `/meu-agendamento`.
-- O Header público é renderizado no servidor. O link de conta aponta sempre para `/entrar`, que redireciona uma nutriz já autenticada; não carregar o cliente Supabase apenas para trocar esse rótulo.
+- O grupo app/(nutriz) fornece o main da área pessoal e renderiza o Header, mas não o Footer institucional; o route group evita lógica cliente baseada no pathname sem alterar `/meu-agendamento`.
+- O Header é renderizado no servidor e consulta `getNutrizAccess()`. Quem tem sessão de nutriz vê "Minha área" e "Sair"; visitante vê "Entrar". `forbidden` — admin logado ou perfil com soft delete — é tratado como visitante, porque não existe Minha Área para essas pessoas. A consulta é deduplicada pelo `cache` do React, então o layout da área, que já chama o mesmo gate, não paga uma segunda ida ao banco.
+- **Consequência do item anterior: o Header lê cookie, portanto toda rota que o inclui é renderizada sob demanda.** Antes dessa mudança, 11 rotas eram pré-renderizadas no build; hoje nenhuma é. Isso foi medido e aceito em 19 de setembro de 2026, porque oferecer "Entrar" a quem já está logado é informação errada, e o custo é nulo sem deploy, CDN ou tráfego. A regra que substitui a anterior é de cache, não de sessão: **não colocar cache de HTML público (CDN, ISR, `Cache-Control: public`) na frente dessas rotas sem tratar o cabeçalho personalizado**, sob pena de servir o HTML de uma nutriz logada a um visitante anônimo. Se a renderização estática voltar a importar, as saídas são uma ilha cliente para o bloco da conta ou PPR.
 - A navegação ativa é a única ilha cliente do Header. O menu mobile usa `details` nativo e não depende de Radix.
+- "Sair" usa a Server Action `logoutNutrizAction`. O cabeçalho é a única saída de sessão da nutriz na interface; não duplicar o botão dentro da área.
 - Páginas públicas não devem criar outro elemento main.
 - A área admin usa o segmento literal app/admin para preservar URLs /admin/*.
 - O grupo interno (painel) organiza telas protegidas sem entrar na URL.
