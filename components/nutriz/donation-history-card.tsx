@@ -38,16 +38,14 @@ export function DonationHistoryCard({
       </CardHeader>
       <CardContent>
         {donations.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-10 text-center">
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed py-6 text-center">
             <span
               className="bg-secondary text-primary flex size-11 items-center justify-center rounded-full"
               aria-hidden="true"
             >
               <Gift className="size-5" />
             </span>
-            <p className="text-muted-foreground max-w-[26ch] text-sm leading-6">
-              {copy.empty}
-            </p>
+            <p className="text-muted-foreground text-sm">{copy.empty}</p>
           </div>
         ) : (
           <ul className="space-y-3">
