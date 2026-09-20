@@ -1,5 +1,6 @@
 import { MapPin } from 'lucide-react'
 
+import { CoverageMunicipalitiesMap } from '@/components/shared/coverage-municipalities-map'
 import { SERVICE_REGION_VALUES } from '@/lib/constants/service-municipalities'
 import type { PublicServiceMunicipality } from '@/lib/db/queries/service-municipalities'
 import { COVERAGE } from '@/lib/i18n/pt-br'
@@ -27,6 +28,8 @@ export function CoverageMunicipalityList({
           )}
         </p>
       </div>
+
+      <CoverageMunicipalitiesMap municipalities={municipalities} />
 
       <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {SERVICE_REGION_VALUES.map((region) => {
