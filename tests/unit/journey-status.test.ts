@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ADMIN_JOURNEY_STATUS_VALUES,
   canTransitionJourneyStatus,
+  getAllowedAdminJourneyTransitions,
   getAllowedJourneyTransitions,
   JOURNEY_STATUS_TRANSITIONS,
   JOURNEY_STATUS_VALUES,
@@ -19,11 +21,14 @@ const ALLOWED_TRANSITIONS: [JourneyStatusValue, JourneyStatusValue][] = [
   ['REGISTERED', 'FORM_RECEIVED'],
   ['DOCUMENT_SENT', 'FORM_RECEIVED'],
   ['FORM_RECEIVED', 'EXAM_SCHEDULED'],
+  ['FORM_RECEIVED', 'EXAMS_COMPLETED'],
   ['EXAM_SCHEDULED', 'EXAMS_COMPLETED'],
   ['EXAM_SCHEDULED', 'AWAITING_RESULT'],
   ['EXAMS_COMPLETED', 'AWAITING_RESULT'],
+  ['EXAMS_COMPLETED', 'KIT_SENT'],
   ['AWAITING_RESULT', 'ELIGIBLE'],
   ['AWAITING_RESULT', 'NOT_ELIGIBLE'],
+  ['AWAITING_RESULT', 'KIT_SENT'],
   ['ELIGIBLE', 'KIT_SENT'],
   ['ELIGIBLE', 'KIT_DELIVERED'],
   ['KIT_SENT', 'KIT_DELIVERED'],
@@ -71,12 +76,39 @@ describe('regras de transição do status da jornada', () => {
     expect(getAllowedJourneyTransitions('AWAITING_RESULT')).toEqual([
       'ELIGIBLE',
       'NOT_ELIGIBLE',
+      'KIT_SENT',
     ])
     expect(getAllowedJourneyTransitions('KIT_SENT')).toEqual(['KIT_DELIVERED'])
     expect(getAllowedJourneyTransitions('NOT_ELIGIBLE')).toEqual([])
     expect(getAllowedJourneyTransitions('RECURRING_DONATION_ELIGIBLE')).toEqual(
       ['DONATION_CONFIRMED'],
     )
+  })
+
+  it('consolida as opções do painel nos seis marcos da jornada pública', () => {
+    expect(ADMIN_JOURNEY_STATUS_VALUES).toEqual([
+      'REGISTERED',
+      'FORM_RECEIVED',
+      'EXAMS_COMPLETED',
+      'KIT_SENT',
+      'KIT_DELIVERED',
+      'DONATION_CONFIRMED',
+    ])
+    expect(getAllowedAdminJourneyTransitions('REGISTERED')).toEqual([
+      'FORM_RECEIVED',
+    ])
+    expect(getAllowedAdminJourneyTransitions('FORM_RECEIVED')).toEqual([
+      'EXAMS_COMPLETED',
+    ])
+    expect(getAllowedAdminJourneyTransitions('EXAMS_COMPLETED')).toEqual([
+      'KIT_SENT',
+    ])
+    expect(getAllowedAdminJourneyTransitions('KIT_SENT')).toEqual([
+      'KIT_DELIVERED',
+    ])
+    expect(getAllowedAdminJourneyTransitions('KIT_DELIVERED')).toEqual([
+      'DONATION_CONFIRMED',
+    ])
   })
 })
 
