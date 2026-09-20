@@ -10,6 +10,7 @@ import {
 import { NutrizJourneyProgress } from '@/components/nutriz/nutriz-journey-progress'
 import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-card'
 import { DonationHistoryCard } from '@/components/nutriz/donation-history-card'
+import { JourneySummaryCard } from '@/components/nutriz/journey-summary-card'
 import { PersonalHighlights } from '@/components/nutriz/personal-highlights'
 import { NutrizAccountCard } from '@/components/nutriz/nutriz-account-card'
 import { ReminderConsentCard } from '@/components/nutriz/reminder-consent-card'
@@ -90,11 +91,12 @@ export default async function NutrizAreaPage() {
           />
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
           <DonationHistoryCard
             snapshot={journey}
             wellbeingEntries={personal.wellbeingEntries}
           />
+          <JourneySummaryCard />
         </div>
 
         <div className="mt-6">
