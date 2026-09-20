@@ -1191,10 +1191,6 @@ export const NUTRIZ_AUTH = {
       copyMessageAction: 'Copiar mensagem',
       messageCopiedFeedback: 'Mensagem copiada.',
       sendWhatsappAction: 'Abrir no WhatsApp',
-      sharingNotice:
-        'O envio é sempre uma escolha sua. O NutriLink não envia mensagens automaticamente nem informa dados sobre outras pessoas.',
-      safetyNotice:
-        'O link só registra a origem de um novo cadastro para fins de métrica. Ele não gera recompensa material, não confirma atendimento nem informa dados sobre outras pessoas.',
     },
     account: {
       title: 'Meus dados',

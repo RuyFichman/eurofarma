@@ -117,9 +117,6 @@ export function NutrizReferralCard({ code }: { code: string }) {
               </a>
             </Button>
           </div>
-          <p className="text-muted-foreground mt-3 text-xs leading-5">
-            {copy.sharingNotice}
-          </p>
         </div>
         {feedback ? (
           <p role="status" className="text-primary mt-3 text-sm">
@@ -131,9 +128,6 @@ export function NutrizReferralCard({ code }: { code: string }) {
             {error}
           </p>
         ) : null}
-        <p className="text-muted-foreground mt-4 text-xs leading-5">
-          {copy.safetyNotice}
-        </p>
       </CardContent>
     </Card>
   )
