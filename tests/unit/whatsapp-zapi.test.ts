@@ -5,6 +5,10 @@ import {
   isZapiTestPhoneAllowed,
 } from '../../lib/whatsapp/zapi-payload'
 import { ZapiWhatsAppProvider } from '../../lib/whatsapp/zapi-provider'
+import {
+  getZapiReplyOptionIds,
+  resolveZapiNumberedReplyId,
+} from '../../lib/whatsapp/zapi-reply-options'
 
 const instanceId = 'instance-test'
 
@@ -111,6 +115,28 @@ describe('integração Z-API', () => {
 
     vi.stubEnv('ZAPI_TEST_MODE', 'false')
     expect(isZapiTestPhoneAllowed('5511777776666')).toBe(true)
+  })
+
+  it('converte respostas numéricas usando somente os ids da última opção', () => {
+    const optionIds = getZapiReplyOptionIds({
+      type: 'buttons',
+      body: 'Menu',
+      buttons: [
+        { id: 'menu_saber_mais', title: 'Quero saber mais' },
+        { id: 'menu_quero_doar', title: 'Quero doar leite' },
+      ],
+    })
+
+    expect(resolveZapiNumberedReplyId('1', optionIds ?? undefined)).toBe(
+      'menu_saber_mais',
+    )
+    expect(resolveZapiNumberedReplyId('2.', optionIds ?? undefined)).toBe(
+      'menu_quero_doar',
+    )
+    expect(resolveZapiNumberedReplyId('3', optionIds ?? undefined)).toBeNull()
+    expect(
+      resolveZapiNumberedReplyId('quero doar', optionIds ?? undefined),
+    ).toBeNull()
   })
 
   it('envia texto puro e degrada interações instáveis para opções numeradas', async () => {

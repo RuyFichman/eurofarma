@@ -34,6 +34,8 @@ export type FailureReason =
 
 export type ConversationContext = {
   location?: { city: string; state: string }
+  /** IDs técnicos efêmeros da última lista textual enviada pela Z-API. */
+  zapiReplyOptionIds?: string[]
 }
 
 export type ConversationProfile = {

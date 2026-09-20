@@ -174,4 +174,20 @@ describe('POST /api/whatsapp/zapi/[secret]', () => {
       },
     })
   })
+
+  it('persiste os ids técnicos do menu Z-API para aceitar a próxima resposta numérica', async () => {
+    await post(payload())
+
+    expect(mocks.saveState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: {
+          zapiReplyOptionIds: [
+            'menu_saber_mais',
+            'menu_quero_doar',
+            'menu_falar_pessoa',
+          ],
+        },
+      }),
+    )
+  })
 })

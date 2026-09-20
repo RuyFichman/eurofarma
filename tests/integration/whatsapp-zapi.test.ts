@@ -120,6 +120,55 @@ describe('Z-API no fluxo persistido', () => {
     })
   })
 
+  it('aceita uma opção numérica da última lista textual enviada pela Z-API', async () => {
+    const phone = testPhone('3')
+    await createTestNutrizProfile({ phoneWhatsapp: phone })
+    const sendSessionMessage = vi.fn().mockResolvedValue({
+      outcome: 'SENT' as const,
+      providerMessageId: `${testPrefix}-numeric-outbound`,
+    })
+    const zapi = provider(sendSessionMessage)
+
+    await processInboundWhatsappMessage({
+      message: {
+        from: phone,
+        messageId: `${testPrefix}-numeric-menu`,
+        text: 'oi',
+        replyId: null,
+      },
+      provider: zapi,
+      inboundProvider: 'ZAPI',
+      siteUrl: 'https://nutrilink.test',
+    })
+    await processInboundWhatsappMessage({
+      message: {
+        from: phone,
+        messageId: `${testPrefix}-numeric-choice`,
+        text: '2',
+        replyId: null,
+      },
+      provider: zapi,
+      inboundProvider: 'ZAPI',
+      siteUrl: 'https://nutrilink.test',
+    })
+
+    expect(sendSessionMessage).toHaveBeenCalledTimes(2)
+    expect(sendSessionMessage.mock.calls[1]?.[0]).toEqual(
+      expect.objectContaining({
+        reply: expect.objectContaining({ type: 'text' }),
+      }),
+    )
+    await expect(
+      prisma.whatsappConversation.findUniqueOrThrow({
+        where: { phoneWhatsapp: phone },
+        select: { step: true, context: true },
+      }),
+    ).resolves.toMatchObject({
+      step: 'AWAITING_COVERAGE',
+      context: {},
+    })
+  })
+
   it('mantém o callback de status como auditoria append-only, sem vínculo à outbox', async () => {
     const providerMessageId = `${testPrefix}-status`
     const [statusEvent] = extractZapiDeliveryStatusEvents(

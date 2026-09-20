@@ -11,6 +11,14 @@ const migrationSql = readFileSync(
   'utf8',
 )
 
+const zapiMigrationSql = readFileSync(
+  resolve(
+    process.cwd(),
+    'prisma/migrations/20260919140000_allow_zapi_numeric_reply_options/migration.sql',
+  ),
+  'utf8',
+)
+
 describe('migration do fluxo conversacional', () => {
   it('adiciona os estados ativos e muda o default para MENU', () => {
     for (const step of [
@@ -43,5 +51,22 @@ describe('migration do fluxo conversacional', () => {
     )
     expect(migrationSql).toContain("?& ARRAY['city', 'state']")
     expect(migrationSql).toContain("~ '^[A-Z]{2}$'")
+  })
+
+  it('aceita apenas ids técnicos numerados no contexto da Z-API', () => {
+    expect(zapiMigrationSql).toContain('zapiReplyOptionIds')
+    expect(zapiMigrationSql).toContain(
+      "jsonb_typeof(\"context\" -> 'zapiReplyOptionIds') = 'array'",
+    )
+    // A lista é validada inteira, no formato em que o jsonb a renderiza:
+    // somente ids técnicos, no máximo dez e 64 caracteres cada.
+    expect(zapiMigrationSql).toContain(
+      '\'^\\["[A-Za-z0-9_-]{1,64}"(, "[A-Za-z0-9_-]{1,64}"){0,9}\\]$\'',
+    )
+    // Nenhuma outra chave pode entrar no contexto além dessas duas.
+    expect(zapiMigrationSql).toContain(
+      "(\"context\" - 'location' - 'zapiReplyOptionIds') = '{}'::jsonb",
+    )
+    expect(zapiMigrationSql).not.toMatch(/phone|full_name|zip|message_body/iu)
   })
 })

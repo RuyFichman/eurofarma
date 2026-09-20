@@ -4,9 +4,10 @@
 
 A integração Z-API está limitada ao chatbot **reativo**: ela recebe uma mensagem
 privada e envia a resposta daquela conversa. O adaptador usa somente
-`send-text`; botões e listas são convertidos em opções numeradas, com orientação
-para a pessoa responder usando o título da opção. Avisos de mudança de jornada e
-lembretes continuam sem transporte Z-API.
+`send-text`; botões e listas são convertidos em opções numeradas e a próxima
+resposta `1`, `2`, etc. é resolvida conforme a lista que a própria conversa
+acabou de enviar. Avisos de mudança de jornada e lembretes continuam sem
+transporte Z-API.
 
 A outbox preserva sua regra de janela de atendimento e de templates aprovados
 dos provedores oficiais. A Z-API opera pela sessão do WhatsApp Web e seus

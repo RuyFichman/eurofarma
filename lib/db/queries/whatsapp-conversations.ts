@@ -74,12 +74,28 @@ function parseConversationContext(
     }
   }
 
+  const zapiReplyOptionIds = candidate.zapiReplyOptionIds
+  if (
+    Array.isArray(zapiReplyOptionIds) &&
+    zapiReplyOptionIds.length > 0 &&
+    zapiReplyOptionIds.length <= 10
+  ) {
+    const optionIds = zapiReplyOptionIds.filter(
+      (value): value is string =>
+        typeof value === 'string' && /^[a-z0-9_-]{1,64}$/iu.test(value),
+    )
+    if (optionIds.length === zapiReplyOptionIds.length) {
+      context.zapiReplyOptionIds = optionIds
+    }
+  }
+
   return context
 }
 
 /**
- * Estado atual da conversa. O contexto aceita apenas município/UF; nome, CEP e
- * texto livre nunca são reidratados nem persistidos antes do cadastro.
+ * Estado atual da conversa. O contexto aceita município/UF e, no fluxo Z-API,
+ * IDs técnicos da última lista; nome, CEP e texto livre nunca são reidratados
+ * nem persistidos antes do cadastro.
  */
 export async function getConversationState(
   phoneWhatsapp: string,
