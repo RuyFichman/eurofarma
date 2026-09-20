@@ -2,10 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { UserRound } from 'lucide-react'
 
-import {
-  NutrizJourneyCurrentStatus,
-  NutrizJourneyTimeline,
-} from '@/components/nutriz/nutriz-journey-status'
+import { NutrizJourneyTimeline } from '@/components/nutriz/nutriz-journey-status'
 import { NutrizJourneyProgress } from '@/components/nutriz/nutriz-journey-progress'
 import { PersonalExtractionCard } from '@/components/nutriz/personal-extraction-card'
 import { DonationHistoryCard } from '@/components/nutriz/donation-history-card'
@@ -124,10 +121,6 @@ export default async function NutrizAreaPage() {
             <WellbeingCard entries={personal.wellbeingEntries} />
           </div>
         ) : null}
-
-        <div className="mt-6">
-          <NutrizJourneyCurrentStatus snapshot={journey} />
-        </div>
 
         <div className="mt-6">
           <NutrizJourneyTimeline snapshot={journey} />

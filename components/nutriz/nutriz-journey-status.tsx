@@ -1,5 +1,3 @@
-import { BadgeCheck, Info } from 'lucide-react'
-
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -18,58 +16,6 @@ type JourneyStatusCopy =
 
 function getStatusCopy(status: JourneyStatusValue): JourneyStatusCopy {
   return NUTRIZ_AUTH.area.journey.status[status]
-}
-
-function NutrizJourneyStatusBadge({ status }: { status: JourneyStatusValue }) {
-  return <Badge variant="secondary">{getStatusCopy(status).label}</Badge>
-}
-
-export function NutrizJourneyCurrentStatus({
-  snapshot,
-}: {
-  snapshot: NutrizJourneySnapshot
-}) {
-  const copy = NUTRIZ_AUTH.area.journey
-  const statusCopy = getStatusCopy(snapshot.journeyStatus)
-  const lastChangedAt =
-    snapshot.journeyHistory.at(-1)?.changedAt ?? snapshot.createdAt
-
-  return (
-    <Card className="border-primary/20 bg-secondary/20">
-      <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <BadgeCheck className="text-primary size-5" aria-hidden="true" />
-            <p className="text-primary text-sm font-semibold">
-              {copy.current.eyebrow}
-            </p>
-          </div>
-          <NutrizJourneyStatusBadge status={snapshot.journeyStatus} />
-        </div>
-        <CardTitle className="text-xl">{statusCopy.title}</CardTitle>
-        <CardDescription className="leading-6">
-          {statusCopy.description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-muted-foreground text-xs">
-          {copy.current.updatedAt.replace(
-            '{date}',
-            formatShortDate(lastChangedAt),
-          )}
-        </p>
-        <div className="bg-background/80 flex gap-3 rounded-xl border p-4">
-          <Info
-            className="text-primary mt-0.5 size-4 shrink-0"
-            aria-hidden="true"
-          />
-          <p className="text-muted-foreground text-sm leading-6">
-            {copy.current.sourceNotice}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  )
 }
 
 export function NutrizJourneyTimeline({
