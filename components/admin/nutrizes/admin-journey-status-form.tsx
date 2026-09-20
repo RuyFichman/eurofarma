@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { getJourneyStatusLabel } from '@/lib/admin/nutrizes/journey-labels'
 import {
@@ -54,8 +55,10 @@ export function AdminJourneyStatusForm({
       fromStatus: currentStatus,
       toStatus: undefined,
       administrativeNote: '',
+      kitDeliveryScheduledAt: '',
     },
   })
+  const selectedNextStatus = form.watch('toStatus')
 
   async function onSubmit(values: JourneyStatusTransition) {
     setSubmitError(null)
@@ -66,7 +69,11 @@ export function AdminJourneyStatusForm({
 
     if (result.fields) {
       for (const [field, message] of Object.entries(result.fields)) {
-        if (field === 'toStatus' || field === 'administrativeNote') {
+        if (
+          field === 'toStatus' ||
+          field === 'administrativeNote' ||
+          field === 'kitDeliveryScheduledAt'
+        ) {
           form.setError(field, { message })
         }
       }
@@ -146,6 +153,41 @@ export function AdminJourneyStatusForm({
           </p>
         ) : null}
       </div>
+
+      {selectedNextStatus === 'KIT_SENT' ? (
+        <div className="space-y-2">
+          <Label htmlFor="journey-kit-scheduled-at">
+            {copy.form.kitScheduledAt.label}
+          </Label>
+          <Input
+            id="journey-kit-scheduled-at"
+            type="datetime-local"
+            aria-invalid={Boolean(errors.kitDeliveryScheduledAt)}
+            aria-describedby={
+              errors.kitDeliveryScheduledAt
+                ? 'journey-kit-scheduled-at-hint journey-kit-scheduled-at-error'
+                : 'journey-kit-scheduled-at-hint'
+            }
+            disabled={isSubmitting}
+            {...form.register('kitDeliveryScheduledAt')}
+          />
+          <p
+            id="journey-kit-scheduled-at-hint"
+            className="text-muted-foreground text-xs leading-5"
+          >
+            {copy.form.kitScheduledAt.helper}
+          </p>
+          {errors.kitDeliveryScheduledAt ? (
+            <p
+              id="journey-kit-scheduled-at-error"
+              role="alert"
+              className="text-destructive text-sm"
+            >
+              {errors.kitDeliveryScheduledAt.message}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="space-y-2">
         <Label htmlFor="journey-administrative-note">

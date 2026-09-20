@@ -1152,28 +1152,153 @@ export const NUTRIZ_AUTH = {
     greetingTemplate: 'Olá, {firstName}!',
     subtitle: 'Sua jornada com informação e transparência 💙',
     badge: 'Área da nutriz',
+    // "Meus lembretes" (20/09/2026): substitui o card único de opt-in por 3
+    // lembretes configuráveis independentemente. O consentimento guarda-chuva
+    // (CommunicationConsentEvent, purpose REMINDERS_WHATSAPP) continua por
+    // trás — ativar qualquer um destes concede esse consentimento se ainda
+    // não existir; o fluxo do chatbot no WhatsApp continua igual e usa o
+    // mesmo consentimento.
     reminders: {
-      title: 'Lembretes pelo WhatsApp',
-      enabledLabel: 'Lembretes ativados',
-      disabledLabel: 'Lembretes desativados',
-      description:
-        'Você escolhe se quer receber lembretes de continuidade da jornada. Essa escolha é independente dos avisos de mudança de status.',
-      safetyNotice:
-        'Um lembrete não agenda nem confirma coleta, exame, visita ou atendimento. Essas combinações continuam sendo feitas diretamente com a equipe do Lactare.',
-      enableAction: 'Ativar lembretes',
-      disableAction: 'Desativar lembretes',
+      title: 'Meus lembretes',
+      subtitle: 'Avisos que você escolheu receber no WhatsApp',
+      activeCountNone: 'Nenhum ativo',
+      activeCountOne: '1 ativo',
+      activeCountOther: '{count} ativos',
+      activeSectionTitle: 'ATIVOS',
+      availableSectionTitle: 'DISPONÍVEL PARA ATIVAR',
+      disableAction: 'Desativar',
+      configureAction: 'Configurar',
+      // Nota fixa do card fechado/aberto — distinta do disclaimer de cada
+      // tela de configuração, que é mais específico por tipo.
+      footerNote:
+        'Nenhum lembrete agenda, confirma ou substitui contato direto com a equipe do Lactare.',
+      backToList: 'Voltar para seus lembretes',
+      activateAction: 'Ativar lembrete',
+      cancelAction: 'Cancelar',
       submitting: 'Salvando...',
-      enabledFeedback:
-        'Lembretes ativados. Sua escolha foi registrada e poderá ser cancelada quando quiser.',
-      disabledFeedback: 'Lembretes desativados. O cancelamento foi registrado.',
-      referenceDateLabel: 'Data de referência do lembrete',
-      referenceDateHelp:
-        'Esta data é apenas uma referência para a continuidade da jornada; não é agendamento.',
-      referenceDateStatus: 'Data de referência registrada: {date}',
-      referenceDateRequired:
-        'Informe uma data de referência para ativar o lembrete.',
+      previewLabel: 'Prévia da mensagem no WhatsApp',
       error:
         'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
+
+      milkValidity: {
+        // Título/subtítulo da linha ativa seguem o texto literal do mockup;
+        // {days} já vem formatado ("1 dia"/"2 dias"/"3 dias") pelo componente.
+        rowTitle: 'Validade do leite extraído em {date}',
+        rowSubtitle: 'Avisaremos {days} antes do prazo de 15 dias no freezer',
+        // Estado "disponível para ativar": não há mockup deste estado
+        // específico (o mockup só mostra este tipo já ativo) — texto
+        // consistente com a tela de configuração, fácil de ajustar depois.
+        availableTitle: 'Validade do leite',
+        availableSubtitle:
+          'Baseado na sua última sessão registrada, avisamos antes do prazo de 15 dias no freezer.',
+        configTitle: 'Lembrete de validade do leite',
+        configDescription:
+          'Baseado na sessão de extração que você registrou. Vamos te avisar antes do prazo recomendado de armazenamento, para você combinar a coleta com a equipe do Lactare a tempo.',
+        sourceLabel: 'Sessão registrada',
+        sourceValue: '{volume}ml extraídos em {date}',
+        deadlineLabel: 'Prazo recomendado no freezer (15 dias)',
+        questionLabel: 'Quando quer ser avisada?',
+        options: {
+          MILK_1_DAY_BEFORE: {
+            label: '1 dia antes do prazo',
+            helper: 'Aviso em {date}',
+          },
+          MILK_2_DAYS_BEFORE: {
+            label: '2 dias antes do prazo',
+            helper: 'Aviso em {date} — tempo de sobra para combinar a coleta',
+          },
+          MILK_3_DAYS_BEFORE: {
+            label: '3 dias antes do prazo',
+            helper: 'Aviso em {date}',
+          },
+        },
+        reactivateHint:
+          'Se você registrar uma nova sessão de extração, pode ativar este lembrete de novo para o novo lote.',
+        previewTemplate:
+          'Oi, {firstName}! O leite que você registrou em {recordedDate} está próximo do prazo de armazenamento (15 dias no freezer). Vale falar com a equipe do Lactare para combinar a coleta. 💙',
+        disclaimer:
+          'Este lembrete não agenda nem confirma a coleta. A combinação do dia e horário continua sendo feita diretamente com a equipe do Lactare.',
+        emptyState:
+          'Você ainda não registrou nenhuma sessão de extração. Assim que registrar a primeira, este lembrete fica disponível.',
+      },
+
+      futureDonation: {
+        availableTitle: 'Doação futura',
+        availableSubtitle:
+          'Nos diga quando pretende doar de novo e avisamos você perto da data',
+        // Estado ativo também não tem mockup próprio; reaproveita o rótulo
+        // curto da opção escolhida ({optionLabel}, ex.: "7 dias antes").
+        rowTitle: 'Doação futura em {date}',
+        rowSubtitle: 'Avisaremos {optionLabel}',
+        configTitle: 'Lembrete de doação futura',
+        configDescription:
+          'Nos diga quando você pretende doar de novo. Vamos te enviar um aviso gentil pelo WhatsApp perto dessa data — sem cobrança, sem compromisso.',
+        dateLabel: 'Quando você pretende doar novamente?',
+        dateHelp: 'Você pode alterar essa data a qualquer momento.',
+        dateRequired: 'Informe a data em que pretende doar novamente.',
+        datePast: 'Escolha uma data futura.',
+        questionLabel: 'Quando quer ser avisada?',
+        options: {
+          DONATION_7_DAYS_BEFORE: {
+            label: '7 dias antes',
+            helper: 'Um único aviso, com tempo de sobra para se organizar',
+          },
+          DONATION_ON_DAY: {
+            label: 'No próprio dia',
+            helper: 'Um único aviso, na data que você indicou',
+          },
+          DONATION_7_DAYS_BEFORE_AND_ON_DAY: {
+            label: '7 dias antes e no dia',
+            helper:
+              'Dois avisos, para quem prefere ser lembrada com mais calma',
+          },
+        },
+        previewTemplate:
+          'Oi, {firstName}! Você mencionou que pretendia doar novamente por volta desta data. Sem pressa — é só um lembrete carinhoso. Qualquer dúvida, fale com a equipe do Lactare. 💙',
+        // Igual ao disclaimer geral de lembretes (mesmo texto do mockup).
+        disclaimer:
+          'Este lembrete não agenda nem confirma coleta, exame, visita ou atendimento. Essas combinações continuam sendo feitas diretamente com a equipe do Lactare.',
+      },
+
+      kitDelivery: {
+        availableTitle: 'Entrega do kit',
+        availableSubtitle:
+          'Vamos te avisar perto do horário marcado pela equipe do Lactare',
+        rowTitle: 'Entrega do kit — {date}, às {time}',
+        rowSubtitle: 'Avisaremos {optionLabel}',
+        configTitle: 'Lembrete de entrega do kit',
+        configDescription:
+          'A equipe do Lactare combinou uma visita para trazer os potinhos esterilizados e dar as orientações de coleta. Vamos te avisar perto do horário marcado.',
+        sourceLabel: 'Compromisso registrado pela equipe do Lactare',
+        sourceValue: 'Entrega do kit — {date}, às {time}',
+        presenceNotice:
+          'Sua presença é necessária nessa visita — é quando você recebe as orientações de higiene, coleta e armazenamento.',
+        questionLabel: 'Quando quer ser avisada?',
+        options: {
+          KIT_MORNING_OF: {
+            label: 'No dia, pela manhã',
+            helper: 'Aviso às 8h do dia {date}',
+          },
+          KIT_1_DAY_BEFORE: {
+            label: '1 dia antes',
+            helper: 'Aviso às 18h do dia {date}',
+          },
+          KIT_1_DAY_BEFORE_AND_ON_DAY: {
+            label: '1 dia antes e no dia',
+            helper: 'Dois avisos, para quem prefere se organizar com calma',
+          },
+        },
+        checklistHint:
+          'O lembrete inclui um link para o checklist "O que esperar da entrega do kit", com o que levar nessa visita.',
+        previewTemplateSameDay:
+          'Oi, {firstName}! Passando para lembrar: hoje, às {time}, a equipe do Lactare vai até você entregar o kit e dar as orientações. Não esqueça o documento com foto e a Caderneta de Saúde do bebê. Qualquer imprevisto, avise a equipe. 💙',
+        previewTemplateDayBefore:
+          'Oi, {firstName}! Passando para lembrar: amanhã, dia {date} às {time}, a equipe do Lactare vai até você entregar o kit e dar as orientações. Não esqueça o documento com foto e a Caderneta de Saúde do bebê. Qualquer imprevisto, avise a equipe. 💙',
+        disclaimer:
+          'Este lembrete apenas ecoa um compromisso já combinado com a equipe do Lactare. Qualquer alteração de data ou horário deve ser feita diretamente com eles.',
+        emptyState:
+          'Ainda não há uma visita de entrega do kit registrada pela equipe do Lactare.',
+      },
     },
     referral: {
       title: 'Indique o NutriLink',
@@ -2998,6 +3123,15 @@ export const ADMIN = {
         helper:
           'Até 500 caracteres. Não registre informações clínicas ou resultados de exame.',
       },
+      // Só aparece quando o próximo status selecionado é "Kit enviado"
+      // (20/09/2026) — vira a fonte do lembrete de entrega do kit na área da
+      // nutriz. Opcional: sem essa informação, o lembrete simplesmente não
+      // fica disponível para ela.
+      kitScheduledAt: {
+        label: 'Data e horário combinados da entrega (opcional)',
+        helper:
+          'Informe se já combinou um horário com a nutriz. Isso habilita, na área dela, o lembrete de entrega do kit.',
+      },
       submit: 'Registrar mudança de status',
       submitting: 'Registrando mudança...',
     },
@@ -3054,6 +3188,7 @@ export const ADMIN = {
       noteMax: 'A observação deve ter no máximo 500 caracteres.',
       noteClinical:
         'Registre apenas contexto administrativo, sem laudo, diagnóstico, exame específico ou motivo clínico.',
+      kitScheduledAtInvalid: 'Informe uma data e horário válidos.',
     },
     mutations: {
       success:

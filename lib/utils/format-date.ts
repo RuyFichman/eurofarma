@@ -21,6 +21,21 @@ export function formatShortDate(value: Date): string {
   return SHORT_DATE.format(value)
 }
 
+const SHORT_DAY_MONTH = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: '2-digit',
+  timeZone: 'America/Sao_Paulo',
+})
+
+/**
+ * `19/09`, sem ano — usado nos resumos de "Meus lembretes", onde o ano fica
+ * implícito (o mesmo padrão do mockup do time). Use `formatShortDate` quando
+ * o ano precisar aparecer, como nas telas de configuração de cada lembrete.
+ */
+export function formatShortDayMonth(value: Date): string {
+  return SHORT_DAY_MONTH.format(value)
+}
+
 const LONG_DATE = new Intl.DateTimeFormat('pt-BR', {
   weekday: 'long',
   day: '2-digit',

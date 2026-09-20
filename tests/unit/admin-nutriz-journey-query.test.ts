@@ -190,6 +190,52 @@ describe('mutação administrativa da jornada', () => {
     expect(outboxCreate).toHaveBeenCalledOnce()
   })
 
+  it('grava a data/horário da entrega apenas quando o próximo status é KIT_SENT', async () => {
+    const { client, updateMany, historyCreate, consentFindFirst } = makeClient()
+    updateMany.mockResolvedValue({ count: 1 })
+    historyCreate.mockResolvedValue({ id: 'history-kit' })
+    consentFindFirst.mockResolvedValue(null)
+
+    await applyAdminNutrizJourneyStatusTransition(client, {
+      ...input,
+      toStatus: 'KIT_SENT',
+      kitDeliveryScheduledAt: '2026-09-25T16:00',
+    })
+
+    expect(updateMany).toHaveBeenCalledWith({
+      where: {
+        id: input.nutrizProfileId,
+        deletedAt: null,
+        journeyStatus: input.fromStatus,
+      },
+      data: {
+        journeyStatus: 'KIT_SENT',
+        kitDeliveryScheduledAt: new Date('2026-09-25T16:00:00-03:00'),
+      },
+    })
+  })
+
+  it('ignora a data/horário de entrega quando o próximo status não é KIT_SENT', async () => {
+    const { client, updateMany, historyCreate, consentFindFirst } = makeClient()
+    updateMany.mockResolvedValue({ count: 1 })
+    historyCreate.mockResolvedValue({ id: 'history-other' })
+    consentFindFirst.mockResolvedValue(null)
+
+    await applyAdminNutrizJourneyStatusTransition(client, {
+      ...input,
+      kitDeliveryScheduledAt: '2026-09-25T16:00',
+    })
+
+    expect(updateMany).toHaveBeenCalledWith({
+      where: {
+        id: input.nutrizProfileId,
+        deletedAt: null,
+        journeyStatus: input.fromStatus,
+      },
+      data: { journeyStatus: input.toStatus },
+    })
+  })
+
   it('detecta concorrência e não acrescenta histórico divergente', async () => {
     const { client, updateMany, findFirst, historyCreate, outboxCreate } =
       makeClient()

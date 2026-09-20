@@ -246,6 +246,34 @@ enum WellbeingFeeling {
   TIRED
 }
 
+/// Os três lembretes que a nutriz pode configurar individualmente na área
+/// pessoal (20/09/2026). Cada um vira uma linha própria em
+/// `NutrizReminderPreference`; nenhum deles agenda ou confirma nada — só
+/// ecoa, pelo WhatsApp, uma informação que já existe em outro lugar do
+/// sistema (sessão de extração, data autodeclarada ou visita registrada pelo
+/// admin).
+enum NutrizReminderType {
+  MILK_VALIDITY
+  FUTURE_DONATION
+  KIT_DELIVERY
+}
+
+/// Lista fechada porque cada tipo de lembrete oferece só 3 opções fixas na
+/// interface. Os valores são prefixados pelo tipo porque as opções não se
+/// misturam entre tipos (mesmo padrão de enum "guarda-chuva" de
+/// `WhatsappConversationStep`); o CHECK da tabela garante o pareamento certo.
+enum ReminderTimingOption {
+  MILK_1_DAY_BEFORE
+  MILK_2_DAYS_BEFORE
+  MILK_3_DAYS_BEFORE
+  DONATION_7_DAYS_BEFORE
+  DONATION_ON_DAY
+  DONATION_7_DAYS_BEFORE_AND_ON_DAY
+  KIT_MORNING_OF
+  KIT_1_DAY_BEFORE
+  KIT_1_DAY_BEFORE_AND_ON_DAY
+}
+
 model User {
   id          String    @id @default(uuid())
   email       String    @unique
@@ -266,41 +294,47 @@ model User {
 }
 
 model NutrizProfile {
-  id                 String             @id @default(uuid())
+  id                     String             @id @default(uuid())
   /// `id` do usuário em `auth.users` (Supabase Auth), quando a nutriz tem conta.
   /// Nulo para quem se cadastrou só como lead. **Não** usa a tabela `users`, que
   /// é do staff (ADMIN/VIEWER) e é o que o `requireAdminUser()` consulta.
-  authUserId         String?            @unique @map("auth_user_id")
-  fullName           String             @map("full_name")
+  authUserId             String?            @unique @map("auth_user_id")
+  fullName               String             @map("full_name")
   /// Único porque é o identificador da nutriz no chatbot: o webhook resolve o
   /// perfil a partir do número que enviou a mensagem.
-  phoneWhatsapp      String             @unique @map("phone_whatsapp")
-  email              String?
+  phoneWhatsapp          String             @unique @map("phone_whatsapp")
+  email                  String?
   /// Somente dígitos (11), sem máscara. Coletado hoje só pelo fluxo do chatbot
   /// (RF11, cadastro via WhatsApp); nulo para quem se cadastra pelo site, que
   /// não pede esse campo. Dado sensível (documento de identidade) — a exposição
   /// pública deste projeto ainda não tem RLS aplicado (AGENTS.md, seção 3.4).
-  cpf                String?            @unique
+  cpf                    String?            @unique
   /// Endereço completo em texto livre (rua, número, complemento, bairro), como
   /// a nutriz digitou no chatbot. Nulo para quem se cadastra pelo site.
-  address            String?
-  state              String             @db.Char(2)
-  city               String
-  neighborhood       String?
-  interestStatus     InterestStatus     @default(INTERESTED) @map("interest_status")
+  address                String?
+  state                  String             @db.Char(2)
+  city                   String
+  neighborhood           String?
+  interestStatus         InterestStatus     @default(INTERESTED) @map("interest_status")
   /// Estado operacional atual da jornada. É independente do `interestStatus`
   /// legado e só pode avançar pelas transições explícitas do domínio.
-  journeyStatus      JourneyStatus      @default(REGISTERED) @map("journey_status")
-  contactPreference  ContactPreference  @default(WHATSAPP) @map("contact_preference")
-  lgpdConsentAt      DateTime           @map("lgpd_consent_at")
-  marketingConsent   Boolean            @default(false) @map("marketing_consent")
-  sourceUtm          Json?              @map("source_utm")
+  journeyStatus          JourneyStatus      @default(REGISTERED) @map("journey_status")
+  /// Data e horário da visita de entrega do kit, informados pelo admin do
+  /// Lactare ao marcar `KIT_SENT` (20/09/2026). É a única fonte legítima do
+  /// lembrete de entrega do kit — a nutriz nunca preenche nem altera este
+  /// campo, só visualiza. Nulo até o admin informar; permanece mesmo depois
+  /// de `KIT_DELIVERED`, como registro do que foi combinado.
+  kitDeliveryScheduledAt DateTime?          @map("kit_delivery_scheduled_at")
+  contactPreference      ContactPreference  @default(WHATSAPP) @map("contact_preference")
+  lgpdConsentAt          DateTime           @map("lgpd_consent_at")
+  marketingConsent       Boolean            @default(false) @map("marketing_consent")
+  sourceUtm              Json?              @map("source_utm")
   /// Dimensões derivadas e mantidas por trigger para o read model do dashboard.
-  dashboardRegion    ServiceRegion?     @map("dashboard_region")
-  registrationOrigin RegistrationOrigin @default(UNKNOWN) @map("registration_origin")
-  deletedAt          DateTime?          @map("deleted_at")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  updatedAt          DateTime           @updatedAt @map("updated_at")
+  dashboardRegion        ServiceRegion?     @map("dashboard_region")
+  registrationOrigin     RegistrationOrigin @default(UNKNOWN) @map("registration_origin")
+  deletedAt              DateTime?          @map("deleted_at")
+  createdAt              DateTime           @default(now()) @map("created_at")
+  updatedAt              DateTime           @updatedAt @map("updated_at")
 
   contactIntents           ContactIntent[]
   whatsappClicks           WhatsappClick[]
@@ -312,6 +346,7 @@ model NutrizProfile {
   extractionLogs           ExtractionLog[]
   wellbeingEntries         WellbeingEntry[]
   recognitions             NutrizRecognition[]
+  reminderPreferences      NutrizReminderPreference[]
   referralLink             ReferralLink?               @relation("NutrizReferralLink")
   referredByReferralLink   ReferralLink?               @relation("NutrizReferralAttribution", fields: [referredByReferralLinkId], references: [id], onDelete: SetNull)
   referredByReferralLinkId String?                     @map("referred_by_referral_link_id")
@@ -350,10 +385,40 @@ model ExtractionLog {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  nutrizProfile NutrizProfile @relation(fields: [nutrizProfileId], references: [id], onDelete: Cascade)
+  nutrizProfile       NutrizProfile              @relation(fields: [nutrizProfileId], references: [id], onDelete: Cascade)
+  reminderPreferences NutrizReminderPreference[]
 
   @@index([nutrizProfileId, recordedAt])
   @@map("extraction_logs")
+}
+
+/// Configuração **atual** de um lembrete por WhatsApp escolhido pela nutriz
+/// na área pessoal (20/09/2026) — não é um ledger de consentimento (esse
+/// continua em `CommunicationConsentEvent`, purpose `REMINDERS_WHATSAPP`;
+/// ativar qualquer lembrete daqui concede esse consentimento guarda-chuva se
+/// ainda não existir). Uma linha por nutriz e tipo, sobrescrita a cada nova
+/// ativação. O CHECK da migration garante que cada tipo só preencha o campo
+/// que faz sentido para ele e só aceite as opções da sua própria lista.
+model NutrizReminderPreference {
+  id                    String               @id @default(uuid())
+  nutrizProfileId       String               @map("nutriz_profile_id")
+  type                  NutrizReminderType
+  enabled               Boolean              @default(false)
+  timingOption          ReminderTimingOption @map("timing_option")
+  /// Só para FUTURE_DONATION: data autodeclarada de quando pretende doar de
+  /// novo. Nunca é agendamento nem compromisso — só referência do lembrete.
+  targetDate            DateTime?            @map("target_date") @db.Date
+  /// Só para MILK_VALIDITY: qual sessão de extração originou o lembrete. Uma
+  /// nova sessão exige reativar o lembrete apontando para o novo lote.
+  sourceExtractionLogId String?              @map("source_extraction_log_id")
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @updatedAt @map("updated_at")
+
+  nutrizProfile       NutrizProfile  @relation(fields: [nutrizProfileId], references: [id], onDelete: Cascade)
+  sourceExtractionLog ExtractionLog? @relation(fields: [sourceExtractionLogId], references: [id], onDelete: SetNull)
+
+  @@unique([nutrizProfileId, type], map: "nutriz_reminder_preferences_profile_type_key")
+  @@map("nutriz_reminder_preferences")
 }
 
 /// Registro opcional, mínimo e não clínico de bem-estar após uma doação.
