@@ -372,6 +372,64 @@ export const CONTENT = {
     searchLabel: 'Buscar conteúdos',
     searchPlaceholder: 'Buscar artigos, vídeos ou dúvidas frequentes...',
     filters: ['Todos', 'Extração', 'Armazenamento', 'Amamentação', 'Doação'],
+    articles: [
+      {
+        category: 'Extração',
+        title: 'Técnica de extração manual',
+        summary:
+          'Conheça os cuidados e movimentos que ajudam a tornar a extração mais segura e confortável.',
+        readTime: '4 min de leitura',
+        href: '#amamentacao-na-pratica',
+      },
+      {
+        category: 'Extração',
+        title: 'Higiene antes da extração',
+        summary:
+          'Veja como preparar as mãos, o ambiente e os utensílios antes de coletar o leite.',
+        readTime: '3 min de leitura',
+        href: '#caminho-da-doacao',
+      },
+      {
+        category: 'Armazenamento',
+        title: 'Armazenamento seguro do leite',
+        summary:
+          'Entenda como identificar, conservar e proteger o leite extraído seguindo as orientações recebidas.',
+        readTime: '3 min de leitura',
+        href: '#caminho-da-doacao',
+      },
+      {
+        category: 'Amamentação',
+        title: 'Como identificar uma boa pega',
+        summary:
+          'Conheça os sinais de uma pega adequada e saiba quando buscar orientação profissional.',
+        readTime: '4 min de leitura',
+        href: '#amamentacao-na-pratica',
+      },
+      {
+        category: 'Amamentação',
+        title: 'Produção de leite e rotina',
+        summary:
+          'Leia sobre estímulo, frequência e sinais do dia a dia que ajudam a compreender a produção de leite.',
+        readTime: '4 min de leitura',
+        href: '#amamentacao-na-pratica',
+      },
+      {
+        category: 'Doação',
+        title: 'Quem pode ser doadora',
+        summary:
+          'Veja os critérios iniciais e entenda por que a decisão depende da avaliação da equipe do Lactare.',
+        readTime: '2 min de leitura',
+        href: '#duvidas-frequentes',
+      },
+      {
+        category: 'Doação',
+        title: 'As etapas da jornada de doação',
+        summary:
+          'Acompanhe o caminho do primeiro contato à coleta domiciliar e saiba o que esperar de cada etapa.',
+        readTime: '3 min de leitura',
+        href: '#caminho-da-doacao',
+      },
+    ],
   },
   startHere: {
     eyebrow: 'Seção 1',
