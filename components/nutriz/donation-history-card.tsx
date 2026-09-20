@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { Check, Gift } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { NutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
@@ -38,7 +38,17 @@ export function DonationHistoryCard({
       </CardHeader>
       <CardContent>
         {donations.length === 0 ? (
-          <p className="text-muted-foreground text-sm">{copy.empty}</p>
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-10 text-center">
+            <span
+              className="bg-secondary text-primary flex size-11 items-center justify-center rounded-full"
+              aria-hidden="true"
+            >
+              <Gift className="size-5" />
+            </span>
+            <p className="text-muted-foreground max-w-[26ch] text-sm leading-6">
+              {copy.empty}
+            </p>
+          </div>
         ) : (
           <ul className="space-y-3">
             {donations.map((donation, index) => {

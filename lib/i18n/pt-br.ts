@@ -1339,7 +1339,7 @@ export const NUTRIZ_AUTH = {
       history: {
         title: 'Resumo da sua jornada',
         description:
-          'Sessões, doações e tempo como doadora em um documento — ótimo para levar na entrega do kit.',
+          'Sessões, doações e tempo como doadora em um documento. Ótimo para levar na entrega do kit.',
         action: 'Exportar PDF',
         pdf: {
           brand: 'NutriLink',
