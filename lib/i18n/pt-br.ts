@@ -408,34 +408,38 @@ export const CONTENT = {
   },
   donationPath: {
     eyebrow: 'Seção 2',
-    title: 'O Caminho da Doação',
+    title: 'O Caminho do Leite',
     description:
       'Do primeiro contato até a coleta — um passo a passo visual e claro.',
     steps: [
       {
         title: 'Primeiro contato pelo WhatsApp',
-        description:
-          'Converse com o NutriLink para esclarecer dúvidas e iniciar sua jornada com o Lactare.',
+        description: 'Tire suas dúvidas e comece sua jornada com o Lactare.',
       },
       {
         title: 'Verificação da área atendida',
         description:
-          'Informe sua cidade para saber se ela faz parte da área de atuação configurada do Lactare.',
+          'Informe sua cidade e veja se está na área de atuação do Lactare.',
       },
       {
-        title: 'Contato com o Lactare',
+        title: 'Ficha de saúde e exame de sangue',
         description:
-          'A equipe do Lactare realiza a triagem profissional e combina diretamente os próximos passos, conforme disponibilidade.',
+          'Preencha a ficha de saúde. O laboratório parceiro coleta o exame na sua casa.',
       },
       {
-        title: 'Extração e preparação em casa',
+        title: 'Entrega do kit em casa',
         description:
-          'Siga o guia de higiene e extração, armazene em frasco esterilizado e etiquete com data e hora. Simples assim.',
+          'A equipe leva os potinhos esterilizados e orienta sobre higiene e coleta. Sua presença é necessária.',
       },
       {
-        title: 'Doação ao Lactare',
+        title: 'Extração e armazenamento em casa',
         description:
-          'O Lactare recebe o leite conforme a orientação combinada e realiza processamento e controle de qualidade.',
+          'Siga as orientações recebidas e guarde o leite no freezer.',
+      },
+      {
+        title: 'Coleta domiciliar do leite',
+        description:
+          'Nossa equipe busca o leite na sua casa, sem custo e sem deslocamento.',
       },
     ],
   },
