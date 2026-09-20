@@ -1,23 +1,18 @@
 import {
   ArrowRight,
-  CalendarCheck,
-  ClipboardCheck,
   Droplets,
-  Heart,
+  MapPin,
   MessageCircle,
+  Package,
+  Syringe,
+  Truck,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ContentSectionHeader } from '@/components/shared/content-section-header'
 import { CONTENT } from '@/lib/i18n/pt-br'
 
-const STEP_ICONS = [
-  MessageCircle,
-  ClipboardCheck,
-  CalendarCheck,
-  Droplets,
-  Heart,
-]
+const STEP_ICONS = [MessageCircle, MapPin, Syringe, Package, Droplets, Truck]
 
 export function ContentDonationPath() {
   const { donationPath } = CONTENT
@@ -32,7 +27,7 @@ export function ContentDonationPath() {
         description={donationPath.description}
       />
 
-      <ol className="mt-10 grid gap-8 md:mt-12 md:grid-cols-5 md:gap-4">
+      <ol className="mt-10 grid gap-8 md:mt-12 md:grid-cols-6 md:gap-4">
         {donationPath.steps.map((step, index) => {
           const Icon = STEP_ICONS[index] ?? MessageCircle
           return (
