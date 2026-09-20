@@ -234,7 +234,7 @@ export const HOME = {
         cta: { label: 'Saiba mais', href: '/sobre' },
       },
       {
-        title: 'Lactare — banco de leite humano da Eurofarma',
+        title: 'Lactare, o banco de leite humano da Eurofarma',
         description:
           'É a operação responsável pelo atendimento, pela triagem profissional, pela coleta conforme disponibilidade e pelo processamento seguro do leite doado.',
         items: [

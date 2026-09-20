@@ -77,7 +77,7 @@ export function HomeNetwork() {
                       isNutriLink ? '' : 'bg-secondary/15'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-6">
+                    <div className="flex items-start gap-6">
                       <span
                         className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${
                           isNutriLink
@@ -86,12 +86,6 @@ export function HomeNetwork() {
                         }`}
                       >
                         <Icon className="size-5" aria-hidden="true" />
-                      </span>
-                      <span
-                        className="text-muted-foreground/35 text-sm font-semibold tracking-[0.2em]"
-                        aria-hidden="true"
-                      >
-                        {String(index + 1).padStart(2, '0')}
                       </span>
                     </div>
 
