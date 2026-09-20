@@ -14,11 +14,6 @@ export const NAV = {
     { label: 'Verificar cobertura', href: '/verificar-cobertura' },
     { label: 'Sobre', href: '/sobre' },
   ],
-  cta: {
-    label: 'Verificar cobertura',
-    shortLabel: 'Cobertura',
-    href: '/verificar-cobertura',
-  },
   mobileMenu: {
     open: 'Abrir menu',
     close: 'Fechar menu',
