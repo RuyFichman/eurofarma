@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Search } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
@@ -8,8 +9,22 @@ export function ContentHero() {
   const { hero } = CONTENT
 
   return (
-    <section className="from-primary to-chart-3 text-primary-foreground bg-gradient-to-b">
-      <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-24">
+    <section className="bg-primary text-primary-foreground relative isolate overflow-hidden">
+      <Image
+        src="/images/como-funciona-hero.png"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        aria-hidden="true"
+        className="scale-105 object-cover opacity-75 blur-md"
+      />
+      <div
+        aria-hidden="true"
+        className="from-primary/80 via-primary/65 to-chart-3/75 absolute inset-0 bg-gradient-to-b"
+      />
+
+      <div className="relative mx-auto max-w-3xl px-6 py-16 text-center md:py-24">
         <h1>
           {hero.titleLead}{' '}
           <span className="text-secondary block sm:inline">
