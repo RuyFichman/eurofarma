@@ -1390,12 +1390,6 @@ export const NUTRIZ_AUTH = {
         sourceNotice:
           'As etapas são atualizadas pela equipe do Lactare. Esta visualização não substitui orientações recebidas diretamente pela equipe.',
       },
-      current: {
-        eyebrow: 'Sua etapa atual',
-        updatedAt: 'Última atualização registrada em {date}',
-        sourceNotice:
-          'O status é atualizado manualmente pela equipe do Lactare. O NutriLink mostra somente a categoria e a data registradas; não analisa exames nem exibe detalhes clínicos.',
-      },
       guidance: {
         title: 'Orientações desta etapa',
         description:
