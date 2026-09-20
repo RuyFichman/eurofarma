@@ -20,7 +20,10 @@ import { getNutrizJourneySnapshot } from '@/lib/db/queries/nutriz-journey'
 import { getReminderConsentPreference } from '@/lib/db/queries/communication-consents'
 import { getNutrizAccountData } from '@/lib/db/queries/nutriz-account'
 import { getNutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
-import { getOrCreateNutrizReferralLink } from '@/lib/db/queries/referral-links'
+import {
+  getOrCreateNutrizReferralLink,
+  hasNutrizReferredSignup,
+} from '@/lib/db/queries/referral-links'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 import { formatDateTimeLocal } from '@/lib/utils/local-date-time'
 
@@ -32,19 +35,25 @@ export const metadata: Metadata = {
 
 export default async function NutrizAreaPage() {
   const nutriz = await requireNutrizUser()
-  const [journey, reminders, personal, referralLink, account] =
+  const [journey, reminders, personal, referralLink, account, referredSignup] =
     await Promise.all([
       getNutrizJourneySnapshot(nutriz.id),
       getReminderConsentPreference(nutriz.id),
       getNutrizPersonalAreaData(nutriz.id),
       getOrCreateNutrizReferralLink(nutriz.id),
       getNutrizAccountData(nutriz.id),
+      hasNutrizReferredSignup(nutriz.id),
     ])
   if (!journey || !reminders || !personal || !referralLink || !account) {
     notFound()
   }
 
   const copy = NUTRIZ_AUTH.area
+  // Cada doação é uma transição registrada pelo Lactare; aptidão para
+  // recorrência não é doação e não entra na contagem dos selos.
+  const donationDates = journey.journeyHistory
+    .filter((entry) => entry.toStatus === 'DONATION_CONFIRMED')
+    .map((entry) => entry.changedAt)
   const isPostDonation =
     journey.journeyStatus === 'DONATION_CONFIRMED' ||
     journey.journeyStatus === 'RECURRING_DONATION_ELIGIBLE'
@@ -97,7 +106,11 @@ export default async function NutrizAreaPage() {
         </div>
 
         <div className="mt-6">
-          <PersonalHighlights recognitions={personal.recognitions} />
+          <PersonalHighlights
+            registeredAt={journey.createdAt}
+            donationDates={donationDates}
+            hasReferredSignup={referredSignup}
+          />
         </div>
 
         <div className="mt-6">

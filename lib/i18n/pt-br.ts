@@ -1158,34 +1158,6 @@ export const NUTRIZ_AUTH = {
       error:
         'Não foi possível salvar sua escolha agora. Tente novamente em instantes.',
     },
-    recognitions: {
-      items: {
-        JOURNEY_STARTED: {
-          title: 'Jornada iniciada',
-          description: 'Seu cadastro marcou o início da jornada no NutriLink.',
-        },
-        READY_FOR_DONATION: {
-          title: 'Pronta para seguir',
-          description:
-            'O Lactare registrou a categoria apta para a próxima etapa operacional.',
-        },
-        KIT_RECEIVED: {
-          title: 'Kit recebido',
-          description:
-            'O Lactare registrou a entrega do kit para continuidade da jornada.',
-        },
-        FIRST_DONATION: {
-          title: 'Primeira doação registrada',
-          description:
-            'O Lactare registrou administrativamente uma primeira doação confirmada.',
-        },
-        CONTINUITY_RECOGNIZED: {
-          title: 'Jornada de continuidade',
-          description:
-            'O Lactare registrou a aptidão para seguir em doações recorrentes.',
-        },
-      },
-    },
     referral: {
       title: 'Indique o NutriLink',
       description:
@@ -1294,10 +1266,46 @@ export const NUTRIZ_AUTH = {
       },
       highlights: {
         badges: {
-          title: 'Seus selos',
+          title: 'Meus selos',
           description: 'Última conquista: {title}.',
           empty:
             'Seus primeiros selos aparecem conforme a equipe registra suas etapas.',
+          subtitle:
+            'Um jeito de guardar cada passo da sua jornada com o Lactare.',
+          expandAction: 'Ver selos',
+          collapseAction: 'Ocultar selos',
+          progressLabel: 'conquistados até agora',
+          achievedOn: 'Conquistado em {date}',
+          achieved: 'Conquistado',
+          pending: 'Ainda não conquistado',
+          donationProgress: '{done} de {target} doações',
+          items: {
+            FIRST_STEP: {
+              title: 'Primeiro passo',
+              description:
+                'O início de tudo: seu cadastro abriu caminho para se tornar doadora.',
+            },
+            LIFE_GIFT: {
+              title: 'Presente de vida',
+              description:
+                'Sua primeira doação registrada pelo Lactare: o leite segue para os hospitais parceiros que cuidam dos bebês.',
+            },
+            GENEROUS_HEART: {
+              title: 'Coração generoso',
+              description:
+                'Para quem volta a doar — porque ajudar uma vez já é muito, mas duas vezes muda tudo.',
+            },
+            STEADY_SOURCE: {
+              title: 'Fonte que não seca',
+              description:
+                'Para as doadoras mais constantes, que fazem da doação um hábito.',
+            },
+            CHAIN_OF_GOOD: {
+              title: 'Corrente do bem',
+              description:
+                'Para quem espalha a causa: alguém se cadastrou através do seu convite.',
+            },
+          },
         },
         impactCard: {
           title: 'Cartão de impacto',

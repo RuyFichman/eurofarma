@@ -1,3 +1,13 @@
+/**
+ * Registro do RF14/UC15: reconhecimentos gravados em `nutriz_recognitions` na
+ * mesma transação da mudança de status, com unicidade por nutriz e tipo.
+ *
+ * Desde 20 de setembro de 2026 os selos que a nutriz vê na área pessoal são
+ * derivados do histórico da jornada (`./badges`), porque eles precisam de
+ * contagem de doações e de indicação — coisas que estas linhas booleanas não
+ * expressam. Estas regras continuam valendo como registro interno da jornada.
+ */
+
 import type { JourneyStatusValue } from './status'
 
 export type RecognitionKindValue =

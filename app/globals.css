@@ -57,6 +57,17 @@
     --whatsapp: hsl(142 71% 30%);
     --whatsapp-foreground: hsl(0 0% 100%);
 
+    /* Selos conquistados (área pessoal da nutriz) — dourado. Segunda exceção
+       controlada à paleta azul, como o verde do WhatsApp: marca apenas o
+       estado "conquistado" dos selos. `--achievement` é superfície decorativa
+       (o ícone sobre ela é aria-hidden e o estado também aparece em texto,
+       nunca só na cor); todo texto usa `--achievement-soft-foreground`, que
+       fica em ~5.7:1 sobre `--achievement-soft` e passa WCAG AA. */
+    --achievement: hsl(43 88% 45%);
+    --achievement-foreground: hsl(0 0% 100%);
+    --achievement-soft: hsl(45 92% 96%);
+    --achievement-soft-foreground: hsl(38 72% 30%);
+
     /* Famílias de cor dos cartões de tema do "Comece por Aqui"
        (/como-funciona) — pedido do time a partir do mockup original, que usa
        um tom por assunto. Uso restrito a essa seção; o resto do site segue a
@@ -115,6 +126,10 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-achievement: var(--achievement);
+  --color-achievement-foreground: var(--achievement-foreground);
+  --color-achievement-soft: var(--achievement-soft);
+  --color-achievement-soft-foreground: var(--achievement-soft-foreground);
   --color-topic-blue: var(--topic-blue);
   --color-topic-blue-foreground: var(--topic-blue-foreground);
   --color-topic-green: var(--topic-green);

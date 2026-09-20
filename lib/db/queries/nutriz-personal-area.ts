@@ -17,13 +17,6 @@ const WELLBEING_SELECT = {
   recordedAt: true,
 } as const satisfies Prisma.WellbeingEntrySelect
 
-const RECOGNITION_SELECT = {
-  id: true,
-  kind: true,
-  journeyStatus: true,
-  assignedAt: true,
-} as const satisfies Prisma.NutrizRecognitionSelect
-
 export type NutrizPersonalAreaData = {
   extractionLogs: Array<
     Prisma.ExtractionLogGetPayload<{ select: typeof EXTRACTION_SELECT }>
@@ -32,9 +25,6 @@ export type NutrizPersonalAreaData = {
   extractionCount: number
   wellbeingEntries: Array<
     Prisma.WellbeingEntryGetPayload<{ select: typeof WELLBEING_SELECT }>
-  >
-  recognitions: Array<
-    Prisma.NutrizRecognitionGetPayload<{ select: typeof RECOGNITION_SELECT }>
   >
 }
 
@@ -70,7 +60,7 @@ export async function getNutrizPersonalAreaData(
   })
   if (!profile) return null
 
-  const [extractionLogs, extractionSummary, wellbeingEntries, recognitions] =
+  const [extractionLogs, extractionSummary, wellbeingEntries] =
     await Promise.all([
       prisma.extractionLog.findMany({
         where: { nutrizProfileId: id },
@@ -89,11 +79,6 @@ export async function getNutrizPersonalAreaData(
         orderBy: [{ recordedAt: 'desc' }, { id: 'desc' }],
         take: 12,
       }),
-      prisma.nutrizRecognition.findMany({
-        where: { nutrizProfileId: id },
-        select: RECOGNITION_SELECT,
-        orderBy: [{ assignedAt: 'asc' }, { id: 'asc' }],
-      }),
     ])
 
   return {
@@ -101,7 +86,6 @@ export async function getNutrizPersonalAreaData(
     extractionTotalMl: extractionSummary._sum.volumeMl ?? 0,
     extractionCount: extractionSummary._count._all,
     wellbeingEntries,
-    recognitions,
   }
 }
 
