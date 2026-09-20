@@ -14,11 +14,6 @@ export const NAV = {
     { label: 'Verificar cobertura', href: '/verificar-cobertura' },
     { label: 'Sobre', href: '/sobre' },
   ],
-  cta: {
-    label: 'Verificar cobertura',
-    shortLabel: 'Cobertura',
-    href: '/verificar-cobertura',
-  },
   mobileMenu: {
     open: 'Abrir menu',
     close: 'Fechar menu',
@@ -40,6 +35,7 @@ export const FOOTER = {
       label: 'Verificar cidade atendida',
       href: '/verificar-cobertura',
     },
+    admin: { label: 'Admin', href: '/admin/login' },
   },
   contact: {
     title: 'Contato institucional',
@@ -492,51 +488,51 @@ export const CONTENT = {
     action: { label: 'Ver todos os guias', href: '#' },
     cards: [
       {
-        tag: 'Extração',
-        title: 'Técnica de Extração Manual',
+        tag: 'Elegibilidade',
+        title: 'Quem pode doar leite humano?',
         description:
-          'Posicione o polegar e o indicador formando um C. Pressione para dentro e depois comprima suavemente, em ritmo constante.',
-        readTime: '4 min de leitura',
+          'Toda mulher que amamenta, produz um volume excedente de leite, está saudável e não utiliza medicamentos contraindicados para a amamentação pode ser uma doadora. Basta entrar em contato com o banco de leite para fazer o cadastro e receber as orientações.',
+        readTime: '1 min de leitura',
         cta: { label: 'Ler artigo', href: '#' },
       },
       {
-        tag: 'Armazenamento',
-        title: 'Armazenamento Seguro',
+        tag: 'Segurança',
+        title: 'O que é amamentação cruzada e por que ela é perigosa?',
         description:
-          'Freezer: até 15 dias. Congelador: até 3 meses. Geladeira: até 12 horas. Nunca reaqueça no micro-ondas.',
-        readTime: '3 min de leitura',
+          'Amamentação cruzada é a prática de amamentar o filho de outra mulher diretamente no peito. Ela é contraindicada pela Organização Mundial da Saúde e pelo Ministério da Saúde devido ao risco de transmissão de doenças infectocontagiosas. A forma segura de compartilhar leite é por meio da doação a um Banco de Leite Humano, onde o leite passa por rigoroso processo de pasteurização.',
+        readTime: '1 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Saúde',
+        title: 'É possível amamentar com mastite?',
+        description:
+          'Sim. Na maioria dos casos, amamentar ou extrair o leite no peito afetado ajuda a aliviar o ingurgitamento e acelera a recuperação. O leite de uma mama com mastite não faz mal ao bebê. Contudo, é fundamental buscar avaliação médica para o tratamento adequado da infecção.',
+        readTime: '1 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Produção',
+        title: 'Como saber se o meu leite é suficiente?',
+        description:
+          'A melhor forma de avaliar se o bebê está mamando o suficiente é observar o ganho de peso nas consultas pediátricas e os sinais do dia a dia, como se ele molha fraldas com frequência (urina clara) e se demonstra satisfação após as mamadas. A sensação de peito "murcho" não significa falta de leite, pois a maior parte da produção ocorre durante a própria mamada.',
+        readTime: '1 min de leitura',
+        cta: { label: 'Ler artigo', href: '#' },
+      },
+      {
+        tag: 'Relactação',
+        title: 'É possível retomar a amamentação após uma pausa?',
+        description:
+          'Sim, o processo é chamado de relactação. Com o estímulo correto das mamas (frequência de extração ou sucção do bebê) e orientação profissional especializada, é possível reestimular a produção de leite humano mesmo após dias ou semanas sem amamentar.',
+        readTime: '1 min de leitura',
         cta: { label: 'Ler artigo', href: '#' },
       },
       {
         tag: 'Pega',
-        title: 'Pega Correta do Bebê',
+        title: 'Como identificar uma boa pega do bebê?',
         description:
-          'A boca do bebê deve abocanhar boa parte da aréola, não apenas o mamilo. Lábios virados para fora é o sinal certo.',
-        readTime: '5 min de leitura',
-        cta: { label: 'Ler artigo', href: '#' },
-      },
-      {
-        tag: 'Posicionamento',
-        title: 'Posições para Amamentar',
-        description:
-          'Tradicional, cavaleiro, invertida, deitada — cada posição tem vantagens. A certa é a que funciona para você e seu bebê.',
-        readTime: '6 min de leitura',
-        cta: { label: 'Ler artigo', href: '#' },
-      },
-      {
-        tag: 'Dicas',
-        title: 'Aumentando a Produção',
-        description:
-          'Ofereça o peito com frequência, mantenha-se hidratada, durma quando o bebê dormir e evite estresse desnecessário.',
-        readTime: '4 min de leitura',
-        cta: { label: 'Ler artigo', href: '#' },
-      },
-      {
-        tag: 'Higiene',
-        title: 'Higiene na Extração',
-        description:
-          'Lave as mãos, limpe as mamas com compressa estéril, esterilize frascos e bombas a cada uso. Prevenção é essencial.',
-        readTime: '3 min de leitura',
+          'Uma pega adequada acontece quando o bebê abocanha a maior parte da aréola (e não apenas o mamilo), fica com a boca bem aberta ("boca de peixinho"), o queixo encostado na mama e o nariz livre. A amamentação correta não deve causar dor nem ferimentos no peito.',
+        readTime: '1 min de leitura',
         cta: { label: 'Ler artigo', href: '#' },
       },
     ],
@@ -545,28 +541,28 @@ export const CONTENT = {
     eyebrow: 'Seção 4',
     title: 'Jornadas possíveis',
     description:
-      'Exemplos ilustrativos de como a informação e o acolhimento podem apoiar cada etapa.',
+      'Relatos reais de nutrizes atendidas pelo Lactare, publicados pelos canais oficiais do banco de leite.',
     items: [
       {
-        role: 'Doadora',
+        role: 'Doadora e receptora',
         quote:
-          'Quando descobri que meu leite poderia salvar a vida de um bebê prematuro, chorei de emoção. O processo foi muito mais simples do que imaginava. Hoje é parte da minha rotina e me sinto parte de algo enorme.',
-        name: 'Jornada ilustrativa 1',
-        detail: 'Exemplo de uma primeira doação',
-      },
-      {
-        role: 'Continuidade',
-        quote:
-          'Nosso filho nasceu com 28 semanas. Durante 4 meses, o leite humano doado foi o único alimento que ele recebeu. Hoje ele tem 2 anos e é cheio de vida. Não temos palavras para agradecer.',
-        name: 'Jornada ilustrativa 2',
-        detail: 'Exemplo de acompanhamento acolhedor',
+          'Ah, a doação de leite! Descobri o Lactare no nascimento da minha primeira filha, que hoje tem 3 anos, e contribuí um pouco com a doação de leite. Com minha segunda filha foi diferente: ela nasceu prematura e precisou de doação na UTI neonatal. Quando ela saiu da UTI, procurei de novo o Lactare e fui recebida de braços abertos por esse projeto que ajuda tantos bebês! Sempre fui recebida com um sorriso, as meninas são fantásticas e estão de parabéns.',
+        name: 'Polyana',
+        detail: 'Doadora e receptora, mãe de Mariana e Maria Vitória',
       },
       {
         role: 'Doadora',
         quote:
-          'Tinha muito leite sobrando e não sabia o que fazer. Uma amiga me indicou o NutriLink. Em menos de uma semana já estava cadastrada e fazendo minha primeira coleta. É gratificante demais.',
-        name: 'Jornada ilustrativa 3',
-        detail: 'Exemplo de indicação entre nutrizes',
+          'Sou mãe do Arthur, de 6 meses. Foi durante o pré-natal que conheci o Lactare e aprendi mais sobre amamentação e doação de leite humano. Com o apoio que recebi, consegui amamentar o meu filho e também doar o leite excedente. Vi de perto a angústia das famílias que aguardavam do lado de fora da UTI neonatal, torcendo pela recuperação de seus bebês. Foi ali que compreendi ainda mais a importância da doação de leite humano. Hoje, compartilho minha experiência e incentivo outras pessoas a conhecerem a doação. É uma sensação maravilhosa nutrir o meu filho e ainda poder ajudar tantos bebês prematuros.',
+        name: 'Bruna Sousa',
+        detail: 'Mãe do Arthur',
+      },
+      {
+        role: 'Receptora e doadora',
+        quote:
+          'Eu estava muito triste por não conseguir amamentar minha filha e me sentia frustrada. O Lactare salvou a minha amamentação. Quando voltamos para casa, meu leite desceu, meus seios ficaram empedrados, feridos e doendo muito. Eu tinha leite, mas não sabia como massagear nem fazer a extração, e minha filha não conseguia mamar. Desesperado, meu marido ligou para o Lactare e fomos orientados a ir até lá. Fui acolhida pelas enfermeiras, que cuidaram de mim, extraíram meu leite e me ensinaram a amamentar, massagear as mamas e fazer a extração corretamente. Foi por causa desse acolhimento que hoje tenho a alegria de retribuir um pouco desse cuidado, doando leite para outros bebês.',
+        name: 'Ariane Nazari',
+        detail: 'Mãe da Alice',
       },
     ],
     cta: {
@@ -718,6 +714,12 @@ export const COVERAGE = {
     emptyTitle: 'Cobertura indisponível no momento',
     emptyDescription:
       'Não foi possível carregar a lista de municípios. Tente novamente em alguns instantes.',
+    map: {
+      imageAlt:
+        'Mapa com um marcador para cada município atendido pelo Lactare',
+      unavailable:
+        'Mapa indisponível no momento. A lista abaixo continua completa.',
+    },
   },
 } as const
 
@@ -1806,70 +1808,119 @@ export const APPOINTMENT = {
 export const WHATSAPP_BOT = {
   menu: {
     welcome:
-      'Oi! Aqui é o NutriLink, canal digital do Lactare, banco de leite humano da Eurofarma. 💙\n\nPosso explicar como funciona, verificar se sua cidade está na área atendida ou mostrar os canais oficiais do Lactare.\n\nComo posso ajudar?',
+      'Oi! Aqui é o Lactare, banco de leite humano da Eurofarma 💛 Ajudamos mães que amamentam a doar o leite excedente pra bebês prematuros internados em UTI neonatal. Como posso te ajudar hoje?',
     registeredWelcome:
       'Oi, {name}! 💙\n\nSeu status atual no NutriLink é: {status}. Essa categoria foi registrada pela equipe do Lactare; o bot não realiza avaliação clínica.\n\n{guidance}\n\nComo posso ajudar agora?',
     knowMore: 'Quero saber mais',
-    donate: 'Quero doar leite',
-    human: 'Falar com a equipe',
+    donate: 'Quero doar meu leite',
+    human: 'Falar com alguém da equipe',
     reminders: 'Gerir lembretes',
     button: 'Ver opções',
   },
   faq: {
-    body: 'Qual dúvida você quer esclarecer?',
+    body: 'Sobre o que você quer saber?',
     button: 'Ver dúvidas',
     questions: {
+      STEPS: 'Quais são todas as etapas até o processo de doação?',
       WHO_CAN_DONATE: 'Quem pode doar?',
-      HOW_IT_WORKS: 'Como funciona?',
-      STORAGE: 'Como guardar o leite?',
-      PAIN: 'Doar dói?',
-      FREQUENCY: 'Posso doar mais vezes?',
+      PAIN: 'Doar dói ou atrapalha a amamentação do meu bebê?',
+      FREQUENCY: 'Posso doar mais de uma vez?',
     },
-    answers: {
-      WHO_CAN_DONATE:
-        'Quem amamenta e tem leite excedente pode demonstrar interesse. A confirmação da aptidão é feita por profissionais do Lactare, depois do contato e da avaliação adequada. O NutriLink não avalia medicamentos nem condições de saúde.',
-      HOW_IT_WORKS:
-        'Primeiro você verifica se sua localização faz parte da área atendida. Depois, pode se cadastrar e falar diretamente com o Lactare. A equipe realiza a triagem profissional e combina modalidade, data e disponibilidade fora do NutriLink.',
-      STORAGE:
-        'O Lactare orienta como higienizar, identificar, congelar e entregar o leite com segurança. Confirme o passo a passo diretamente com a equipe antes de começar, porque o NutriLink não substitui a orientação profissional.',
-      PAIN: 'A doação considera somente o leite excedente, depois de alimentar o seu bebê. Se você sente dor ou tem uma dúvida sobre sua saúde, converse com um profissional e com a equipe do Lactare antes de doar.',
-      FREQUENCY:
-        'Pode existir continuidade enquanto houver leite excedente e o Lactare mantiver sua aptidão registrada. Cada novo contato e a logística são combinados diretamente com a equipe.',
+    steps: {
+      body: 'As etapas para doação do leite são: Ficha de saúde e exame de sangue, Entrega do kit em casa, Extração e armazenamento em casa, e Coleta domiciliar do leite.\n\nQuer saber mais sobre alguma etapa específica?',
+      chooseAnotherBody: 'Qual outra etapa você deseja ver agora?',
+      button: 'Ver etapas',
+      items: {
+        HEALTH_FORM: 'Ficha de saúde e exame de sangue',
+        KIT: 'Entrega do kit em casa',
+        EXTRACTION: 'Extração e armazenamento em casa',
+        COLLECTION: 'Coleta domiciliar do leite',
+      },
+      back: 'Voltar ao menu de dúvidas',
+      details: {
+        HEALTH_FORM:
+          'A ficha de saúde serve pra entender seu histórico, se você toma algum medicamento, tem alguma condição de saúde, coisas assim. Já o exame de sangue existe pra confirmar que está tudo bem antes de qualquer coleta, protegendo tanto você quanto o bebê que vai receber o leite depois.\nO exame é coletado direto na sua casa, pelo nosso laboratório parceiro, o Fleury — assim você não precisa se deslocar pra lugar nenhum.',
+        KIT: 'O kit serve pra garantir que a extração do seu leite aconteça de um jeito seguro e higiênico — ele traz os potinhos esterilizados que você vai usar daqui pra frente.\nA entrega é feita por profissionais da nossa equipe, que aproveitam esse momento pra te explicar com calma toda a higiene, a extração e o armazenamento. É a única visita em que sua presença é necessária, justamente porque é quando você aprende o passo a passo.',
+        EXTRACTION:
+          'A extração é feita por você, no seu próprio ritmo, seguindo as orientações recebidas: mãos lavadas, mamas higienizadas, frasco esterilizado por perto. O leite fica guardado no freezer até a nossa equipe buscar.',
+        COLLECTION:
+          'A coleta domiciliar é gratuita e feita pela nossa equipe — um motorista e uma profissional de enfermagem vão até a sua casa buscar o leite já congelado. Você não precisa estar presente nesse momento, e não tem nenhum custo.',
+      },
+      closing: {
+        body: 'Posso ajudar com mais alguma coisa?',
+        seeAnother: 'Ver outra etapa',
+        seeSite: 'Ver o passo a passo completo no site',
+        siteBody:
+          'Aqui está o link de acesso ao nosso site: {howItWorksUrl}. Lá você pode ver essas e outras informações com mais detalhes, imagens e vídeos.',
+      },
     },
-    afterAnswer: 'O que você gostaria de fazer agora?',
-    more: 'Outra dúvida',
-    donate: 'Quero doar',
-    site: 'Ver conteúdo',
-    siteBody:
-      'Você encontra os conteúdos educativos e o checklist do NutriLink em: {howItWorksUrl}',
+    whoCanDonate: {
+      answer:
+        'Pode doar qualquer mulher que está amamentando, é saudável, e não usa determinados medicamentos, álcool ou fumo no período. Isso existe pra garantir que o leite chegue seguro pros bebês prematuros, que têm o sistema imunológico bem mais frágil.\nA confirmação de verdade acontece com a ficha de saúde e o exame de sangue — então, mesmo que você não tenha certeza se se qualifica, vale a pena começar o processo e deixar essa avaliação com quem entende. 💙',
+      closingBody: 'Posso ajudar com mais alguma coisa?',
+      seeAnother: 'Ver outra dúvida',
+      ownHealthDoubt: 'Tenho uma dúvida sobre minha própria saúde',
+    },
+    pain: {
+      answer:
+        'Não. Você só doa o excedente — o que sobra depois de alimentar seu bebê normalmente. A ideia nunca é tirar leite que seria dele; é aproveitar o que seu corpo produz a mais.\nSobre dor: a extração, quando feita do jeito certo, não deveria doer. Na entrega do kit, nossa equipe te ensina a técnica com calma, exatamente pra evitar desconforto.',
+      closingBody: 'Posso ajudar com mais alguma coisa?',
+      seeAnother: 'Ver outra dúvida',
+      extractionTips: 'Ver mais dicas de extração no site',
+      tipsBody:
+        'Você encontra mais dicas de extração no site do NutriLink: {howItWorksUrl}',
+    },
+    frequency: {
+      answer:
+        'Sim! E essa é uma das partes mais tranquilas do processo: diferente da doação de sangue, não existe um intervalo obrigatório de espera. Depois que você é uma doadora ativa, nossa equipe já vai buscar o leite direto na sua casa nas próximas vezes, sem precisar repetir ficha, exame ou entrega de kit.',
+      closingBody: 'Posso ajudar com mais alguma coisa?',
+      seeAnother: 'Ver outra dúvida',
+    },
+    donate: 'Quero doar meu leite',
   },
   coverage: {
-    ask: 'Ótimo! Para verificar a área de atuação do Lactare, envie seu CEP com oito dígitos ou escreva o nome do município.\n\nO CEP será usado somente nesta consulta e não será salvo.',
+    ask: 'Ótimo! Pra eu te indicar certinho como funciona na sua região, me manda seu CEP, ou clica no clipe 📎 e compartilha sua localização.',
     invalid:
       'Não consegui identificar esse CEP ou município. Envie um CEP no formato 00000-000 ou escreva o nome completo da cidade.',
     unavailable:
       'Não foi possível consultar a cobertura agora. Tente novamente em alguns instantes ou fale diretamente com o Lactare.',
-    eligibleAskConsent:
-      '{city} está na área configurada do Lactare segundo o Mapa do Leite. Isso indica elegibilidade geográfica, mas não confirma modalidade, data ou disponibilidade.\n\nSe quiser continuar, o cadastro é opcional.',
+    eligible:
+      'Você está dentro da nossa área de atendimento! 🎉 Vamos começar seu cadastro, é rápido.',
     eligibleRegistered:
       '{city} está na área configurada do Lactare segundo o Mapa do Leite. Isso não confirma atendimento ou coleta. Para combinar os próximos passos, fale diretamente com o Lactare: WhatsApp {whatsapp} ou telefone {phone}.',
     outside:
-      'Essa localização não aparece na área configurada do Lactare. Para procurar atendimento em outra região, consulte o diretório oficial da Rede Brasileira de Bancos de Leite Humano: {directoryUrl}\n\nSe conhecer alguém que amamenta e mora na Grande São Paulo, você pode compartilhar: “O NutriLink verifica a área atendida pelo Lactare e orienta o contato para doação de leite humano: {coverageUrl}”.',
+      'No momento, o Lactare atende só a região da Grande São Paulo, então infelizmente não consigo te encaminhar por aqui. Mas se você conhece alguém que amamenta e mora na Grande SP, essa indicação vale muito 💛\n\nVocê pode compartilhar: “O NutriLink verifica a área atendida pelo Lactare e orienta o contato para doação de leite humano: {coverageUrl}”.\n\nE se quiser doar de outro jeito, aqui está o localizador da Rede Brasileira de Bancos de Leite: {directoryUrl}',
   },
   registration: {
+    askName: 'Qual é o seu nome completo?',
     invalidName:
       'Não consegui identificar o nome completo. Digite apenas seu nome, com no mínimo 3 e no máximo 120 caracteres.',
+    askCpf: 'Qual o seu CPF?',
+    invalidCpf:
+      'Não consegui validar esse CPF. Confira os números, sem pontos nem traço se preferir, e envie novamente.',
+    askEmail: 'Qual o seu e-mail?',
+    invalidEmail: 'Não consegui identificar um e-mail válido. Envie novamente.',
+    askAddress:
+      'Qual o seu endereço completo (rua, número, complemento, bairro)?',
+    invalidAddress:
+      'Não consegui registrar esse endereço. Envie o endereço completo (rua, número, complemento, bairro), com pelo menos alguns caracteres.',
     consent:
-      'Antes de pedir seu nome, preciso do seu consentimento: o NutriLink usará nome, número de WhatsApp, cidade e UF para acompanhar sua jornada e falar com você por este canal. O cadastro é opcional e não representa triagem ou coleta confirmada.\n\nLeia a Política de Privacidade em {privacyUrl}. Você concorda?',
-    askName: 'Obrigada pelo aceite. Qual é o seu nome completo?',
+      'Prontinho, {name}! Só preciso do seu ok: usamos seus dados só pra te acompanhar na jornada de doação e falar com você por aqui. Você pode ler o termo completo em {privacyUrl}. Tudo bem?',
     accept: 'Sim, concordo',
     decline: 'Prefiro não',
     success:
-      'Cadastro recebido, {name}! 💙\n\nA equipe do Lactare é responsável pela triagem e por combinar os próximos passos. Canais oficiais: WhatsApp {whatsapp} e telefone {phone}.',
+      'Cadastro recebido, {name}! 💛 Nossa equipe vai analisar suas informações e entrar em contato pra dar sequência à sua ficha de saúde e ao exame de sangue.\n\nEnquanto isso, você pode:',
     declined:
-      'Sem problema. Nenhum cadastro foi criado. Você pode verificar a cobertura e consultar os conteúdos sem se cadastrar.',
+      'Sem problema! Você pode voltar e se cadastrar quando quiser — é só mandar “oi” de novo por aqui.',
     unavailable:
       'Não foi possível salvar o cadastro agora. Envie seu nome completo novamente para tentar de novo, ou escreva “menu” para sair.',
+    postMenu: {
+      accessArea: 'Acessar minha área pessoal',
+      talkToTeam: 'Falar com alguém da equipe agora',
+      seeFaq: 'Ver dúvidas frequentes',
+      areaBody:
+        'Sua área pessoal já está pronta! Lá você acompanha cada etapa da sua jornada em tempo real, e vê conteúdos preparados especialmente pro momento em que você está.\n\n{areaUrl}',
+    },
   },
   reminders: {
     enabled:
@@ -1899,17 +1950,14 @@ export const WHATSAPP_BOT = {
       'Este é um lembrete opcional de continuidade da sua jornada com o Lactare. Se a entrega do kit já foi registrada pelo Lactare, siga as orientações recebidas. Se precisar de ajuda, fale diretamente com o Lactare.\n\nConsulte sua área no NutriLink: {areaUrl}\n\nEste lembrete não agenda nem confirma coleta, visita ou atendimento.',
   },
   human: {
-    body: 'Sua dúvida precisa da equipe do Lactare. Este bot ainda não transfere a conversa automaticamente. Fale pelo WhatsApp {whatsapp} ou ligue para {phone}, de segunda a sexta, das 7h às 22h. Os canais foram conferidos em {verifiedAt}.',
     handoffOpen:
-      'Seu pedido para falar com a equipe do Lactare foi registrado. Um atendente assumirá este mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília. Enquanto isso, o bot ficará pausado. Não há prazo de resposta confirmado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
+      'Entendi que sua dúvida merece uma resposta mais cuidadosa — já avisei nossa equipe. Um atendente assumirá este mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília, e vai te responder por aqui assim que possível. Enquanto isso, o bot ficará pausado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
     handoffOutsideHours:
-      'Seu pedido para falar com a equipe do Lactare foi registrado. O atendimento humano acontece neste mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília. Como estamos fora dessa janela, a solicitação ficará aguardando a próxima janela de atendimento e o bot ficará pausado. Não há prazo de resposta confirmado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
+      'Entendi que sua dúvida merece uma resposta mais cuidadosa — já avisei nossa equipe. O atendimento humano acontece neste mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília. Como estamos fora dessa janela, sua solicitação ficará aguardando a próxima janela de atendimento, e o bot ficará pausado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
   },
   fallback: {
     first:
       'Não consegui entender. Toque em uma das opções para eu seguir com você.',
-    second:
-      'Ainda não consegui entender. Para não te prender no bot, aqui estão os canais oficiais do Lactare: WhatsApp {whatsapp} ou telefone {phone}.',
   },
   statusNotification: {
     body: 'O Lactare atualizou uma etapa da sua jornada para: {status}.\n\nConsulte sua área no NutriLink: {areaUrl}\n\nEste aviso não representa agendamento, confirmação de coleta ou avaliação feita pelo NutriLink.',
@@ -1954,27 +2002,6 @@ export const WHATSAPP_BOT = {
     RECURRING_DONATION_ELIGIBLE:
       'A continuidade e a logística são combinadas diretamente com a equipe do Lactare.',
   },
-} as const
-
-export const THANKS = {
-  meta: {
-    title: 'Cadastro concluído',
-    description:
-      'Seu cadastro foi concluído no NutriLink. Agora você pode verificar a cobertura do Lactare e acompanhar sua jornada.',
-  },
-  badge: 'Cadastro recebido',
-  title: 'Obrigada por fazer parte dessa rede de amor 💙',
-  body: 'Seu cadastro foi recebido com todo o cuidado. Agora você pode verificar se sua cidade faz parte da área de atuação do Lactare.',
-  nextSteps: {
-    title: 'O que acontece agora?',
-    items: [
-      'Verifique se sua cidade está na área de atuação',
-      'Consulte os conteúdos para se preparar com segurança',
-      'A triagem e os próximos passos são combinados diretamente com o Lactare',
-    ],
-  },
-  primaryCta: 'Verificar minha cidade',
-  secondaryCta: 'Ver como funciona a doação',
 } as const
 
 export const ADMIN_LOGIN = {

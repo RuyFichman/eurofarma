@@ -148,6 +148,9 @@ describe('persistência da conversa do WhatsApp', () => {
     const created = await createWhatsappNutrizLead({
       phoneWhatsapp: '5511999998888',
       fullName: 'Maria da Silva',
+      cpf: '11144477735',
+      email: 'maria@example.com',
+      address: 'Rua das Flores, 123',
       city: 'Osasco',
       state: 'SP',
     })
@@ -158,6 +161,9 @@ describe('persistência da conversa do WhatsApp', () => {
       data: expect.objectContaining({
         fullName: 'Maria da Silva',
         phoneWhatsapp: '5511999998888',
+        cpf: '11144477735',
+        email: 'maria@example.com',
+        address: 'Rua das Flores, 123',
         city: 'Osasco',
         state: 'SP',
         interestStatus: 'INTERESTED',

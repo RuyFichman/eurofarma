@@ -129,15 +129,28 @@ enum AppointmentFailureReason {
 /// mora no banco, indexado pelo número de WhatsApp.
 enum WhatsappConversationStep {
   MENU
-  FAQ
+  FAQ_MENU
+  FAQ_STEPS_MENU
+  FAQ_STEPS_CLOSING
+  FAQ_WHO_CLOSING
+  FAQ_PAIN_CLOSING
+  FAQ_FREQUENCY_CLOSING
   AWAITING_COVERAGE
   AWAITING_FULL_NAME
+  AWAITING_CPF
+  AWAITING_EMAIL
+  AWAITING_ADDRESS
   AWAITING_CONSENT
+  POST_REGISTRATION_MENU
   AWAITING_REMINDER_REFERENCE
   HUMAN_HANDOFF
 
   // Estados do fluxo antigo. Permanecem no enum para que a migration preserve
   // os registros existentes; a aplicação os reinicia no menu quando reaparecem.
+  // `FAQ` (o menu único de 5 perguntas) entrou aqui em 20/09/2026, quando o
+  // fluxo de dúvidas virou o menu em duas camadas das seções 2/2.1 do
+  // documento consolidado do chatbot.
+  FAQ
   ASKED_SCHEDULED
   AWAITING_DATE
   AWAITING_DATE_CONFIRMATION
@@ -291,6 +304,14 @@ model NutrizProfile {
   /// perfil a partir do número que enviou a mensagem.
   phoneWhatsapp          String             @unique @map("phone_whatsapp")
   email                  String?
+  /// Somente dígitos (11), sem máscara. Coletado hoje só pelo fluxo do chatbot
+  /// (RF11, cadastro via WhatsApp); nulo para quem se cadastra pelo site, que
+  /// não pede esse campo. Dado sensível (documento de identidade) — a exposição
+  /// pública deste projeto ainda não tem RLS aplicado (AGENTS.md, seção 3.4).
+  cpf                    String?            @unique
+  /// Endereço completo em texto livre (rua, número, complemento, bairro), como
+  /// a nutriz digitou no chatbot. Nulo para quem se cadastra pelo site.
+  address                String?
   state                  String             @db.Char(2)
   city                   String
   neighborhood           String?
@@ -697,8 +718,12 @@ model WhatsappConversation {
   phoneWhatsapp      String                   @unique @map("phone_whatsapp")
   nutrizProfileId    String?                  @map("nutriz_profile_id")
   step               WhatsappConversationStep @default(MENU)
-  /// Rascunho mínimo do fluxo: somente cidade/UF resolvidas. Nome e CEP nunca
-  /// entram aqui; o nome só é gravado no perfil depois do consentimento.
+  /// Cidade/UF resolvidas (nunca o CEP) e, entre a coleta e o consentimento do
+  /// cadastro (RF11), um rascunho de nome/CPF/e-mail/endereço em
+  /// `registration` — o fluxo atual pergunta esses dados antes do "você
+  /// concorda?", então precisam de um lugar temporário até a resposta chegar.
+  /// O handler apaga esse rascunho assim que o cadastro é criado ou recusado;
+  /// ele nunca chega a `NutrizProfile` sem consentimento explícito.
   context            Json?
   misunderstoodCount Int                      @default(0) @map("misunderstood_count")
   /// Data que a nutriz digitou e ainda não confirmou no passo seguinte.

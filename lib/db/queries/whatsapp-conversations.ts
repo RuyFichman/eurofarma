@@ -7,6 +7,7 @@ import type {
   ConversationContext,
   ConversationProfile,
   ConversationStep,
+  DonationStepId,
   FailureReason,
 } from '../../whatsapp/conversation'
 
@@ -89,6 +90,58 @@ function parseConversationContext(
     }
   }
 
+  const faqStep = candidate.faqStep
+  if (
+    typeof faqStep === 'string' &&
+    (['HEALTH_FORM', 'KIT', 'EXTRACTION', 'COLLECTION'] as const).includes(
+      faqStep as DonationStepId,
+    )
+  ) {
+    context.faqStep = faqStep as DonationStepId
+  }
+
+  const registration = candidate.registration
+  if (
+    registration &&
+    typeof registration === 'object' &&
+    !Array.isArray(registration)
+  ) {
+    const registrationRecord = registration as Record<string, Prisma.JsonValue>
+    const fullName = registrationRecord.fullName
+    const cpf = registrationRecord.cpf
+    const email = registrationRecord.email
+    const address = registrationRecord.address
+
+    const draft: NonNullable<ConversationContext['registration']> = {}
+    if (
+      typeof fullName === 'string' &&
+      fullName.length >= 3 &&
+      fullName.length <= 120
+    ) {
+      draft.fullName = fullName
+    }
+    if (typeof cpf === 'string' && /^\d{11}$/u.test(cpf)) {
+      draft.cpf = cpf
+    }
+    if (
+      typeof email === 'string' &&
+      email.length >= 3 &&
+      email.length <= 254 &&
+      /^[^@\s]+@[^@\s]+\.[^@\s]+$/u.test(email)
+    ) {
+      draft.email = email
+    }
+    if (
+      typeof address === 'string' &&
+      address.length >= 5 &&
+      address.length <= 300
+    ) {
+      draft.address = address
+    }
+
+    if (Object.keys(draft).length > 0) context.registration = draft
+  }
+
   return context
 }
 
@@ -140,12 +193,16 @@ export async function saveConversationState(params: {
 }
 
 /**
- * Cria o cadastro simplificado feito dentro do WhatsApp. O aceite acontece no
- * passo imediatamente anterior; lembretes e marketing continuam desligados.
+ * Cria o cadastro feito dentro do WhatsApp (nome, CPF, e-mail e endereço). O
+ * aceite acontece no passo imediatamente anterior; lembretes e marketing
+ * continuam desligados.
  */
 export async function createWhatsappNutrizLead(params: {
   phoneWhatsapp: string
   fullName: string
+  cpf: string
+  email: string
+  address: string
   city: string
   state: string
 }): Promise<({ id: string } & ConversationProfile) | null> {
@@ -158,6 +215,9 @@ export async function createWhatsappNutrizLead(params: {
         data: {
           fullName: params.fullName,
           phoneWhatsapp: params.phoneWhatsapp,
+          cpf: params.cpf,
+          email: params.email,
+          address: params.address,
           city: params.city,
           state: params.state,
           contactPreference: 'WHATSAPP',
@@ -187,6 +247,19 @@ export async function createWhatsappNutrizLead(params: {
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === 'P2002'
     if (!isDuplicate) throw error
+
+    // O alvo do índice único diz qual campo colidiu. Se foi o telefone, é a
+    // mesma nutriz reenviando (idempotência normal). Se foi o CPF, é um dado
+    // já usado por outro perfil — devolver esse outro perfil criaria um
+    // cadastro fantasma; melhor sinalizar falha e deixar a nutriz tentar de
+    // novo (o handler pede o nome novamente, reiniciando os quatro campos).
+    const target = Array.isArray(
+      (error as Prisma.PrismaClientKnownRequestError).meta?.target,
+    )
+      ? ((error as Prisma.PrismaClientKnownRequestError).meta
+          ?.target as string[])
+      : []
+    if (target.includes('cpf')) return null
 
     return findNutrizByWhatsapp(params.phoneWhatsapp)
   }

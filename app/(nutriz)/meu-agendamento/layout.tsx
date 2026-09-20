@@ -1,4 +1,5 @@
 import { Header } from '@/components/shared/header'
+import { Footer } from '@/components/shared/footer'
 import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
 
 /**
@@ -14,9 +15,10 @@ import { requireNutrizUser } from '@/lib/auth/get-nutriz-user'
  * URL e sem depender de lógica cliente baseada no pathname.
  *
  * O `Header` é renderizado aqui, e não herdado de `(public)`, porque a área
- * precisa da navegação do site mas não do `Footer` institucional nem do `main`
- * público — ter dois `main` na mesma página quebraria o alvo do "pular para o
- * conteúdo".
+ * precisa da navegação do site mas não do `main` público — ter dois `main` na
+ * mesma página quebraria o alvo do "pular para o conteúdo". O `Footer`
+ * institucional passou a ser renderizado aqui também (20/09/2026, a pedido do
+ * time), fora do `main`, então não afeta esse alvo.
  */
 export default async function MeuAgendamentoLayout({
   children,
@@ -28,6 +30,7 @@ export default async function MeuAgendamentoLayout({
     <>
       <Header />
       <main id="main-content">{children}</main>
+      <Footer />
     </>
   )
 }

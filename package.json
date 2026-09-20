@@ -64,6 +64,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.17.0",
+    "mapbox-gl": "^3.31.0",
     "next": "^15.5.18",
     "pdf-lib": "^1.17.1",
     "radix-ui": "^1.4.3",

@@ -97,6 +97,9 @@ export async function processInboundWhatsappMessage(params: {
         created = await createWhatsappNutrizLead({
           phoneWhatsapp: message.from,
           fullName: outcome.effect.fullName,
+          cpf: outcome.effect.cpf,
+          email: outcome.effect.email,
+          address: outcome.effect.address,
           city: outcome.effect.city,
           state: outcome.effect.state,
         })

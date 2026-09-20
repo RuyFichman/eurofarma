@@ -41,3 +41,16 @@ export function buildMapboxStaticImageUrl(params: {
 
   return `${MAPBOX_STATIC_BASE}/${marker}/${viewport}/${width}x${height}@2x?access_token=${encodeURIComponent(token)}`
 }
+
+/**
+ * Token para o mapa **interativo** (Mapbox GL JS) do resumo de cobertura —
+ * diferente das funções acima, este vai para dentro do bundle do cliente, que
+ * inicializa o SDK diretamente no navegador. Só lê `NEXT_PUBLIC_MAPBOX_TOKEN`
+ * (nunca o fallback `MAPBOX_TOKEN` sem prefixo): aquele existe só para o caso
+ * — improvável, mas possível — de alguém configurar um token privado, o que
+ * nunca deve vazar para o cliente.
+ */
+export function getPublicMapboxToken(): string | null {
+  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
+  return token.trim() === '' ? null : token
+}

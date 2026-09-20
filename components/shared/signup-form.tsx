@@ -144,10 +144,10 @@ export function SignupForm() {
       })
 
       if (response.ok) {
-        // Sucesso → página de agradecimento (mantém o botão travado durante a
+        // Sucesso → direto pra Minha Área (mantém o botão travado durante a
         // navegação). A sessão já veio nos cookies da resposta.
         setIsRedirecting(true)
-        router.push('/obrigada')
+        router.push('/meu-agendamento')
         // Server Component com dado de sessão: sem refresh o cabeçalho ficaria
         // com o estado anterior em cache (mesmo ajuste do login-form.tsx).
         router.refresh()

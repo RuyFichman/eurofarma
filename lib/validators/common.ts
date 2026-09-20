@@ -90,6 +90,41 @@ export const emailSchema = z
   .toLowerCase()
   .trim()
 
+/**
+ * Valida os dois digitos verificadores do CPF (modulo 11). Recebe somente
+ * digitos (11 caracteres); rejeita sequencias repetidas (ex.: "00000000000"),
+ * que passariam no calculo mas nunca sao CPFs reais.
+ */
+function isValidCpfChecksum(digits: string): boolean {
+  if (digits.length !== 11) return false
+  if (/^(\d)\1{10}$/.test(digits)) return false
+
+  function checkDigit(length: number): number {
+    let sum = 0
+    for (let i = 0; i < length; i++) {
+      sum += Number(digits[i]) * (length + 1 - i)
+    }
+    const remainder = (sum * 10) % 11
+    return remainder === 10 ? 0 : remainder
+  }
+
+  return (
+    checkDigit(9) === Number(digits[9]) && checkDigit(10) === Number(digits[10])
+  )
+}
+
+/**
+ * Normaliza e valida CPF. Remove formatacao, exige 11 digitos com os dois
+ * digitos verificadores corretos (modulo 11) e retorna somente digitos, sem
+ * mascara — o mesmo formato gravado em `NutrizProfile.cpf`.
+ */
+export const cpfSchema = z
+  .string()
+  .transform((value) => value.replace(/\D/g, ''))
+  .refine(isValidCpfChecksum, {
+    message: 'CPF invalido. Confira os numeros e tente novamente.',
+  })
+
 /** String obrigatoria: aplica trim e exige ao menos 1 caractere. */
 export const stringNotEmptySchema = z
   .string()
