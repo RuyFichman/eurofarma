@@ -54,3 +54,28 @@ export async function getOrCreateNutrizReferralLink(
 
   throw new Error('Não foi possível criar o link de indicação.')
 }
+
+/**
+ * Responde apenas se **algum** cadastro ativo foi atribuído ao link desta
+ * nutriz, para o selo "Corrente do bem". O id lido não sai daqui: a nutriz
+ * indicadora não recebe identidade, quantidade nem data de quem se cadastrou,
+ * porque o RF15 atribui a indicação sem expor dados da pessoa indicada.
+ *
+ * Perfis com soft delete ficam de fora, como em todo o resto do produto.
+ */
+export async function hasNutrizReferredSignup(
+  nutrizProfileId: string,
+): Promise<boolean> {
+  const id = validProfileId(nutrizProfileId)
+  if (!id) return false
+
+  const referred = await prisma.nutrizProfile.findFirst({
+    where: {
+      deletedAt: null,
+      referredByReferralLink: { nutrizProfileId: id },
+    },
+    select: { id: true },
+  })
+
+  return referred !== null
+}

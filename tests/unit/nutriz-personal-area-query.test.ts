@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
   wellbeingFindMany: vi.fn(),
   wellbeingCreate: vi.fn(),
   wellbeingDeleteMany: vi.fn(),
-  recognitionFindMany: vi.fn(),
   extractionDeleteMany: vi.fn(),
 }))
 
@@ -26,7 +25,6 @@ vi.mock('../../lib/db/prisma', () => ({
       create: mocks.wellbeingCreate,
       deleteMany: mocks.wellbeingDeleteMany,
     },
-    nutrizRecognition: { findMany: mocks.recognitionFindMany },
   },
 }))
 
@@ -51,7 +49,6 @@ describe('consulta dos registros pessoais', () => {
       _count: { _all: 0 },
     })
     mocks.wellbeingFindMany.mockResolvedValue([])
-    mocks.recognitionFindMany.mockResolvedValue([])
   })
 
   it('não consulta nem expõe registros com perfil inválido', async () => {

@@ -1,53 +1,144 @@
-import {
-  Award,
-  BadgeCheck,
-  ChevronDown,
-  Flag,
-  Heart,
-  Package,
-  Repeat2,
-} from 'lucide-react'
+import { Award, ChevronDown, Droplet, Flag, Heart, Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import type { NutrizPersonalAreaData } from '@/lib/db/queries/nutriz-personal-area'
 import {
-  RECOGNITION_KIND_ORDER,
-  type RecognitionKindValue,
-} from '@/lib/journey/recognitions'
+  getNutrizBadges,
+  type NutrizBadgeId,
+  type NutrizBadgeState,
+} from '@/lib/journey/badges'
 import { NUTRIZ_AUTH } from '@/lib/i18n/pt-br'
 import { formatShortDate } from '@/lib/utils/format-date'
 
-const RECOGNITION_ICON: Record<RecognitionKindValue, LucideIcon> = {
-  JOURNEY_STARTED: Flag,
-  READY_FOR_DONATION: BadgeCheck,
-  KIT_RECEIVED: Package,
-  FIRST_DONATION: Heart,
-  CONTINUITY_RECOGNIZED: Repeat2,
+const BADGE_ICON: Record<NutrizBadgeId, LucideIcon> = {
+  FIRST_STEP: Flag,
+  LIFE_GIFT: Heart,
+  GENEROUS_HEART: Heart,
+  STEADY_SOURCE: Droplet,
+  CHAIN_OF_GOOD: Share2,
+}
+
+/**
+ * O coração da primeira doação fica cheio quando o selo é conquistado — é o
+ * que separa os dois corações da lista. Selo pendente mantém o traço vazado.
+ */
+const BADGE_ICON_FILLED: Partial<Record<NutrizBadgeId, true>> = {
+  LIFE_GIFT: true,
+}
+
+const COPY = NUTRIZ_AUTH.area.personal.highlights.badges
+
+function BadgeTile({ badge }: { badge: NutrizBadgeState }) {
+  const Icon = BADGE_ICON[badge.id]
+  const item = COPY.items[badge.id]
+
+  return (
+    <li
+      className={
+        badge.achieved
+          ? 'border-achievement/45 from-card to-achievement-soft flex flex-col items-center rounded-xl border bg-gradient-to-b p-4 text-center'
+          : 'border-border bg-muted/20 flex flex-col items-center rounded-xl border p-4 text-center'
+      }
+    >
+      <span
+        className={
+          badge.achieved
+            ? 'bg-achievement text-achievement-foreground flex size-12 items-center justify-center rounded-full'
+            : 'bg-muted text-muted-foreground flex size-12 items-center justify-center rounded-full'
+        }
+        aria-hidden="true"
+      >
+        <Icon
+          className={
+            badge.achieved && BADGE_ICON_FILLED[badge.id]
+              ? 'size-5 fill-current'
+              : 'size-5'
+          }
+        />
+      </span>
+
+      <p
+        className={
+          badge.achieved
+            ? 'mt-3 text-sm font-semibold'
+            : 'text-muted-foreground mt-3 text-sm font-semibold'
+        }
+      >
+        {item.title}
+      </p>
+      <p className="text-muted-foreground mt-1 text-xs leading-5">
+        {item.description}
+      </p>
+
+      <div className="mt-auto w-full pt-3">
+        {badge.achieved ? (
+          <span className="border-achievement/45 text-achievement-soft-foreground bg-card inline-flex rounded-full border px-2.5 py-1 text-xs font-medium">
+            {/*
+              "Corrente do bem" não tem data: ela seria o dia do cadastro de
+              outra pessoa, e o RF15 atribui a indicação sem expor dados de
+              quem foi indicada.
+            */}
+            {badge.achievedAt
+              ? COPY.achievedOn.replace(
+                  '{date}',
+                  formatShortDate(badge.achievedAt),
+                )
+              : COPY.achieved}
+          </span>
+        ) : (
+          <>
+            {badge.progress ? (
+              <span
+                className="bg-muted flex h-1.5 w-full overflow-hidden rounded-full"
+                aria-hidden="true"
+              >
+                <span
+                  className="bg-muted-foreground/45 h-full rounded-full"
+                  style={{
+                    width: `${(badge.progress.done / badge.progress.target) * 100}%`,
+                  }}
+                />
+              </span>
+            ) : null}
+            <p className="text-muted-foreground mt-2 text-xs">
+              {badge.progress
+                ? COPY.donationProgress
+                    .replace('{done}', String(badge.progress.done))
+                    .replace('{target}', String(badge.progress.target))
+                : COPY.pending}
+            </p>
+          </>
+        )}
+      </div>
+    </li>
+  )
 }
 
 /**
  * "Meus selos" é um disclosure nativo (`details`/`summary`, sem Client
- * Component), no mesmo padrão de "Minha jornada". Fechado, mostra só a
- * última conquista; aberto, lista os cinco reconhecimentos possíveis com a
- * data de quem já foi alcançado. Não há barra de progresso por doações ou
- * indicações: cada selo aqui vem de um status categórico já registrado pelo
- * Lactare, sem contagem própria ainda implementada.
+ * Component), no mesmo padrão de "Minha jornada". Fechado, mostra só a última
+ * conquista; aberto, lista os cinco selos com data, progresso ou pendência.
+ *
+ * O estado conquistado aparece em texto, não apenas no dourado: a cor é
+ * reforço visual, nunca a única informação.
  */
 export function MyBadgesCard({
-  recognitions,
+  registeredAt,
+  donationDates,
+  hasReferredSignup,
 }: {
-  recognitions: NutrizPersonalAreaData['recognitions']
+  registeredAt: Date
+  donationDates: readonly Date[]
+  hasReferredSignup: boolean
 }) {
-  const copy = NUTRIZ_AUTH.area.personal.highlights.badges
-  const itemsCopy = NUTRIZ_AUTH.area.recognitions.items
-  const latest = recognitions.at(-1)
-  const earnedAtByKind = new Map(
-    recognitions.map((entry) => [entry.kind, entry.assignedAt]),
-  )
-  const earnedCount = recognitions.length
-  const totalCount = RECOGNITION_KIND_ORDER.length
+  const badges = getNutrizBadges({
+    registeredAt,
+    donationDates,
+    hasReferredSignup,
+  })
+  const achieved = badges.filter((badge) => badge.achieved)
+  const latest = achieved.at(-1)
+  const progressPercent = (achieved.length / badges.length) * 100
 
   return (
     <Card>
@@ -59,23 +150,23 @@ export function MyBadgesCard({
                 <Award className="size-5" aria-hidden="true" />
               </span>
               <div>
-                <h3 className="font-semibold">{copy.title}</h3>
+                <h3 className="font-semibold">{COPY.title}</h3>
                 <p className="text-muted-foreground mt-2 text-sm leading-6 group-open/badges:hidden">
                   {latest
-                    ? copy.description.replace(
+                    ? COPY.description.replace(
                         '{title}',
-                        itemsCopy[latest.kind].title,
+                        COPY.items[latest.id].title,
                       )
-                    : copy.empty}
+                    : COPY.empty}
                 </p>
               </div>
             </div>
             <span className="text-primary mt-1 inline-flex shrink-0 items-center gap-1 text-sm font-medium">
               <span className="group-open/badges:hidden">
-                {copy.expandAction}
+                {COPY.expandAction}
               </span>
               <span className="hidden group-open/badges:inline">
-                {copy.collapseAction}
+                {COPY.collapseAction}
               </span>
               <ChevronDown
                 className="size-4 transition-transform group-open/badges:rotate-180"
@@ -87,65 +178,28 @@ export function MyBadgesCard({
           <div className="mt-5 border-t pt-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-muted-foreground text-sm leading-6">
-                {copy.subtitle}
+                {COPY.subtitle}
               </p>
-              <div className="text-muted-foreground flex shrink-0 items-center gap-2 text-xs">
+              <div className="text-muted-foreground flex shrink-0 items-center gap-2 text-xs leading-4">
+                {/* Anel de progresso em CSS puro: os tokens vêm do tema. */}
                 <span
-                  className="border-primary/50 text-primary flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold"
-                  aria-hidden="true"
+                  className="flex size-11 items-center justify-center rounded-full"
+                  style={{
+                    background: `conic-gradient(var(--primary) ${progressPercent}%, var(--secondary) 0)`,
+                  }}
                 >
-                  {earnedCount}/{totalCount}
+                  <span className="bg-card text-primary flex size-8 items-center justify-center rounded-full text-xs font-semibold">
+                    {achieved.length}/{badges.length}
+                  </span>
                 </span>
-                {copy.progressLabel}
+                {COPY.progressLabel}
               </div>
             </div>
 
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-              {RECOGNITION_KIND_ORDER.map((kind) => {
-                const Icon = RECOGNITION_ICON[kind]
-                const assignedAt = earnedAtByKind.get(kind)
-                const item = itemsCopy[kind]
-
-                return (
-                  <li
-                    key={kind}
-                    className={
-                      assignedAt
-                        ? 'border-primary/30 bg-secondary/20 rounded-xl border p-4'
-                        : 'border-border bg-muted/20 rounded-xl border p-4'
-                    }
-                  >
-                    <span
-                      className={
-                        assignedAt
-                          ? 'bg-primary text-primary-foreground flex size-9 items-center justify-center rounded-full'
-                          : 'bg-muted text-muted-foreground flex size-9 items-center justify-center rounded-full'
-                      }
-                      aria-hidden="true"
-                    >
-                      <Icon className="size-4" />
-                    </span>
-                    <p className="mt-3 text-sm font-semibold">{item.title}</p>
-                    <p className="text-muted-foreground mt-1 text-xs leading-5">
-                      {item.description}
-                    </p>
-                    <div className="mt-3">
-                      {assignedAt ? (
-                        <Badge variant="outline">
-                          {copy.achievedOn.replace(
-                            '{date}',
-                            formatShortDate(assignedAt),
-                          )}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">
-                          {copy.pending}
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                )
-              })}
+              {badges.map((badge) => (
+                <BadgeTile key={badge.id} badge={badge} />
+              ))}
             </ul>
           </div>
         </details>
