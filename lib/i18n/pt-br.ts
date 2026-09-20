@@ -189,7 +189,7 @@ export const HOME = {
   },
   stats: {
     title: 'Área de atuação em números',
-    municipalities: { label: 'Municípios configurados', fallback: '30' },
+    municipalities: { label: 'Municípios atendidos', fallback: '30' },
     regions: { label: 'Sub-regiões da Grande SP', fallback: '6' },
     sourceNote:
       'A cobertura exibida segue a lista administrável de municípios atendidos pelo Lactare.',
@@ -410,7 +410,7 @@ export const CONTENT = {
     eyebrow: 'Seção 2',
     title: 'O Caminho do Leite',
     description:
-      'Do primeiro contato até a coleta — um passo a passo visual e claro.',
+      'Do primeiro contato até a coleta um passo a passo visual e claro.',
     steps: [
       {
         title: 'Primeiro contato pelo WhatsApp',
