@@ -1099,14 +1099,8 @@ export const SIGNUP = {
         'Quero receber pelo WhatsApp avisos quando o Lactare atualizar minha etapa da jornada.',
       help: 'Opcional e separado dos lembretes. Não representa agendamento ou confirmação de coleta.',
     },
-    reminderWhatsappOptIn: {
-      label:
-        'Quero receber pelo WhatsApp lembretes de continuidade da minha jornada.',
-      help: 'Opcional e separado dos avisos de status. Os lembretes não agendam nem confirmam coleta e podem ser desativados a qualquer momento.',
-      referenceDateLabel: 'Data de referência do lembrete',
-      referenceDateHelp:
-        'Informe uma data apenas para orientar a continuidade. Ela não cria nem confirma agendamento.',
-    },
+    // O opt-in de lembretes saiu do cadastro (21/09/2026): ele é configurado
+    // por tipo em "Meus lembretes", na Minha Área, e pelo chatbot.
   },
   actions: {
     submit: 'Criar minha conta',
@@ -1134,10 +1128,6 @@ export const SIGNUP = {
     cityMax: 'Cidade inválida.',
     consentRequired:
       'É necessário aceitar a Política de Privacidade para continuar.',
-    referenceDateRequired:
-      'Informe uma data de referência para ativar o lembrete.',
-    referenceDateInvalid:
-      'Informe uma data de referência válida, que não esteja no futuro.',
   },
   legal: {
     lead: 'Ao se cadastrar, você concorda com os',

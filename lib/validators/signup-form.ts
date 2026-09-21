@@ -2,7 +2,6 @@ import { z } from 'zod'
 
 import { isBrazilianState } from '../constants/brazilian-states'
 import { SIGNUP } from '../i18n/pt-br'
-import { formatLocalDate, isValidLocalDate } from '../utils/local-date-time'
 
 const V = SIGNUP.validation
 
@@ -63,32 +62,12 @@ export const signupFormSchema = z
     }),
     // Opt-in independente, opcional e nunca pré-marcado (RF17).
     journeyStatusWhatsappOptIn: z.boolean(),
-    // Opt-in de lembretes é outra finalidade e também começa desligado (RF06).
-    reminderWhatsappOptIn: z.boolean(),
-    reminderReferenceDate: z.string().optional(),
   })
   // A confirmação existe só no cliente: o servidor recebe uma senha só. O erro
   // aponta para o campo de confirmação, que é onde a pessoa consegue corrigir.
   .refine((values) => values.password === values.passwordConfirm, {
     message: V.passwordMismatch,
     path: ['passwordConfirm'],
-  })
-  .superRefine((values, context) => {
-    if (!values.reminderWhatsappOptIn) return
-    const date = values.reminderReferenceDate?.trim() ?? ''
-    if (!date) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['reminderReferenceDate'],
-        message: V.referenceDateRequired,
-      })
-    } else if (!isValidLocalDate(date) || date > formatLocalDate(new Date())) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['reminderReferenceDate'],
-        message: V.referenceDateInvalid,
-      })
-    }
   })
 
 /** Forma de entrada (campos do React Hook Form). */

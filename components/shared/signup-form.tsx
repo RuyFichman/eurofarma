@@ -44,7 +44,6 @@ const FORM_FIELD_KEYS = [
   'state',
   'city',
   'password',
-  'reminderReferenceDate',
 ] as const satisfies ReadonlyArray<keyof SignupFormInput>
 
 /** Lê os UTMs da URL atual (sem dado pessoal). Chaves vazias são omitidas. */
@@ -114,8 +113,6 @@ export function SignupForm() {
       passwordConfirm: '',
       lgpdConsent: false,
       journeyStatusWhatsappOptIn: false,
-      reminderWhatsappOptIn: false,
-      reminderReferenceDate: '',
     },
   })
 
@@ -136,8 +133,6 @@ export function SignupForm() {
           city: values.city,
           lgpdConsent: values.lgpdConsent,
           journeyStatusWhatsappOptIn: values.journeyStatusWhatsappOptIn,
-          reminderWhatsappOptIn: values.reminderWhatsappOptIn,
-          reminderReferenceDate: values.reminderReferenceDate,
           referralCode: getCurrentReferralCode(),
           sourceUtm: getCurrentUtmParams(),
         }),
@@ -490,65 +485,6 @@ export function SignupForm() {
               </p>
             </div>
           </div>
-        </div>
-
-        {/* Opt-in de lembretes, independente dos avisos de status. */}
-        <div className="bg-secondary/20 space-y-2 rounded-xl border p-4">
-          <div className="flex items-start gap-3.5">
-            <Controller
-              control={form.control}
-              name="reminderWhatsappOptIn"
-              render={({ field }) => (
-                <Checkbox
-                  id="signup-reminder-opt-in"
-                  className="mt-0.5 size-5 rounded-md"
-                  checked={field.value}
-                  onCheckedChange={(checked) =>
-                    field.onChange(checked === true)
-                  }
-                  aria-describedby="signup-reminder-opt-in-help"
-                />
-              )}
-            />
-            <div className="min-w-0 flex-1">
-              <Label
-                htmlFor="signup-reminder-opt-in"
-                className="block text-sm leading-relaxed font-normal"
-              >
-                {COPY.fields.reminderWhatsappOptIn.label}
-              </Label>
-              <p
-                id="signup-reminder-opt-in-help"
-                className="text-muted-foreground mt-1 text-xs leading-5"
-              >
-                {COPY.fields.reminderWhatsappOptIn.help}
-              </p>
-            </div>
-          </div>
-          {form.watch('reminderWhatsappOptIn') ? (
-            <div className="space-y-2 pt-2">
-              <Label htmlFor="signup-reminder-reference-date">
-                {COPY.fields.reminderWhatsappOptIn.referenceDateLabel}
-              </Label>
-              <Input
-                id="signup-reminder-reference-date"
-                type="date"
-                max={new Date().toISOString().slice(0, 10)}
-                {...form.register('reminderReferenceDate')}
-                aria-describedby="signup-reminder-reference-date-help"
-              />
-              <p
-                id="signup-reminder-reference-date-help"
-                className="text-muted-foreground text-xs leading-5"
-              >
-                {COPY.fields.reminderWhatsappOptIn.referenceDateHelp}
-              </p>
-              <FieldError
-                id="signup-reminder-reference-date-error"
-                message={form.formState.errors.reminderReferenceDate?.message}
-              />
-            </div>
-          ) : null}
         </div>
 
         {submitError ? (
