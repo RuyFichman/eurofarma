@@ -127,7 +127,7 @@ O motivo para manter o site junto ao chatbot está no Anexo A.2.
 | RF09 | Permitir edição da lista de municípios atendidos pelo Lactare. |
 | RF10 | Exibir indicadores de alcance, engajamento, conversão e adesão a lembretes. |
 | RF11 | Conduzir o fluxo completo do chatbot via WhatsApp. |
-| RF12 | Gerar um cartão de impacto compartilhável após cada doação confirmada. |
+| RF12 | Disponibilizar o “Postal do Bem”, uma imagem universal compartilhável, depois de uma doação confirmada pelo Lactare, sem PII, contagem ou alegação clínica individual. |
 | RF13 | Gerar uma mensagem de encaminhamento pronta para a nutriz compartilhar com outras pessoas. |
 | RF14 | Atribuir e exibir reconhecimentos por status, como “primeira doação”, “doadora recorrente” e “embaixadora”, na área pessoal da nutriz. |
 | RF15 | Registrar quando um cadastro novo se origina de um link próprio de indicação, para fins de métrica de first-touch, sem vincular a recompensa material. |
@@ -225,7 +225,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 ### 9.3 Funcionalidades ainda não implementadas
 
 - RF06: entrega real pela Meta. Opt-in, cancelamento e regra do job de enfileiramento já estão implementados; o job não cria nem confirma agendamento.
-- RF12: cartão de impacto após confirmação legítima da doação.
+- RF12 implementado localmente como “Postal do Bem”: uma arte estática universal é liberada após ao menos uma confirmação administrativa de doação e pode ser compartilhada pelo recurso nativo do dispositivo ou baixada em PNG. A peça não identifica a nutriz, não quantifica impacto e não atribui resultado clínico.
 - RF14: reconhecimento por status na área pessoal. Reconhecimentos objetivos já estão implementados; ainda não há reconhecimento derivado de indicação.
 - RF15: atribuição específica de novos cadastros por indicação.
 - RF17: retirada e reconcessão do opt-in e entrega real por template aprovado da Meta. A base transacional, o processador e o simulador estão implementados, e a migration da outbox está aplicada no Supabase cloud.
@@ -237,7 +237,7 @@ O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para 
 ### 9.4 Validações externas pendentes
 
 - Confirmar com o Lactare se a coleta domiciliar gratuita é uniforme para todos os 30 municípios do Mapa do Leite ou se varia conforme distância e logística.
-- Definir quem e como confirma uma doação no NutriLink antes de gerar cartão de impacto, atualizar status ou contar recorrência.
+- Definir a evidência operacional definitiva da confirmação de doação antes de calcular impacto clínico, atualizar indicadores institucionais ou contar recorrência. O “Postal do Bem” universal não faz esses cálculos e usa somente a existência do status administrativo `DONATION_CONFIRMED` como gate.
 - Validar a redação jurídica da Política de Privacidade, dos Termos de Uso e dos consentimentos.
 
 ### 9.5 Ordem recomendada de implementação
