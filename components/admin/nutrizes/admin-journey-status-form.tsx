@@ -125,10 +125,10 @@ export function AdminJourneyStatusForm({
               <SelectContent>
                 {allowedStatuses.map((status) => (
                   <SelectItem key={status} value={status}>
-                    {/* Doação confirmada pode se repetir; sem esta marca a
-                        opção pareceria o status que já está em vigor. */}
+                    {/* Todos os seis marcos permanecem disponíveis para
+                        correções; a marca evita confundir o valor vigente. */}
                     {status === currentStatus
-                      ? copy.form.nextStatus.repeatOption.replace(
+                      ? copy.form.nextStatus.currentOption.replace(
                           '{label}',
                           getJourneyStatusLabel(status),
                         )

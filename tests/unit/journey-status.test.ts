@@ -60,16 +60,10 @@ describe('regras de transição do status da jornada', () => {
 
   it.each(ALLOWED_TRANSITIONS)('permite %s → %s', (fromStatus, toStatus) => {
     expect(canTransitionJourneyStatus(fromStatus, toStatus)).toBe(true)
-    expect(
-      journeyStatusTransitionSchema.safeParse({ fromStatus, toStatus }).success,
-    ).toBe(true)
   })
 
   it.each(REJECTED_TRANSITIONS)('recusa %s → %s', (fromStatus, toStatus) => {
     expect(canTransitionJourneyStatus(fromStatus, toStatus)).toBe(false)
-    expect(
-      journeyStatusTransitionSchema.safeParse({ fromStatus, toStatus }).success,
-    ).toBe(false)
   })
 
   it('expõe somente os próximos estados válidos', () => {
@@ -94,21 +88,34 @@ describe('regras de transição do status da jornada', () => {
       'KIT_DELIVERED',
       'DONATION_CONFIRMED',
     ])
-    expect(getAllowedAdminJourneyTransitions('REGISTERED')).toEqual([
-      'FORM_RECEIVED',
-    ])
-    expect(getAllowedAdminJourneyTransitions('FORM_RECEIVED')).toEqual([
-      'EXAMS_COMPLETED',
-    ])
-    expect(getAllowedAdminJourneyTransitions('EXAMS_COMPLETED')).toEqual([
-      'KIT_SENT',
-    ])
-    expect(getAllowedAdminJourneyTransitions('KIT_SENT')).toEqual([
-      'KIT_DELIVERED',
-    ])
-    expect(getAllowedAdminJourneyTransitions('KIT_DELIVERED')).toEqual([
-      'DONATION_CONFIRMED',
-    ])
+    for (const currentStatus of JOURNEY_STATUS_VALUES) {
+      expect(getAllowedAdminJourneyTransitions(currentStatus)).toEqual(
+        ADMIN_JOURNEY_STATUS_VALUES,
+      )
+    }
+  })
+})
+
+describe('atualização administrativa para qualquer status', () => {
+  it.each(JOURNEY_STATUS_VALUES)(
+    'aceita todos os seis destinos quando a origem é %s',
+    (fromStatus) => {
+      for (const toStatus of ADMIN_JOURNEY_STATUS_VALUES) {
+        expect(
+          journeyStatusTransitionSchema.safeParse({ fromStatus, toStatus })
+            .success,
+        ).toBe(true)
+      }
+    },
+  )
+
+  it('não reabre os valores legados como destinos selecionáveis', () => {
+    expect(
+      journeyStatusTransitionSchema.safeParse({
+        fromStatus: 'REGISTERED',
+        toStatus: 'ELIGIBLE',
+      }).success,
+    ).toBe(false)
   })
 })
 

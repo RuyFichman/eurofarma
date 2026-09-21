@@ -67,25 +67,10 @@ export const JOURNEY_STATUS_TRANSITIONS = {
   RECURRING_DONATION_ELIGIBLE: ['DONATION_CONFIRMED'],
 } as const satisfies Record<JourneyStatusValue, readonly JourneyStatusValue[]>
 
-const ADMIN_JOURNEY_NEXT_STATUS = {
-  REGISTERED: ['FORM_RECEIVED'],
-  DOCUMENT_SENT: ['FORM_RECEIVED'],
-  FORM_RECEIVED: ['EXAMS_COMPLETED'],
-  EXAM_SCHEDULED: ['EXAMS_COMPLETED'],
-  EXAMS_COMPLETED: ['KIT_SENT'],
-  AWAITING_RESULT: ['KIT_SENT'],
-  ELIGIBLE: ['KIT_SENT'],
-  NOT_ELIGIBLE: [],
-  KIT_SENT: ['KIT_DELIVERED'],
-  KIT_DELIVERED: ['DONATION_CONFIRMED'],
-  DONATION_CONFIRMED: ['DONATION_CONFIRMED'],
-  RECURRING_DONATION_ELIGIBLE: ['DONATION_CONFIRMED'],
-} as const satisfies Record<JourneyStatusValue, readonly JourneyStatusValue[]>
-
 export function getAllowedAdminJourneyTransitions(
-  currentStatus: JourneyStatusValue,
+  _currentStatus: JourneyStatusValue,
 ): readonly JourneyStatusValue[] {
-  return ADMIN_JOURNEY_NEXT_STATUS[currentStatus]
+  return ADMIN_JOURNEY_STATUS_VALUES
 }
 
 export function getAllowedJourneyTransitions(

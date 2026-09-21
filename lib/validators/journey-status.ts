@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import {
-  canTransitionJourneyStatus,
+  ADMIN_JOURNEY_STATUS_VALUES,
   JOURNEY_STATUS_VALUES,
 } from '../journey/status'
 import { isValidLocalDateTime } from '../utils/local-date-time'
@@ -49,21 +49,12 @@ export const kitDeliveryScheduledAtSchema = z
   .optional()
   .transform((value) => value || undefined)
 
-export const journeyStatusTransitionSchema = z
-  .object({
-    fromStatus: z.enum(JOURNEY_STATUS_VALUES),
-    toStatus: z.enum(JOURNEY_STATUS_VALUES),
-    administrativeNote: journeyAdministrativeNoteSchema,
-    kitDeliveryScheduledAt: kitDeliveryScheduledAtSchema,
-  })
-  .refine(
-    ({ fromStatus, toStatus }) =>
-      canTransitionJourneyStatus(fromStatus, toStatus),
-    {
-      path: ['toStatus'],
-      message: COPY.transitionInvalid,
-    },
-  )
+export const journeyStatusTransitionSchema = z.object({
+  fromStatus: z.enum(JOURNEY_STATUS_VALUES),
+  toStatus: z.enum(ADMIN_JOURNEY_STATUS_VALUES),
+  administrativeNote: journeyAdministrativeNoteSchema,
+  kitDeliveryScheduledAt: kitDeliveryScheduledAtSchema,
+})
 
 export const nutrizProfileIdSchema = z.string().uuid(COPY.idInvalid)
 

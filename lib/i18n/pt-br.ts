@@ -623,7 +623,7 @@ export const CONTENT = {
   },
   stories: {
     eyebrow: 'Seção 4',
-    title: 'Jornadas possíveis',
+    title: 'Histórias Reais',
     description:
       'Relatos reais de nutrizes atendidas pelo Lactare, publicados pelos canais oficiais do banco de leite.',
     items: [
@@ -3217,9 +3217,9 @@ export const ADMIN = {
       description:
         'A mudança será registrada de forma permanente com seu usuário, data e horário.',
       nextStatus: {
-        label: 'Próximo status',
-        placeholder: 'Selecione o próximo status',
-        repeatOption: '{label} (registrar nova ocorrência)',
+        label: 'Novo status',
+        placeholder: 'Selecione o status',
+        currentOption: '{label} (status atual)',
       },
       note: {
         label: 'Observação administrativa (opcional)',
