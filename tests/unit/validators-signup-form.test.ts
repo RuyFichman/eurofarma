@@ -18,7 +18,6 @@ const validForm = {
   passwordConfirm: 'senha-forte-123',
   lgpdConsent: true,
   journeyStatusWhatsappOptIn: false,
-  reminderWhatsappOptIn: false,
 }
 
 describe('signupFormSchema', () => {
@@ -78,15 +77,14 @@ describe('signupFormSchema', () => {
     ).toBe(true)
   })
 
-  it('aceita o opt-in de lembretes como escolha separada', () => {
+  it('ignora o opt-in de lembretes: ele saiu do cadastro e vive na Minha Área', () => {
     const parsed = signupFormSchema.parse({
       ...validForm,
-      journeyStatusWhatsappOptIn: false,
       reminderWhatsappOptIn: true,
       reminderReferenceDate: '2026-09-16',
     })
-    expect(parsed.reminderWhatsappOptIn).toBe(true)
-    expect(parsed.journeyStatusWhatsappOptIn).toBe(false)
+    expect(parsed).not.toHaveProperty('reminderWhatsappOptIn')
+    expect(parsed).not.toHaveProperty('reminderReferenceDate')
   })
 
   it('rejeita WhatsApp inválido', () => {
