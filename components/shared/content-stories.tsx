@@ -27,6 +27,7 @@ export function ContentStories() {
           eyebrow={stories.eyebrow}
           title={stories.title}
           description={stories.description}
+          titleClassName="text-3xl font-semibold tracking-[-0.03em] text-balance md:text-4xl"
         />
 
         {/* Relatos reais de nutrizes do Lactare, publicados pelos canais
