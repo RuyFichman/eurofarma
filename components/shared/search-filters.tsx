@@ -196,7 +196,7 @@ export function SearchFilters() {
                 <SelectContent>
                   {BRAZILIAN_STATES.map((state) => (
                     <SelectItem key={state.uf} value={state.uf}>
-                      {state.uf} — {state.name}
+                      {state.uf} · {state.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

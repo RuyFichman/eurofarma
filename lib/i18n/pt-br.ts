@@ -672,7 +672,7 @@ export const CONTENT = {
       {
         question: 'Quantas vezes por semana posso fazer a coleta?',
         answer:
-          'Não há um limite único — isso depende da sua produção e da orientação recebida. O importante é não comprometer a alimentação do seu próprio bebê.',
+          'Não há um limite único: isso depende da sua produção e da orientação recebida. O importante é não comprometer a alimentação do seu próprio bebê.',
       },
       {
         question: 'Meu bebê vai ter menos leite se eu doar?',
@@ -765,7 +765,7 @@ export const COVERAGE = {
     municipalityValidation: 'Selecione uma opção para continuar.',
     responseInvalid:
       'Não foi possível interpretar a resposta. Tente novamente.',
-    resolvedLocation: 'O CEP {cep} corresponde a {city} — {state}.',
+    resolvedLocation: 'O CEP {cep} corresponde a {city}, {state}.',
   },
   eligible: {
     badge: 'Possibilidade de coleta residencial',
@@ -1041,7 +1041,7 @@ export const SIGNUP = {
       'Cada gota de leite humano doado',
       'é um ato de amor que salva vidas.',
     ],
-    quoteSource: 'Ministério da Saúde — rBLH',
+    quoteSource: 'Ministério da Saúde / rBLH',
     bullets: [
       'Acompanhe sua jornada de doação',
       'Consulte a área de atuação do Lactare',
@@ -1309,7 +1309,7 @@ export const NUTRIZ_AUTH = {
           },
           MILK_2_DAYS_BEFORE: {
             label: '2 dias antes do prazo',
-            helper: 'Aviso em {date} — tempo de sobra para combinar a coleta',
+            helper: 'Aviso em {date}, tempo de sobra para combinar a coleta',
           },
           MILK_3_DAYS_BEFORE: {
             label: '3 dias antes do prazo',
@@ -1336,7 +1336,7 @@ export const NUTRIZ_AUTH = {
         rowSubtitle: 'Avisaremos {optionLabel}',
         configTitle: 'Lembrete de doação futura',
         configDescription:
-          'Nos diga quando você pretende doar de novo. Vamos te enviar um aviso gentil pelo WhatsApp perto dessa data — sem cobrança, sem compromisso.',
+          'Nos diga quando você pretende doar de novo. Vamos te enviar um aviso gentil pelo WhatsApp perto dessa data, sem cobrança, sem compromisso.',
         dateLabel: 'Quando você pretende doar novamente?',
         dateHelp: 'Você pode alterar essa data a qualquer momento.',
         dateRequired: 'Informe a data em que pretende doar novamente.',
@@ -1358,7 +1358,7 @@ export const NUTRIZ_AUTH = {
           },
         },
         previewTemplate:
-          'Oi, {firstName}! Você mencionou que pretendia doar novamente por volta desta data. Sem pressa — é só um lembrete carinhoso. Qualquer dúvida, fale com a equipe do Lactare. 💙',
+          'Oi, {firstName}! Você mencionou que pretendia doar novamente por volta desta data. Sem pressa, é só um lembrete carinhoso. Qualquer dúvida, fale com a equipe do Lactare. 💙',
         // Igual ao disclaimer geral de lembretes (mesmo texto do mockup).
         disclaimer:
           'Este lembrete não agenda nem confirma coleta, exame, visita ou atendimento. Essas combinações continuam sendo feitas diretamente com a equipe do Lactare.',
@@ -1368,15 +1368,15 @@ export const NUTRIZ_AUTH = {
         availableTitle: 'Entrega do kit',
         availableSubtitle:
           'Vamos te avisar perto do horário marcado pela equipe do Lactare',
-        rowTitle: 'Entrega do kit — {date}, às {time}',
+        rowTitle: 'Entrega do kit em {date}, às {time}',
         rowSubtitle: 'Avisaremos {optionLabel}',
         configTitle: 'Lembrete de entrega do kit',
         configDescription:
           'A equipe do Lactare combinou uma visita para trazer os potinhos esterilizados e dar as orientações de coleta. Vamos te avisar perto do horário marcado.',
         sourceLabel: 'Compromisso registrado pela equipe do Lactare',
-        sourceValue: 'Entrega do kit — {date}, às {time}',
+        sourceValue: 'Entrega do kit em {date}, às {time}',
         presenceNotice:
-          'Sua presença é necessária nessa visita — é quando você recebe as orientações de higiene, coleta e armazenamento.',
+          'Sua presença é necessária nessa visita: é quando você recebe as orientações de higiene, coleta e armazenamento.',
         questionLabel: 'Quando quer ser avisada?',
         options: {
           KIT_MORNING_OF: {
@@ -1479,7 +1479,7 @@ export const NUTRIZ_AUTH = {
         thresholdSuggestion: {
           title: 'Você já registrou {volume} ml no total',
           description:
-            'Isso não agenda nada — é só uma sugestão. Se quiser, avise a equipe do Lactare. Este aviso não envia solicitação nem confirma coleta.',
+            'Isso não agenda nada, é só uma sugestão. Se quiser, avise a equipe do Lactare. Este aviso não envia solicitação nem confirma coleta.',
           contactAction: 'Avisar a equipe',
         },
         error: 'Não foi possível salvar o registro agora. Tente novamente.',
@@ -1535,7 +1535,7 @@ export const NUTRIZ_AUTH = {
             GENEROUS_HEART: {
               title: 'Coração generoso',
               description:
-                'Para quem volta a doar — porque ajudar uma vez já é muito, mas duas vezes muda tudo.',
+                'Para quem volta a doar, porque ajudar uma vez já é muito, mas duas vezes muda tudo.',
             },
             STEADY_SOURCE: {
               title: 'Fonte que não seca',
@@ -1557,7 +1557,7 @@ export const NUTRIZ_AUTH = {
             'O postal fica disponível depois que a equipe do Lactare registra sua primeira doação.',
           imageAlt:
             'Postal do Bem com uma gota de leite protegida por mãos e uma mensagem sobre uma corrente de cuidado',
-          shareTitle: 'Postal do Bem — NutriLink e Lactare',
+          shareTitle: 'Postal do Bem · NutriLink e Lactare',
           shareAction: 'Compartilhar postal',
           downloadAction: 'Baixar imagem',
           sharedFeedback: 'Postal compartilhado.',
@@ -1593,7 +1593,7 @@ export const NUTRIZ_AUTH = {
           extractionColumnTime: 'Hora',
           extractionColumnVolume: 'Volume',
           extractionFootnote:
-            'Este registro não aciona nem confirma coleta — é uma organização pessoal da nutriz.',
+            'Este registro não aciona nem confirma coleta, é uma organização pessoal da nutriz.',
           extractionEmpty: 'Nenhum registro de extração.',
           donationSectionTitle: 'HISTÓRICO DE DOAÇÕES CONFIRMADAS',
           donationSectionDescription:
@@ -1612,14 +1612,14 @@ export const NUTRIZ_AUTH = {
           donorDay: '1 dia',
           wellbeingSectionTitle: 'REGISTROS DE BEM-ESTAR',
           wellbeingSectionDescription:
-            'Sensação registrada pela própria nutriz após uma doação — não é um dado clínico.',
+            'Sensação registrada pela própria nutriz após uma doação, não é um dado clínico.',
           wellbeingColumnDate: 'Data',
           wellbeingColumnFeeling: 'Como se sentiu',
           aboutTitle: 'Sobre este documento',
           aboutText:
             'As informações acima refletem apenas o que foi registrado no NutriLink: sessões de extração e sensações informadas pela própria nutriz, e doações confirmadas pela equipe do Lactare. Este documento não representa triagem concluída, avaliação clínica, nem confirmação de coleta. Dados de saúde (ficha, exames) são de responsabilidade exclusiva do Lactare e não aparecem aqui.',
           footer:
-            'Documento gerado em {date} · NutriLink — solução digital do Lactare',
+            'Documento gerado em {date} · NutriLink, solução digital do Lactare',
         },
       },
       education: {
@@ -1877,7 +1877,7 @@ export const APPOINTMENT = {
     mapAltTemplate: 'Mapa com a localização de {unitName}',
     unknownTitle: 'Você não nos disse qual banco de leite',
     unknownBody:
-      'Tudo bem — o agendamento continua valendo. Se quiser, conte pelo WhatsApp com qual unidade você combinou e mostramos o endereço aqui.',
+      'Tudo bem, o agendamento continua valendo. Se quiser, conte pelo WhatsApp com qual unidade você combinou e mostramos o endereço aqui.',
   },
   actions: {
     title: 'Ações rápidas',
@@ -1954,12 +1954,12 @@ export const WHATSAPP_BOT = {
       back: 'Voltar ao menu de dúvidas',
       details: {
         HEALTH_FORM:
-          'A ficha de saúde serve pra entender seu histórico, se você toma algum medicamento, tem alguma condição de saúde, coisas assim. Já o exame de sangue existe pra confirmar que está tudo bem antes de qualquer coleta, protegendo tanto você quanto o bebê que vai receber o leite depois.\nO exame é coletado direto na sua casa, pelo nosso laboratório parceiro, o Fleury — assim você não precisa se deslocar pra lugar nenhum.',
-        KIT: 'O kit serve pra garantir que a extração do seu leite aconteça de um jeito seguro e higiênico — ele traz os potinhos esterilizados que você vai usar daqui pra frente.\nA entrega é feita por profissionais da nossa equipe, que aproveitam esse momento pra te explicar com calma toda a higiene, a extração e o armazenamento. É a única visita em que sua presença é necessária, justamente porque é quando você aprende o passo a passo.',
+          'A ficha de saúde serve pra entender seu histórico, se você toma algum medicamento, tem alguma condição de saúde, coisas assim. Já o exame de sangue existe pra confirmar que está tudo bem antes de qualquer coleta, protegendo tanto você quanto o bebê que vai receber o leite depois.\nO exame é coletado direto na sua casa, pelo nosso laboratório parceiro, o Fleury, assim você não precisa se deslocar pra lugar nenhum.',
+        KIT: 'O kit serve pra garantir que a extração do seu leite aconteça de um jeito seguro e higiênico: ele traz os potinhos esterilizados que você vai usar daqui pra frente.\nA entrega é feita por profissionais da nossa equipe, que aproveitam esse momento pra te explicar com calma toda a higiene, a extração e o armazenamento. É a única visita em que sua presença é necessária, justamente porque é quando você aprende o passo a passo.',
         EXTRACTION:
           'A extração é feita por você, no seu próprio ritmo, seguindo as orientações recebidas: mãos lavadas, mamas higienizadas, frasco esterilizado por perto. O leite fica guardado no freezer até a nossa equipe buscar.',
         COLLECTION:
-          'A coleta domiciliar é gratuita e feita pela nossa equipe — um motorista e uma profissional de enfermagem vão até a sua casa buscar o leite já congelado. Você não precisa estar presente nesse momento, e não tem nenhum custo.',
+          'A coleta domiciliar é gratuita e feita pela nossa equipe: um motorista e uma profissional de enfermagem vão até a sua casa buscar o leite já congelado. Você não precisa estar presente nesse momento, e não tem nenhum custo.',
       },
       closing: {
         body: 'Posso ajudar com mais alguma coisa?',
@@ -1971,14 +1971,14 @@ export const WHATSAPP_BOT = {
     },
     whoCanDonate: {
       answer:
-        'Pode doar qualquer mulher que está amamentando, é saudável, e não usa determinados medicamentos, álcool ou fumo no período. Isso existe pra garantir que o leite chegue seguro pros bebês prematuros, que têm o sistema imunológico bem mais frágil.\nA confirmação de verdade acontece com a ficha de saúde e o exame de sangue — então, mesmo que você não tenha certeza se se qualifica, vale a pena começar o processo e deixar essa avaliação com quem entende. 💙',
+        'Pode doar qualquer mulher que está amamentando, é saudável, e não usa determinados medicamentos, álcool ou fumo no período. Isso existe pra garantir que o leite chegue seguro pros bebês prematuros, que têm o sistema imunológico bem mais frágil.\nA confirmação de verdade acontece com a ficha de saúde e o exame de sangue. Então, mesmo que você não tenha certeza se se qualifica, vale a pena começar o processo e deixar essa avaliação com quem entende. 💙',
       closingBody: 'Posso ajudar com mais alguma coisa?',
       seeAnother: 'Ver outra dúvida',
       ownHealthDoubt: 'Tenho uma dúvida sobre minha própria saúde',
     },
     pain: {
       answer:
-        'Não. Você só doa o excedente — o que sobra depois de alimentar seu bebê normalmente. A ideia nunca é tirar leite que seria dele; é aproveitar o que seu corpo produz a mais.\nSobre dor: a extração, quando feita do jeito certo, não deveria doer. Na entrega do kit, nossa equipe te ensina a técnica com calma, exatamente pra evitar desconforto.',
+        'Não. Você só doa o excedente, o que sobra depois de alimentar seu bebê normalmente. A ideia nunca é tirar leite que seria dele; é aproveitar o que seu corpo produz a mais.\nSobre dor: a extração, quando feita do jeito certo, não deveria doer. Na entrega do kit, nossa equipe te ensina a técnica com calma, exatamente pra evitar desconforto.',
       closingBody: 'Posso ajudar com mais alguma coisa?',
       seeAnother: 'Ver outra dúvida',
       extractionTips: 'Ver mais dicas de extração no site',
@@ -2026,7 +2026,7 @@ export const WHATSAPP_BOT = {
     success:
       'Cadastro recebido, {name}! 💛 Nossa equipe vai analisar suas informações e entrar em contato pra dar sequência à sua ficha de saúde e ao exame de sangue.\n\nEnquanto isso, você pode:',
     declined:
-      'Sem problema! Você pode voltar e se cadastrar quando quiser — é só mandar “oi” de novo por aqui.',
+      'Sem problema! Você pode voltar e se cadastrar quando quiser, é só mandar “oi” de novo por aqui.',
     unavailable:
       'Não foi possível salvar o cadastro agora. Envie seu nome completo novamente para tentar de novo, ou escreva “menu” para sair.',
     postMenu: {
@@ -2066,9 +2066,9 @@ export const WHATSAPP_BOT = {
   },
   human: {
     handoffOpen:
-      'Entendi que sua dúvida merece uma resposta mais cuidadosa — já avisei nossa equipe. Um atendente assumirá este mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília, e vai te responder por aqui assim que possível. Enquanto isso, o bot ficará pausado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
+      'Entendi que sua dúvida merece uma resposta mais cuidadosa, e já avisei nossa equipe. Um atendente assumirá este mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília, e vai te responder por aqui assim que possível. Enquanto isso, o bot ficará pausado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
     handoffOutsideHours:
-      'Entendi que sua dúvida merece uma resposta mais cuidadosa — já avisei nossa equipe. O atendimento humano acontece neste mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília. Como estamos fora dessa janela, sua solicitação ficará aguardando a próxima janela de atendimento, e o bot ficará pausado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
+      'Entendi que sua dúvida merece uma resposta mais cuidadosa, e já avisei nossa equipe. O atendimento humano acontece neste mesmo chat de segunda a sábado, das 9h às 18h, no horário de Brasília. Como estamos fora dessa janela, sua solicitação ficará aguardando a próxima janela de atendimento, e o bot ficará pausado.\n\nEsta conversa não cria nem confirma agendamento; data e horário são combinados diretamente com o Lactare.',
   },
   fallback: {
     first:
@@ -2392,7 +2392,7 @@ export const ADMIN = {
       title: 'Cobertura por sub-região',
       description: 'Municípios ativos em cada sub-região da Grande São Paulo',
       empty:
-        'Nenhum município ativo ainda — por isso não há cobertura para mostrar.',
+        'Nenhum município ativo ainda, por isso não há cobertura para mostrar.',
     },
 
     nutrizByRegion: {
@@ -2505,7 +2505,7 @@ export const ADMIN = {
       fields: {
         name: {
           label: 'Nome interno',
-          placeholder: 'Ex.: Feira da Saúde — setembro',
+          placeholder: 'Ex.: Feira da Saúde de setembro',
           helper: 'Visível somente no painel administrativo.',
         },
         utmSource: {
@@ -2537,8 +2537,8 @@ export const ADMIN = {
         },
       },
       status: {
-        active: 'Ativa — pronta para divulgação',
-        inactive: 'Inativa — mantida apenas no histórico',
+        active: 'Ativa: pronta para divulgação',
+        inactive: 'Inativa: mantida apenas no histórico',
       },
       actions: { back: 'Voltar para campanhas', cancel: 'Cancelar' },
       validation: {
@@ -2680,8 +2680,8 @@ export const ADMIN = {
         },
       },
       status: {
-        draft: 'Rascunho — disponível somente no painel',
-        published: 'Publicado — disponível no acervo administrativo',
+        draft: 'Rascunho: disponível somente no painel',
+        published: 'Publicado: disponível no acervo administrativo',
       },
       actions: { back: 'Voltar para conteúdos', cancel: 'Cancelar' },
       validation: {
@@ -2793,8 +2793,8 @@ export const ADMIN = {
         country: { label: 'País', value: 'Brazil' },
       },
       status: {
-        active: 'Ativo — aparece na verificação pública',
-        inactive: 'Inativo — não aparece como área atendida',
+        active: 'Ativo: aparece na verificação pública',
+        inactive: 'Inativo: não aparece como área atendida',
       },
       actions: { back: 'Voltar para municípios', cancel: 'Cancelar' },
       validation: {
@@ -2889,7 +2889,7 @@ export const ADMIN = {
         coordinates: {
           title: 'Coordenadas',
           description:
-            'Opcional. Preencha as duas juntas — usamos para posicionar o mapa da página da unidade.',
+            'Opcional. Preencha as duas juntas: usamos para posicionar o mapa da página da unidade.',
         },
         publication: {
           title: 'Publicação',
@@ -2925,7 +2925,7 @@ export const ADMIN = {
           label: 'WhatsApp',
           placeholder: '(11) 90000-0000',
           helper:
-            'Só preencha um número que realmente atende no WhatsApp — é o botão principal de contato da nutriz.',
+            'Só preencha um número que realmente atende no WhatsApp: é o botão principal de contato da nutriz.',
         },
         email: { label: 'E-mail', placeholder: 'contato@unidade.org.br' },
         openingHours: {
@@ -3341,7 +3341,7 @@ export type NavItem = (typeof NAV.items)[number]
 export const DASHBOARD_CHARTS = {
   evolution: 'Evolução dos cadastros',
   registrations: 'Cadastros',
-  period: '{start} – {end} · mês atual parcial',
+  period: '{start} a {end} · mês atual parcial',
   evolutionNote: 'Cadastros criados em cada mês, sem incluir perfis removidos.',
   evolutionEmpty: 'Ainda não há cadastros neste período.',
   origins: 'Origem dos Cadastros',
