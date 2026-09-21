@@ -10,7 +10,7 @@ import {
 import { COVERAGE, SITE } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
-  title: `${COVERAGE.meta.title} — ${SITE.name}`,
+  title: `${COVERAGE.meta.title} | ${SITE.name}`,
   description: COVERAGE.meta.description,
 }
 

@@ -7,7 +7,7 @@ import { SignupHero } from '@/components/shared/signup-hero'
 import { SIGNUP, SITE } from '@/lib/i18n/pt-br'
 
 export const metadata: Metadata = {
-  title: `${SIGNUP.meta.title} — ${SITE.name}`,
+  title: `${SIGNUP.meta.title} | ${SITE.name}`,
   description: SIGNUP.meta.description,
 }
 

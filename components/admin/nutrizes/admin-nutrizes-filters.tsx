@@ -89,7 +89,7 @@ export function AdminNutrizesFilters({
                 <option value="">{COPY.state.all}</option>
                 {BRAZILIAN_STATES.map((state) => (
                   <option key={state.uf} value={state.uf}>
-                    {state.uf} — {state.name}
+                    {state.uf} · {state.name}
                   </option>
                 ))}
               </select>

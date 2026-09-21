@@ -36,7 +36,7 @@ const COPY = ADMIN.units.form
 /** UFs no formato que o `Select` consome: `SP — São Paulo`. */
 const STATE_OPTIONS = BRAZILIAN_STATES.map((state) => ({
   value: state.uf,
-  label: `${state.uf} — ${state.name}`,
+  label: `${state.uf} · ${state.name}`,
 }))
 
 /**

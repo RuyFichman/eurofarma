@@ -24,7 +24,7 @@ import {
 import { SITE } from '@/lib/i18n/pt-br'
 
 export const metadata = {
-  title: `Style Guide — ${SITE.name} Digital`,
+  title: `Style Guide | ${SITE.name} Digital`,
 }
 
 type ColorToken = { name: string; className: string; value: string }
@@ -145,7 +145,7 @@ export default function StyleGuidePage(): ReactNode {
     <div className="mx-auto max-w-5xl px-6 py-12">
       <header className="space-y-2 pb-6">
         <Badge variant="secondary">Referência interna</Badge>
-        <h1>Style Guide — {SITE.name} Digital</h1>
+        <h1>Style Guide | {SITE.name} Digital</h1>
         <p className="text-muted-foreground">
           Tokens visuais, tipografia e componentes base. Use esta página para
           validar a identidade ao longo do desenvolvimento.
@@ -166,7 +166,7 @@ export default function StyleGuidePage(): ReactNode {
         </div>
         <h3>Exceções controladas (fora da paleta azul)</h3>
         <p className="text-muted-foreground text-sm">
-          Uso restrito ao escopo documentado em cada token — ver comentários em{' '}
+          Uso restrito ao escopo documentado em cada token; ver comentários em{' '}
           <code>app/globals.css</code>.
         </p>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
@@ -177,20 +177,20 @@ export default function StyleGuidePage(): ReactNode {
       </Section>
 
       <Section title="Tipografia">
-        <h1>Heading 1 — Toda gota importa</h1>
-        <h2>Heading 2 — Doe leite materno</h2>
-        <h3>Heading 3 — Verifique sua cidade</h3>
-        <h4>Heading 4 — Como funciona a doação</h4>
+        <h1>Heading 1: Toda gota importa</h1>
+        <h2>Heading 2: Doe leite materno</h2>
+        <h3>Heading 3: Verifique sua cidade</h3>
+        <h4>Heading 4: Como funciona a doação</h4>
         <p>
           Corpo de texto (body). Cada doação de leite materno pode ajudar
           recém-nascidos prematuros a crescerem mais fortes. É um gesto simples
           e cheio de cuidado.
         </p>
         <p className="text-sm">
-          Texto pequeno (small) — usado em legendas e textos de apoio.
+          Texto pequeno (small): usado em legendas e textos de apoio.
         </p>
         <p className="text-muted-foreground text-xs">
-          Caption — informação secundária e metadados.
+          Caption: informação secundária e metadados.
         </p>
       </Section>
 
