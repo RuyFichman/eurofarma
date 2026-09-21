@@ -4,7 +4,8 @@ import { type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
 type ContentSectionHeaderProps = {
-  icon: LucideIcon
+  /** Opcional: "Comece por Aqui" usa o cabeçalho sem ícone. */
+  icon?: LucideIcon
   eyebrow: string
   title: string
   description?: string
@@ -46,9 +47,11 @@ export function ContentSectionHeader({
   if (centered) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-        <span className="bg-secondary text-primary mb-5 flex size-12 items-center justify-center rounded-2xl">
-          <Icon className="size-6" aria-hidden="true" />
-        </span>
+        {Icon ? (
+          <span className="bg-secondary text-primary mb-5 flex size-12 items-center justify-center rounded-2xl">
+            <Icon className="size-6" aria-hidden="true" />
+          </span>
+        ) : null}
         <p className="text-primary text-xs font-medium tracking-[0.24em] uppercase">
           {eyebrow}
         </p>
@@ -73,9 +76,11 @@ export function ContentSectionHeader({
         }
       >
         <div className="flex items-start gap-4">
-          <span className="bg-secondary text-primary flex size-12 shrink-0 items-center justify-center rounded-2xl">
-            <Icon className="size-6" aria-hidden="true" />
-          </span>
+          {Icon ? (
+            <span className="bg-secondary text-primary flex size-12 shrink-0 items-center justify-center rounded-2xl">
+              <Icon className="size-6" aria-hidden="true" />
+            </span>
+          ) : null}
           <div className="space-y-1">
             <p className="text-primary text-xs font-semibold tracking-wider uppercase">
               {eyebrow}
