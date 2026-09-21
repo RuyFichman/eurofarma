@@ -23,10 +23,10 @@ export function ContentStories() {
     <section className="bg-muted/40">
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
         <ContentSectionHeader
-          icon={Heart}
           eyebrow={stories.eyebrow}
           title={stories.title}
           description={stories.description}
+          align="center"
           titleClassName="text-3xl font-semibold tracking-[-0.03em] text-balance md:text-4xl"
         />
 
