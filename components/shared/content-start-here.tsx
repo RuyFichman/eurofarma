@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ChevronRight, Star } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 import { ContentSectionHeader } from '@/components/shared/content-section-header'
 import { CONTENT } from '@/lib/i18n/pt-br'
@@ -42,7 +42,6 @@ export function ContentStartHere() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
       <ContentSectionHeader
-        icon={Star}
         eyebrow={startHere.eyebrow}
         title={startHere.title}
         description={startHere.description}
