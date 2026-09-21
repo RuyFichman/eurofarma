@@ -46,7 +46,8 @@ export function ContentStartHere() {
         eyebrow={startHere.eyebrow}
         title={startHere.title}
         description={startHere.description}
-        descriptionPlacement="beside"
+        align="center"
+        titleClassName="text-3xl font-semibold tracking-[-0.03em] text-balance md:text-4xl"
       />
 
       <div className="mt-10 grid items-stretch gap-5 md:grid-cols-3 md:gap-6">
