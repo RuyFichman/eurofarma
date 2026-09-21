@@ -1,32 +1,38 @@
 import Link from 'next/link'
-import { ChevronRight, Heart, Shield, Star, Users } from 'lucide-react'
+import { ChevronRight, Star } from 'lucide-react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ContentSectionHeader } from '@/components/shared/content-section-header'
 import { CONTENT } from '@/lib/i18n/pt-br'
 import { cn } from '@/lib/utils/cn'
 
 /**
- * Uma família de cor por assunto, como no mockup: elegibilidade em azul,
- * mitos em verde, segurança em lilás. Os tokens vivem em `globals.css` — é a
- * única seção do site fora da paleta azul, e continua sem cor hardcoded.
+ * Uma família de cor por assunto: elegibilidade em azul, mitos em verde,
+ * segurança em lilás. Os tokens vivem em `globals.css` — é a única seção do
+ * site fora da paleta azul, e continua sem cor hardcoded.
+ *
+ * O preenchimento chapado saiu: a cor agora é um véu no topo do cartão branco,
+ * mais a barra de acento e o selo da categoria. O cartão passa a ter a mesma
+ * gramática dos cartões de conteúdo do hero — selo, título, texto e uma ação
+ * separada por divisória — em vez de três blocos pastel destoando do resto.
  */
 const TOPICS = [
   {
-    icon: Users,
-    surface: 'bg-topic-blue',
+    tint: 'from-topic-blue',
+    bar: 'bg-topic-blue-foreground',
     accent: 'text-topic-blue-foreground',
+    chip: 'bg-topic-blue text-topic-blue-foreground',
   },
   {
-    icon: Heart,
-    surface: 'bg-topic-green',
+    tint: 'from-topic-green',
+    bar: 'bg-topic-green-foreground',
     accent: 'text-topic-green-foreground',
+    chip: 'bg-topic-green text-topic-green-foreground',
   },
   {
-    icon: Shield,
-    surface: 'bg-topic-lilac',
+    tint: 'from-topic-lilac',
+    bar: 'bg-topic-lilac-foreground',
     accent: 'text-topic-lilac-foreground',
+    chip: 'bg-topic-lilac text-topic-lilac-foreground',
   },
 ] as const
 
@@ -43,57 +49,63 @@ export function ContentStartHere() {
         descriptionPlacement="beside"
       />
 
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
+      <div className="mt-10 grid items-stretch gap-5 md:grid-cols-3 md:gap-6">
         {startHere.cards.map((card, index) => {
           const topic = TOPICS[index] ?? TOPICS[0]
-          const Icon = topic.icon
+
           return (
-            <Card
+            /* O cartão inteiro é o alvo do clique; a linha de ação é só o
+               rótulo visível dela, para não aninhar dois links. */
+            <Link
               key={card.title}
-              className={cn('h-full border-0 shadow-sm', topic.surface)}
+              href={card.cta.href}
+              className="focus-visible:ring-ring/50 group flex rounded-2xl outline-none focus-visible:ring-[3px]"
             >
-              <CardHeader>
-                <div className="flex items-start justify-between gap-3">
+              <article className="bg-card border-border/70 relative flex h-full flex-col overflow-hidden rounded-2xl border shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-lg">
+                <span
+                  aria-hidden="true"
+                  className={cn('h-1 w-full', topic.bar)}
+                />
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'pointer-events-none absolute inset-x-0 top-1 h-28 bg-gradient-to-b to-transparent opacity-70 transition-opacity duration-200 group-hover:opacity-100',
+                    topic.tint,
+                  )}
+                />
+
+                <div className="relative flex h-full flex-col p-6">
                   <span
                     className={cn(
-                      'bg-card flex size-12 items-center justify-center rounded-xl shadow-sm',
-                      topic.accent,
-                    )}
-                  >
-                    <Icon className="size-6" aria-hidden="true" />
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      'bg-card/80 border-transparent',
-                      topic.accent,
+                      'inline-flex w-fit rounded-full px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide uppercase',
+                      topic.chip,
                     )}
                   >
                     {card.tag}
-                  </Badge>
-                </div>
-                <CardTitle className="mt-4">{card.title}</CardTitle>
-              </CardHeader>
+                  </span>
 
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground text-sm leading-6">
-                  {card.description}
-                </p>
-                {/* Link direto, não `Button variant="link"`: o mockup mostra um
-                    link de texto com chevron, e o botão trazia altura e padding
-                    que não existem ali. */}
-                <Link
-                  href={card.cta.href}
-                  className={cn(
-                    'focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm text-sm font-medium outline-none hover:underline focus-visible:ring-[3px]',
-                    topic.accent,
-                  )}
-                >
-                  {card.cta.label}
-                  <ChevronRight className="size-4" aria-hidden="true" />
-                </Link>
-              </CardContent>
-            </Card>
+                  <h3 className="mt-4 text-lg font-semibold tracking-tight">
+                    {card.title}
+                  </h3>
+                  <p className="text-muted-foreground mt-2 mb-6 text-sm leading-6">
+                    {card.description}
+                  </p>
+
+                  <span
+                    className={cn(
+                      'border-border/70 mt-auto flex items-center gap-1 border-t pt-4 text-sm font-semibold',
+                      topic.accent,
+                    )}
+                  >
+                    {card.cta.label}
+                    <ChevronRight
+                      className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </div>
+              </article>
+            </Link>
           )
         })}
       </div>
