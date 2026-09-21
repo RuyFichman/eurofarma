@@ -1552,8 +1552,19 @@ export const NUTRIZ_AUTH = {
         impactCard: {
           title: 'Postal do Bem',
           description:
-            'Sua doação é uma história real. Compartilhe seu postal e ajude mais bebês a receberem leite',
-          action: 'Em breve',
+            'Seu postal universal está pronto. Compartilhe a imagem pelo WhatsApp, Instagram ou outro aplicativo, sem expor seus dados pessoais.',
+          unavailableDescription:
+            'O postal fica disponível depois que a equipe do Lactare registra sua primeira doação.',
+          imageAlt:
+            'Postal do Bem com uma gota de leite protegida por mãos e uma mensagem sobre uma corrente de cuidado',
+          shareTitle: 'Postal do Bem — NutriLink e Lactare',
+          shareAction: 'Compartilhar postal',
+          downloadAction: 'Baixar imagem',
+          sharedFeedback: 'Postal compartilhado.',
+          downloadFallbackFeedback:
+            'Seu navegador não oferece o compartilhamento direto. A imagem foi baixada para você enviar pelo aplicativo que preferir.',
+          shareError:
+            'Não foi possível preparar o postal agora. Tente baixar a imagem.',
         },
       },
       donations: {
