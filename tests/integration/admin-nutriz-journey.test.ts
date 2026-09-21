@@ -246,27 +246,29 @@ describe('atualização transacional da jornada', () => {
     })
   })
 
-  it('mantém no CHECK do banco as transições antigas e recusa atalhos pelos marcos novos', async () => {
+  it('no CHECK do banco, aceita qualquer origem para os seis marcos administrativos e recusa os valores legados como destino', async () => {
+    // A migration 20260920130000_allow_any_admin_journey_status tornou o
+    // CHECK permissivo por design: o painel precisa deixar o admin corrigir,
+    // voltar uma etapa ou repetir o status atual (comentário da migration).
+    // Só o destino é restrito aos seis marcos consolidados; a origem pode ser
+    // qualquer valor do enum, incluindo os legados anteriores à consolidação.
     const accepted: Array<[JourneyStatusValue, JourneyStatusValue]> = [
       ['REGISTERED', 'FORM_RECEIVED'],
-      ['EXAM_SCHEDULED', 'AWAITING_RESULT'],
-      ['ELIGIBLE', 'KIT_DELIVERED'],
-      ['KIT_DELIVERED', 'RECURRING_DONATION_ELIGIBLE'],
-      ['REGISTERED', 'DOCUMENT_SENT'],
-      ['EXAM_SCHEDULED', 'EXAMS_COMPLETED'],
-      ['ELIGIBLE', 'KIT_SENT'],
-      ['KIT_DELIVERED', 'DONATION_CONFIRMED'],
+      ['REGISTERED', 'EXAMS_COMPLETED'],
+      ['DOCUMENT_SENT', 'KIT_SENT'],
+      ['EXAM_SCHEDULED', 'DONATION_CONFIRMED'],
+      ['KIT_DELIVERED', 'REGISTERED'],
       ['DONATION_CONFIRMED', 'DONATION_CONFIRMED'],
-      ['RECURRING_DONATION_ELIGIBLE', 'DONATION_CONFIRMED'],
+      ['RECURRING_DONATION_ELIGIBLE', 'KIT_DELIVERED'],
     ]
     const rejected: Array<[JourneyStatusValue, JourneyStatusValue]> = [
-      ['REGISTERED', 'EXAMS_COMPLETED'],
-      ['DOCUMENT_SENT', 'EXAM_SCHEDULED'],
-      ['EXAMS_COMPLETED', 'ELIGIBLE'],
-      ['NOT_ELIGIBLE', 'KIT_SENT'],
-      ['KIT_SENT', 'DONATION_CONFIRMED'],
-      ['DONATION_CONFIRMED', 'KIT_DELIVERED'],
-      ['RECURRING_DONATION_ELIGIBLE', 'KIT_DELIVERED'],
+      ['REGISTERED', 'DOCUMENT_SENT'],
+      ['FORM_RECEIVED', 'EXAM_SCHEDULED'],
+      ['EXAMS_COMPLETED', 'AWAITING_RESULT'],
+      ['AWAITING_RESULT', 'ELIGIBLE'],
+      ['ELIGIBLE', 'NOT_ELIGIBLE'],
+      ['KIT_DELIVERED', 'RECURRING_DONATION_ELIGIBLE'],
+      ['DONATION_CONFIRMED', 'RECURRING_DONATION_ELIGIBLE'],
     ]
 
     await withRolledBackJourney(async (transaction, { nutrizId, adminId }) => {
