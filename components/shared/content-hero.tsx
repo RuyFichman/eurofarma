@@ -3,28 +3,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import {
-  ArrowRight,
-  Baby,
-  Clock,
-  HandHeart,
-  Search,
-  Snowflake,
-  Droplets,
-} from 'lucide-react'
+import { ArrowRight, Clock, Search } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
 import { CONTENT } from '@/lib/i18n/pt-br'
 import { cn } from '@/lib/utils/cn'
 
-const CATEGORY_ICONS = {
-  Extração: Droplets,
-  Armazenamento: Snowflake,
-  Amamentação: Baby,
-  Doação: HandHeart,
-} as const
-
-type ContentCategory = keyof typeof CATEGORY_ICONS
 type ContentFilter = (typeof CONTENT.hero.filters)[number]
 
 export function ContentHero() {
@@ -126,49 +110,41 @@ export function ContentHero() {
               aria-live="polite"
               className="grid gap-3 text-left md:grid-cols-2"
             >
-              {visibleArticles.map((article) => {
-                const Icon = CATEGORY_ICONS[article.category as ContentCategory]
-
-                return (
-                  <article
-                    key={article.title}
-                    className="bg-card/95 text-foreground group flex gap-4 rounded-2xl border border-white/30 p-4 shadow-lg backdrop-blur-sm transition-transform duration-200 hover:-translate-y-0.5 sm:p-5"
-                  >
-                    <span className="bg-secondary text-primary flex size-11 shrink-0 items-center justify-center rounded-xl">
-                      <Icon className="size-5" aria-hidden="true" />
+              {visibleArticles.map((article) => (
+                <article
+                  key={article.title}
+                  className="bg-card/95 text-foreground group rounded-2xl border border-white/30 p-4 shadow-lg backdrop-blur-sm transition-transform duration-200 hover:-translate-y-0.5 sm:p-5"
+                >
+                  <div className="min-w-0">
+                    <span className="bg-secondary/70 text-primary inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide uppercase">
+                      {article.category}
                     </span>
+                    <h2 className="mt-2 text-base leading-snug font-semibold sm:text-lg">
+                      {article.title}
+                    </h2>
+                    <p className="text-muted-foreground mt-1.5 line-clamp-2 text-sm leading-5">
+                      {article.summary}
+                    </p>
 
-                    <div className="min-w-0 flex-1">
-                      <span className="bg-secondary/70 text-primary inline-flex rounded-full px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide uppercase">
-                        {article.category}
+                    <div className="border-border mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+                      <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                        <Clock className="size-3.5" aria-hidden="true" />
+                        {article.readTime}
                       </span>
-                      <h2 className="mt-2 text-base leading-snug font-semibold sm:text-lg">
-                        {article.title}
-                      </h2>
-                      <p className="text-muted-foreground mt-1.5 line-clamp-2 text-sm leading-5">
-                        {article.summary}
-                      </p>
-
-                      <div className="border-border mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
-                        <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                          <Clock className="size-3.5" aria-hidden="true" />
-                          {article.readTime}
-                        </span>
-                        <Link
-                          href={article.href}
-                          className="text-primary focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm text-sm font-semibold outline-none hover:underline focus-visible:ring-[3px]"
-                        >
-                          Ver conteúdo
-                          <ArrowRight
-                            className="size-4 transition-transform group-hover:translate-x-0.5"
-                            aria-hidden="true"
-                          />
-                        </Link>
-                      </div>
+                      <Link
+                        href={article.href}
+                        className="text-primary focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm text-sm font-semibold outline-none hover:underline focus-visible:ring-[3px]"
+                      >
+                        Ver conteúdo
+                        <ArrowRight
+                          className="size-4 transition-transform group-hover:translate-x-0.5"
+                          aria-hidden="true"
+                        />
+                      </Link>
                     </div>
-                  </article>
-                )
-              })}
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </div>
