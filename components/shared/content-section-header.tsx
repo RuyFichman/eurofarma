@@ -13,6 +13,12 @@ type ContentSectionHeaderProps = {
    */
   descriptionPlacement?: 'below' | 'beside'
   action?: ReactNode
+  /**
+   * Sobrescreve o estilo padrão do `<h2>` (definido globalmente em
+   * globals.css). Usado quando uma seção específica precisa igualar o título
+   * de outra seção com header próprio, como "O Caminho do Leite".
+   */
+  titleClassName?: string
 }
 
 export function ContentSectionHeader({
@@ -22,6 +28,7 @@ export function ContentSectionHeader({
   description,
   descriptionPlacement = 'below',
   action,
+  titleClassName,
 }: ContentSectionHeaderProps) {
   const beside = descriptionPlacement === 'beside'
 
@@ -42,7 +49,7 @@ export function ContentSectionHeader({
             <p className="text-primary text-xs font-semibold tracking-wider uppercase">
               {eyebrow}
             </p>
-            <h2>{title}</h2>
+            <h2 className={titleClassName}>{title}</h2>
             {description && !beside ? (
               <p className="text-muted-foreground max-w-xl">{description}</p>
             ) : null}
