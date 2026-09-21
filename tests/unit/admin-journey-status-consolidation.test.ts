@@ -13,6 +13,13 @@ const migration = readFileSync(
   ),
   'utf8',
 )
+const anyStatusMigration = readFileSync(
+  resolve(
+    process.cwd(),
+    'prisma/migrations/20260920130000_allow_any_admin_journey_status/migration.sql',
+  ),
+  'utf8',
+)
 
 describe('consolidação dos status administrativos da nutriz', () => {
   it('exibe exatamente os seis nomes definidos para o painel', () => {
@@ -34,5 +41,13 @@ describe('consolidação dos status administrativos da nutriz', () => {
     expect(migration).toContain(
       "\"to_status\" IN ('AWAITING_RESULT', 'KIT_SENT')",
     )
+  })
+
+  it('permite qualquer um dos seis destinos novos e preserva históricos legados', () => {
+    for (const status of ADMIN_JOURNEY_STATUS_VALUES) {
+      expect(anyStatusMigration).toContain(`'${status}'`)
+    }
+    expect(anyStatusMigration).toContain(') NOT VALID;')
+    expect(anyStatusMigration).not.toMatch(/DROP\s+TYPE/iu)
   })
 })

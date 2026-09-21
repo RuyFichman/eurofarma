@@ -199,20 +199,15 @@ describe('atualização transacional da jornada', () => {
     ).resolves.toEqual({ journeyStatus: 'REGISTERED' })
   })
 
-  it('percorre todos os marcos novos até a aptidão para recorrência', async () => {
-    const path: JourneyStatusValue[] = [
+  it('percorre os seis marcos administrativos consolidados', async () => {
+    const path = [
       'REGISTERED',
-      'DOCUMENT_SENT',
       'FORM_RECEIVED',
-      'EXAM_SCHEDULED',
       'EXAMS_COMPLETED',
-      'AWAITING_RESULT',
-      'ELIGIBLE',
       'KIT_SENT',
       'KIT_DELIVERED',
       'DONATION_CONFIRMED',
-      'RECURRING_DONATION_ELIGIBLE',
-    ]
+    ] as const
 
     await withRolledBackJourney(async (transaction, { nutrizId, adminId }) => {
       for (let index = 1; index < path.length; index += 1) {
@@ -233,7 +228,7 @@ describe('atualização transacional da jornada', () => {
           where: { id: nutrizId },
           select: { journeyStatus: true },
         }),
-      ).resolves.toEqual({ journeyStatus: 'RECURRING_DONATION_ELIGIBLE' })
+      ).resolves.toEqual({ journeyStatus: 'DONATION_CONFIRMED' })
 
       const history = await transaction.journeyStatusHistory.findMany({
         where: { nutrizProfileId: nutrizId },
