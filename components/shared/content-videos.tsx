@@ -18,7 +18,7 @@ export function ContentVideos() {
         {videos.items.map((video) => (
           <div
             key={video.title}
-            className="from-primary to-chart-3 relative flex aspect-video items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br bg-cover bg-center shadow-sm"
+            className="group from-primary to-chart-3 relative flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br bg-cover bg-center shadow-sm transition-shadow hover:shadow-lg"
             style={
               video.thumbnail
                 ? { backgroundImage: `url("${video.thumbnail}")` }
@@ -35,7 +35,7 @@ export function ContentVideos() {
               <Video className="size-3" aria-hidden="true" />
               Vídeo
             </Badge>
-            <span className="bg-card/90 text-primary flex size-16 items-center justify-center rounded-full shadow-md">
+            <span className="bg-card/90 text-primary flex size-16 items-center justify-center rounded-full shadow-md transition-transform duration-200 group-hover:scale-110">
               <Play className="size-7 translate-x-0.5" aria-hidden="true" />
             </span>
             <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 bg-gradient-to-t from-black/60 to-transparent p-4 text-white">
