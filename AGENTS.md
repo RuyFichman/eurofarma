@@ -92,7 +92,7 @@ TypeScript estrito está ativo com strict e noUncheckedIndexedAccess. A suíte c
 
 ### 3.1 O que está implementado
 
-- Scaffold Next.js e design system.
+- Scaffold Next.js e design system. As superfícies pública, da nutriz e administrativa têm estados de carregamento acessíveis nos limites do App Router, com skeletons coerentes com cada layout e animação desativável por preferência de movimento reduzido.
 - Landing pública, página “Sobre”, conteúdo educativo, style guide e minutas técnicas de Privacidade e Termos em `/privacidade` e `/termos`. Em `/como-funciona`, as categorias do hero expandem prévias locais de artigos por Extração, Armazenamento, Amamentação e Doação; o campo de busca aceita digitação, mas permanece apenas visual e não filtra o acervo. O rodapé aponta para os canais oficiais verificados do Lactare — site, Instagram, YouTube, LinkedIn, WhatsApp e e-mail — e não inclui Facebook sem um perfil próprio confirmado. As minutas deixam explícita a pendência de validação institucional e jurídica e não apresentam canal fictício como oficial.
 - Página pública de verificação de cobertura por CEP ou município em `/verificar-cobertura`, com os 30 municípios do Lactare agrupados em seis sub-regiões.
 - A lista ativa de municípios usada pela página pública, pela API de cidades, pela verificação de CEP e pelo chatbot compartilha um cache de uma hora. Criação e edição no painel invalidam a tag e as superfícies públicas imediatamente; respostas que contêm o CEP informado continuam `no-store`.
