@@ -212,6 +212,20 @@ O job de enfileiramento reutiliza a outbox do RF17: dois dias após `KIT_SENT`, 
 
 O fluxo local registra `HUMAN_HANDOFF` quando a nutriz pede explicitamente para falar com a equipe do Lactare. O mesmo chat do WhatsApp é mantido, o bot fica pausado e a resposta diferencia o horário de atendimento de segunda a sábado, das 9h às 18h, no horário de Brasília. Fora da janela, o pedido permanece registrado para o próximo expediente, sem prazo de resposta prometido; “menu” é a saída explícita para retomar o autoatendimento. A migration `20260916200000_add_human_handoff_step` foi aplicada e registrada no Supabase cloud em 17 de setembro de 2026. A integração do atendente e a infraestrutura real da Meta continuam pendentes.
 
+### Atualização de 26 de setembro de 2026 — Central de Ação do painel
+
+**Decisão de produto:** o dashboard administrativo deixa de ser apenas um relatório e passa a abrir com "O que precisa de atenção hoje", uma lista de filas de trabalho para a equipe do Lactare. Cada fila informa quantidade, criticidade, tempo de espera, responsável e ação recomendada, e leva direto à nutriz ou à ocorrência que precisa de ação. Os indicadores e filtros existentes continuam iguais, logo abaixo.
+
+Filas adotadas: pedidos de atendimento humano pelo WhatsApp; nutrizes sem avanço registrado; kits enviados sem entrega registrada; kit entregue sem doação registrada; possíveis doadoras recorrentes sem retorno recente; e falhas técnicas de envio. Os princípios que valem para todas:
+
+- **Criticidade só por tempo de espera.** Nada é avaliado por dado clínico, exame ou aptidão, e a interface não aprova, reprova nem promete coleta. A linguagem é "sem avanço registrado", nunca "abandono", e "possível doadora recorrente", nunca "doadora ativa".
+- **Limites provisórios.** Os prazos de cada fila foram propostos pelo time do NutriLink e ainda precisam ser validados com a equipe do Lactare.
+- **Responsável é um papel, não uma pessoa.** Não há atribuição individual nesta etapa.
+- **Exposição mínima.** O resumo mostra só números; a lista detalhada mostra nome, cidade e status atual, sem contato. A fila de falhas mostra só códigos técnicos.
+- **Avisos aguardando a integração com a Meta não são tratados como falha,** porque ainda não há como enviá-los; aparecem apenas como informação.
+
+Ficaram fora: uma fila de cadastros incompletos no chatbot, porque o rascunho contém dados pessoais ainda sem consentimento e não há ação legítima a tomar sobre ele, e uma fila de consentimentos e exclusões, porque as retiradas já são respeitadas automaticamente e a remoção definitiva ainda não tem procedimento. Perguntas abertas ao Lactare: os prazos de cada fila, quem responde por cada uma e se a equipe quer atribuição individual e um estado de "resolvido" por item.
+
 ### 9.2 Funcionalidades parciais ou incompatíveis com o escopo atualizado
 
 - **Elegibilidade operacional:** o produto verifica se o CEP ou município pertence à área configurada e indica elegibilidade geográfica para coleta domiciliar gratuita segundo o Mapa do Leite; a confirmação da modalidade e da logística continua dependendo do Lactare.
