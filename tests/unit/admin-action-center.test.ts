@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getActionCenterCutoffs,
+  getItemSeverity,
+  isKitVisitOverdue,
+} from '../../lib/admin/action-center/cutoffs'
+
+import {
   DELIVERY_FAILURE_CATEGORIES,
   PROFILE_QUEUE_EXCLUDED_STATUSES,
   PROFILE_QUEUE_STATUSES,
@@ -372,5 +378,38 @@ describe('copy da Central de Ação', () => {
       expect(owner).toContain('Lactare')
     }
     expect(copy.ownerNote.length).toBeGreaterThan(0)
+  })
+})
+
+describe('cortes e criticidade por item', () => {
+  const now = new Date('2026-09-26T15:00:00.000Z')
+
+  it('calcula os cortes a partir dos limites tipados', () => {
+    const cutoffs = getActionCenterCutoffs(now)
+    expect(now.getTime() - cutoffs.noProgress.getTime()).toBe(
+      ACTION_CENTER_THRESHOLDS.noProgress.entryMinutes * 60_000,
+    )
+    expect(now.getTime() - cutoffs.kitVisitOverdue.getTime()).toBe(DAY * 60_000)
+  })
+
+  it('considera a visita de kit vencida só depois da tolerância', () => {
+    expect(isKitVisitOverdue(null, now)).toBe(false)
+    expect(
+      isKitVisitOverdue(new Date(now.getTime() - 2 * DAY * 60_000), now),
+    ).toBe(true)
+    expect(isKitVisitOverdue(new Date(now.getTime() - 60 * 60_000), now)).toBe(
+      false,
+    )
+  })
+
+  it('eleva só a fila de kit quando a visita venceu', () => {
+    expect(
+      getItemSeverity('kitNotDelivered', 60, { kitVisitOverdue: true }),
+    ).toBe('medium')
+    expect(getItemSeverity('kitNotDelivered', 60)).toBe('low')
+    expect(getItemSeverity('noProgress', 60, { kitVisitOverdue: true })).toBe(
+      'low',
+    )
+    expect(getItemSeverity('deliveryFailures', 0)).toBe('medium')
   })
 })
