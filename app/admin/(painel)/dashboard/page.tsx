@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { ActionCenterSection } from '@/components/admin/action-center/action-center-section'
 import { DashboardCharts } from '@/components/admin/dashboard/dashboard-charts'
 import { DashboardFiltersForm } from '@/components/admin/dashboard/dashboard-filters'
 import { DashboardOverview } from '@/components/admin/dashboard/dashboard-overview'
@@ -8,6 +9,7 @@ import {
   parseDashboardFilters,
   type DashboardSearchParams,
 } from '@/lib/admin/dashboard/filters'
+import { getActionCenterOverview } from '@/lib/db/queries/admin-action-center'
 import { getDashboardCharts } from '@/lib/db/queries/dashboard-charts'
 import { getAdminDashboardMetrics } from '@/lib/db/queries/dashboard-metrics'
 import { buildDashboardNutrizScope } from '@/lib/db/queries/dashboard-segmentation'
@@ -39,7 +41,8 @@ export default async function AdminDashboardPage({
   const hasFilters = hasActiveDashboardFilters(filters)
   const now = new Date()
   const nutrizScope = buildDashboardNutrizScope(filters)
-  const [metrics, charts] = await Promise.all([
+  const [actionCenter, metrics, charts] = await Promise.all([
+    getActionCenterOverview(now),
     getAdminDashboardMetrics(nutrizScope, now),
     getDashboardCharts(now, nutrizScope),
   ])
@@ -56,6 +59,10 @@ export default async function AdminDashboardPage({
           {ADMIN.dashboard.description}
         </p>
       </div>
+
+      {/* Central de Ação primeiro: o que pede ação vem antes dos indicadores.
+          Não responde aos filtros abaixo, que recortam só os indicadores. */}
+      <ActionCenterSection overview={actionCenter} />
 
       <DashboardFiltersForm filters={filters} />
 

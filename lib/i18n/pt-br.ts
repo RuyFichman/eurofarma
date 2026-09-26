@@ -3309,6 +3309,165 @@ export const ADMIN = {
       successTitle: 'Mudança registrada',
     },
   },
+  /**
+   * Central de Ação (26/09/2026). A criticidade vem só do tempo de espera; os
+   * textos evitam "abandono", "doadora ativa" e qualquer promessa de coleta.
+   */
+  actionCenter: {
+    title: 'O que precisa de atenção hoje',
+    description:
+      'Filas de trabalho montadas a partir dos registros do painel e do chatbot. A criticidade considera apenas o tempo de espera, nunca dados de saúde. Os limites são provisórios e ainda serão validados com a equipe do Lactare.',
+    allClear: 'Em dia: {queues}.',
+    allClearEverything:
+      'Nada precisa de atenção agora. Todas as filas estão em dia.',
+    severity: {
+      label: 'Criticidade',
+      high: 'Alta',
+      medium: 'Média',
+      low: 'Baixa',
+    },
+    fields: {
+      count: 'Quantidade',
+      oldestWait: 'Espera mais longa',
+      medianWait: 'Espera mediana',
+      owner: 'Responsável',
+      action: 'Ação recomendada',
+    },
+    wait: {
+      minutes: { one: '{value} minuto', other: '{value} minutos' },
+      hours: { one: '{value} hora', other: '{value} horas' },
+      days: { one: '{value} dia', other: '{value} dias' },
+      businessSuffix: 'em horário de atendimento',
+    },
+    owners: {
+      service: 'Equipe de atendimento do Lactare',
+      operations: 'Equipe operacional do Lactare',
+      technical: 'Suporte técnico do NutriLink, com a equipe do Lactare',
+    },
+    ownerNote:
+      'O responsável indica uma equipe, não uma pessoa: ainda não existe atribuição individual.',
+    openQueue: 'Ver fila',
+    openQueueLabel: 'Ver a fila "{queue}"',
+    pendingOutbox: {
+      one: '{count} aviso aguardando a ativação do envio pelo WhatsApp. Não é falha: a entrega depende da integração com a Meta.',
+      other:
+        '{count} avisos aguardando a ativação do envio pelo WhatsApp. Não é falha: a entrega depende da integração com a Meta.',
+    },
+    queues: {
+      humanHandoff: {
+        title: 'Pedidos de atendimento humano',
+        description:
+          'Conversas do WhatsApp em que o bot está pausado aguardando a equipe do Lactare. O painel não sabe se a conversa já foi respondida: ela sai da fila quando a pessoa volta ao menu.',
+        action:
+          'Responder pelo mesmo chat do WhatsApp do Lactare. O bot só volta quando a pessoa escrever "menu".',
+        since: 'Pausada desde',
+      },
+      noProgress: {
+        title: 'Nutrizes sem avanço registrado',
+        description:
+          'Etapas até o exame sem nenhuma mudança registrada no painel. A ausência de registro não indica que a nutriz deixou a jornada.',
+        action:
+          'Verificar se há atualização a registrar ou retomar o contato pelos canais do Lactare.',
+        since: 'Último registro',
+      },
+      kitNotDelivered: {
+        title: 'Kits enviados sem entrega registrada',
+        description:
+          'Kit marcado como enviado, ou com a visita informada já vencida, sem a entrega registrada no painel.',
+        action:
+          'Confirmar com a logística do Lactare se o kit chegou e, em caso positivo, registrar a entrega no detalhe da nutriz. A nutriz não precisa confirmar nada.',
+        since: 'Kit enviado em',
+      },
+      deliveryFailures: {
+        title: 'Falhas de envio',
+        description:
+          'Falhas técnicas de avisos, lembretes e respostas do chatbot nos últimos 7 dias. Aparecem só categorias e códigos técnicos: o conteúdo das mensagens não é armazenado.',
+        action:
+          'Conferir a configuração do provedor e o código de erro. Esta tela não reenvia mensagens.',
+        since: 'Ocorreu em',
+      },
+      firstDonation: {
+        title: 'Kit entregue sem doação registrada',
+        description:
+          'Nutrizes com o kit entregue e nenhuma doação registrada pelo Lactare.',
+        action:
+          'Retomar o contato para orientar a próxima etapa. Registre a doação somente depois que a equipe do Lactare realizar a coleta.',
+        since: 'Na etapa desde',
+      },
+      returningDonors: {
+        title: 'Possíveis doadoras recorrentes sem retorno recente',
+        description:
+          'Nutrizes com ao menos uma doação registrada pelo Lactare e nenhuma nova no período.',
+        action:
+          'Se fizer sentido, convidar a nutriz a conversar com o Lactare sobre uma nova doação. É um convite, sem cobrança e sem pressupor nada sobre a amamentação.',
+        since: 'Última doação registrada',
+      },
+    },
+    failureCategories: {
+      OUTBOX_FAILED: 'Aviso ou lembrete com tentativas esgotadas',
+      PROVIDER_UNDELIVERED: 'Provedor informou falha na entrega',
+      CHATBOT_REPLY_NOT_SENT: 'Resposta do chatbot não enviada',
+      INBOUND_PROCESSING_FAILED: 'Erro ao processar mensagem recebida',
+      INBOUND_STUCK: 'Processamento interrompido',
+    },
+    providers: {
+      META_CLOUD_API: 'Meta Cloud API',
+      TWILIO: 'Twilio',
+      ZAPI: 'Z-API',
+      OUTBOX: 'Fila de avisos',
+    },
+    detail: {
+      seo: {
+        title: '{queue} | NutriLink Admin',
+        description: 'Fila de trabalho da Central de Ação do painel.',
+      },
+      back: 'Voltar ao dashboard',
+      entryRule: 'Entra na fila a partir de {entry}.',
+      entryImmediate: 'Entra na fila assim que ocorre.',
+      severityRule:
+        'Criticidade média a partir de {medium}; alta a partir de {high}.',
+      severityRuleNoHigh:
+        'Criticidade média a partir de {medium}. Esta fila nunca chega a alta: é um convite, não uma pendência.',
+      provisional:
+        'Limites provisórios, pendentes de validação com a equipe do Lactare.',
+      privacyNotice:
+        'Esta lista mostra apenas nome, cidade e status atual. Contato e demais dados ficam no detalhe de cada nutriz.',
+      failuresPrivacyNotice:
+        'Esta lista mostra apenas categorias e códigos técnicos. Telefones e o conteúdo das mensagens nunca são exibidos.',
+      empty: 'Nenhum item nesta fila agora.',
+      count: { one: '{count} item', other: '{count} itens' },
+      listLabel: 'Itens da fila, do mais antigo para o mais recente',
+      columns: {
+        nutriz: 'Nutriz',
+        location: 'Cidade',
+        status: 'Status atual',
+        wait: 'Espera',
+        severity: 'Criticidade',
+        category: 'Ocorrência',
+        code: 'Código técnico',
+        provider: 'Origem',
+        link: 'Detalhe',
+      },
+      openNutriz: 'Abrir cadastro',
+      openNutrizLabel: 'Abrir o cadastro de {name}',
+      openLinkedNutriz: 'Abrir cadastro relacionado',
+      noProfile: 'Conversa sem cadastro',
+      noProfileHint: 'Localize a conversa pelo horário no WhatsApp do Lactare.',
+      ignoredMessages: {
+        one: '{count} mensagem recebida durante a pausa',
+        other: '{count} mensagens recebidas durante a pausa',
+      },
+      kitVisit: 'Visita informada: {date}',
+      noCode: 'Sem código',
+      notLinked: 'Sem cadastro relacionado',
+      pagination: {
+        label: 'Paginação da fila',
+        previous: 'Anterior',
+        next: 'Próxima',
+        status: 'Página {page} de {total}',
+      },
+    },
+  },
   noAccess: {
     seo: {
       title: 'Acesso restrito | NutriLink Admin',
