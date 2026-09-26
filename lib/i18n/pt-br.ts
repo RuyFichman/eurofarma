@@ -7,6 +7,14 @@ export const SITE = {
   partnerCredit: 'Desenvolvido em parceria com FIAP',
 } as const
 
+export const LOADING = {
+  application: 'Carregando o NutriLink...',
+  public: 'Carregando conteúdo...',
+  nutriz: 'Carregando sua área...',
+  admin: 'Carregando o painel...',
+  adminAccess: 'Verificando acesso...',
+} as const
+
 export const NAV = {
   items: [
     { label: 'Início', href: '/' },
